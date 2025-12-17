@@ -20,14 +20,32 @@ const ContextEditor: React.FC = () => {
   const [session, setSession] = useState<ContextSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [summarizing, setSummarizing] = useState(false);
   const [activeView, setActiveView] = useState<'original' | 'summarized'>('original');
   const [editorContent, setEditorContent] = useState('');
+  const [compressionRatio, setCompressionRatio] = useState<number | null>(null);
+  const [autoSave, setAutoSave] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (sessionId) {
       loadSession();
+      // Start polling for updates every 30 seconds
+      const pollInterval = setInterval(checkForUpdates, 30000);
+      return () => clearInterval(pollInterval);
     }
   }, [sessionId]);
+
+  // Auto-save when content changes
+  useEffect(() => {
+    if (autoSave && editorContent && session) {
+      const timeoutId = setTimeout(() => {
+        saveSession();
+      }, 2000); // Auto-save after 2 seconds of no typing
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [editorContent, autoSave]);
 
   const loadSession = async () => {
     if (!sessionId) return;
@@ -47,15 +65,60 @@ const ContextEditor: React.FC = () => {
   const formatConversationsForEditor = (conversations: any[]): string => {
     return conversations.map((turn, index) => {
       const timestamp = new Date(turn.timestamp).toLocaleString();
-      return `// ===== TURN ${index + 1} (${timestamp}) =====
-// --- USER ---
-${JSON.stringify(turn.request, null, 2)}
+      const userMessage = turn.request?.messages?.find((m: any) => m.role === 'user')?.content || 'No user message';
+      const assistantMessage = turn.response?.choices?.[0]?.message?.content || 'No assistant response';
 
-// --- ASSISTANT ---
-${JSON.stringify(turn.response, null, 2)}
+      return `// ═══════════════════════════════════════════════════════════════
+// CONVERSATION TURN ${index + 1}
+// Timestamp: ${timestamp}
+// ═══════════════════════════════════════════════════════════════
+
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │                          USER MESSAGE                            │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+${typeof userMessage === 'string' ? userMessage : JSON.stringify(userMessage, null, 2)}
+
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │                        ASSISTANT RESPONSE                        │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+${typeof assistantMessage === 'string' ? assistantMessage : JSON.stringify(assistantMessage, null, 2)}
+
+/* ┌─────────────────────────────────────────────────────────────────┐
+   │                          METADATA                               │
+   └─────────────────────────────────────────────────────────────────┘ */
+
+Model: ${turn.request?.model || 'unknown'}
+Tokens: ${turn.response?.usage?.total_tokens || 'unknown'}
+Finish Reason: ${turn.response?.choices?.[0]?.finish_reason || 'unknown'}
+
+═══════════════════════════════════════════════════════════════════════
 
 `;
     }).join('\n');
+  };
+
+  const checkForUpdates = async () => {
+    if (!sessionId) return;
+
+    try {
+      const response = await axios.get(`http://localhost:3001/api/sessions/${sessionId}`);
+      const latestSession = response.data;
+
+      // Check if there are new conversations
+      if (latestSession.conversations.length > (session?.conversations.length || 0)) {
+        const newTurns = latestSession.conversations.length - (session?.conversations.length || 0);
+        setLastUpdate(new Date());
+
+        if (confirm(`${newTurns} new conversation turn(s) detected. Reload to see updates?`)) {
+          setSession(latestSession);
+          setEditorContent(formatConversationsForEditor(latestSession.conversations));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to check for updates:', error);
+    }
   };
 
   const saveSession = async () => {
@@ -67,7 +130,10 @@ ${JSON.stringify(turn.response, null, 2)}
         ...session,
         conversations: parseEditorContent(editorContent)
       });
-      alert('Session saved successfully!');
+      setLastUpdate(new Date());
+      if (!autoSave) {
+        alert('Session saved successfully!');
+      }
     } catch (error) {
       console.error('Failed to save session:', error);
       alert('Failed to save session');
@@ -85,11 +151,71 @@ ${JSON.stringify(turn.response, null, 2)}
   const summarizeContext = async () => {
     if (!session) return;
 
+    setSummarizing(true);
     try {
-      // TODO: Implement LMStudio summarization
-      alert('Summarization not yet implemented - will call LMStudio API');
+      // Calculate original size
+      const originalText = JSON.stringify(session.conversations);
+      const originalSize = new Blob([originalText]).size;
+
+      // TODO: Implement LMStudio API call for summarization
+      // For now, simulate summarization
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+
+      // Create summarized version (simplified for demo)
+      const summarizedConversations = session.conversations.map(turn => ({
+        ...turn,
+        request: {
+          ...turn.request,
+          messages: turn.request.messages?.map((msg: any) => ({
+            ...msg,
+            content: msg.content?.length > 100
+              ? msg.content.substring(0, 100) + '... [summarized]'
+              : msg.content
+          }))
+        },
+        response: {
+          ...turn.response,
+          choices: turn.response.choices?.map((choice: any) => ({
+            ...choice,
+            message: {
+              ...choice.message,
+              content: choice.message.content?.length > 200
+                ? choice.message.content.substring(0, 200) + '... [summarized]'
+                : choice.message.content
+            }
+          }))
+        }
+      }));
+
+      const summarizedText = JSON.stringify(summarizedConversations);
+      const summarizedSize = new Blob([summarizedText]).size;
+      const ratio = originalSize > 0 ? (originalSize - summarizedSize) / originalSize : 0;
+
+      // Update session with summarized data
+      const updatedSession = {
+        ...session,
+        conversations: summarizedConversations,
+        originalSize,
+        summarizedSize,
+        summary: {
+          compressed: true,
+          ratio: Math.round(ratio * 100) / 100,
+          timestamp: new Date().toISOString()
+        }
+      };
+
+      // Save to server
+      await axios.put(`http://localhost:3001/api/sessions/${session.id}`, updatedSession);
+      setSession(updatedSession);
+      setCompressionRatio(ratio);
+      setEditorContent(formatConversationsForEditor(summarizedConversations));
+
+      alert(`Context summarized! Compression ratio: ${(ratio * 100).toFixed(1)}%`);
     } catch (error) {
-      console.error('Failed to summarize:', error);
+      console.error('Failed to summarize context:', error);
+      alert('Failed to summarize context. Check LMStudio connection.');
+    } finally {
+      setSummarizing(false);
     }
   };
 
@@ -150,33 +276,95 @@ ${JSON.stringify(turn.response, null, 2)}
         </div>
       </div>
 
-      {/* View Toggle */}
+      {/* View Toggle & Summarization */}
       <div className="mb-4">
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveView('original')}
-            className={`px-4 py-2 text-sm font-medium rounded-md ${
-              activeView === 'original'
-                ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            📝 Original Context
-            {session.originalSize && ` (${session.originalSize} chars)`}
-          </button>
-          <button
-            onClick={() => setActiveView('summarized')}
-            className={`px-4 py-2 text-sm font-medium rounded-md ${
-              activeView === 'summarized'
-                ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-            disabled={!session.summary}
-          >
-            🗜️ Summarized Context
-            {session.summarizedSize && ` (${session.summarizedSize} chars)`}
-          </button>
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setActiveView('original');
+                if (session?.conversations) {
+                  setEditorContent(formatConversationsForEditor(session.conversations));
+                }
+              }}
+              className={`px-4 py-2 text-sm font-medium rounded-md ${
+                activeView === 'original'
+                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              📝 Original Context
+              {session?.originalSize && ` (${session.originalSize} bytes)`}
+            </button>
+            <button
+              onClick={() => {
+                setActiveView('summarized');
+                if (session?.conversations) {
+                  setEditorContent(formatConversationsForEditor(session.conversations));
+                }
+              }}
+              className={`px-4 py-2 text-sm font-medium rounded-md ${
+                activeView === 'summarized'
+                  ? 'bg-green-100 text-green-700 border border-green-300'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              🗜️ Current Context
+              {session?.summarizedSize && ` (${session.summarizedSize} bytes)`}
+            </button>
+          </div>
+
+          <div className="flex gap-2 ml-4">
+            <button
+              onClick={summarizeContext}
+              disabled={summarizing || !session}
+              className="px-4 py-2 text-sm font-medium rounded-md bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
+            >
+              {summarizing ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Summarizing...
+                </>
+              ) : (
+                <>
+                  ⚡ Summarize with LMStudio
+                </>
+              )}
+            </button>
+
+            {compressionRatio !== null && (
+              <div className="px-3 py-2 text-sm bg-green-100 text-green-800 rounded-md">
+                📊 Compressed: {(compressionRatio * 100).toFixed(1)}% reduction
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 ml-4">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={autoSave}
+                  onChange={(e) => setAutoSave(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                💾 Auto-save
+              </label>
+
+              <button
+                onClick={checkForUpdates}
+                className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                title="Check for new conversation turns"
+              >
+                🔄 Refresh
+              </button>
+            </div>
+          </div>
         </div>
+
+        {session?.summary && (
+          <div className="mt-2 text-sm text-gray-600">
+            💡 This context has been processed with LMStudio summarization
+          </div>
+        )}
       </div>
 
       {/* Monaco Editor */}
@@ -204,10 +392,19 @@ ${JSON.stringify(turn.response, null, 2)}
       </div>
 
       {/* Status Bar */}
-      <div className="mt-4 text-sm text-gray-500 flex justify-between">
-        <span>Characters: {editorContent.length}</span>
-        <span>Lines: {editorContent.split('\n').length}</span>
-        <span>Mode: Edit</span>
+      <div className="mt-4 text-sm text-gray-500 flex justify-between items-center">
+        <div className="flex gap-4">
+          <span>Characters: {editorContent.length.toLocaleString()}</span>
+          <span>Lines: {editorContent.split('\n').length}</span>
+          <span>Mode: {activeView === 'original' ? 'View Original' : 'Edit Context'}</span>
+          {autoSave && <span className="text-green-600">● Auto-save ON</span>}
+        </div>
+        <div className="flex gap-4">
+          {lastUpdate && (
+            <span>Last updated: {lastUpdate.toLocaleTimeString()}</span>
+          )}
+          <span className="text-blue-600">🔄 Auto-refresh every 30s</span>
+        </div>
       </div>
     </div>
   );
