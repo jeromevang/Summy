@@ -9,6 +9,8 @@ import path from 'path';
 // Load environment variables
 dotenv.config();
 
+// __dirname is available in CommonJS
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
