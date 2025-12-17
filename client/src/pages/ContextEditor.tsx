@@ -592,8 +592,8 @@ const ContextEditor: React.FC = () => {
           </div>
         )}
         
-        {/* Keywords */}
-        {keywords.length > 0 && (
+        {/* Keywords - only show when compressed */}
+        {keywords.length > 0 && compressedPreview && compressedPreview.length > 0 && (
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <span className="text-xs text-gray-500">Keywords:</span>
             {keywords.map((keyword, i) => (
@@ -626,7 +626,7 @@ const ContextEditor: React.FC = () => {
                 role={msg.role}
                 content={msg.content || JSON.stringify(msg.tool_calls || msg, null, 2)}
                 isTool={msg.role === 'tool' || !!msg.tool_calls}
-                keywords={keywords}
+                keywords={compressedPreview && compressedPreview.length > 0 ? keywords : []}
                 keywordMap={keywordMap}
               />
             ))}
