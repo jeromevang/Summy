@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs-extra';
 import path from 'path';
@@ -42,7 +42,7 @@ app.use((req, res, next) => {
     timestamp: new Date().toISOString()
   });
 
-  // Continue to next middleware (including proxy)
+  // Continue to next middleware
   next();
 });
 
@@ -258,9 +258,12 @@ const parseStreamingResponse = (body: string): any => {
 
 // Create session immediately on request
 const createSessionFromRequest = async (req: any): Promise<void> => {
+  console.log('🔥 EMERGENCY DEBUG: createSessionFromRequest called for:', req.sessionId);
   let session = await loadSession(req.sessionId);
-  
+  console.log('🔥 EMERGENCY DEBUG: loadSession result:', session ? 'EXISTS' : 'NULL');
+
   if (!session) {
+    console.log('🔥 EMERGENCY DEBUG: Creating new session');
     // Extract meaningful name from first user message
     let sessionName = `Conversation ${new Date().toLocaleString()}`;
     if (req.requestBody?.messages?.length > 0) {
@@ -281,13 +284,17 @@ const createSessionFromRequest = async (req: any): Promise<void> => {
       conversations: []
     };
 
+    console.log('🔥 EMERGENCY DEBUG: About to save session:', session.id);
     await saveSession(session);
-    
+    console.log('🔥 EMERGENCY DEBUG: Session saved successfully');
+
     addDebugEntry('session', `✅ Auto-created session: ${session.id}`, {
       name: session.name,
       ide: session.ide,
       isStreaming: req.isStreaming
     });
+  } else {
+    console.log('🔥 EMERGENCY DEBUG: Session already exists, skipping creation');
   }
 };
 
@@ -317,108 +324,91 @@ const updateSessionWithResponse = async (sessionId: string, requestBody: any, re
   });
 };
 
-// OpenAI Proxy Middleware
-const openaiProxy = createProxyMiddleware({
-  target: 'https://api.openai.com',
-  changeOrigin: true,
-  timeout: 120000, // 2 minute timeout for streaming
-  pathRewrite: (path: string) => {
-    // Handle both /chat/completions and /v1/chat/completions
-    if (path.startsWith('/chat/completions')) {
-      return path.replace('/chat/completions', '/v1/chat/completions');
-    }
-    // Keep /v1/chat/completions as-is
-    return path;
-  },
-  onProxyReq: (proxyReq: any, req: any, res: any) => {
-    // Log incoming request FIRST (before any validation)
+// Manual proxy function using axios - MUCH SIMPLER!
+const proxyToOpenAI = async (req: any, res: any) => {
+  try {
+    // Extract session info and create session FIRST
     req.requestBody = req.body;
     req.sessionId = extractConversationId(req);
-    req.conversationId = req.sessionId;
     req.isStreaming = req.body?.stream === true;
 
-    addDebugEntry('request', `Incoming request: ${req.sessionId}`, {
-      method: req.method,
-      url: req.url,
-      userAgent: req.headers['user-agent'],
-      contentLength: req.headers['content-length'],
-      isStreaming: req.isStreaming,
-      hasApiKey: !!process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_openai_api_key_here'
-    });
+    console.log('🎯 MANUAL PROXY: Processing', req.method, req.url, '-> session:', req.sessionId);
 
-    // Validate OpenAI API key AFTER logging
+    // CREATE SESSION IMMEDIATELY (this was the key missing piece!)
+    await createSessionFromRequest(req);
+
+    // Validate API key
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey || apiKey === 'your_openai_api_key_here') {
-      addDebugEntry('error', `Rejected request ${req.sessionId}: OpenAI API key not configured`, { missingKey: true });
-      // Mark request as invalid - will be handled in onProxyRes
-      req.invalidApiKey = true;
+      return res.status(500).json({
+        error: 'Configuration Error',
+        message: 'OpenAI API key not configured'
+      });
     }
 
-    proxyReq.setHeader('Authorization', `Bearer ${apiKey}`);
-    
-    // Create session immediately on request (don't wait for response)
-    createSessionFromRequest(req).catch(err => {
-      addDebugEntry('error', `Failed to create session from request: ${err.message}`, { error: String(err) });
-    });
-  },
-  onProxyRes: (proxyRes: any, req: any, res: any) => {
-    addDebugEntry('response', `Proxy response started for session ${req.sessionId}`, {
-      statusCode: proxyRes.statusCode,
-      headers: proxyRes.headers,
-      isStreaming: req.isStreaming
-    });
+    // Proxy to OpenAI using axios
+    const openaiUrl = req.url.startsWith('/v1/') ? req.url : req.url.replace('/chat/completions', '/v1/chat/completions');
 
-    // For streaming responses, collect all chunks
-    let body = '';
-    const chunks: string[] = [];
-    
-    proxyRes.on('data', (chunk: Buffer) => {
-      const chunkStr = chunk.toString();
-      body += chunkStr;
-      chunks.push(chunkStr);
+    const response = await axios({
+      method: req.method,
+      url: `https://api.openai.com${openaiUrl}`,
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      data: req.body,
+      timeout: 120000,
+      responseType: req.isStreaming ? 'stream' : 'json',
     });
 
-    proxyRes.on('end', async () => {
-      try {
-        addDebugEntry('response', `Proxy response complete for session ${req.sessionId}`, {
-          bodyLength: body.length,
-          statusCode: proxyRes.statusCode,
-          isStreaming: req.isStreaming,
-          chunkCount: chunks.length
-        });
+    if (req.isStreaming) {
+      // Handle streaming
+      res.setHeader('Content-Type', 'text/plain');
+      let fullContent = '';
+      response.data.on('data', (chunk: Buffer) => {
+        const chunkStr = chunk.toString();
+        fullContent += chunkStr;
+        res.write(chunkStr);
+      });
+      response.data.on('end', async () => {
+        const parsedResponse = parseStreamingResponse(fullContent);
+        await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+        res.end();
+      });
+    } else {
+      // Handle regular response
+      await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
+      res.json(response.data);
+    }
 
-        let responseData;
-        
-        if (req.isStreaming) {
-          // Parse SSE streaming response
-          responseData = parseStreamingResponse(body);
-        } else {
-          // Parse regular JSON response
-          try {
-            responseData = JSON.parse(body);
-          } catch {
-            responseData = { error: 'Non-JSON response', content: body };
-          }
-        }
-
-        // Update session with response
-        await updateSessionWithResponse(req.sessionId, req.requestBody, responseData);
-        
-      } catch (error) {
-        addDebugEntry('error', `Failed to process response for session ${req.sessionId}`, { error: String(error) });
-        console.error('[PROXY] Error processing response:', error);
-      }
-    });
-  },
-  onError: (err: Error, req: any, res: any) => {
-    console.error('[PROXY] Error:', err);
-    res.status(500).json({ error: 'Proxy error' });
+  } catch (error: any) {
+    console.error('❌ PROXY ERROR:', error.message);
+    try {
+      await updateSessionWithResponse(req.sessionId, req.requestBody, { error: error.message });
+    } catch {}
+    res.status(500).json({ error: error.message });
   }
-} as any);
+};
 
-// Routes - handle both standard and simplified paths
-app.use('/v1/chat/completions', openaiProxy);
-app.use('/chat/completions', openaiProxy);
+// Simple manual proxy routes - NO MORE http-proxy-middleware!
+app.post('/chat/completions', proxyToOpenAI);
+app.post('/v1/chat/completions', proxyToOpenAI);
+
+console.log('✅ MANUAL PROXY ROUTES REGISTERED - No more http-proxy-middleware!');
+
+// Debug route to test routing
+app.get('/debug-route-test', (req, res) => {
+  console.log('🔥 EMERGENCY DEBUG: Debug route called');
+  res.json({ message: 'Debug route works' });
+});
+
+// TEMPORARILY DISABLED: Catch-all route
+/*
+app.use((req, res, next) => {
+  console.log('🔥 EMERGENCY DEBUG: Catch-all route called for:', req.method, req.url);
+  next();
+});
+*/
 
 // Session management API
 app.get('/api/sessions', async (req, res) => {
@@ -492,6 +482,17 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Test route
+app.get('/test-proxy', (req, res) => {
+  console.log('🔥 EMERGENCY DEBUG: Test route called');
+  res.json({ message: 'Proxy routes are registered' });
+});
+
+app.post('/test-post', (req, res) => {
+  console.log('🔥 EMERGENCY DEBUG: Test POST route called');
+  res.json({ message: 'POST routing works', body: req.body });
+});
+
 // Debug endpoint
 app.get('/debug', async (req, res) => {
   try {
@@ -519,4 +520,9 @@ server.listen(PORT, () => {
   console.log(`🚀 Summy proxy server running on port ${PORT}`);
   console.log(`📁 Sessions stored in: ${SESSIONS_DIR}`);
   console.log(`🔌 WebSocket server ready for real-time updates`);
+  console.log('✅ SERVER STARTED - Manual proxy (no http-proxy-middleware):');
+  console.log('  📝 General logging middleware: ACTIVE');
+  console.log('  🤖 Manual proxy routes: POST /chat/completions, /v1/chat/completions');
+  console.log('  📊 API routes: /api/*');
+  console.log('  🔌 WebSocket: Ready for real-time updates');
 });
