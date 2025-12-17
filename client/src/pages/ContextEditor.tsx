@@ -66,7 +66,18 @@ const ContextEditor: React.FC = () => {
     return conversations.map((turn, index) => {
       const timestamp = new Date(turn.timestamp).toLocaleString();
       const userMessage = turn.request?.messages?.find((m: any) => m.role === 'user')?.content || 'No user message';
-      const assistantMessage = turn.response?.choices?.[0]?.message?.content || 'No assistant response';
+
+      // Handle both streaming and non-streaming responses
+      let assistantMessage = 'No assistant response';
+      if (turn.response) {
+        if (turn.response.type === 'streaming') {
+          // Streaming response
+          assistantMessage = turn.response.content || 'No assistant response';
+        } else if (turn.response.choices?.[0]?.message?.content) {
+          // Regular JSON response
+          assistantMessage = turn.response.choices[0].message.content;
+        }
+      }
 
       return `// ═══════════════════════════════════════════════════════════════
 // CONVERSATION TURN ${index + 1}
@@ -89,9 +100,9 @@ ${typeof assistantMessage === 'string' ? assistantMessage : JSON.stringify(assis
    │                          METADATA                               │
    └─────────────────────────────────────────────────────────────────┘ */
 
-Model: ${turn.request?.model || 'unknown'}
+Model: ${turn.response?.model || turn.request?.model || 'localproxy'}
 Tokens: ${turn.response?.usage?.total_tokens || 'unknown'}
-Finish Reason: ${turn.response?.choices?.[0]?.finish_reason || 'unknown'}
+Finish Reason: ${turn.response?.finish_reason || turn.response?.choices?.[0]?.finish_reason || 'unknown'}
 
 ═══════════════════════════════════════════════════════════════════════
 
