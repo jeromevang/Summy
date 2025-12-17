@@ -216,11 +216,112 @@ declare global {
   }
 }
 
+// Parse SSE streaming response from OpenAI
+const parseStreamingResponse = (body: string): any => {
+  const lines = body.split('\n');
+  const chunks: any[] = [];
+  let fullContent = '';
+  let usage = null;
+
+  for (const line of lines) {
+    if (line.startsWith('data: ')) {
+      const data = line.substring(6).trim();
+      if (data === '[DONE]') continue;
+      
+      try {
+        const parsed = JSON.parse(data);
+        chunks.push(parsed);
+        
+        // Extract content from delta
+        if (parsed.choices?.[0]?.delta?.content) {
+          fullContent += parsed.choices[0].delta.content;
+        }
+        
+        // Extract usage if present
+        if (parsed.usage) {
+          usage = parsed.usage;
+        }
+      } catch {
+        // Skip invalid JSON lines
+      }
+    }
+  }
+
+  return {
+    type: 'streaming',
+    content: fullContent,
+    chunks: chunks.length,
+    usage: usage,
+    model: chunks[0]?.model || 'unknown'
+  };
+};
+
+// Create session immediately on request
+const createSessionFromRequest = async (req: any): Promise<void> => {
+  let session = await loadSession(req.sessionId);
+  
+  if (!session) {
+    // Extract meaningful name from first user message
+    let sessionName = `Conversation ${new Date().toLocaleString()}`;
+    if (req.requestBody?.messages?.length > 0) {
+      const firstUserMessage = req.requestBody.messages.find((m: any) => m.role === 'user');
+      if (firstUserMessage?.content) {
+        const content = typeof firstUserMessage.content === 'string'
+          ? firstUserMessage.content
+          : JSON.stringify(firstUserMessage.content);
+        sessionName = content.substring(0, 50) + (content.length > 50 ? '...' : '');
+      }
+    }
+
+    session = {
+      id: req.sessionId,
+      name: sessionName,
+      ide: req.headers['x-ide'] || req.headers['user-agent']?.split(' ')[0] || 'Unknown',
+      created: new Date().toISOString(),
+      conversations: []
+    };
+
+    await saveSession(session);
+    
+    addDebugEntry('session', `✅ Auto-created session: ${session.id}`, {
+      name: session.name,
+      ide: session.ide,
+      isStreaming: req.isStreaming
+    });
+  }
+};
+
+// Update session with response data
+const updateSessionWithResponse = async (sessionId: string, requestBody: any, responseData: any): Promise<void> => {
+  let session = await loadSession(sessionId);
+  
+  if (!session) {
+    addDebugEntry('error', `Session not found for update: ${sessionId}`, {});
+    return;
+  }
+
+  const turn: ConversationTurn = {
+    id: uuidv4(),
+    timestamp: new Date().toISOString(),
+    request: requestBody,
+    response: responseData
+  };
+
+  session.conversations.push(turn);
+  await saveSession(session);
+
+  addDebugEntry('response', `✅ Captured turn ${session.conversations.length} for session: ${session.id}`, {
+    turnCount: session.conversations.length,
+    responseType: responseData.type || 'json',
+    contentLength: responseData.content?.length || 0
+  });
+};
+
 // OpenAI Proxy Middleware
 const openaiProxy = createProxyMiddleware({
   target: 'https://api.openai.com',
   changeOrigin: true,
-  timeout: 30000, // 30 second timeout
+  timeout: 120000, // 2 minute timeout for streaming
   pathRewrite: (path: string) => {
     // Handle both /chat/completions and /v1/chat/completions
     if (path.startsWith('/chat/completions')) {
@@ -234,12 +335,14 @@ const openaiProxy = createProxyMiddleware({
     req.requestBody = req.body;
     req.sessionId = extractConversationId(req);
     req.conversationId = req.sessionId;
+    req.isStreaming = req.body?.stream === true;
 
     addDebugEntry('request', `Incoming request: ${req.sessionId}`, {
       method: req.method,
       url: req.url,
       userAgent: req.headers['user-agent'],
       contentLength: req.headers['content-length'],
+      isStreaming: req.isStreaming,
       hasApiKey: !!process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_openai_api_key_here'
     });
 
@@ -247,93 +350,60 @@ const openaiProxy = createProxyMiddleware({
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey || apiKey === 'your_openai_api_key_here') {
       addDebugEntry('error', `Rejected request ${req.sessionId}: OpenAI API key not configured`, { missingKey: true });
-      res.status(500).json({
-        error: 'Configuration Error',
-        message: 'OpenAI API key not configured. Please set OPENAI_API_KEY in server/.env file.'
-      });
-      return;
+      // Mark request as invalid - will be handled in onProxyRes
+      req.invalidApiKey = true;
     }
 
     proxyReq.setHeader('Authorization', `Bearer ${apiKey}`);
+    
+    // Create session immediately on request (don't wait for response)
+    createSessionFromRequest(req).catch(err => {
+      addDebugEntry('error', `Failed to create session from request: ${err.message}`, { error: String(err) });
+    });
   },
   onProxyRes: (proxyRes: any, req: any, res: any) => {
     addDebugEntry('response', `Proxy response started for session ${req.sessionId}`, {
       statusCode: proxyRes.statusCode,
-      headers: proxyRes.headers
+      headers: proxyRes.headers,
+      isStreaming: req.isStreaming
     });
 
+    // For streaming responses, collect all chunks
     let body = '';
+    const chunks: string[] = [];
+    
     proxyRes.on('data', (chunk: Buffer) => {
-      body += chunk.toString();
+      const chunkStr = chunk.toString();
+      body += chunkStr;
+      chunks.push(chunkStr);
     });
 
     proxyRes.on('end', async () => {
       try {
         addDebugEntry('response', `Proxy response complete for session ${req.sessionId}`, {
           bodyLength: body.length,
-          statusCode: proxyRes.statusCode
+          statusCode: proxyRes.statusCode,
+          isStreaming: req.isStreaming,
+          chunkCount: chunks.length
         });
 
         let responseData;
-        try {
-          responseData = JSON.parse(body);
-        } catch {
-          // If response isn't JSON, create a text response
-          responseData = { error: 'Non-JSON response', content: body };
-        }
-
-        // Always create session, even on errors
-        const turn: ConversationTurn = {
-          id: uuidv4(),
-          timestamp: new Date().toISOString(),
-          request: req.requestBody,
-          response: responseData
-        };
-
-        // Load or create session
-        let session = await loadSession(req.sessionId);
-        if (!session) {
-          // Extract meaningful name from first message
-          let sessionName = `Conversation ${new Date().toLocaleString()}`;
-          if (req.requestBody?.messages?.length > 0) {
-            const firstMessage = req.requestBody.messages[0];
-            if (firstMessage.role === 'user' && firstMessage.content) {
-              const content = typeof firstMessage.content === 'string'
-                ? firstMessage.content
-                : JSON.stringify(firstMessage.content);
-              sessionName = content.substring(0, 50) + (content.length > 50 ? '...' : '');
-            }
+        
+        if (req.isStreaming) {
+          // Parse SSE streaming response
+          responseData = parseStreamingResponse(body);
+        } else {
+          // Parse regular JSON response
+          try {
+            responseData = JSON.parse(body);
+          } catch {
+            responseData = { error: 'Non-JSON response', content: body };
           }
-
-          session = {
-            id: req.sessionId,
-            name: sessionName,
-            ide: req.headers['x-ide'] || req.headers['user-agent']?.split(' ')[0] || 'Unknown',
-            created: new Date().toISOString(),
-            conversations: []
-          };
-
-          addDebugEntry('session', `Auto-created session: ${session.id}`, {
-            name: session.name,
-            ide: session.ide,
-            requestBody: req.requestBody
-          });
         }
 
-        // Add turn to session
-        session.conversations.push(turn);
-
-        // Save session
-        await saveSession(session);
-
-        const status = proxyRes.statusCode >= 200 && proxyRes.statusCode < 300 ? 'success' : 'error';
-        addDebugEntry('response', `Captured turn ${session.conversations.length} for session: ${session.id} (${status})`, {
-          turnCount: session.conversations.length,
-          statusCode: proxyRes.statusCode,
-          tokens: turn.response?.usage?.total_tokens,
-          error: turn.response?.error,
-          sessionFile: path.join(SESSIONS_DIR, `${session.id}.json`)
-        });
+        // Update session with response
+        await updateSessionWithResponse(req.sessionId, req.requestBody, responseData);
+        
       } catch (error) {
         addDebugEntry('error', `Failed to process response for session ${req.sessionId}`, { error: String(error) });
         console.error('[PROXY] Error processing response:', error);

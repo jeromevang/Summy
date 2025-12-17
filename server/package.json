@@ -1,6 +1,7 @@
 {
   "name": "server",
   "version": "1.0.0",
+  "type": "module",
   "description": "Summy proxy server for context management",
   "main": "dist/index.js",
   "scripts": {
