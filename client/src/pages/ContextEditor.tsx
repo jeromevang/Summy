@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 interface CompressionConfig {
   mode: 0 | 1 | 2 | 3;
@@ -255,12 +256,65 @@ const ContextEditor: React.FC = () => {
   const leftPanelRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
   const [syncScroll, setSyncScroll] = useState(true);
+  const [autoScrollToBottom, setAutoScrollToBottom] = useState(true);
+  const [wsConnected, setWsConnected] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  // Load session
+  // Load session and setup WebSocket
   useEffect(() => {
     if (sessionId) {
       loadSession();
       checkLMStudioConnection();
+
+      // WebSocket for real-time updates
+      const ws = new ReconnectingWebSocket('ws://localhost:3001');
+
+      ws.onopen = () => {
+        console.log('[WS] Connected to server');
+        setWsConnected(true);
+      };
+
+      ws.onclose = () => {
+        console.log('[WS] Disconnected from server');
+        setWsConnected(false);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.type === 'session_updated' && message.data?.id === sessionId) {
+            // Update session in real-time
+            setSession(message.data);
+            setLastUpdate(new Date());
+            
+            // Update compressed preview if available
+            if (message.data.compressedConversations) {
+              setCompressedPreview(message.data.compressedConversations);
+            }
+            if (message.data.compression?.stats) {
+              setCompressionStats(message.data.compression.stats);
+            }
+            
+            // Auto-scroll to bottom if enabled
+            setTimeout(() => {
+              if (leftPanelRef.current) {
+                leftPanelRef.current.scrollTop = leftPanelRef.current.scrollHeight;
+              }
+            }, 100);
+          }
+        } catch (error) {
+          console.error('Failed to parse WebSocket message:', error);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('[WS] Error:', error);
+        setWsConnected(false);
+      };
+
+      return () => {
+        ws.close();
+      };
     }
   }, [sessionId]);
 
@@ -647,7 +701,15 @@ const ContextEditor: React.FC = () => {
             <span>Keep recent: {keepRecent}</span>
             {autoCompress && <span className="text-green-400">● Auto-compress ON</span>}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            {lastUpdate && (
+              <span className="text-gray-400">
+                Updated: {lastUpdate.toLocaleTimeString()}
+              </span>
+            )}
+            <span className={wsConnected ? 'text-green-400' : 'text-yellow-400'}>
+              {wsConnected ? '● Live' : '○ Connecting...'}
+            </span>
             <span className={lmstudioConnected ? 'text-green-400' : 'text-red-400'}>
               LMStudio: {lmstudioConnected ? 'Connected' : 'Disconnected'}
             </span>
