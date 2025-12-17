@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +17,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const server = createServer(app);
+const wss = new WebSocketServer({ server });
 const PORT = process.env.PORT || 3001;
 
 // Middleware
@@ -23,8 +27,8 @@ app.use(express.json());
 
 // General request logging middleware - captures EVERYTHING from ngrok
 app.use((req, res, next) => {
-  // Skip logging internal health/debug endpoints to reduce noise
-  if (req.url === '/health' || req.url === '/debug' || req.url.startsWith('/debug/')) {
+  // Skip logging internal endpoints to reduce noise
+  if (req.url === '/health' || req.url === '/debug' || req.url.startsWith('/debug/') || req.url === '/api/sessions') {
     return next();
   }
 
@@ -59,6 +63,42 @@ interface DebugEntry {
 const debugLog: DebugEntry[] = [];
 const MAX_DEBUG_ENTRIES = 100;
 const sessionCache: { [key: string]: any } = {}; // Simple cache for session count
+
+// WebSocket clients
+const wsClients: Set<any> = new Set();
+
+// Broadcast to all connected WebSocket clients
+const broadcastToClients = (type: string, data: any) => {
+  const message = JSON.stringify({ type, data, timestamp: new Date().toISOString() });
+  wsClients.forEach(client => {
+    if (client.readyState === client.OPEN) {
+      client.send(message);
+    }
+  });
+};
+
+// WebSocket connection handling
+wss.on('connection', (ws) => {
+  console.log('[WS] Client connected');
+  wsClients.add(ws);
+
+  // Send initial connection status
+  ws.send(JSON.stringify({
+    type: 'status',
+    data: { websocket: 'connected', server: 'online' },
+    timestamp: new Date().toISOString()
+  }));
+
+  ws.on('close', () => {
+    console.log('[WS] Client disconnected');
+    wsClients.delete(ws);
+  });
+
+  ws.on('error', (error) => {
+    console.error('[WS] Connection error:', error);
+    wsClients.delete(ws);
+  });
+});
 
 const addDebugEntry = (type: DebugEntry['type'], message: string, data?: any) => {
   debugLog.unshift({
@@ -134,6 +174,9 @@ const extractConversationId = (req: any): string => {
 const saveSession = async (session: ContextSession): Promise<void> => {
   const filePath = path.join(SESSIONS_DIR, `${session.id}.json`);
   await fs.writeJson(filePath, session, { spaces: 2 });
+
+  // Broadcast session update to all clients
+  broadcastToClients('session_updated', session);
 };
 
 const loadSession = async (sessionId: string): Promise<ContextSession | null> => {
@@ -214,6 +257,11 @@ const openaiProxy = createProxyMiddleware({
     proxyReq.setHeader('Authorization', `Bearer ${apiKey}`);
   },
   onProxyRes: (proxyRes: any, req: any, res: any) => {
+    addDebugEntry('response', `Proxy response started for session ${req.sessionId}`, {
+      statusCode: proxyRes.statusCode,
+      headers: proxyRes.headers
+    });
+
     let body = '';
     proxyRes.on('data', (chunk: Buffer) => {
       body += chunk.toString();
@@ -221,6 +269,11 @@ const openaiProxy = createProxyMiddleware({
 
     proxyRes.on('end', async () => {
       try {
+        addDebugEntry('response', `Proxy response complete for session ${req.sessionId}`, {
+          bodyLength: body.length,
+          statusCode: proxyRes.statusCode
+        });
+
         let responseData;
         try {
           responseData = JSON.parse(body);
@@ -262,7 +315,8 @@ const openaiProxy = createProxyMiddleware({
 
           addDebugEntry('session', `Auto-created session: ${session.id}`, {
             name: session.name,
-            ide: session.ide
+            ide: session.ide,
+            requestBody: req.requestBody
           });
         }
 
@@ -277,7 +331,8 @@ const openaiProxy = createProxyMiddleware({
           turnCount: session.conversations.length,
           statusCode: proxyRes.statusCode,
           tokens: turn.response?.usage?.total_tokens,
-          error: turn.response?.error
+          error: turn.response?.error,
+          sessionFile: path.join(SESSIONS_DIR, `${session.id}.json`)
         });
       } catch (error) {
         addDebugEntry('error', `Failed to process response for session ${req.sessionId}`, { error: String(error) });
@@ -390,7 +445,8 @@ app.post('/debug/clear', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Summy proxy server running on port ${PORT}`);
   console.log(`📁 Sessions stored in: ${SESSIONS_DIR}`);
+  console.log(`🔌 WebSocket server ready for real-time updates`);
 });
