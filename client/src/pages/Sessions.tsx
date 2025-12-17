@@ -3,6 +3,18 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
+interface CompressionConfig {
+  mode: 0 | 1 | 2 | 3;
+  keepRecent: number;
+  enabled: boolean;
+  lastCompressed?: string;
+  stats?: {
+    originalTokens: number;
+    compressedTokens: number;
+    ratio: number;
+  };
+}
+
 interface ContextSession {
   id: string;
   name: string;
@@ -12,7 +24,10 @@ interface ContextSession {
   originalSize?: number;
   summarizedSize?: number;
   summary?: any;
+  compression?: CompressionConfig;
 }
+
+const COMPRESSION_MODE_LABELS = ['None', 'Light', 'Medium', 'Aggressive'];
 
 const Sessions: React.FC = () => {
   const [sessions, setSessions] = useState<ContextSession[]>([]);
@@ -154,9 +169,23 @@ const Sessions: React.FC = () => {
                     <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-400">
                       {session.conversations.length} turns
                     </span>
+                    {/* Compression status badges */}
+                    {session.compression?.enabled && (
+                      <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-400">
+                        🗜️ {COMPRESSION_MODE_LABELS[session.compression.mode]}
+                      </span>
+                    )}
+                    {session.compression?.stats && (
+                      <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-400">
+                        -{Math.round(session.compression.stats.ratio * 100)}%
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-gray-500">
                     {session.ide} • {new Date(session.created).toLocaleDateString()}
+                    {session.compression?.lastCompressed && (
+                      <> • Compressed: {new Date(session.compression.lastCompressed).toLocaleDateString()}</>
+                    )}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 ml-4">

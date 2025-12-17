@@ -14,7 +14,7 @@ function App() {
           <Route path="/" element={<Sessions />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/debug" element={<Debug />} />
-          <Route path="/editor/:sessionId" element={<ContextEditor />} />
+          <Route path="/session/:sessionId" element={<ContextEditor />} />
         </Routes>
       </Layout>
     </Router>

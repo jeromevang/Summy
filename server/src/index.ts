@@ -136,7 +136,389 @@ interface ContextSession {
   originalSize?: number;
   summarizedSize?: number;
   summary?: any;
+  compression?: CompressionConfig;
+  compressedConversations?: ConversationTurn[];
 }
+
+// Compression configuration
+interface CompressionConfig {
+  mode: 0 | 1 | 2 | 3; // 0=None, 1=Light, 2=Medium, 3=Aggressive
+  keepRecent: number;
+  enabled: boolean;
+  lastCompressed?: string;
+  stats?: {
+    originalTokens: number;
+    compressedTokens: number;
+    ratio: number;
+  };
+}
+
+// Message segment types for compression
+interface TextSegment {
+  type: 'text';
+  messages: any[];
+  startIndex: number;
+  endIndex: number;
+}
+
+interface ToolSegment {
+  type: 'tool';
+  messages: any[]; // tool_call + tool response pair
+  startIndex: number;
+  endIndex: number;
+}
+
+type MessageSegment = TextSegment | ToolSegment;
+
+// ============================================================
+// COMPRESSION ENGINE
+// ============================================================
+
+// Check if a message is tool-related (tool_call or tool response)
+const isToolRelated = (msg: any): boolean => {
+  if (!msg) return false;
+  
+  // Check for tool_calls in assistant message
+  if (msg.tool_calls && Array.isArray(msg.tool_calls) && msg.tool_calls.length > 0) {
+    return true;
+  }
+  
+  // Check for tool role (tool response)
+  if (msg.role === 'tool') {
+    return true;
+  }
+  
+  // Check for function_call (older format)
+  if (msg.function_call) {
+    return true;
+  }
+  
+  return false;
+};
+
+// Segment messages into text groups and tool blocks
+const segmentMessages = (messages: any[]): MessageSegment[] => {
+  const segments: MessageSegment[] = [];
+  let currentTextGroup: any[] = [];
+  let textStartIndex = 0;
+  
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    
+    if (isToolRelated(msg)) {
+      // Save any accumulated text group first
+      if (currentTextGroup.length > 0) {
+        segments.push({
+          type: 'text',
+          messages: [...currentTextGroup],
+          startIndex: textStartIndex,
+          endIndex: i - 1
+        });
+        currentTextGroup = [];
+      }
+      
+      // Check if this is a tool_call followed by tool response
+      const toolMessages: any[] = [msg];
+      let endIdx = i;
+      
+      // If this is a tool_call, look for the corresponding tool response
+      if (msg.tool_calls || msg.function_call) {
+        // Look ahead for tool responses
+        let j = i + 1;
+        while (j < messages.length && messages[j].role === 'tool') {
+          toolMessages.push(messages[j]);
+          endIdx = j;
+          j++;
+        }
+        i = endIdx; // Skip past the tool responses we just added
+      }
+      
+      segments.push({
+        type: 'tool',
+        messages: toolMessages,
+        startIndex: i - (toolMessages.length - 1),
+        endIndex: endIdx
+      });
+      
+      textStartIndex = i + 1;
+    } else {
+      // Regular text message
+      if (currentTextGroup.length === 0) {
+        textStartIndex = i;
+      }
+      currentTextGroup.push(msg);
+    }
+  }
+  
+  // Don't forget the last text group
+  if (currentTextGroup.length > 0) {
+    segments.push({
+      type: 'text',
+      messages: currentTextGroup,
+      startIndex: textStartIndex,
+      endIndex: messages.length - 1
+    });
+  }
+  
+  return segments;
+};
+
+// Server settings storage
+interface ServerSettings {
+  lmstudioUrl: string;
+  lmstudioModel: string;
+  defaultCompressionMode: 0 | 1 | 2 | 3;
+  defaultKeepRecent: number;
+}
+
+const SETTINGS_FILE = path.join(__dirname, '../settings.json');
+
+const loadServerSettings = async (): Promise<ServerSettings> => {
+  try {
+    if (await fs.pathExists(SETTINGS_FILE)) {
+      return await fs.readJson(SETTINGS_FILE);
+    }
+  } catch (error) {
+    console.error('Failed to load settings:', error);
+  }
+  // Default settings
+  return {
+    lmstudioUrl: 'http://localhost:1234',
+    lmstudioModel: '',
+    defaultCompressionMode: 1,
+    defaultKeepRecent: 5
+  };
+};
+
+const saveServerSettings = async (settings: ServerSettings): Promise<void> => {
+  await fs.writeJson(SETTINGS_FILE, settings, { spaces: 2 });
+};
+
+// Call LMStudio API for summarization
+const callLMStudio = async (
+  messages: any[],
+  systemPrompt: string
+): Promise<string> => {
+  const settings = await loadServerSettings();
+  
+  if (!settings.lmstudioUrl) {
+    throw new Error('LMStudio URL not configured');
+  }
+  
+  const url = `${settings.lmstudioUrl}/v1/chat/completions`;
+  
+  try {
+    const response = await axios.post(url, {
+      model: settings.lmstudioModel || 'local-model',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages
+      ],
+      temperature: 0.3, // Lower temperature for more consistent summaries
+      max_tokens: 1000
+    }, {
+      timeout: 60000 // 60 second timeout
+    });
+    
+    const content = response.data?.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('Empty response from LMStudio');
+    }
+    
+    return content;
+  } catch (error: any) {
+    if (error.code === 'ECONNREFUSED') {
+      throw new Error('LMStudio is not running or not accessible');
+    }
+    throw new Error(`LMStudio API error: ${error.message}`);
+  }
+};
+
+// Summarize a group of text messages
+const summarizeTextGroup = async (messages: any[]): Promise<string> => {
+  // Build a readable format of the messages for the LLM
+  const formattedMessages = messages.map(msg => {
+    const role = msg.role === 'user' ? 'User' : msg.role === 'assistant' ? 'Assistant' : msg.role;
+    const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+    return `${role}: ${content}`;
+  }).join('\n\n');
+  
+  const systemPrompt = `You are a conversation summarizer. Your task is to create a concise summary of the following conversation segment.
+
+IMPORTANT GUIDELINES:
+- Preserve key information: file names, code snippets, technical terms, decisions made
+- Keep the summary brief but informative
+- Focus on WHAT was discussed and WHAT was decided
+- Remove pleasantries, verbose explanations, and redundant content
+- Output ONLY the summary, no preamble or explanation
+
+Format your response as a brief paragraph or bullet points.`;
+
+  const userMessage = { 
+    role: 'user', 
+    content: `Summarize this conversation:\n\n${formattedMessages}` 
+  };
+  
+  return await callLMStudio([userMessage], systemPrompt);
+};
+
+// Truncate tool response content (for Medium mode)
+const truncateToolResponse = (msg: any, maxLength: number = 500): any => {
+  if (msg.role !== 'tool') return msg;
+  
+  const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+  
+  if (content.length <= maxLength) return msg;
+  
+  // Count lines
+  const lines = content.split('\n');
+  const truncated = `[TRUNCATED: ${lines.length} lines, ${content.length} chars]\n${content.substring(0, maxLength)}...\n[END TRUNCATION]`;
+  
+  return {
+    ...msg,
+    content: truncated
+  };
+};
+
+// Convert tool block to text summary (for Aggressive mode)
+const convertToolBlockToText = async (toolMessages: any[]): Promise<string> => {
+  const toolCall = toolMessages.find(m => m.tool_calls || m.function_call);
+  const toolResponses = toolMessages.filter(m => m.role === 'tool');
+  
+  let description = '';
+  
+  if (toolCall?.tool_calls) {
+    for (const tc of toolCall.tool_calls) {
+      const funcName = tc.function?.name || 'unknown';
+      const args = tc.function?.arguments || '{}';
+      description += `Called ${funcName}(${args.substring(0, 100)}${args.length > 100 ? '...' : ''}). `;
+    }
+  } else if (toolCall?.function_call) {
+    const funcName = toolCall.function_call.name || 'unknown';
+    description += `Called ${funcName}. `;
+  }
+  
+  for (const resp of toolResponses) {
+    const content = typeof resp.content === 'string' ? resp.content : JSON.stringify(resp.content);
+    const lines = content.split('\n').length;
+    description += `Got response (${lines} lines, ${content.length} chars). `;
+  }
+  
+  return description.trim();
+};
+
+// Main compression orchestrator
+const compressMessages = async (
+  messages: any[],
+  config: CompressionConfig
+): Promise<{ compressed: any[]; stats: { originalTokens: number; compressedTokens: number; ratio: number } }> => {
+  // Mode 0: No compression
+  if (config.mode === 0 || !config.enabled) {
+    const tokenEstimate = JSON.stringify(messages).length / 4; // Rough estimate
+    return {
+      compressed: messages,
+      stats: {
+        originalTokens: Math.round(tokenEstimate),
+        compressedTokens: Math.round(tokenEstimate),
+        ratio: 0
+      }
+    };
+  }
+  
+  const keepRecent = config.keepRecent || 5;
+  
+  // If not enough messages, don't compress
+  if (messages.length <= keepRecent) {
+    const tokenEstimate = JSON.stringify(messages).length / 4;
+    return {
+      compressed: messages,
+      stats: {
+        originalTokens: Math.round(tokenEstimate),
+        compressedTokens: Math.round(tokenEstimate),
+        ratio: 0
+      }
+    };
+  }
+  
+  // Split into old and recent
+  const recentMessages = messages.slice(-keepRecent);
+  const oldMessages = messages.slice(0, -keepRecent);
+  
+  // Estimate original tokens
+  const originalTokens = Math.round(JSON.stringify(messages).length / 4);
+  
+  // Segment old messages
+  const segments = segmentMessages(oldMessages);
+  
+  // Process each segment based on mode
+  const compressedSegments: any[] = [];
+  
+  for (const segment of segments) {
+    if (segment.type === 'text') {
+      // Always summarize text segments (modes 1, 2, 3)
+      try {
+        const summary = await summarizeTextGroup(segment.messages);
+        compressedSegments.push({
+          role: 'system',
+          content: `[CONVERSATION SUMMARY]\n${summary}\n[END SUMMARY]`
+        });
+      } catch (error: any) {
+        // If summarization fails, throw error (fail mode)
+        throw new Error(`Compression failed: ${error.message}`);
+      }
+    } else if (segment.type === 'tool') {
+      // Handle tool segments based on mode
+      switch (config.mode) {
+        case 1: // Light: preserve tools completely
+          compressedSegments.push(...segment.messages);
+          break;
+          
+        case 2: // Medium: preserve tool calls, truncate responses
+          for (const msg of segment.messages) {
+            if (msg.role === 'tool') {
+              compressedSegments.push(truncateToolResponse(msg));
+            } else {
+              compressedSegments.push(msg);
+            }
+          }
+          break;
+          
+        case 3: // Aggressive: convert tools to text
+          try {
+            const toolSummary = await convertToolBlockToText(segment.messages);
+            compressedSegments.push({
+              role: 'system',
+              content: `[TOOL SUMMARY] ${toolSummary} [END TOOL SUMMARY]`
+            });
+          } catch {
+            // If conversion fails, keep original
+            compressedSegments.push(...segment.messages);
+          }
+          break;
+      }
+    }
+  }
+  
+  // Combine compressed segments with recent messages
+  const compressed = [...compressedSegments, ...recentMessages];
+  
+  // Calculate stats
+  const compressedTokens = Math.round(JSON.stringify(compressed).length / 4);
+  const ratio = originalTokens > 0 ? (originalTokens - compressedTokens) / originalTokens : 0;
+  
+  return {
+    compressed,
+    stats: {
+      originalTokens,
+      compressedTokens,
+      ratio: Math.round(ratio * 100) / 100
+    }
+  };
+};
+
+// ============================================================
+// END COMPRESSION ENGINE
+// ============================================================
 
 // Conversation ID extraction function
 const extractConversationId = (req: any): string => {
@@ -354,6 +736,40 @@ const proxyToOpenAI = async (req: any, res: any) => {
       });
     }
 
+    // Check if compression is enabled for this session
+    let messagesToSend = req.body?.messages || [];
+    const session = await loadSession(req.sessionId);
+    
+    if (session?.compression?.enabled && session.compression.mode > 0) {
+      try {
+        addDebugEntry('request', `Applying compression mode ${session.compression.mode}`, {
+          originalMessageCount: messagesToSend.length,
+          keepRecent: session.compression.keepRecent
+        });
+        
+        const compressionResult = await compressMessages(messagesToSend, session.compression);
+        messagesToSend = compressionResult.compressed;
+        
+        addDebugEntry('request', `Compression complete`, {
+          originalTokens: compressionResult.stats.originalTokens,
+          compressedTokens: compressionResult.stats.compressedTokens,
+          ratio: compressionResult.stats.ratio,
+          newMessageCount: messagesToSend.length
+        });
+        
+        // Update session stats
+        session.compression.stats = compressionResult.stats;
+        session.compression.lastCompressed = new Date().toISOString();
+        await saveSession(session);
+      } catch (compressionError: any) {
+        // Compression failed - log error and continue with original messages
+        addDebugEntry('error', `Compression failed: ${compressionError.message}`, {
+          error: compressionError.message
+        });
+        // Don't modify messagesToSend - use original
+      }
+    }
+
     // Map custom model names to real OpenAI models
     // If model is not a known OpenAI model, default to gpt-4o-mini
     const knownOpenAIModels = [
@@ -366,16 +782,18 @@ const proxyToOpenAI = async (req: any, res: any) => {
       ? requestedModel 
       : 'gpt-4o-mini';
     
-    // Create modified request body with correct model
+    // Create modified request body with correct model and potentially compressed messages
     const modifiedBody = {
       ...req.body,
-      model: actualModel
+      model: actualModel,
+      messages: messagesToSend
     };
 
     addDebugEntry('request', `Proxying to OpenAI: ${requestedModel} -> ${actualModel}`, {
       originalModel: requestedModel,
       actualModel: actualModel,
-      streaming: req.isStreaming
+      streaming: req.isStreaming,
+      messageCount: messagesToSend.length
     });
 
     // Proxy to OpenAI using axios
@@ -534,6 +952,157 @@ app.delete('/api/sessions/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete session' });
   }
 });
+
+// ============================================================
+// SETTINGS API
+// ============================================================
+
+// Get server settings
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await loadServerSettings();
+    res.json(settings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load settings' });
+  }
+});
+
+// Save server settings
+app.post('/api/settings', async (req, res) => {
+  try {
+    const currentSettings = await loadServerSettings();
+    const newSettings: ServerSettings = {
+      ...currentSettings,
+      ...req.body
+    };
+    await saveServerSettings(newSettings);
+    res.json(newSettings);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to save settings' });
+  }
+});
+
+// Test LMStudio connection
+app.post('/api/test-lmstudio', async (req, res) => {
+  try {
+    const { url, model } = req.body;
+    const testUrl = url || (await loadServerSettings()).lmstudioUrl;
+    
+    const response = await axios.get(`${testUrl}/v1/models`, { timeout: 5000 });
+    
+    res.json({
+      success: true,
+      models: response.data?.data || [],
+      message: 'LMStudio connection successful'
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.code === 'ECONNREFUSED' 
+        ? 'LMStudio is not running or not accessible'
+        : error.message
+    });
+  }
+});
+
+// Update session compression settings
+app.post('/api/sessions/:id/compression', async (req, res) => {
+  try {
+    const session = await loadSession(req.params.id);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    // Update compression config
+    session.compression = {
+      mode: req.body.mode ?? 1,
+      keepRecent: req.body.keepRecent ?? 5,
+      enabled: req.body.enabled ?? true,
+      lastCompressed: session.compression?.lastCompressed,
+      stats: session.compression?.stats
+    };
+    
+    await saveSession(session);
+    res.json(session);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update compression settings' });
+  }
+});
+
+// Compress a session (manual trigger)
+app.post('/api/sessions/:id/compress', async (req, res) => {
+  try {
+    const session = await loadSession(req.params.id);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    if (!session.conversations || session.conversations.length === 0) {
+      return res.status(400).json({ error: 'No conversations to compress' });
+    }
+    
+    // Get compression config from session or request
+    const config: CompressionConfig = {
+      mode: req.body.mode ?? session.compression?.mode ?? 1,
+      keepRecent: req.body.keepRecent ?? session.compression?.keepRecent ?? 5,
+      enabled: true
+    };
+    
+    // Get all messages from all conversation turns
+    const allMessages: any[] = [];
+    for (const turn of session.conversations) {
+      if (turn.request?.messages) {
+        // Only add messages that aren't already in allMessages (avoid duplicates)
+        const lastUserMsg = turn.request.messages.filter((m: any) => m.role === 'user').pop();
+        if (lastUserMsg) {
+          allMessages.push(lastUserMsg);
+        }
+      }
+      if (turn.response) {
+        if (turn.response.type === 'streaming') {
+          allMessages.push({ role: 'assistant', content: turn.response.content });
+        } else if (turn.response.choices?.[0]?.message) {
+          allMessages.push(turn.response.choices[0].message);
+        }
+      }
+    }
+    
+    // Compress
+    const result = await compressMessages(allMessages, config);
+    
+    // Update session
+    session.compression = {
+      ...config,
+      lastCompressed: new Date().toISOString(),
+      stats: result.stats
+    };
+    session.compressedConversations = result.compressed.map((msg, idx) => ({
+      id: `compressed-${idx}`,
+      timestamp: new Date().toISOString(),
+      request: { messages: [msg] },
+      response: undefined
+    }));
+    
+    await saveSession(session);
+    
+    res.json({
+      success: true,
+      stats: result.stats,
+      originalCount: allMessages.length,
+      compressedCount: result.compressed.length
+    });
+  } catch (error: any) {
+    console.error('Compression error:', error);
+    res.status(500).json({ 
+      error: 'Compression failed', 
+      message: error.message 
+    });
+  }
+});
+
+// ============================================================
+// END SETTINGS API
+// ============================================================
 
 // Health check
 app.get('/health', (req, res) => {
