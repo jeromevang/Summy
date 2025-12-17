@@ -28,6 +28,9 @@ const Settings: React.FC = () => {
   const [lmstudioStatus, setLmstudioStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
   const [lmstudioModels, setLmstudioModels] = useState<string[]>([]);
   const [lmstudioError, setLmstudioError] = useState<string>('');
+  const [unloadOthers, setUnloadOthers] = useState(true);
+  const [loadingModel, setLoadingModel] = useState(false);
+  const [loadModelStatus, setLoadModelStatus] = useState<string>('');
 
   // Load settings from server and localStorage
   useEffect(() => {
@@ -102,6 +105,36 @@ const Settings: React.FC = () => {
     }
   };
 
+  const handleLoadModel = async () => {
+    if (!settings.lmstudioModel) {
+      setLoadModelStatus('No model selected');
+      return;
+    }
+
+    setLoadingModel(true);
+    setLoadModelStatus('Loading model...');
+
+    try {
+      const response = await axios.post('http://localhost:3001/api/lmstudio/load-model', {
+        model: settings.lmstudioModel,
+        unloadOthers: unloadOthers
+      });
+
+      if (response.data.success) {
+        setLoadModelStatus(`✓ ${settings.lmstudioModel} loaded!`);
+        // Refresh model list
+        handleTestLMStudio();
+      } else {
+        setLoadModelStatus(`✗ ${response.data.error}`);
+      }
+    } catch (error: any) {
+      setLoadModelStatus(`✗ ${error.response?.data?.error || error.message}`);
+    } finally {
+      setLoadingModel(false);
+      setTimeout(() => setLoadModelStatus(''), 5000);
+    }
+  };
+
   const handleChange = (field: keyof ServerSettings, value: any) => {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
@@ -173,24 +206,58 @@ const Settings: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-300 mb-1">
                     Model
                   </label>
-                  {lmstudioModels.length > 0 ? (
-                    <select
-                      value={settings.lmstudioModel}
-                      onChange={(e) => handleChange('lmstudioModel', e.target.value)}
-                      className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  <div className="flex gap-2">
+                    {lmstudioModels.length > 0 ? (
+                      <select
+                        value={settings.lmstudioModel}
+                        onChange={(e) => handleChange('lmstudioModel', e.target.value)}
+                        className="flex-1 bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      >
+                        {lmstudioModels.map(model => (
+                          <option key={model} value={model}>{model}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={settings.lmstudioModel}
+                        onChange={(e) => handleChange('lmstudioModel', e.target.value)}
+                        className="flex-1 bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        placeholder="Test connection to see available models"
+                      />
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleLoadModel}
+                      disabled={loadingModel || !settings.lmstudioModel}
+                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                        loadingModel
+                          ? 'bg-yellow-600 text-white cursor-wait'
+                          : 'bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed'
+                      }`}
                     >
-                      {lmstudioModels.map(model => (
-                        <option key={model} value={model}>{model}</option>
-                      ))}
-                    </select>
-                  ) : (
+                      {loadingModel ? '⏳ Loading...' : '📥 Load Model'}
+                    </button>
+                  </div>
+                  
+                  {/* Unload others checkbox */}
+                  <label className="flex items-center gap-2 mt-3 cursor-pointer">
                     <input
-                      type="text"
-                      value={settings.lmstudioModel}
-                      onChange={(e) => handleChange('lmstudioModel', e.target.value)}
-                      className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="Test connection to see available models"
+                      type="checkbox"
+                      checked={unloadOthers}
+                      onChange={(e) => setUnloadOthers(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
                     />
+                    <span className="text-sm text-gray-400">
+                      Unload other models when loading (recommended)
+                    </span>
+                  </label>
+                  
+                  {/* Load status message */}
+                  {loadModelStatus && (
+                    <p className={`mt-2 text-sm ${loadModelStatus.startsWith('✓') ? 'text-green-400' : loadModelStatus.startsWith('✗') ? 'text-red-400' : 'text-yellow-400'}`}>
+                      {loadModelStatus}
+                    </p>
                   )}
                 </div>
               </div>
