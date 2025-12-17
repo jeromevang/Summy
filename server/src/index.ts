@@ -218,9 +218,15 @@ const openaiProxy = createProxyMiddleware({
 
     proxyRes.on('end', async () => {
       try {
-        const responseData = JSON.parse(body);
+        let responseData;
+        try {
+          responseData = JSON.parse(body);
+        } catch {
+          // If response isn't JSON, create a text response
+          responseData = { error: 'Non-JSON response', content: body };
+        }
 
-        // Create conversation turn
+        // Always create session, even on errors
         const turn: ConversationTurn = {
           id: uuidv4(),
           timestamp: new Date().toISOString(),
@@ -263,11 +269,15 @@ const openaiProxy = createProxyMiddleware({
         // Save session
         await saveSession(session);
 
-        addDebugEntry('response', `Captured turn ${session.conversations.length} for session: ${session.id}`, {
+        const status = proxyRes.statusCode >= 200 && proxyRes.statusCode < 300 ? 'success' : 'error';
+        addDebugEntry('response', `Captured turn ${session.conversations.length} for session: ${session.id} (${status})`, {
           turnCount: session.conversations.length,
-          tokens: turn.response?.usage?.total_tokens
+          statusCode: proxyRes.statusCode,
+          tokens: turn.response?.usage?.total_tokens,
+          error: turn.response?.error
         });
       } catch (error) {
+        addDebugEntry('error', `Failed to process response for session ${req.sessionId}`, { error: String(error) });
         console.error('[PROXY] Error processing response:', error);
       }
     });
