@@ -100,6 +100,43 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
+            {/* Server Management */}
+            <div>
+              <h4 className="text-md font-medium text-gray-900 mb-3">Server Management</h4>
+              <div className="bg-gray-50 p-4 rounded-md">
+                <div className="flex flex-col space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">Server Status:</span>
+                    <span className="text-sm font-medium text-gray-900">Check the status indicator in the navigation bar</span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        alert('To start the server:\n1. Open a new terminal\n2. Run: cd server && npm run dev\n3. Refresh this page');
+                      }}
+                      className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                    >
+                      How to Start Server
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        alert('To stop the server, kill Node processes:\n\nnpm run kill\n\nOr manually: taskkill /F /IM node.exe /T');
+                      }}
+                      className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      How to Stop Server
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    The server runs independently. Start with: <code>npm run dev:server</code><br/>
+                    Stop with: <code>npm run kill</code>
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="flex justify-end">
               <button
                 type="submit"

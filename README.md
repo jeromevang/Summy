@@ -31,30 +31,41 @@ cd ../client && npm install
 
 ### Development
 
-#### Option 1: Batch Script (Windows)
+#### Start Client (Web Interface)
 ```bash
-# Kill existing processes and start both server & client
-start.bat
+# Start only the web interface
+npm run dev
 ```
+**Opens:** http://localhost:5173 (or next available port)
 
-#### Option 2: PowerShell Script
-```powershell
-# Run with PowerShell (allows Ctrl+C to stop all)
-.\start.ps1
-```
-
-#### Option 3: Manual Start
+#### Start Server (API/Proxy)
 ```bash
-# Terminal 1: Start server
+# Start the backend server separately
+npm run dev:server
+# or manually:
 cd server && npm run dev
-
-# Terminal 2: Start client
-cd client && npm run dev
 ```
+**Runs on:** http://localhost:3001
+
+#### Full Development Setup
+```bash
+# Terminal 1: Start client
+npm run dev
+
+# Terminal 2: Start server
+npm run dev:server
+```
+
+**Server Status:** Check the indicator in the web interface navigation bar.
 
 ### URLs
-- **Client Interface**: http://localhost:5174
+- **Client Interface**: http://localhost:5173
 - **Server API**: http://localhost:3001
+
+### Server Management
+- **Status**: Check the indicator in the web interface navigation
+- **Start**: Click "🚀 Start Server" button for instructions
+- **Stop**: Click "🛑 Stop Server" → `npm run kill`
 
 ## Configuration
 
@@ -84,7 +95,8 @@ IDE → ngrok → Summy Proxy → OpenAI API
 
 ## Scripts
 
-- `npm start` - Kill processes and start both services
-- `npm run kill` - Kill all node processes
+- `npm run dev` - Start client (web interface)
+- `npm run dev:server` - Start server (API/proxy)
+- `npm run kill` - Kill all Node.js processes
 - `npm run build` - Build both server and client
 - `npm run install:all` - Install dependencies for all components

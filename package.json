@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "Context management middleware for LLM conversations",
   "scripts": {
+    "dev": "npm run dev:client",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
     "kill": "taskkill /F /IM node.exe /T 2>nul || echo No node processes found",
-    "start": "npm run kill && npm run server:start && npm run client:start",
-    "server:start": "cd server && npm run dev",
-    "client:start": "cd client && npm run dev",
-    "server:build": "cd server && npm run build",
-    "client:build": "cd client && npm run build",
-    "build": "npm run server:build && npm run client:build",
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install"
   },
   "keywords": [
