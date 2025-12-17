@@ -8,6 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
+import { LMStudioClient } from '@lmstudio/sdk';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -1005,30 +1006,33 @@ app.post('/api/test-lmstudio', async (req, res) => {
   }
 });
 
-// Load model in LMStudio
+// Load model in LMStudio using SDK
 app.post('/api/lmstudio/load-model', async (req, res) => {
   try {
     const { model, unloadOthers } = req.body;
     const settings = await loadServerSettings();
-    const baseUrl = settings.lmstudioUrl || 'http://localhost:1234';
     
     if (!model) {
       return res.status(400).json({ success: false, error: 'No model specified' });
     }
     
+    // Connect to LMStudio via SDK
+    const client = new LMStudioClient();
+    
     // Unload other models if requested
     if (unloadOthers) {
       try {
-        const modelsRes = await axios.get(`${baseUrl}/v1/models`, { timeout: 5000 });
-        const loadedModels = modelsRes.data?.data || [];
+        const loadedModels = await client.llm.listLoaded();
+        console.log(`[LMStudio] Currently loaded models: ${loadedModels.map(m => m.identifier).join(', ')}`);
         
         for (const m of loadedModels) {
-          if (m.id !== model) {
+          if (m.identifier !== model && m.path !== model) {
             try {
-              await axios.delete(`${baseUrl}/v1/models/${encodeURIComponent(m.id)}`, { timeout: 30000 });
-              console.log(`[LMStudio] Unloaded model: ${m.id}`);
+              console.log(`[LMStudio] Unloading model: ${m.identifier}`);
+              await client.llm.unload(m.identifier);
+              console.log(`[LMStudio] Unloaded model: ${m.identifier}`);
             } catch (unloadErr: any) {
-              console.warn(`[LMStudio] Failed to unload ${m.id}:`, unloadErr.message);
+              console.warn(`[LMStudio] Failed to unload ${m.identifier}:`, unloadErr.message);
             }
           }
         }
@@ -1039,9 +1043,11 @@ app.post('/api/lmstudio/load-model', async (req, res) => {
     
     // Load the requested model
     console.log(`[LMStudio] Loading model: ${model}`);
-    const loadRes = await axios.post(`${baseUrl}/v1/models`, {
-      model: model
-    }, { timeout: 120000 }); // 2 min timeout for loading large models
+    await client.llm.load(model, {
+      config: {
+        contextLength: 8192
+      }
+    });
     
     // Save model to settings
     settings.lmstudioModel = model;
@@ -1054,10 +1060,10 @@ app.post('/api/lmstudio/load-model', async (req, res) => {
       model: model
     });
   } catch (error: any) {
-    console.error('[LMStudio] Load model error:', error.response?.data || error.message);
+    console.error('[LMStudio] Load model error:', error.message);
     res.status(500).json({
       success: false,
-      error: error.response?.data?.error?.message || error.response?.data?.error || error.message
+      error: error.message || 'Failed to load model'
     });
   }
 });
