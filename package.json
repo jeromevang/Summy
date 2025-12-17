@@ -1,0 +1,24 @@
+{
+  "name": "summy",
+  "version": "1.0.0",
+  "description": "Context management middleware for LLM conversations",
+  "scripts": {
+    "kill": "taskkill /F /IM node.exe /T 2>nul || echo No node processes found",
+    "start": "npm run kill && npm run server:start && npm run client:start",
+    "server:start": "cd server && npm run dev",
+    "client:start": "cd client && npm run dev",
+    "server:build": "cd server && npm run build",
+    "client:build": "cd client && npm run build",
+    "build": "npm run server:build && npm run client:build",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [
+    "llm",
+    "context",
+    "middleware",
+    "proxy",
+    "openai"
+  ],
+  "author": "",
+  "license": "ISC"
+}
