@@ -18,11 +18,60 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// General request logging middleware - captures EVERYTHING from ngrok
+app.use((req, res, next) => {
+  // Skip logging internal health/debug endpoints to reduce noise
+  if (req.url === '/health' || req.url === '/debug' || req.url.startsWith('/debug/')) {
+    return next();
+  }
+
+  addDebugEntry('request', `INCOMING: ${req.method} ${req.url}`, {
+    headers: req.headers,
+    query: req.query,
+    body: req.method === 'POST' ? req.body : undefined,
+    userAgent: req.headers['user-agent'],
+    contentType: req.headers['content-type'],
+    contentLength: req.headers['content-length'],
+    timestamp: new Date().toISOString()
+  });
+
+  // Continue to next middleware (including proxy)
+  next();
+});
+
 // Configuration
 const SESSIONS_DIR = path.join(__dirname, '../../sessions');
 
 // Ensure sessions directory exists
 fs.ensureDirSync(SESSIONS_DIR);
+
+// Debug logging
+interface DebugEntry {
+  timestamp: string;
+  type: 'request' | 'response' | 'session' | 'error';
+  message: string;
+  data?: any;
+}
+
+const debugLog: DebugEntry[] = [];
+const MAX_DEBUG_ENTRIES = 100;
+const sessionCache: { [key: string]: any } = {}; // Simple cache for session count
+
+const addDebugEntry = (type: DebugEntry['type'], message: string, data?: any) => {
+  debugLog.unshift({
+    timestamp: new Date().toISOString(),
+    type,
+    message,
+    data
+  });
+
+  // Keep only recent entries
+  if (debugLog.length > MAX_DEBUG_ENTRIES) {
+    debugLog.splice(MAX_DEBUG_ENTRIES);
+  }
+
+  console.log(`[${type.toUpperCase()}] ${message}`);
+};
 
 // Types
 interface ConversationTurn {
@@ -42,6 +91,41 @@ interface ContextSession {
   summarizedSize?: number;
   summary?: any;
 }
+
+// Conversation ID extraction function
+const extractConversationId = (req: any): string => {
+  const body = req.body || {};
+  const headers = req.headers || {};
+
+  // Try different sources for conversation ID:
+
+  // 1. Custom header from IDE
+  if (headers['x-conversation-id'] || headers['x-session-id']) {
+    return headers['x-conversation-id'] || headers['x-session-id'];
+  }
+
+  // 2. Conversation ID in request body (if IDE sends it)
+  if (body.conversation_id || body.session_id) {
+    return body.conversation_id || body.session_id;
+  }
+
+  // 3. Generate ID based on first user message (content hash + timestamp)
+  if (body.messages && body.messages.length > 0) {
+    const firstUserMessage = body.messages.find((msg: any) => msg.role === 'user');
+    if (firstUserMessage && firstUserMessage.content) {
+      // Create a hash of the first user message + timestamp for uniqueness
+      const content = typeof firstUserMessage.content === 'string'
+        ? firstUserMessage.content
+        : JSON.stringify(firstUserMessage.content);
+      const timestamp = Date.now();
+      const hashInput = `${content.substring(0, 50)}-${timestamp}`;
+      return Buffer.from(hashInput).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+    }
+  }
+
+  // 4. Fallback to timestamp-based ID
+  return `conv_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+};
 
 // Session storage functions
 const saveSession = async (session: ContextSession): Promise<void> => {
@@ -90,21 +174,41 @@ declare global {
 const openaiProxy = createProxyMiddleware({
   target: 'https://api.openai.com',
   changeOrigin: true,
-  pathRewrite: {
-    '^/v1/chat/completions': '/v1/chat/completions'
+  timeout: 30000, // 30 second timeout
+  pathRewrite: (path: string) => {
+    // Handle both /chat/completions and /v1/chat/completions
+    if (path.startsWith('/chat/completions')) {
+      return path.replace('/chat/completions', '/v1/chat/completions');
+    }
+    // Keep /v1/chat/completions as-is
+    return path;
   },
   onProxyReq: (proxyReq: any, req: any, res: any) => {
-    // Add OpenAI API key from environment
+    // Log incoming request FIRST (before any validation)
+    req.requestBody = req.body;
+    req.sessionId = extractConversationId(req);
+    req.conversationId = req.sessionId;
+
+    addDebugEntry('request', `Incoming request: ${req.sessionId}`, {
+      method: req.method,
+      url: req.url,
+      userAgent: req.headers['user-agent'],
+      contentLength: req.headers['content-length'],
+      hasApiKey: !!process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_openai_api_key_here'
+    });
+
+    // Validate OpenAI API key AFTER logging
     const apiKey = process.env.OPENAI_API_KEY;
-    if (apiKey) {
-      proxyReq.setHeader('Authorization', `Bearer ${apiKey}`);
+    if (!apiKey || apiKey === 'your_openai_api_key_here') {
+      addDebugEntry('error', `Rejected request ${req.sessionId}: OpenAI API key not configured`, { missingKey: true });
+      res.status(500).json({
+        error: 'Configuration Error',
+        message: 'OpenAI API key not configured. Please set OPENAI_API_KEY in server/.env file.'
+      });
+      return;
     }
 
-    // Generate session ID for this request
-    req.sessionId = uuidv4();
-    req.requestBody = req.body;
-
-    console.log(`[PROXY] Forwarding request to OpenAI: ${req.sessionId}`);
+    proxyReq.setHeader('Authorization', `Bearer ${apiKey}`);
   },
   onProxyRes: (proxyRes: any, req: any, res: any) => {
     let body = '';
@@ -127,13 +231,30 @@ const openaiProxy = createProxyMiddleware({
         // Load or create session
         let session = await loadSession(req.sessionId);
         if (!session) {
+          // Extract meaningful name from first message
+          let sessionName = `Conversation ${new Date().toLocaleString()}`;
+          if (req.requestBody?.messages?.length > 0) {
+            const firstMessage = req.requestBody.messages[0];
+            if (firstMessage.role === 'user' && firstMessage.content) {
+              const content = typeof firstMessage.content === 'string'
+                ? firstMessage.content
+                : JSON.stringify(firstMessage.content);
+              sessionName = content.substring(0, 50) + (content.length > 50 ? '...' : '');
+            }
+          }
+
           session = {
             id: req.sessionId,
-            name: `Session ${new Date().toLocaleString()}`,
-            ide: req.headers['x-ide'] || 'Unknown',
+            name: sessionName,
+            ide: req.headers['x-ide'] || req.headers['user-agent']?.split(' ')[0] || 'Unknown',
             created: new Date().toISOString(),
             conversations: []
           };
+
+          addDebugEntry('session', `Auto-created session: ${session.id}`, {
+            name: session.name,
+            ide: session.ide
+          });
         }
 
         // Add turn to session
@@ -142,7 +263,10 @@ const openaiProxy = createProxyMiddleware({
         // Save session
         await saveSession(session);
 
-        console.log(`[PROXY] Captured conversation turn: ${turn.id}`);
+        addDebugEntry('response', `Captured turn ${session.conversations.length} for session: ${session.id}`, {
+          turnCount: session.conversations.length,
+          tokens: turn.response?.usage?.total_tokens
+        });
       } catch (error) {
         console.error('[PROXY] Error processing response:', error);
       }
@@ -154,8 +278,9 @@ const openaiProxy = createProxyMiddleware({
   }
 } as any);
 
-// Routes
+// Routes - handle both standard and simplified paths
 app.use('/v1/chat/completions', openaiProxy);
+app.use('/chat/completions', openaiProxy);
 
 // Session management API
 app.get('/api/sessions', async (req, res) => {
@@ -227,6 +352,28 @@ app.delete('/api/sessions/:id', async (req, res) => {
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Debug endpoint
+app.get('/debug', async (req, res) => {
+  try {
+    const sessions = await listSessions();
+    res.json({
+      entries: debugLog,
+      sessionCount: sessions.length,
+      uptime: process.uptime(),
+      lastActivity: debugLog[0]?.timestamp || null
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get debug info' });
+  }
+});
+
+// Clear debug log
+app.post('/debug/clear', (req, res) => {
+  debugLog.length = 0;
+  addDebugEntry('session', 'Debug log cleared');
+  res.json({ success: true });
 });
 
 // Start server
