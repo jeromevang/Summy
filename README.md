@@ -61,11 +61,18 @@ npm run dev:server
 ### URLs
 - **Client Interface**: http://localhost:5173
 - **Server API**: http://localhost:3001
+- **Debug Console**: Check /debug page for live activity
+
+### IDE Setup (One-time)
+1. Start server: `npm run dev:server`
+2. Start ngrok: `ngrok http 3001`
+3. Configure IDE to use ngrok URL instead of OpenAI API
+4. Sessions auto-create as you chat!
 
 ### Server Management
-- **Status**: Check the indicator in the web interface navigation
-- **Start**: Click "🚀 Start Server" button for instructions
-- **Stop**: Click "🛑 Stop Server" → `npm run kill`
+- **Status**: Green/red indicator in navigation bar
+- **Stop**: `npm run kill` (kills all Node processes)
+- **Debug**: Check Debug page for live request monitoring
 
 ## Configuration
 

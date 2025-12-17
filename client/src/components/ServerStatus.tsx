@@ -1,9 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const ServerStatus: React.FC = () => {
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [websocketStatus, setWebsocketStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [isStarting, setIsStarting] = useState(false);
+
+  // WebSocket connection
+  useEffect(() => {
+    const ws = new ReconnectingWebSocket('ws://localhost:3001');
+
+    ws.onopen = () => {
+      setWebsocketStatus('connected');
+    };
+
+    ws.onclose = () => {
+      setWebsocketStatus('disconnected');
+    };
+
+    ws.onerror = () => {
+      setWebsocketStatus('disconnected');
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'status') {
+          // Server sends connection status
+          setWebsocketStatus(message.data.websocket === 'connected' ? 'connected' : 'disconnected');
+          setServerStatus(message.data.server === 'online' ? 'online' : 'offline');
+        }
+      } catch (error) {
+        console.error('Failed to parse WebSocket message:', error);
+      }
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   const checkServerStatus = async () => {
     try {
@@ -87,6 +123,22 @@ The server will run on: http://localhost:3001
     }
   };
 
+  const getWebsocketColor = () => {
+    switch (websocketStatus) {
+      case 'connected': return 'text-green-600';
+      case 'disconnected': return 'text-red-600';
+      default: return 'text-yellow-500';
+    }
+  };
+
+  const getWebsocketText = () => {
+    switch (websocketStatus) {
+      case 'connected': return 'Connected';
+      case 'disconnected': return 'Disconnected';
+      default: return 'Connecting...';
+    }
+  };
+
   return (
     <div className="flex items-center space-x-4">
       <div className="flex items-center space-x-2">
@@ -96,6 +148,16 @@ The server will run on: http://localhost:3001
         }`}></div>
         <span className={`text-sm font-medium ${getStatusColor()}`}>
           Server: {getStatusText()}
+        </span>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <div className={`w-2 h-2 rounded-full ${
+          websocketStatus === 'connected' ? 'bg-green-500' :
+          websocketStatus === 'disconnected' ? 'bg-red-500' : 'bg-yellow-400 animate-pulse'
+        }`}></div>
+        <span className={`text-sm font-medium ${getWebsocketColor()}`}>
+          WebSocket: {getWebsocketText()}
         </span>
       </div>
 

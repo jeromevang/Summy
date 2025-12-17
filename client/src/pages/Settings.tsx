@@ -1,18 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Settings: React.FC = () => {
   const [settings, setSettings] = useState({
     openaiKey: '',
     lmstudioUrl: 'http://localhost:1234',
-    lmstudioModel: '',
-    ngrokUrl: ''
+    lmstudioModel: ''
   });
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('summy-settings');
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        setSettings(prev => ({ ...prev, ...parsed }));
+      } catch (error) {
+        console.error('Failed to parse saved settings:', error);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Save settings to localStorage and send to server
+    setSaveStatus('saving');
+
+    // Save settings to localStorage
     localStorage.setItem('summy-settings', JSON.stringify(settings));
-    alert('Settings saved!');
+
+    // Show success feedback
+    setSaveStatus('saved');
+    setTimeout(() => setSaveStatus('idle'), 2000);
   };
 
   const handleChange = (field: string, value: string) => {
@@ -32,9 +52,18 @@ const Settings: React.FC = () => {
             <div>
               <h4 className="text-md font-medium text-gray-900 mb-3">OpenAI Configuration</h4>
               <div>
-                <label htmlFor="openaiKey" className="block text-sm font-medium text-gray-700">
-                  OpenAI API Key
-                </label>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="openaiKey" className="block text-sm font-medium text-gray-700">
+                    OpenAI API Key
+                  </label>
+                  {isLoaded && (
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      settings.openaiKey ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {settings.openaiKey ? '✓ Set' : 'Not set'}
+                    </span>
+                  )}
+                </div>
                 <input
                   type="password"
                   id="openaiKey"
@@ -43,6 +72,9 @@ const Settings: React.FC = () => {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="sk-..."
                 />
+                <p className="mt-1 text-xs text-gray-500">
+                  {isLoaded ? 'Settings loaded from browser storage' : 'Loading settings...'}
+                </p>
               </div>
             </div>
 
@@ -79,24 +111,23 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
-            {/* ngrok Configuration */}
+            {/* IDE Setup Instructions */}
             <div>
-              <h4 className="text-md font-medium text-gray-900 mb-3">IDE Integration</h4>
-              <div>
-                <label htmlFor="ngrokUrl" className="block text-sm font-medium text-gray-700">
-                  ngrok URL (for IDE connection)
-                </label>
-                <input
-                  type="text"
-                  id="ngrokUrl"
-                  value={settings.ngrokUrl}
-                  onChange={(e) => handleChange('ngrokUrl', e.target.value)}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="https://your-ngrok-url.ngrok.io"
-                />
-                <p className="mt-1 text-sm text-gray-500">
-                  Start ngrok locally and paste the HTTPS URL here. Configure your IDE to use this URL.
-                </p>
+              <h4 className="text-md font-medium text-gray-900 mb-3">IDE Configuration</h4>
+              <div className="bg-gray-50 p-4 rounded-md">
+                <div className="text-sm text-gray-700 space-y-2">
+                  <p><strong>1.</strong> Start this Summy server: <code className="bg-gray-100 px-1 rounded">npm run dev:server</code></p>
+                  <p><strong>2.</strong> Start ngrok: <code className="bg-gray-100 px-1 rounded">ngrok http 3001</code></p>
+                  <p><strong>3.</strong> Copy the ngrok HTTPS URL (e.g., <code className="bg-gray-100 px-1 rounded">https://abc123.ngrok.io</code>)</p>
+                  <p><strong>4.</strong> Configure your IDE to use: <code className="bg-gray-100 px-1 rounded">https://your-ngrok-url.ngrok.io/v1/chat/completions</code></p>
+                  <p className="text-xs text-gray-500 ml-4">Or just: <code className="bg-gray-100 px-1 rounded">https://your-ngrok-url.ngrok.io/chat/completions</code></p>
+                </div>
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> Sessions will be automatically created as you chat in your IDE.
+                    Check the Sessions page to see captured conversations.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -137,12 +168,17 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                {saveStatus === 'saving' && '💾 Saving...'}
+                {saveStatus === 'saved' && '✅ Settings saved!'}
+              </div>
               <button
                 type="submit"
-                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                disabled={saveStatus === 'saving'}
+                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Settings
+                {saveStatus === 'saving' ? 'Saving...' : 'Save Settings'}
               </button>
             </div>
           </form>
