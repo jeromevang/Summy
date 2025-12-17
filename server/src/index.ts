@@ -9,12 +9,15 @@ import { fileURLToPath } from 'url';
 import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 
-// Load environment variables
-dotenv.config();
-
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment variables from server directory
+console.log('🔧 DOTENV DEBUG: Loading .env from:', path.join(__dirname, '../.env'));
+const dotenvResult = dotenv.config({ path: path.join(__dirname, '../.env') });
+console.log('🔧 DOTENV DEBUG: Result:', dotenvResult);
+console.log('🔧 DOTENV DEBUG: OPENAI_API_KEY after dotenv:', process.env.OPENAI_API_KEY ? 'EXISTS' : 'MISSING');
 
 const app = express();
 const server = createServer(app);
@@ -222,21 +225,27 @@ const parseStreamingResponse = (body: string): any => {
   const chunks: any[] = [];
   let fullContent = '';
   let usage = null;
+  let finishReason = null;
 
   for (const line of lines) {
     if (line.startsWith('data: ')) {
       const data = line.substring(6).trim();
       if (data === '[DONE]') continue;
-      
+
       try {
         const parsed = JSON.parse(data);
         chunks.push(parsed);
-        
+
         // Extract content from delta
         if (parsed.choices?.[0]?.delta?.content) {
           fullContent += parsed.choices[0].delta.content;
         }
-        
+
+        // Extract finish reason
+        if (parsed.choices?.[0]?.finish_reason) {
+          finishReason = parsed.choices[0].finish_reason;
+        }
+
         // Extract usage if present
         if (parsed.usage) {
           usage = parsed.usage;
@@ -249,10 +258,11 @@ const parseStreamingResponse = (body: string): any => {
 
   return {
     type: 'streaming',
-    content: fullContent,
+    content: fullContent || 'No assistant response',
     chunks: chunks.length,
     usage: usage,
-    model: chunks[0]?.model || 'unknown'
+    finish_reason: finishReason || 'unknown',
+    model: chunks[0]?.model || 'localproxy'
   };
 };
 
@@ -332,8 +342,6 @@ const proxyToOpenAI = async (req: any, res: any) => {
     req.sessionId = extractConversationId(req);
     req.isStreaming = req.body?.stream === true;
 
-    console.log('🎯 MANUAL PROXY: Processing', req.method, req.url, '-> session:', req.sessionId);
-
     // CREATE SESSION IMMEDIATELY (this was the key missing piece!)
     await createSessionFromRequest(req);
 
@@ -346,9 +354,32 @@ const proxyToOpenAI = async (req: any, res: any) => {
       });
     }
 
+    // Map custom model names to real OpenAI models
+    // If model is not a known OpenAI model, default to gpt-4o-mini
+    const knownOpenAIModels = [
+      'gpt-4', 'gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini',
+      'gpt-3.5-turbo', 'gpt-3.5-turbo-16k',
+      'o1', 'o1-mini', 'o1-preview'
+    ];
+    const requestedModel = req.body?.model || 'gpt-4o-mini';
+    const actualModel = knownOpenAIModels.some(m => requestedModel.startsWith(m)) 
+      ? requestedModel 
+      : 'gpt-4o-mini';
+    
+    // Create modified request body with correct model
+    const modifiedBody = {
+      ...req.body,
+      model: actualModel
+    };
+
+    addDebugEntry('request', `Proxying to OpenAI: ${requestedModel} -> ${actualModel}`, {
+      originalModel: requestedModel,
+      actualModel: actualModel,
+      streaming: req.isStreaming
+    });
+
     // Proxy to OpenAI using axios
     const openaiUrl = req.url.startsWith('/v1/') ? req.url : req.url.replace('/chat/completions', '/v1/chat/completions');
-
     const response = await axios({
       method: req.method,
       url: `https://api.openai.com${openaiUrl}`,
@@ -356,14 +387,16 @@ const proxyToOpenAI = async (req: any, res: any) => {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      data: req.body,
+      data: modifiedBody,
       timeout: 120000,
       responseType: req.isStreaming ? 'stream' : 'json',
     });
 
     if (req.isStreaming) {
-      // Handle streaming
-      res.setHeader('Content-Type', 'text/plain');
+      // Handle streaming - use text/event-stream for SSE
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
       let fullContent = '';
       response.data.on('data', (chunk: Buffer) => {
         const chunkStr = chunk.toString();
@@ -375,6 +408,11 @@ const proxyToOpenAI = async (req: any, res: any) => {
         await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
         res.end();
       });
+      response.data.on('error', (err: Error) => {
+        console.error('❌ STREAM ERROR:', err.message);
+        addDebugEntry('error', `Stream error: ${err.message}`, {});
+        res.end();
+      });
     } else {
       // Handle regular response
       await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
@@ -383,10 +421,30 @@ const proxyToOpenAI = async (req: any, res: any) => {
 
   } catch (error: any) {
     console.error('❌ PROXY ERROR:', error.message);
+    console.error('❌ PROXY ERROR DETAILS:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      code: error.code,
+      errno: error.errno,
+      syscall: error.syscall
+    });
+
     try {
-      await updateSessionWithResponse(req.sessionId, req.requestBody, { error: error.message });
-    } catch {}
-    res.status(500).json({ error: error.message });
+      await updateSessionWithResponse(req.sessionId, req.requestBody, {
+        error: error.message,
+        statusCode: error.response?.status,
+        details: error.response?.data
+      });
+    } catch (sessionError) {
+      console.error('❌ SESSION UPDATE ERROR:', sessionError);
+    }
+
+    const statusCode = error.response?.status || 500;
+    res.status(statusCode).json({
+      error: error.message,
+      details: error.response?.data || 'No additional details'
+    });
   }
 };
 

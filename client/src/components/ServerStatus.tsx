@@ -107,91 +107,45 @@ The server will run on: http://localhost:3001
     return () => clearInterval(interval);
   }, []);
 
-  const getStatusColor = () => {
-    switch (serverStatus) {
-      case 'online': return 'text-green-600';
-      case 'offline': return 'text-red-600';
-      default: return 'text-gray-500';
-    }
-  };
-
-  const getStatusText = () => {
-    switch (serverStatus) {
-      case 'online': return 'Online';
-      case 'offline': return 'Offline';
-      default: return 'Checking...';
-    }
-  };
-
-  const getWebsocketColor = () => {
-    switch (websocketStatus) {
-      case 'connected': return 'text-green-600';
-      case 'disconnected': return 'text-red-600';
-      default: return 'text-yellow-500';
-    }
-  };
-
-  const getWebsocketText = () => {
-    switch (websocketStatus) {
-      case 'connected': return 'Connected';
-      case 'disconnected': return 'Disconnected';
-      default: return 'Connecting...';
-    }
-  };
-
   return (
-    <div className="flex items-center space-x-4">
-      <div className="flex items-center space-x-2">
-        <div className={`w-2 h-2 rounded-full ${
-          serverStatus === 'online' ? 'bg-green-500' :
-          serverStatus === 'offline' ? 'bg-red-500' : 'bg-gray-400 animate-pulse'
+    <div className="flex items-center space-x-3">
+      {/* Server status */}
+      <div className="flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-[#2d2d2d]">
+        <div className={`w-1.5 h-1.5 rounded-full ${
+          serverStatus === 'online' ? 'bg-green-400' :
+          serverStatus === 'offline' ? 'bg-red-400' : 'bg-gray-400 animate-pulse'
         }`}></div>
-        <span className={`text-sm font-medium ${getStatusColor()}`}>
-          Server: {getStatusText()}
+        <span className={`text-xs font-medium ${
+          serverStatus === 'online' ? 'text-green-400' :
+          serverStatus === 'offline' ? 'text-red-400' : 'text-gray-400'
+        }`}>
+          {serverStatus === 'online' ? 'Server' : serverStatus === 'offline' ? 'Offline' : '...'}
         </span>
       </div>
 
-      <div className="flex items-center space-x-2">
-        <div className={`w-2 h-2 rounded-full ${
-          websocketStatus === 'connected' ? 'bg-green-500' :
-          websocketStatus === 'disconnected' ? 'bg-red-500' : 'bg-yellow-400 animate-pulse'
+      {/* WebSocket status */}
+      <div className="flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-[#2d2d2d]">
+        <div className={`w-1.5 h-1.5 rounded-full ${
+          websocketStatus === 'connected' ? 'bg-green-400' :
+          websocketStatus === 'disconnected' ? 'bg-red-400' : 'bg-yellow-400 animate-pulse'
         }`}></div>
-        <span className={`text-sm font-medium ${getWebsocketColor()}`}>
-          WebSocket: {getWebsocketText()}
+        <span className={`text-xs font-medium ${
+          websocketStatus === 'connected' ? 'text-green-400' :
+          websocketStatus === 'disconnected' ? 'text-red-400' : 'text-yellow-400'
+        }`}>
+          {websocketStatus === 'connected' ? 'WS' : websocketStatus === 'disconnected' ? 'WS ✗' : 'WS...'}
         </span>
       </div>
 
       {serverStatus === 'offline' && (
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={startServer}
-            disabled={isStarting}
-            className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 font-medium"
-          >
-            {isStarting ? 'Starting...' : '🚀 Start Server'}
-          </button>
-          <div className="text-xs text-gray-500">
-            Need to run: <code className="bg-gray-100 px-1 rounded">npm run dev:server</code>
-          </div>
-        </div>
-      )}
-
-      {serverStatus === 'online' && (
         <button
-          onClick={stopServer}
-          className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 font-medium"
+          onClick={startServer}
+          disabled={isStarting}
+          className="px-2 py-1 text-xs bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 disabled:opacity-50 transition-colors"
         >
-          🛑 Stop Server
+          {isStarting ? '...' : '▶ Start'}
         </button>
       )}
-
-      <button
-        onClick={checkServerStatus}
-        className="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
-        title="Check server status"
-      >
-        🔄
-      </button>
     </div>
   );
 };

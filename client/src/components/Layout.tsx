@@ -8,52 +8,60 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
+  
+  // Check if we're on the context editor page (dark theme)
+  const isContextEditor = location.pathname.startsWith('/session/');
+
+  if (isContextEditor) {
+    // Render without layout for context editor (it has its own full-page layout)
+    return <>{children}</>;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0d0d0d]">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
+      <nav className="bg-[#1a1a1a] border-b border-[#2d2d2d]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+          <div className="flex justify-between h-14">
             <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold text-gray-900">
-                Summy
+              <Link to="/" className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                ✨ Summy
               </Link>
             </div>
             <div className="flex items-center space-x-6">
               <ServerStatus />
-            <div className="flex space-x-8">
-              <Link
-                to="/"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  location.pathname === '/'
-                    ? 'border-blue-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Sessions
-              </Link>
-              <Link
-                to="/debug"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  location.pathname === '/debug'
-                    ? 'border-blue-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Debug
-              </Link>
-              <Link
-                to="/settings"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  location.pathname === '/settings'
-                    ? 'border-blue-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Settings
-              </Link>
-            </div>
+              <div className="flex space-x-1">
+                <Link
+                  to="/"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                >
+                  Sessions
+                </Link>
+                <Link
+                  to="/debug"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/debug'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                >
+                  Debug
+                </Link>
+                <Link
+                  to="/settings"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/settings'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                >
+                  Settings
+                </Link>
+              </div>
             </div>
           </div>
         </div>

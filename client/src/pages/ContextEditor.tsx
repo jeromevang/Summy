@@ -1,59 +1,235 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Editor from '@monaco-editor/react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface ContextSession {
   id: string;
   name: string;
   ide: string;
   created: string;
-  conversations: any[];
+  conversations: ConversationTurn[];
   originalSize?: number;
   summarizedSize?: number;
   summary?: any;
 }
+
+interface ConversationTurn {
+  id: string;
+  timestamp: string;
+  request: {
+    messages: Array<{ role: string; content: string }>;
+    model?: string;
+  };
+  response: {
+    type?: string;
+    content?: string;
+    model?: string;
+    usage?: { total_tokens?: number };
+    finish_reason?: string;
+    choices?: Array<{ message?: { content: string }; finish_reason?: string }>;
+  };
+}
+
+// Code block component for syntax highlighting
+const CodeBlock = ({ language, children }: { language: string; children: string }) => {
+  const [copied, setCopied] = useState(false);
+  
+  const handleCopy = () => {
+    navigator.clipboard.writeText(children);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="relative group my-3">
+      <div className="flex items-center justify-between bg-[#2d2d2d] px-4 py-2 rounded-t-lg border-b border-[#404040]">
+        <span className="text-xs text-gray-400 font-mono">{language || 'text'}</span>
+        <button
+          onClick={handleCopy}
+          className="text-xs text-gray-400 hover:text-white transition-colors"
+        >
+          {copied ? '✓ Copied' : 'Copy'}
+        </button>
+      </div>
+      <SyntaxHighlighter
+        language={language || 'text'}
+        style={oneDark}
+        customStyle={{
+          margin: 0,
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+          borderBottomLeftRadius: '0.5rem',
+          borderBottomRightRadius: '0.5rem',
+          fontSize: '13px',
+        }}
+      >
+        {children}
+      </SyntaxHighlighter>
+    </div>
+  );
+};
+
+// Thinking/reasoning block component
+const ThinkingBlock = ({ content }: { content: string }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  return (
+    <div className="my-3 border border-[#3d3d3d] rounded-lg overflow-hidden">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center gap-2 px-4 py-2 bg-[#2a2a2a] hover:bg-[#333] transition-colors text-left"
+      >
+        <span className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>▶</span>
+        <span className="text-purple-400 text-sm font-medium">💭 Thinking</span>
+        <span className="text-gray-500 text-xs ml-auto">{isExpanded ? 'Click to collapse' : 'Click to expand'}</span>
+      </button>
+      {isExpanded && (
+        <div className="px-4 py-3 bg-[#1e1e1e] text-gray-300 text-sm whitespace-pre-wrap border-t border-[#3d3d3d]">
+          {content}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Message bubble component
+const MessageBubble = ({ role, content, timestamp, model, tokens }: {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp?: string;
+  model?: string;
+  tokens?: number;
+}) => {
+  const isUser = role === 'user';
+  const isSystem = role === 'system';
+
+  // Extract thinking content if present
+  const thinkingMatch = content.match(/<thinking>([\s\S]*?)<\/thinking>/);
+  const thinking = thinkingMatch ? thinkingMatch[1] : null;
+  const displayContent = thinking 
+    ? content.replace(/<thinking>[\s\S]*?<\/thinking>/, '').trim()
+    : content;
+
+  if (isSystem) {
+    return (
+      <div className="my-2 px-4 py-2 bg-[#2a2a2a] rounded-lg border border-[#3d3d3d]">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs text-yellow-500 font-medium">⚙️ System</span>
+        </div>
+        <div className="text-gray-400 text-sm whitespace-pre-wrap">{content.substring(0, 200)}...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`my-4 ${isUser ? 'flex justify-end' : ''}`}>
+      <div className={`max-w-[85%] ${isUser ? 'order-2' : ''}`}>
+        {/* Header */}
+        <div className={`flex items-center gap-2 mb-2 ${isUser ? 'justify-end' : ''}`}>
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm ${
+            isUser ? 'bg-blue-600' : 'bg-gradient-to-br from-purple-500 to-pink-500'
+          }`}>
+            {isUser ? '👤' : '✨'}
+          </div>
+          <span className="text-sm font-medium text-gray-300">
+            {isUser ? 'You' : 'Assistant'}
+          </span>
+          {timestamp && (
+            <span className="text-xs text-gray-500">
+              {new Date(timestamp).toLocaleTimeString()}
+            </span>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className={`rounded-2xl px-4 py-3 ${
+          isUser 
+            ? 'bg-blue-600 text-white' 
+            : 'bg-[#2a2a2a] text-gray-100 border border-[#3d3d3d]'
+        }`}>
+          {isUser ? (
+            <div className="whitespace-pre-wrap">{displayContent}</div>
+          ) : (
+            <>
+              {thinking && <ThinkingBlock content={thinking} />}
+              <div className="prose prose-invert prose-sm max-w-none">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    code({ node, className, children, ...props }: any) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      const isInline = !match && !className;
+                      return isInline ? (
+                        <code className="bg-[#1e1e1e] px-1.5 py-0.5 rounded text-pink-400 text-sm" {...props}>
+                          {children}
+                        </code>
+                      ) : (
+                        <CodeBlock language={match ? match[1] : ''}>
+                          {String(children).replace(/\n$/, '')}
+                        </CodeBlock>
+                      );
+                    },
+                    p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                    ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside mb-3 space-y-1">{children}</ol>,
+                    h1: ({ children }) => <h1 className="text-xl font-bold mb-2 mt-4">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-lg font-bold mb-2 mt-3">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-base font-bold mb-2 mt-2">{children}</h3>,
+                    a: ({ children, href }) => (
+                      <a href={href} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+                        {children}
+                      </a>
+                    ),
+                    blockquote: ({ children }) => (
+                      <blockquote className="border-l-4 border-gray-500 pl-4 italic text-gray-400 my-3">
+                        {children}
+                      </blockquote>
+                    ),
+                  }}
+                >
+                  {displayContent}
+                </ReactMarkdown>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Footer for assistant */}
+        {!isUser && (model || tokens) && (
+          <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+            {model && <span>🤖 {model}</span>}
+            {tokens && <span>📊 {tokens} tokens</span>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const ContextEditor: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const [session, setSession] = useState<ContextSession | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [summarizing, setSummarizing] = useState(false);
-  const [activeView, setActiveView] = useState<'original' | 'summarized'>('original');
-  const [editorContent, setEditorContent] = useState('');
-  const [compressionRatio, setCompressionRatio] = useState<number | null>(null);
-  const [autoSave, setAutoSave] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (sessionId) {
       loadSession();
-      // Start polling for updates every 30 seconds
-      const pollInterval = setInterval(checkForUpdates, 30000);
+      const pollInterval = setInterval(checkForUpdates, 10000);
       return () => clearInterval(pollInterval);
     }
   }, [sessionId]);
 
-  // Auto-save when content changes
-  useEffect(() => {
-    if (autoSave && editorContent && session) {
-      const timeoutId = setTimeout(() => {
-        saveSession();
-      }, 2000); // Auto-save after 2 seconds of no typing
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [editorContent, autoSave]);
-
   const loadSession = async () => {
     if (!sessionId) return;
-
     try {
       const response = await axios.get(`http://localhost:3001/api/sessions/${sessionId}`);
       setSession(response.data);
-      setEditorContent(formatConversationsForEditor(response.data.conversations));
     } catch (error) {
       console.error('Failed to load session:', error);
       navigate('/');
@@ -62,189 +238,49 @@ const ContextEditor: React.FC = () => {
     }
   };
 
-  const formatConversationsForEditor = (conversations: any[]): string => {
-    return conversations.map((turn, index) => {
-      const timestamp = new Date(turn.timestamp).toLocaleString();
-      const userMessage = turn.request?.messages?.find((m: any) => m.role === 'user')?.content || 'No user message';
-
-      // Handle both streaming and non-streaming responses
-      let assistantMessage = 'No assistant response';
-      if (turn.response) {
-        if (turn.response.type === 'streaming') {
-          // Streaming response
-          assistantMessage = turn.response.content || 'No assistant response';
-        } else if (turn.response.choices?.[0]?.message?.content) {
-          // Regular JSON response
-          assistantMessage = turn.response.choices[0].message.content;
-        }
-      }
-
-      return `// ═══════════════════════════════════════════════════════════════
-// CONVERSATION TURN ${index + 1}
-// Timestamp: ${timestamp}
-// ═══════════════════════════════════════════════════════════════
-
-/* ┌─────────────────────────────────────────────────────────────────┐
-   │                          USER MESSAGE                            │
-   └─────────────────────────────────────────────────────────────────┘ */
-
-${typeof userMessage === 'string' ? userMessage : JSON.stringify(userMessage, null, 2)}
-
-/* ┌─────────────────────────────────────────────────────────────────┐
-   │                        ASSISTANT RESPONSE                        │
-   └─────────────────────────────────────────────────────────────────┘ */
-
-${typeof assistantMessage === 'string' ? assistantMessage : JSON.stringify(assistantMessage, null, 2)}
-
-/* ┌─────────────────────────────────────────────────────────────────┐
-   │                          METADATA                               │
-   └─────────────────────────────────────────────────────────────────┘ */
-
-Model: ${turn.response?.model || turn.request?.model || 'localproxy'}
-Tokens: ${turn.response?.usage?.total_tokens || 'unknown'}
-Finish Reason: ${turn.response?.finish_reason || turn.response?.choices?.[0]?.finish_reason || 'unknown'}
-
-═══════════════════════════════════════════════════════════════════════
-
-`;
-    }).join('\n');
-  };
-
   const checkForUpdates = async () => {
     if (!sessionId) return;
-
     try {
       const response = await axios.get(`http://localhost:3001/api/sessions/${sessionId}`);
       const latestSession = response.data;
-
-      // Check if there are new conversations
       if (latestSession.conversations.length > (session?.conversations.length || 0)) {
-        const newTurns = latestSession.conversations.length - (session?.conversations.length || 0);
+        setSession(latestSession);
         setLastUpdate(new Date());
-
-        if (confirm(`${newTurns} new conversation turn(s) detected. Reload to see updates?`)) {
-          setSession(latestSession);
-          setEditorContent(formatConversationsForEditor(latestSession.conversations));
-        }
       }
     } catch (error) {
       console.error('Failed to check for updates:', error);
     }
   };
 
-  const saveSession = async () => {
-    if (!session) return;
-
-    setSaving(true);
-    try {
-      await axios.put(`http://localhost:3001/api/sessions/${session.id}`, {
-        ...session,
-        conversations: parseEditorContent(editorContent)
-      });
-      setLastUpdate(new Date());
-      if (!autoSave) {
-        alert('Session saved successfully!');
-      }
-    } catch (error) {
-      console.error('Failed to save session:', error);
-      alert('Failed to save session');
-    } finally {
-      setSaving(false);
-    }
+  // Extract user message (last one in the array)
+  const getUserMessage = (turn: ConversationTurn): string => {
+    const userMessages = turn.request?.messages?.filter(m => m.role === 'user') || [];
+    return userMessages.length > 0 ? userMessages[userMessages.length - 1].content : '';
   };
 
-  const parseEditorContent = (content: string): any[] => {
-    // This is a simplified parser - in a real app you'd want more robust parsing
-    // For now, we'll just return the existing conversations
-    return session?.conversations || [];
-  };
-
-  const summarizeContext = async () => {
-    if (!session) return;
-
-    setSummarizing(true);
-    try {
-      // Calculate original size
-      const originalText = JSON.stringify(session.conversations);
-      const originalSize = new Blob([originalText]).size;
-
-      // TODO: Implement LMStudio API call for summarization
-      // For now, simulate summarization
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-
-      // Create summarized version (simplified for demo)
-      const summarizedConversations = session.conversations.map(turn => ({
-        ...turn,
-        request: {
-          ...turn.request,
-          messages: turn.request.messages?.map((msg: any) => ({
-            ...msg,
-            content: msg.content?.length > 100
-              ? msg.content.substring(0, 100) + '... [summarized]'
-              : msg.content
-          }))
-        },
-        response: {
-          ...turn.response,
-          choices: turn.response.choices?.map((choice: any) => ({
-            ...choice,
-            message: {
-              ...choice.message,
-              content: choice.message.content?.length > 200
-                ? choice.message.content.substring(0, 200) + '... [summarized]'
-                : choice.message.content
-            }
-          }))
-        }
-      }));
-
-      const summarizedText = JSON.stringify(summarizedConversations);
-      const summarizedSize = new Blob([summarizedText]).size;
-      const ratio = originalSize > 0 ? (originalSize - summarizedSize) / originalSize : 0;
-
-      // Update session with summarized data
-      const updatedSession = {
-        ...session,
-        conversations: summarizedConversations,
-        originalSize,
-        summarizedSize,
-        summary: {
-          compressed: true,
-          ratio: Math.round(ratio * 100) / 100,
-          timestamp: new Date().toISOString()
-        }
-      };
-
-      // Save to server
-      await axios.put(`http://localhost:3001/api/sessions/${session.id}`, updatedSession);
-      setSession(updatedSession);
-      setCompressionRatio(ratio);
-      setEditorContent(formatConversationsForEditor(summarizedConversations));
-
-      alert(`Context summarized! Compression ratio: ${(ratio * 100).toFixed(1)}%`);
-    } catch (error) {
-      console.error('Failed to summarize context:', error);
-      alert('Failed to summarize context. Check LMStudio connection.');
-    } finally {
-      setSummarizing(false);
+  // Extract assistant response
+  const getAssistantMessage = (turn: ConversationTurn): string => {
+    if (turn.response?.type === 'streaming') {
+      return turn.response.content || '';
     }
+    return turn.response?.choices?.[0]?.message?.content || '';
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center h-64 bg-[#1a1a1a]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
       </div>
     );
   }
 
   if (!session) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">Session not found.</p>
+      <div className="text-center py-12 bg-[#1a1a1a] min-h-screen">
+        <p className="text-gray-400">Session not found.</p>
         <button
           onClick={() => navigate('/')}
-          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+          className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
         >
           Back to Sessions
         </button>
@@ -253,168 +289,105 @@ Finish Reason: ${turn.response?.finish_reason || turn.response?.choices?.[0]?.fi
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-[#1a1a1a]">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{session.name}</h1>
-            <p className="text-gray-600">
-              {session.ide} • Created {new Date(session.created).toLocaleString()}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={saveSession}
-              disabled={saving}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : '💾 Save'}
-            </button>
-            <button
-              onClick={summarizeContext}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
-            >
-              🗜️ Summarize
-            </button>
+      <div className="sticky top-0 z-10 bg-[#1a1a1a] border-b border-[#2d2d2d] px-6 py-4">
+        <div className="flex items-center justify-between max-w-4xl mx-auto">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+              className="p-2 hover:bg-[#2d2d2d] rounded-lg transition-colors text-gray-400 hover:text-white"
             >
-              ← Back
+              ←
             </button>
+            <div>
+              <h1 className="text-lg font-semibold text-white">{session.name}</h1>
+              <p className="text-xs text-gray-500">
+                {session.ide} • {new Date(session.created).toLocaleDateString()}
+                {session.conversations.length > 0 && ` • ${session.conversations.length} turns`}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={checkForUpdates}
+              className="p-2 hover:bg-[#2d2d2d] rounded-lg transition-colors text-gray-400 hover:text-white"
+              title="Refresh"
+            >
+              🔄
+            </button>
+            {lastUpdate && (
+              <span className="text-xs text-gray-500">
+                Updated {lastUpdate.toLocaleTimeString()}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* View Toggle & Summarization */}
-      <div className="mb-4">
-        <div className="flex flex-wrap gap-2 items-center">
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                setActiveView('original');
-                if (session?.conversations) {
-                  setEditorContent(formatConversationsForEditor(session.conversations));
-                }
-              }}
-              className={`px-4 py-2 text-sm font-medium rounded-md ${
-                activeView === 'original'
-                  ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              📝 Original Context
-              {session?.originalSize && ` (${session.originalSize} bytes)`}
-            </button>
-            <button
-              onClick={() => {
-                setActiveView('summarized');
-                if (session?.conversations) {
-                  setEditorContent(formatConversationsForEditor(session.conversations));
-                }
-              }}
-              className={`px-4 py-2 text-sm font-medium rounded-md ${
-                activeView === 'summarized'
-                  ? 'bg-green-100 text-green-700 border border-green-300'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              🗜️ Current Context
-              {session?.summarizedSize && ` (${session.summarizedSize} bytes)`}
-            </button>
+      {/* Chat Container */}
+      <div className="max-w-4xl mx-auto px-6 py-6">
+        {session.conversations.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-4xl mb-4">💬</div>
+            <p className="text-gray-400">No conversations yet.</p>
+            <p className="text-gray-500 text-sm mt-2">Start chatting in your IDE to see messages here.</p>
           </div>
+        ) : (
+          <div className="space-y-2">
+            {session.conversations.map((turn, index) => {
+              const userMsg = getUserMessage(turn);
+              const assistantMsg = getAssistantMessage(turn);
+              const model = turn.response?.model || turn.request?.model;
+              const tokens = turn.response?.usage?.total_tokens;
 
-          <div className="flex gap-2 ml-4">
-            <button
-              onClick={summarizeContext}
-              disabled={summarizing || !session}
-              className="px-4 py-2 text-sm font-medium rounded-md bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
-            >
-              {summarizing ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Summarizing...
-                </>
-              ) : (
-                <>
-                  ⚡ Summarize with LMStudio
-                </>
-              )}
-            </button>
+              return (
+                <div key={turn.id || index} className="pb-4 border-b border-[#2d2d2d] last:border-0">
+                  {/* Turn indicator */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="h-px flex-1 bg-[#2d2d2d]"></div>
+                    <span className="text-xs text-gray-600 px-2">Turn {index + 1}</span>
+                    <div className="h-px flex-1 bg-[#2d2d2d]"></div>
+                  </div>
 
-            {compressionRatio !== null && (
-              <div className="px-3 py-2 text-sm bg-green-100 text-green-800 rounded-md">
-                📊 Compressed: {(compressionRatio * 100).toFixed(1)}% reduction
-              </div>
-            )}
+                  {/* User message */}
+                  {userMsg && (
+                    <MessageBubble
+                      role="user"
+                      content={userMsg}
+                      timestamp={turn.timestamp}
+                    />
+                  )}
 
-            <div className="flex items-center gap-2 ml-4">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={autoSave}
-                  onChange={(e) => setAutoSave(e.target.checked)}
-                  className="rounded border-gray-300"
-                />
-                💾 Auto-save
-              </label>
-
-              <button
-                onClick={checkForUpdates}
-                className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
-                title="Check for new conversation turns"
-              >
-                🔄 Refresh
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {session?.summary && (
-          <div className="mt-2 text-sm text-gray-600">
-            💡 This context has been processed with LMStudio summarization
+                  {/* Assistant message */}
+                  {assistantMsg && (
+                    <MessageBubble
+                      role="assistant"
+                      content={assistantMsg}
+                      timestamp={turn.timestamp}
+                      model={model}
+                      tokens={tokens}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Monaco Editor */}
-      <div className="context-editor">
-        <Editor
-          height="600px"
-          language="typescript"
-          theme="vs-light"
-          value={editorContent}
-          onChange={(value) => setEditorContent(value || '')}
-          options={{
-            minimap: { enabled: false },
-            fontSize: 14,
-            wordWrap: 'on',
-            automaticLayout: true,
-            scrollBeyondLastLine: false,
-            readOnly: false,
-            lineNumbers: 'on',
-            glyphMargin: false,
-            folding: true,
-            renderLineHighlight: 'line',
-            bracketPairColorization: { enabled: true }
-          }}
-        />
-      </div>
-
-      {/* Status Bar */}
-      <div className="mt-4 text-sm text-gray-500 flex justify-between items-center">
-        <div className="flex gap-4">
-          <span>Characters: {editorContent.length.toLocaleString()}</span>
-          <span>Lines: {editorContent.split('\n').length}</span>
-          <span>Mode: {activeView === 'original' ? 'View Original' : 'Edit Context'}</span>
-          {autoSave && <span className="text-green-600">● Auto-save ON</span>}
-        </div>
-        <div className="flex gap-4">
-          {lastUpdate && (
-            <span>Last updated: {lastUpdate.toLocaleTimeString()}</span>
-          )}
-          <span className="text-blue-600">🔄 Auto-refresh every 30s</span>
+      {/* Footer */}
+      <div className="fixed bottom-0 left-0 right-0 bg-[#1a1a1a] border-t border-[#2d2d2d] px-6 py-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center gap-4">
+            <span>📊 {session.conversations.length} conversation turns</span>
+            <span>🔄 Auto-refresh every 10s</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center px-2 py-1 rounded bg-[#2d2d2d] text-gray-400">
+              View Only
+            </span>
+          </div>
         </div>
       </div>
     </div>

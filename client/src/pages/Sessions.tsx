@@ -83,7 +83,7 @@ const Sessions: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
       </div>
     );
   }
@@ -91,27 +91,23 @@ const Sessions: React.FC = () => {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Context Sessions</h1>
+        <h1 className="text-2xl font-bold text-white mb-4">Context Sessions</h1>
 
         {/* Auto-creation info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="bg-[#1a1a1a] border border-[#2d2d2d] rounded-lg p-4 mb-6">
           <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
-            </div>
+            <div className="flex-shrink-0 text-purple-400">💡</div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">Auto-Created Sessions</h3>
-              <div className="mt-2 text-sm text-blue-700">
-                <p>Sessions are automatically created when conversations are detected from your IDE. Each unique conversation gets its own session with an auto-generated name based on the first message.</p>
+              <h3 className="text-sm font-medium text-purple-400">Auto-Created Sessions</h3>
+              <div className="mt-2 text-sm text-gray-400">
+                <p>Sessions are automatically created when conversations are detected from your IDE via ngrok. Each unique conversation gets its own session.</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Manual create session (less prominent) */}
-        <div className="bg-white p-4 rounded-lg shadow mb-6 border-l-4 border-gray-300">
+        <div className="bg-[#1a1a1a] p-4 rounded-lg border border-[#2d2d2d] mb-6">
           <div className="flex gap-4 items-center">
             <div className="flex-1">
               <input
@@ -119,64 +115,66 @@ const Sessions: React.FC = () => {
                 value={newSessionName}
                 onChange={(e) => setNewSessionName(e.target.value)}
                 placeholder="Create manual session (optional)..."
-                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
                 onKeyPress={(e) => e.key === 'Enter' && createSession()}
               />
             </div>
             <button
               onClick={createSession}
               disabled={!newSessionName.trim()}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 disabled:opacity-50"
+              className="px-4 py-2 bg-[#2d2d2d] hover:bg-[#3d3d3d] text-gray-300 rounded-lg transition-colors disabled:opacity-50"
             >
-              Create Manual Session
+              + Create
             </button>
           </div>
         </div>
       </div>
 
       {/* Sessions list */}
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         {sessions.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No sessions yet. Create your first session above.</p>
+          <div className="text-center py-16">
+            <div className="text-4xl mb-4">📭</div>
+            <p className="text-gray-400">No sessions yet.</p>
+            <p className="text-gray-500 text-sm mt-2">Start chatting in your IDE to see sessions here.</p>
           </div>
         ) : (
           sessions.map((session) => (
-            <div key={session.id} className="bg-white rounded-lg shadow p-6">
+            <Link
+              key={session.id}
+              to={`/session/${session.id}`}
+              className="block bg-[#1a1a1a] rounded-lg border border-[#2d2d2d] p-4 hover:border-purple-500/50 transition-colors group"
+            >
               <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-medium text-gray-900">{session.name}</h3>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                      Auto-created
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-white font-medium truncate group-hover:text-purple-400 transition-colors">
+                      {session.name}
+                    </h3>
+                    <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-400">
+                      {session.conversations.length} turns
                     </span>
                   </div>
                   <p className="text-sm text-gray-500">
-                    {session.ide} • {new Date(session.created).toLocaleString()} • {session.conversations.length} conversation turn{session.conversations.length !== 1 ? 's' : ''}
+                    {session.ide} • {new Date(session.created).toLocaleDateString()}
                   </p>
-                  {session.originalSize && session.summarizedSize && (
-                    <p className="text-sm text-green-600 mt-1">
-                      Compressed: {session.originalSize} → {session.summarizedSize} chars
-                      ({Math.round((session.summarizedSize / session.originalSize) * 100)}%)
-                    </p>
-                  )}
                 </div>
-                <div className="flex gap-2">
-                  <Link
-                    to={`/editor/${session.id}`}
-                    className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                  >
-                    Edit
-                  </Link>
+                <div className="flex items-center gap-2 ml-4">
                   <button
-                    onClick={() => deleteSession(session.id)}
-                    className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      deleteSession(session.id);
+                    }}
+                    className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                    title="Delete session"
                   >
-                    Delete
+                    🗑️
                   </button>
+                  <span className="text-gray-500 group-hover:text-purple-400 transition-colors">→</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>

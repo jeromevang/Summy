@@ -106,8 +106,5 @@ server/*.log
 client/dist/
 client/.vite/
 
-# Session data (uncomment if you want to ignore all sessions)
-# sessions/
-
-# Keep example session for documentation
-!sessions/example-session.json
+# Session data (user-specific, should not be committed)
+sessions/*.json
