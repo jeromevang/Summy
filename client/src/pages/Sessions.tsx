@@ -13,6 +13,7 @@ interface CompressionConfig {
     compressedTokens: number;
     ratio: number;
   };
+  systemPrompt?: string | null;
 }
 
 interface ContextSession {

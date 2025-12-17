@@ -17,6 +17,7 @@ interface CompressionConfig {
     compressedTokens: number;
     ratio: number;
   };
+  systemPrompt?: string | null;
 }
 
 interface ContextSession {
@@ -232,23 +233,142 @@ const Message = ({
 
 // Compression mode names
 const COMPRESSION_MODES = [
-  { value: 0, label: 'None', description: 'No compression' },
-  { value: 1, label: 'Light', description: 'Compress text, preserve tools' },
-  { value: 2, label: 'Medium', description: 'Compress text, truncate tool outputs' },
-  { value: 3, label: 'Aggressive', description: 'Convert everything to text summaries' },
+  { value: 0, label: 'None', description: 'Original - no compression', color: 'gray' },
+  { value: 1, label: 'Light', description: 'Summarize text, preserve tools', color: 'green' },
+  { value: 2, label: 'Medium', description: 'Summarize text, truncate tools', color: 'yellow' },
+  { value: 3, label: 'Aggressive', description: 'Convert everything to summaries', color: 'red' },
 ];
+
+// Compression versions interface
+interface CompressionVersion {
+  messages: any[];
+  stats: { originalTokens: number; compressedTokens: number; ratio: number };
+}
+
+interface CompressionVersions {
+  none: CompressionVersion;
+  light: CompressionVersion;
+  medium: CompressionVersion;
+  aggressive: CompressionVersion;
+}
+
+// Compression Stepper Component (panels with border style)
+const CompressionStepper = ({ 
+  value, 
+  onChange, 
+  versions,
+  disabled 
+}: { 
+  value: 0 | 1 | 2 | 3; 
+  onChange: (v: 0 | 1 | 2 | 3) => void;
+  versions: CompressionVersions | null;
+  disabled?: boolean;
+}) => {
+  const steps = [
+    { value: 0, label: 'None', description: 'Original messages', key: 'none' },
+    { value: 1, label: 'Light', description: 'Summarize text only', key: 'light' },
+    { value: 2, label: 'Medium', description: 'Truncate tool outputs', key: 'medium' },
+    { value: 3, label: 'Aggressive', description: 'Full compression', key: 'aggressive' },
+  ];
+
+  const getStats = (key: string) => {
+    if (!versions) return null;
+    return versions[key as keyof CompressionVersions]?.stats;
+  };
+
+  return (
+    <div className="w-full">
+      <div className="flex items-stretch">
+        {steps.map((step, idx) => {
+          const stats = getStats(step.key);
+          const isActive = value === step.value;
+          const isPast = value > step.value;
+          const isFirst = idx === 0;
+          const isLast = idx === steps.length - 1;
+          
+          return (
+            <button
+              key={step.value}
+              onClick={() => !disabled && onChange(step.value as 0 | 1 | 2 | 3)}
+              disabled={disabled}
+              className={`
+                relative flex-1 flex items-center gap-3 px-4 py-3
+                border-y border-r first:border-l first:rounded-l-lg last:rounded-r-lg
+                transition-all duration-200
+                ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
+                ${isActive 
+                  ? 'bg-[#1a1a2e] border-purple-500/50' 
+                  : 'bg-[#0d0d12] border-[#2d2d3d] hover:bg-[#151520]'
+                }
+                ${isFirst ? 'rounded-l-lg' : ''}
+                ${isLast ? 'rounded-r-lg' : ''}
+              `}
+            >
+              {/* Step indicator */}
+              <div className={`
+                flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center
+                font-medium text-sm transition-all duration-200
+                ${isPast 
+                  ? 'bg-purple-500 text-white' 
+                  : isActive 
+                    ? 'border-2 border-purple-500 text-purple-400 bg-transparent' 
+                    : 'border border-[#3d3d4d] text-gray-500 bg-transparent'
+                }
+              `}>
+                {isPast ? (
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <span>{String(idx).padStart(2, '0')}</span>
+                )}
+              </div>
+              
+              {/* Step content */}
+              <div className="flex flex-col items-start min-w-0">
+                <span className={`text-sm font-medium truncate ${
+                  isActive ? 'text-white' : isPast ? 'text-purple-300' : 'text-gray-400'
+                }`}>
+                  {step.label}
+                </span>
+                <span className="text-xs text-gray-500 truncate">
+                  {stats && step.value > 0 
+                    ? `${Math.round(stats.ratio * 100)}% saved` 
+                    : step.description
+                  }
+                </span>
+              </div>
+              
+              {/* Active indicator bar */}
+              {isActive && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500" />
+              )}
+              
+              {/* Arrow connector (except last) */}
+              {!isLast && (
+                <div className="absolute -right-2 top-1/2 -translate-y-1/2 z-10">
+                  <div className={`w-4 h-4 rotate-45 border-t border-r ${
+                    isActive || isPast ? 'border-purple-500/50 bg-[#1a1a2e]' : 'border-[#2d2d3d] bg-[#0d0d12]'
+                  }`} />
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 const ContextEditor: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const [session, setSession] = useState<ContextSession | null>(null);
   const [loading, setLoading] = useState(true);
-  const [compressing, setCompressing] = useState(false);
-  const [compressionMode, setCompressionMode] = useState<0 | 1 | 2 | 3>(1);
+  const [recompressing, setRecompressing] = useState(false);
+  const [compressionMode, setCompressionMode] = useState<0 | 1 | 2 | 3>(0);
   const [keepRecent, setKeepRecent] = useState(5);
-  const [autoCompress, setAutoCompress] = useState(false);
-  const [compressedPreview, setCompressedPreview] = useState<any[] | null>(null);
-  const [compressionStats, setCompressionStats] = useState<{ originalTokens: number; compressedTokens: number; ratio: number } | null>(null);
+  const [compressionVersions, setCompressionVersions] = useState<CompressionVersions | null>(null);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [keywordMap, setKeywordMap] = useState<Map<string, string>>(new Map());
   const [lmstudioConnected, setLmstudioConnected] = useState<boolean | null>(null);
@@ -256,15 +376,68 @@ const ContextEditor: React.FC = () => {
   const leftPanelRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
   const [syncScroll, setSyncScroll] = useState(true);
-  const [autoScrollToBottom, setAutoScrollToBottom] = useState(true);
   const [wsConnected, setWsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [loadingVersions, setLoadingVersions] = useState(false);
+  const [systemPrompt, setSystemPrompt] = useState(
+    `You are a context summarizer. Condense the conversation into a brief summary that preserves key information.
+
+Output format:
+[CONVERSATION SUMMARY]
+Goal: <main objective or topic>
+Key Points: <important details, decisions, or facts>
+Current State: <where things stand>
+[END SUMMARY]
+
+Rules:
+- ONLY use information from the conversation
+- Be concise (under 150 words)
+- Preserve technical terms, names, and specifics exactly
+- Output ONLY the summary block, nothing else`
+  );
+  const [showPromptEditor, setShowPromptEditor] = useState(false);
+
+  // Load compression versions
+  const loadCompressionVersions = async () => {
+    if (!sessionId) return;
+    setLoadingVersions(true);
+    try {
+      const response = await axios.get(`http://localhost:3001/api/sessions/${sessionId}/compressions`);
+      setCompressionVersions(response.data);
+    } catch (error) {
+      console.error('Failed to load compression versions:', error);
+    } finally {
+      setLoadingVersions(false);
+    }
+  };
+
+  // Re-compress all versions
+  const handleRecompress = async () => {
+    if (!sessionId) return;
+    setRecompressing(true);
+    try {
+      const response = await axios.post(`http://localhost:3001/api/sessions/${sessionId}/recompress`, {
+        keepRecent,
+        systemPrompt
+      });
+      if (response.data) {
+        setCompressionVersions(response.data);
+        setLastUpdate(new Date());
+      }
+    } catch (error: any) {
+      console.error('Recompression failed:', error);
+      alert(`Recompression failed: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setRecompressing(false);
+    }
+  };
 
   // Load session and setup WebSocket
   useEffect(() => {
     if (sessionId) {
       loadSession();
       checkLMStudioConnection();
+      loadCompressionVersions();
 
       // WebSocket for real-time updates
       const ws = new ReconnectingWebSocket('ws://localhost:3001');
@@ -287,15 +460,10 @@ const ContextEditor: React.FC = () => {
             setSession(message.data);
             setLastUpdate(new Date());
             
-            // Update compressed preview if available
-            if (message.data.compressedConversations) {
-              setCompressedPreview(message.data.compressedConversations);
-            }
-            if (message.data.compression?.stats) {
-              setCompressionStats(message.data.compression.stats);
-            }
+            // Reload compression versions when session changes
+            loadCompressionVersions();
             
-            // Auto-scroll to bottom if enabled
+            // Auto-scroll to bottom
             setTimeout(() => {
               if (leftPanelRef.current) {
                 leftPanelRef.current.scrollTop = leftPanelRef.current.scrollHeight;
@@ -318,6 +486,13 @@ const ContextEditor: React.FC = () => {
     }
   }, [sessionId]);
 
+  // Load persisted systemPrompt when session loads
+  useEffect(() => {
+    if (session?.compression?.systemPrompt) {
+      setSystemPrompt(session.compression.systemPrompt);
+    }
+  }, [session?.compression?.systemPrompt]);
+
   // Extract keywords when session loads
   useEffect(() => {
     if (session) {
@@ -339,17 +514,12 @@ const ContextEditor: React.FC = () => {
       
       // Load compression settings from session
       if (session.compression) {
-        setCompressionMode(session.compression.mode);
-        setKeepRecent(session.compression.keepRecent);
-        setAutoCompress(session.compression.enabled);
-        if (session.compression.stats) {
-          setCompressionStats(session.compression.stats);
+        if (session.compression.mode !== undefined) {
+          setCompressionMode(session.compression.mode);
         }
-      }
-      
-      // Load compressed preview if available
-      if (session.compressedConversations) {
-        setCompressedPreview(session.compressedConversations);
+        if (session.compression.keepRecent !== undefined) {
+          setKeepRecent(session.compression.keepRecent);
+        }
       }
     }
   }, [session]);
@@ -438,41 +608,13 @@ const ContextEditor: React.FC = () => {
     return messages;
   };
 
-  const handleCompress = async () => {
-    if (!session || !lmstudioConnected) return;
+  // Get messages for the selected compression mode
+  const getSelectedMessages = (): any[] => {
+    if (!compressionVersions) return getAllMessages();
     
-    setCompressing(true);
-    try {
-      const response = await axios.post(`http://localhost:3001/api/sessions/${session.id}/compress`, {
-        mode: compressionMode,
-        keepRecent: keepRecent
-      });
-      
-      if (response.data.success) {
-        setCompressionStats(response.data.stats);
-        // Reload session to get compressed data
-        await loadSession();
-      }
-    } catch (error: any) {
-      alert(`Compression failed: ${error.response?.data?.message || error.message}`);
-    } finally {
-      setCompressing(false);
-    }
-  };
-
-  const handleSaveSettings = async () => {
-    if (!session) return;
-    
-    try {
-      await axios.post(`http://localhost:3001/api/sessions/${session.id}/compression`, {
-        mode: compressionMode,
-        keepRecent: keepRecent,
-        enabled: autoCompress
-      });
-      await loadSession();
-    } catch (error) {
-      console.error('Failed to save compression settings:', error);
-    }
+    const modeKeys = ['none', 'light', 'medium', 'aggressive'];
+    const key = modeKeys[compressionMode] as keyof CompressionVersions;
+    return compressionVersions[key]?.messages || getAllMessages();
   };
 
   if (loading) {
@@ -499,11 +641,14 @@ const ContextEditor: React.FC = () => {
 
   const allMessages = getAllMessages();
 
+  const selectedMessages = getSelectedMessages();
+
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[#0d0d0d] border-b border-[#2d2d2d] px-4 py-3">
-        <div className="flex items-center justify-between">
+        {/* Top row: navigation and controls */}
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/')}
@@ -519,20 +664,8 @@ const ContextEditor: React.FC = () => {
             </div>
           </div>
           
-          {/* Compression Controls */}
+          {/* Controls */}
           <div className="flex items-center gap-3">
-            <select
-              value={compressionMode}
-              onChange={(e) => setCompressionMode(Number(e.target.value) as 0 | 1 | 2 | 3)}
-              className="bg-[#1a1a1a] border border-[#3d3d3d] rounded-lg px-3 py-1.5 text-sm"
-            >
-              {COMPRESSION_MODES.map(mode => (
-                <option key={mode.value} value={mode.value}>
-                  {mode.label} - {mode.description}
-                </option>
-              ))}
-            </select>
-            
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-400">Keep recent:</span>
               <input
@@ -546,55 +679,62 @@ const ContextEditor: React.FC = () => {
             </div>
             
             <button
-              onClick={handleCompress}
-              disabled={compressing || !lmstudioConnected || compressionMode === 0}
-              className="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium"
+              onClick={handleRecompress}
+              disabled={recompressing || !lmstudioConnected}
+              className="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium flex items-center gap-2"
             >
-              {compressing ? 'Compressing...' : '🗜️ Compress'}
+              {recompressing ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  Re-compressing...
+                </>
+              ) : (
+                <>🔄 Re-compress</>
+              )}
             </button>
-            
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={autoCompress}
-                onChange={(e) => {
-                  setAutoCompress(e.target.checked);
-                  handleSaveSettings();
-                }}
-                className="rounded"
-              />
-              <span className="text-gray-400">Auto</span>
-            </label>
             
             <div className={`w-2 h-2 rounded-full ${lmstudioConnected ? 'bg-green-500' : 'bg-red-500'}`} 
                  title={lmstudioConnected ? 'LMStudio connected' : 'LMStudio not connected'} />
           </div>
         </div>
         
-        {/* Stats Bar */}
-        {compressionStats && (
-          <div className="flex items-center gap-4 mt-2 text-xs">
-            <span className="text-gray-400">
-              Original: <span className="text-white">{compressionStats.originalTokens.toLocaleString()}</span> tokens
-            </span>
-            <span className="text-gray-400">
-              Compressed: <span className="text-green-400">{compressionStats.compressedTokens.toLocaleString()}</span> tokens
-            </span>
-            <span className="text-gray-400">
-              Saved: <span className="text-purple-400">{Math.round(compressionStats.ratio * 100)}%</span>
-            </span>
-            <div className="flex-1 h-2 bg-[#2d2d2d] rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                style={{ width: `${Math.round(compressionStats.ratio * 100)}%` }}
-              />
-            </div>
-          </div>
-        )}
+        {/* Compression Stepper */}
+        <div className="mt-4">
+          <CompressionStepper
+            value={compressionMode}
+            onChange={setCompressionMode}
+            versions={compressionVersions}
+            disabled={loadingVersions || recompressing}
+          />
+        </div>
         
-        {/* Keywords - only show when compressed */}
-        {keywords.length > 0 && compressedPreview && compressedPreview.length > 0 && (
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
+        {/* System Prompt Editor */}
+        <div className="mt-3 px-4">
+          <button
+            onClick={() => setShowPromptEditor(!showPromptEditor)}
+            className="text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1"
+          >
+            <span>{showPromptEditor ? '▼' : '▶'}</span>
+            <span>System Prompt</span>
+          </button>
+          {showPromptEditor && (
+            <div className="mt-2">
+              <textarea
+                value={systemPrompt}
+                onChange={(e) => setSystemPrompt(e.target.value)}
+                className="w-full h-24 bg-[#1a1a1a] border border-[#3d3d3d] rounded-lg px-3 py-2 text-sm text-gray-300 font-mono resize-y focus:border-purple-500 focus:outline-none"
+                placeholder="Enter system prompt for summarization..."
+              />
+              <p className="text-xs text-gray-600 mt-1">
+                This prompt tells the LLM how to summarize. Click Re-compress to apply changes.
+              </p>
+            </div>
+          )}
+        </div>
+        
+        {/* Keywords - only show when compression active */}
+        {keywords.length > 0 && compressionMode > 0 && compressionVersions && (
+          <div className="flex items-center gap-2 mt-3 flex-wrap px-8">
             <span className="text-xs text-gray-500">Keywords:</span>
             {keywords.map((keyword, i) => (
               <span key={i} className={`text-xs px-2 py-0.5 rounded ${KEYWORD_COLORS[i % KEYWORD_COLORS.length]}`}>
@@ -606,8 +746,8 @@ const ContextEditor: React.FC = () => {
       </div>
 
       {/* Main Content - Side by Side */}
-      <div className="flex h-[calc(100vh-140px)]">
-        {/* Left Panel - Original */}
+      <div className="flex h-[calc(100vh-180px)]">
+        {/* Left Panel - Original (always) */}
         <div className="flex-1 flex flex-col border-r border-[#2d2d2d]">
           <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d]">
             <span className="text-sm font-medium text-gray-300">📝 Original</span>
@@ -626,23 +766,28 @@ const ContextEditor: React.FC = () => {
                 role={msg.role}
                 content={msg.content || JSON.stringify(msg.tool_calls || msg, null, 2)}
                 isTool={msg.role === 'tool' || !!msg.tool_calls}
-                keywords={compressedPreview && compressedPreview.length > 0 ? keywords : []}
+                keywords={compressionMode > 0 ? keywords : []}
                 keywordMap={keywordMap}
               />
             ))}
           </div>
         </div>
 
-        {/* Right Panel - Compressed */}
+        {/* Right Panel - Selected Compression Mode */}
         <div className="flex-1 flex flex-col">
           <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d] flex items-center justify-between">
             <div>
-              <span className="text-sm font-medium text-gray-300">🗜️ Compressed</span>
-              {compressedPreview && (
-                <span className="text-xs text-gray-500 ml-2">
-                  {compressedPreview.length} messages
-                </span>
-              )}
+              <span className="text-sm font-medium text-gray-300">
+                {compressionMode === 0 ? '📝 None (Original)' : `🗜️ ${COMPRESSION_MODES[compressionMode].label}`}
+              </span>
+              <span className="text-xs text-gray-500 ml-2">
+                {selectedMessages.length} messages
+                {compressionMode > 0 && compressionVersions && (
+                  <> • <span className="text-green-400">
+                    -{Math.round((compressionVersions[['none', 'light', 'medium', 'aggressive'][compressionMode] as keyof CompressionVersions]?.stats?.ratio || 0) * 100)}%
+                  </span></>
+                )}
+              </span>
             </div>
             <label className="flex items-center gap-2 text-xs">
               <input
@@ -659,19 +804,23 @@ const ContextEditor: React.FC = () => {
             className="flex-1 overflow-y-auto p-4"
             onScroll={() => handleScroll('right')}
           >
-            {!compressedPreview || compressedPreview.length === 0 ? (
+            {loadingVersions ? (
+              <div className="text-center py-20">
+                <div className="animate-spin text-4xl mb-4">⏳</div>
+                <p className="text-gray-400">Loading compression versions...</p>
+              </div>
+            ) : !compressionVersions && compressionMode > 0 ? (
               <div className="text-center py-20">
                 <div className="text-4xl mb-4">🗜️</div>
-                <p className="text-gray-400">No compressed version yet.</p>
+                <p className="text-gray-400">No compressed versions available.</p>
                 <p className="text-gray-500 text-sm mt-2">
                   {lmstudioConnected 
-                    ? 'Click "Compress" to generate a compressed version.'
+                    ? 'Click "Re-compress" to generate compressed versions.'
                     : 'Connect LMStudio to enable compression.'}
                 </p>
               </div>
             ) : (
-              compressedPreview.map((turn: any, idx: number) => {
-                const msg = turn.request?.messages?.[0] || turn;
+              selectedMessages.map((msg: any, idx: number) => {
                 const isSummary = msg.content?.includes('[SUMMARY]') || msg.content?.includes('[CONVERSATION SUMMARY]');
                 const isPreserved = msg.role === 'tool' || msg.tool_calls;
                 
@@ -681,9 +830,9 @@ const ContextEditor: React.FC = () => {
                     role={msg.role || 'system'}
                     content={msg.content || JSON.stringify(msg, null, 2)}
                     isCompressed={isSummary}
-                    isPreserved={isPreserved}
+                    isPreserved={isPreserved && compressionMode > 0}
                     isTool={msg.role === 'tool' || !!msg.tool_calls}
-                    keywords={keywords}
+                    keywords={compressionMode > 0 ? keywords : []}
                     keywordMap={keywordMap}
                   />
                 );
@@ -697,9 +846,9 @@ const ContextEditor: React.FC = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0d] border-t border-[#2d2d2d] px-4 py-2">
         <div className="flex items-center justify-between text-xs text-gray-500">
           <div className="flex items-center gap-4">
-            <span>Mode: {COMPRESSION_MODES[compressionMode].label}</span>
+            <span>Viewing: <span className="text-white">{COMPRESSION_MODES[compressionMode].label}</span></span>
             <span>Keep recent: {keepRecent}</span>
-            {autoCompress && <span className="text-green-400">● Auto-compress ON</span>}
+            {recompressing && <span className="text-yellow-400">● Re-compressing...</span>}
           </div>
           <div className="flex items-center gap-4">
             {lastUpdate && (

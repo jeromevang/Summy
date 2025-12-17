@@ -128,6 +128,15 @@ interface ConversationTurn {
   response?: any;
 }
 
+interface CachedCompressions {
+  messageCount: number;
+  keepRecent: number;
+  lastComputed: string;
+  light: { messages: any[]; stats: { originalTokens: number; compressedTokens: number; ratio: number } };
+  medium: { messages: any[]; stats: { originalTokens: number; compressedTokens: number; ratio: number } };
+  aggressive: { messages: any[]; stats: { originalTokens: number; compressedTokens: number; ratio: number } };
+}
+
 interface ContextSession {
   id: string;
   name: string;
@@ -139,6 +148,7 @@ interface ContextSession {
   summary?: any;
   compression?: CompressionConfig;
   compressedConversations?: ConversationTurn[];
+  cachedCompressions?: CachedCompressions;
 }
 
 // Compression configuration
@@ -152,6 +162,7 @@ interface CompressionConfig {
     compressedTokens: number;
     ratio: number;
   };
+  systemPrompt?: string | null; // Custom prompt for summarization
 }
 
 // Message segment types for compression
@@ -315,10 +326,10 @@ const callLMStudio = async (
         { role: 'system', content: systemPrompt },
         ...messages
       ],
-      temperature: 0, // Use 0 for deterministic, consistent summaries
-      max_tokens: 1000
+      temperature: 0,
+      max_tokens: 1000  // Room for structured summary output
     }, {
-      timeout: 60000 // 60 second timeout
+      timeout: 60000
     });
     
     const content = response.data?.choices?.[0]?.message?.content;
@@ -335,29 +346,42 @@ const callLMStudio = async (
   }
 };
 
+// Default system prompt for summarization
+const DEFAULT_SUMMARY_PROMPT = `You are a context summarizer. Condense the conversation into a brief summary that preserves key information.
+
+Output format:
+[CONVERSATION SUMMARY]
+Goal: <main objective or topic>
+Key Points: <important details, decisions, or facts>
+Current State: <where things stand>
+[END SUMMARY]
+
+Rules:
+- ONLY use information from the conversation
+- Be concise (under 150 words)
+- Preserve technical terms, names, and specifics exactly
+- Output ONLY the summary block, nothing else`;
+
 // Summarize a group of text messages
-const summarizeTextGroup = async (messages: any[]): Promise<string> => {
-  // Build a readable format of the messages for the LLM
-  const formattedMessages = messages.map(msg => {
-    const role = msg.role === 'user' ? 'User' : msg.role === 'assistant' ? 'Assistant' : msg.role;
-    const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
-    return `${role}: ${content}`;
-  }).join('\n\n');
+const summarizeTextGroup = async (messages: any[], customPrompt?: string | null): Promise<string> => {
+  // Extract just the content, minimal formatting
+  const content = messages.map(msg => {
+    const role = msg.role === 'user' ? 'User' : msg.role === 'assistant' ? 'Assistant' : 'System';
+    const text = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+    // Truncate very long messages
+    const truncated = text.length > 500 ? text.substring(0, 500) + '...' : text;
+    return `${role}: ${truncated}`;
+  }).join('\n');
   
-  const systemPrompt = `You are a conversation summarizer. Your task is to create a concise summary of the following conversation segment.
-
-IMPORTANT GUIDELINES:
-- Preserve key information: file names, code snippets, technical terms, decisions made
-- Keep the summary brief but informative
-- Focus on WHAT was discussed and WHAT was decided
-- Remove pleasantries, verbose explanations, and redundant content
-- Output ONLY the summary, no preamble or explanation
-
-Format your response as a brief paragraph or bullet points.`;
+  // Use custom prompt if provided, otherwise use default
+  const systemPrompt = customPrompt || DEFAULT_SUMMARY_PROMPT;
+  
+  console.log(`[Summarize] Using ${customPrompt ? 'CUSTOM' : 'DEFAULT'} prompt (${systemPrompt.length} chars)`);
+  console.log(`[Summarize] Prompt starts with: "${systemPrompt.substring(0, 80)}..."`);
 
   const userMessage = { 
     role: 'user', 
-    content: `Summarize this conversation:\n\n${formattedMessages}` 
+    content: `Conversation to summarize:\n\n${content}` 
   };
   
   return await callLMStudio([userMessage], systemPrompt);
@@ -458,7 +482,7 @@ const compressMessages = async (
     if (segment.type === 'text') {
       // Always summarize text segments (modes 1, 2, 3)
       try {
-        const summary = await summarizeTextGroup(segment.messages);
+        const summary = await summarizeTextGroup(segment.messages, config.systemPrompt);
         compressedSegments.push({
           role: 'system',
           content: `[CONVERSATION SUMMARY]\n${summary}\n[END SUMMARY]`
@@ -1160,6 +1184,173 @@ app.post('/api/sessions/:id/compress', async (req, res) => {
       error: 'Compression failed', 
       message: error.message 
     });
+  }
+});
+
+// Get all compression versions for a session (None uses original, Light/Medium/Aggressive computed)
+app.get('/api/sessions/:id/compressions', async (req, res) => {
+  try {
+    const session = await loadSession(req.params.id);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    // Extract all messages from conversations
+    const allMessages: any[] = [];
+    for (const turn of session.conversations) {
+      if (turn.request?.messages) {
+        const lastUserMsg = turn.request.messages.filter((m: any) => m.role === 'user').pop();
+        if (lastUserMsg) {
+          allMessages.push(lastUserMsg);
+        }
+      }
+      if (turn.response) {
+        if (turn.response.type === 'streaming') {
+          allMessages.push({ role: 'assistant', content: turn.response.content });
+        } else if (turn.response.choices?.[0]?.message) {
+          allMessages.push(turn.response.choices[0].message);
+        }
+      }
+    }
+    
+    const keepRecent = session.compression?.keepRecent || 5;
+    
+    // Check if we have cached compressions
+    if (session.cachedCompressions && 
+        session.cachedCompressions.messageCount === allMessages.length &&
+        session.cachedCompressions.keepRecent === keepRecent) {
+      // Return cached versions
+      return res.json({
+        none: { messages: allMessages, stats: { originalTokens: Math.round(JSON.stringify(allMessages).length / 4), compressedTokens: Math.round(JSON.stringify(allMessages).length / 4), ratio: 0 } },
+        light: session.cachedCompressions.light,
+        medium: session.cachedCompressions.medium,
+        aggressive: session.cachedCompressions.aggressive,
+        cached: true
+      });
+    }
+    
+    // Compute all 3 compressed versions - USE SAVED systemPrompt if available
+    const savedSystemPrompt = session.compression?.systemPrompt || null;
+    const baseConfig = { keepRecent, enabled: true, systemPrompt: savedSystemPrompt };
+    
+    console.log(`[Compressions GET] Computing fresh (saved systemPrompt: ${savedSystemPrompt ? 'YES' : 'NO'})`);
+    
+    const [lightResult, mediumResult, aggressiveResult] = await Promise.all([
+      compressMessages(allMessages, { ...baseConfig, mode: 1 }),
+      compressMessages(allMessages, { ...baseConfig, mode: 2 }),
+      compressMessages(allMessages, { ...baseConfig, mode: 3 })
+    ]);
+    
+    // Cache the results
+    session.cachedCompressions = {
+      messageCount: allMessages.length,
+      keepRecent: keepRecent,
+      lastComputed: new Date().toISOString(),
+      light: { messages: lightResult.compressed, stats: lightResult.stats },
+      medium: { messages: mediumResult.compressed, stats: mediumResult.stats },
+      aggressive: { messages: aggressiveResult.compressed, stats: aggressiveResult.stats }
+    };
+    await saveSession(session);
+    
+    res.json({
+      none: { messages: allMessages, stats: { originalTokens: Math.round(JSON.stringify(allMessages).length / 4), compressedTokens: Math.round(JSON.stringify(allMessages).length / 4), ratio: 0 } },
+      light: session.cachedCompressions.light,
+      medium: session.cachedCompressions.medium,
+      aggressive: session.cachedCompressions.aggressive,
+      cached: false
+    });
+  } catch (error: any) {
+    console.error('Get compressions error:', error);
+    res.status(500).json({ error: 'Failed to get compressions', message: error.message });
+  }
+});
+
+// Re-compress a session (clear cache and re-compute all versions)
+app.post('/api/sessions/:id/recompress', async (req, res) => {
+  try {
+    const session = await loadSession(req.params.id);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    if (!session.conversations || session.conversations.length === 0) {
+      return res.status(400).json({ error: 'No conversations to compress' });
+    }
+    
+    // Clear cached compressions
+    delete session.cachedCompressions;
+    delete session.compressedConversations;
+    await saveSession(session);
+    
+    // Extract all messages
+    const allMessages: any[] = [];
+    for (const turn of session.conversations) {
+      if (turn.request?.messages) {
+        const lastUserMsg = turn.request.messages.filter((m: any) => m.role === 'user').pop();
+        if (lastUserMsg) {
+          allMessages.push(lastUserMsg);
+        }
+      }
+      if (turn.response) {
+        if (turn.response.type === 'streaming') {
+          allMessages.push({ role: 'assistant', content: turn.response.content });
+        } else if (turn.response.choices?.[0]?.message) {
+          allMessages.push(turn.response.choices[0].message);
+        }
+      }
+    }
+    
+    const keepRecent = req.body.keepRecent ?? session.compression?.keepRecent ?? 5;
+    const customSystemPrompt = req.body.systemPrompt || null;
+    
+    // Debug: Log what we received
+    console.log(`[Recompress] req.body keys:`, Object.keys(req.body));
+    console.log(`[Recompress] systemPrompt received:`, customSystemPrompt ? `"${customSystemPrompt.substring(0, 60)}..." (${customSystemPrompt.length} chars)` : 'NULL');
+    
+    const baseConfig = { keepRecent, enabled: true, systemPrompt: customSystemPrompt };
+    
+    // Compute all 3 versions fresh
+    console.log(`[Recompress] Computing 3 compression versions for session ${session.id}...`);
+    const [lightResult, mediumResult, aggressiveResult] = await Promise.all([
+      compressMessages(allMessages, { ...baseConfig, mode: 1 }),
+      compressMessages(allMessages, { ...baseConfig, mode: 2 }),
+      compressMessages(allMessages, { ...baseConfig, mode: 3 })
+    ]);
+    
+    // Cache the results
+    session.cachedCompressions = {
+      messageCount: allMessages.length,
+      keepRecent: keepRecent,
+      lastComputed: new Date().toISOString(),
+      light: { messages: lightResult.compressed, stats: lightResult.stats },
+      medium: { messages: mediumResult.compressed, stats: mediumResult.stats },
+      aggressive: { messages: aggressiveResult.compressed, stats: aggressiveResult.stats }
+    };
+    
+    // Update compression settings (including persisted systemPrompt)
+    session.compression = {
+      ...session.compression,
+      mode: session.compression?.mode ?? 1,
+      keepRecent: keepRecent,
+      enabled: true,
+      lastCompressed: new Date().toISOString(),
+      systemPrompt: customSystemPrompt // Persist the custom prompt
+    };
+    
+    await saveSession(session);
+    console.log(`[Recompress] SAVED to file. systemPrompt: ${session.compression?.systemPrompt ? 'YES (' + session.compression.systemPrompt.length + ' chars)' : 'NULL'}`);
+    console.log(`[Recompress] Done. Light: ${lightResult.stats.ratio * 100}%, Medium: ${mediumResult.stats.ratio * 100}%, Aggressive: ${aggressiveResult.stats.ratio * 100}%`);
+    
+    res.json({
+      success: true,
+      none: { messages: allMessages, stats: { originalTokens: Math.round(JSON.stringify(allMessages).length / 4), compressedTokens: Math.round(JSON.stringify(allMessages).length / 4), ratio: 0 } },
+      light: session.cachedCompressions.light,
+      medium: session.cachedCompressions.medium,
+      aggressive: session.cachedCompressions.aggressive
+    });
+  } catch (error: any) {
+    console.error('Recompress error:', error);
+    res.status(500).json({ error: 'Recompression failed', message: error.message });
   }
 });
 
