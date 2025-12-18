@@ -820,10 +820,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
     const settings = await loadServerSettings();
     const requestedModel = req.body?.model || 'gpt-4o-mini';
     
-    // Determine provider: 'localproxy' model always routes to LM Studio
-    // Otherwise use the configured provider
-    const isLMStudioOverride = requestedModel.toLowerCase() === 'localproxy';
-    const effectiveProvider = isLMStudioOverride ? 'lmstudio' : settings.provider;
+    // Use the configured provider from settings
+    const effectiveProvider = settings.provider;
     
     // ========== ROUTE TO LM STUDIO ==========
     if (effectiveProvider === 'lmstudio') {
