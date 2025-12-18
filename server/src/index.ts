@@ -823,6 +823,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
     // Use the configured provider from settings
     const effectiveProvider = settings.provider;
     
+    console.log(`[PROVIDER DEBUG] settings.provider = "${settings.provider}", effectiveProvider = "${effectiveProvider}"`);
+    
     // ========== ROUTE TO LM STUDIO ==========
     if (effectiveProvider === 'lmstudio') {
       const lmstudioUrl = `${settings.lmstudioUrl}/v1/chat/completions`;
@@ -995,6 +997,10 @@ const proxyToOpenAI = async (req: any, res: any) => {
       messages: messagesToSend
     };
 
+    const openaiUrl = req.url.startsWith('/v1/') ? req.url : req.url.replace('/chat/completions', '/v1/chat/completions');
+    const fullOpenAIUrl = `https://api.openai.com${openaiUrl}`;
+    
+    console.log(`[ROUTING] Provider: ${effectiveProvider}, URL: ${fullOpenAIUrl}`);
     addDebugEntry('request', `Proxying to OpenAI: ${requestedModel} -> ${actualModel}`, {
       originalModel: requestedModel,
       actualModel: actualModel,
@@ -1003,10 +1009,9 @@ const proxyToOpenAI = async (req: any, res: any) => {
     });
 
     // Proxy to OpenAI using axios
-    const openaiUrl = req.url.startsWith('/v1/') ? req.url : req.url.replace('/chat/completions', '/v1/chat/completions');
     const response = await axios({
       method: req.method,
-      url: `https://api.openai.com${openaiUrl}`,
+      url: fullOpenAIUrl,
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
