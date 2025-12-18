@@ -20,5 +20,8 @@
     "openai"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "puppeteer": "^24.33.1"
+  }
 }
