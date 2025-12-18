@@ -277,9 +277,23 @@ const segmentMessages = (messages: any[]): MessageSegment[] => {
 
 // Server settings storage
 interface ServerSettings {
+  // Provider selection: 'openai' | 'azure' | 'lmstudio'
+  provider: 'openai' | 'azure' | 'lmstudio';
+  
+  // OpenAI settings
+  openaiModel: string;
+  
+  // Azure OpenAI settings
+  azureResourceName: string;
+  azureDeploymentName: string;
+  azureApiKey: string;
+  azureApiVersion: string;
+  
+  // LM Studio settings
   lmstudioUrl: string;
   lmstudioModel: string;
-  openaiModel: string;
+  
+  // Compression defaults
   defaultCompressionMode: 0 | 1 | 2 | 3;
   defaultKeepRecent: number;
 }
@@ -296,9 +310,14 @@ const loadServerSettings = async (): Promise<ServerSettings> => {
   }
   // Default settings
   return {
+    provider: 'openai',
+    openaiModel: 'gpt-4o-mini',
+    azureResourceName: '',
+    azureDeploymentName: '',
+    azureApiKey: '',
+    azureApiVersion: '2024-02-01',
     lmstudioUrl: 'http://localhost:1234',
     lmstudioModel: '',
-    openaiModel: 'gpt-4o-mini',
     defaultCompressionMode: 1,
     defaultKeepRecent: 5
   };
@@ -797,15 +816,17 @@ const proxyToOpenAI = async (req: any, res: any) => {
       }
     }
 
-    // Determine routing: LM Studio or OpenAI
-    const requestedModel = req.body?.model || 'gpt-4o-mini';
-    const isLMStudioRequest = requestedModel.toLowerCase() === 'localproxy';
-    
     // Load settings for routing decisions
     const settings = await loadServerSettings();
+    const requestedModel = req.body?.model || 'gpt-4o-mini';
     
-    if (isLMStudioRequest) {
-      // ========== ROUTE TO LM STUDIO ==========
+    // Determine provider: 'localproxy' model always routes to LM Studio
+    // Otherwise use the configured provider
+    const isLMStudioOverride = requestedModel.toLowerCase() === 'localproxy';
+    const effectiveProvider = isLMStudioOverride ? 'lmstudio' : settings.provider;
+    
+    // ========== ROUTE TO LM STUDIO ==========
+    if (effectiveProvider === 'lmstudio') {
       const lmstudioUrl = `${settings.lmstudioUrl}/v1/chat/completions`;
       const lmstudioModel = settings.lmstudioModel || 'local-model';
       
@@ -859,7 +880,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
           await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
           res.json(response.data);
         }
-        return; // Exit after LM Studio handling
+        return;
       } catch (lmError: any) {
         console.error('❌ LM STUDIO ERROR:', lmError.message);
         addDebugEntry('error', `LM Studio error: ${lmError.message}`, {});
@@ -873,6 +894,82 @@ const proxyToOpenAI = async (req: any, res: any) => {
         return res.status(500).json({
           error: lmError.message,
           details: lmError.response?.data || 'LM Studio request failed'
+        });
+      }
+    }
+    
+    // ========== ROUTE TO AZURE OPENAI ==========
+    if (effectiveProvider === 'azure') {
+      if (!settings.azureResourceName || !settings.azureDeploymentName || !settings.azureApiKey) {
+        return res.status(400).json({
+          error: 'Azure OpenAI not configured',
+          details: 'Please configure Azure resource name, deployment name, and API key in Settings'
+        });
+      }
+      
+      const azureUrl = `https://${settings.azureResourceName}.openai.azure.com/openai/deployments/${settings.azureDeploymentName}/chat/completions?api-version=${settings.azureApiVersion}`;
+      
+      addDebugEntry('request', `Proxying to Azure OpenAI: ${requestedModel} -> ${settings.azureDeploymentName}`, {
+        originalModel: requestedModel,
+        actualModel: settings.azureDeploymentName,
+        azureResource: settings.azureResourceName,
+        streaming: req.isStreaming,
+        messageCount: messagesToSend.length
+      });
+      
+      const modifiedBody = {
+        ...req.body,
+        messages: messagesToSend
+      };
+      // Remove 'model' from body as Azure uses deployment name in URL
+      delete modifiedBody.model;
+      
+      try {
+        const response = await axios({
+          method: 'POST',
+          url: azureUrl,
+          headers: {
+            'api-key': settings.azureApiKey,
+            'Content-Type': 'application/json',
+          },
+          data: modifiedBody,
+          timeout: 120000,
+          responseType: req.isStreaming ? 'stream' : 'json',
+        });
+        
+        if (req.isStreaming) {
+          res.setHeader('Content-Type', 'text/event-stream');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.setHeader('Connection', 'keep-alive');
+          let fullContent = '';
+          response.data.on('data', (chunk: Buffer) => {
+            const chunkStr = chunk.toString();
+            fullContent += chunkStr;
+            res.write(chunkStr);
+          });
+          response.data.on('end', async () => {
+            const parsedResponse = parseStreamingResponse(fullContent);
+            await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+            res.end();
+          });
+          response.data.on('error', (err: Error) => {
+            console.error('❌ AZURE STREAM ERROR:', err.message);
+            addDebugEntry('error', `Azure stream error: ${err.message}`, {});
+            res.end();
+          });
+        } else {
+          await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
+          res.json(response.data);
+        }
+        return;
+      } catch (azureError: any) {
+        console.error('❌ AZURE ERROR:', azureError.message);
+        addDebugEntry('error', `Azure error: ${azureError.message}`, {});
+        
+        const statusCode = azureError.response?.status || 500;
+        return res.status(statusCode).json({
+          error: azureError.message,
+          details: azureError.response?.data || 'Azure OpenAI request failed'
         });
       }
     }
@@ -1152,6 +1249,52 @@ app.post('/api/test-lmstudio', async (req, res) => {
       error: error.code === 'ECONNREFUSED' 
         ? 'LMStudio is not running or not accessible'
         : error.message
+    });
+  }
+});
+
+// Test Azure OpenAI connection
+app.post('/api/test-azure', async (req, res) => {
+  try {
+    const { resourceName, deploymentName, apiKey, apiVersion } = req.body;
+    const settings = await loadServerSettings();
+    
+    const resource = resourceName || settings.azureResourceName;
+    const deployment = deploymentName || settings.azureDeploymentName;
+    const key = apiKey || settings.azureApiKey;
+    const version = apiVersion || settings.azureApiVersion || '2024-02-01';
+    
+    if (!resource || !deployment || !key) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required Azure configuration (resource name, deployment name, or API key)'
+      });
+    }
+    
+    // Test with a simple completion request
+    const testUrl = `https://${resource}.openai.azure.com/openai/deployments/${deployment}/chat/completions?api-version=${version}`;
+    
+    const response = await axios.post(testUrl, {
+      messages: [{ role: 'user', content: 'Hi' }],
+      max_tokens: 5
+    }, {
+      headers: {
+        'api-key': key,
+        'Content-Type': 'application/json'
+      },
+      timeout: 15000
+    });
+    
+    res.json({
+      success: true,
+      model: response.data?.model || deployment,
+      message: 'Azure OpenAI connection successful'
+    });
+  } catch (error: any) {
+    console.error('Azure test error:', error.response?.data || error.message);
+    res.status(500).json({
+      success: false,
+      error: error.response?.data?.error?.message || error.message || 'Azure connection failed'
     });
   }
 });

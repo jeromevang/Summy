@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface ServerSettings {
+  provider: 'openai' | 'azure' | 'lmstudio';
+  openaiModel: string;
+  azureResourceName: string;
+  azureDeploymentName: string;
+  azureApiKey: string;
+  azureApiVersion: string;
   lmstudioUrl: string;
   lmstudioModel: string;
-  openaiModel: string;
   defaultCompressionMode: 0 | 1 | 2 | 3;
   defaultKeepRecent: number;
 }
@@ -18,9 +23,14 @@ const COMPRESSION_MODES = [
 
 const Settings: React.FC = () => {
   const [settings, setSettings] = useState<ServerSettings>({
+    provider: 'openai',
+    openaiModel: 'gpt-4o-mini',
+    azureResourceName: '',
+    azureDeploymentName: '',
+    azureApiKey: '',
+    azureApiVersion: '2024-02-01',
     lmstudioUrl: 'http://localhost:1234',
     lmstudioModel: '',
-    openaiModel: 'gpt-4o-mini',
     defaultCompressionMode: 1,
     defaultKeepRecent: 5
   });
@@ -38,6 +48,10 @@ const Settings: React.FC = () => {
   const [openaiModels, setOpenaiModels] = useState<string[]>([]);
   const [openaiModelsLoading, setOpenaiModelsLoading] = useState(false);
   const [openaiModelsError, setOpenaiModelsError] = useState<string>('');
+  
+  // Azure connection test
+  const [azureStatus, setAzureStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
+  const [azureError, setAzureError] = useState<string>('');
 
   // Load settings from server and localStorage
   useEffect(() => {
@@ -162,6 +176,30 @@ const Settings: React.FC = () => {
     }
   };
 
+  const handleTestAzure = async () => {
+    setAzureStatus('testing');
+    setAzureError('');
+    
+    try {
+      const response = await axios.post('http://localhost:3001/api/test-azure', {
+        resourceName: settings.azureResourceName,
+        deploymentName: settings.azureDeploymentName,
+        apiKey: settings.azureApiKey,
+        apiVersion: settings.azureApiVersion
+      });
+      
+      if (response.data.success) {
+        setAzureStatus('connected');
+      } else {
+        setAzureStatus('failed');
+        setAzureError(response.data.error || 'Connection failed');
+      }
+    } catch (error: any) {
+      setAzureStatus('failed');
+      setAzureError(error.response?.data?.error || error.message);
+    }
+  };
+
   const handleChange = (field: keyof ServerSettings, value: any) => {
     setSettings(prev => ({ ...prev, [field]: value }));
   };
@@ -180,13 +218,140 @@ const Settings: React.FC = () => {
           </div>
 
           <form onSubmit={handleSave} className="p-6 space-y-8">
+            {/* Provider Selection */}
+            <div>
+              <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                <span className="text-2xl">🔌</span> LLM Provider
+              </h4>
+              <p className="text-sm text-gray-400 mb-4">
+                Select which LLM provider to use for IDE requests. Use model name <code className="bg-[#1a1a1a] px-1 rounded text-purple-400">localproxy</code> in your IDE to always route to LM Studio.
+              </p>
+              
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { value: 'openai', label: 'OpenAI', icon: '🌐', desc: 'GPT-4, GPT-4o, etc.' },
+                  { value: 'azure', label: 'Azure OpenAI', icon: '☁️', desc: 'Azure-hosted models' },
+                  { value: 'lmstudio', label: 'LM Studio', icon: '💻', desc: 'Local models' },
+                ].map(provider => (
+                  <button
+                    key={provider.value}
+                    type="button"
+                    onClick={() => handleChange('provider', provider.value)}
+                    className={`p-4 rounded-lg border text-left transition-all ${
+                      settings.provider === provider.value
+                        ? 'border-purple-500 bg-purple-500/10'
+                        : 'border-[#3d3d3d] bg-[#0d0d0d] hover:border-[#5d5d5d]'
+                    }`}
+                  >
+                    <div className="text-2xl mb-1">{provider.icon}</div>
+                    <div className="font-medium text-white">{provider.label}</div>
+                    <div className="text-xs text-gray-500">{provider.desc}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Azure OpenAI Configuration - only show when Azure is selected */}
+            {settings.provider === 'azure' && (
+              <div className="border border-blue-500/30 rounded-lg p-4 bg-blue-500/5">
+                <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                  <span className="text-2xl">☁️</span> Azure OpenAI Configuration
+                </h4>
+                
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        Resource Name
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.azureResourceName}
+                        onChange={(e) => handleChange('azureResourceName', e.target.value)}
+                        className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="my-resource"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">From: https://<span className="text-blue-400">[resource]</span>.openai.azure.com</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        Deployment Name
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.azureDeploymentName}
+                        onChange={(e) => handleChange('azureDeploymentName', e.target.value)}
+                        className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="gpt-4o-deployment"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      API Key
+                    </label>
+                    <input
+                      type="password"
+                      value={settings.azureApiKey}
+                      onChange={(e) => handleChange('azureApiKey', e.target.value)}
+                      className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter your Azure API key"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 items-end">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                        API Version
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.azureApiVersion}
+                        onChange={(e) => handleChange('azureApiVersion', e.target.value)}
+                        className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="2024-02-01"
+                      />
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={handleTestAzure}
+                        disabled={azureStatus === 'testing' || !settings.azureResourceName || !settings.azureDeploymentName || !settings.azureApiKey}
+                        className={`w-full px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                          azureStatus === 'testing' 
+                            ? 'bg-gray-600 text-gray-300 cursor-wait'
+                            : azureStatus === 'connected'
+                              ? 'bg-green-600 hover:bg-green-700 text-white'
+                              : azureStatus === 'failed'
+                                ? 'bg-red-600 hover:bg-red-700 text-white'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
+                        }`}
+                      >
+                        {azureStatus === 'testing' ? 'Testing...' 
+                          : azureStatus === 'connected' ? '✓ Connected'
+                          : azureStatus === 'failed' ? '✗ Retry'
+                          : 'Test Connection'}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {azureError && (
+                    <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
+                      ❌ {azureError}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* LMStudio Configuration */}
             <div>
               <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
                 <span className="text-2xl">🤖</span> LMStudio Configuration
               </h4>
               <p className="text-sm text-gray-400 mb-4">
-                LMStudio is used for compressing conversation context. Make sure LMStudio is running before testing.
+                LMStudio is used for compressing conversation context{settings.provider === 'lmstudio' ? ' and as the main LLM provider' : ''}. Make sure LMStudio is running.
               </p>
               
               <div className="space-y-4">
