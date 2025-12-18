@@ -3,5 +3,6 @@
   "lmstudioModel": "qwen2.5-7b-instruct-1m",
   "defaultCompressionMode": 0,
   "defaultKeepRecent": 5,
-  "openaiModel": "gpt-4o"
+  "openaiModel": "gpt-5.1-codex",
+  "provider": "openai"
 }
