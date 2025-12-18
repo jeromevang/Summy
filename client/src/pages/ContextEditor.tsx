@@ -411,6 +411,27 @@ Rules:
     }
   };
 
+  // Save compression settings to server
+  const saveCompressionSettings = async (mode: 0 | 1 | 2 | 3, keepRecentValue: number) => {
+    if (!sessionId) return;
+    try {
+      await axios.post(`http://localhost:3001/api/sessions/${sessionId}/compression`, {
+        mode,
+        keepRecent: keepRecentValue,
+        enabled: true
+      });
+      console.log(`Saved compression settings: mode=${mode}, keepRecent=${keepRecentValue}`);
+    } catch (error) {
+      console.error('Failed to save compression settings:', error);
+    }
+  };
+
+  // Handle compression mode change
+  const handleCompressionModeChange = (newMode: 0 | 1 | 2 | 3) => {
+    setCompressionMode(newMode);
+    saveCompressionSettings(newMode, keepRecent);
+  };
+
   // Re-compress all versions
   const handleRecompress = async () => {
     if (!sessionId) return;
@@ -672,6 +693,10 @@ Rules:
                 type="number"
                 value={keepRecent}
                 onChange={(e) => setKeepRecent(Math.max(1, parseInt(e.target.value) || 5))}
+                onBlur={(e) => {
+                  const value = Math.max(1, parseInt(e.target.value) || 5);
+                  saveCompressionSettings(compressionMode, value);
+                }}
                 className="w-12 bg-[#1a1a1a] border border-[#3d3d3d] rounded px-2 py-1 text-sm"
                 min={1}
                 max={20}
@@ -702,7 +727,7 @@ Rules:
         <div className="mt-4">
           <CompressionStepper
             value={compressionMode}
-            onChange={setCompressionMode}
+            onChange={handleCompressionModeChange}
             versions={compressionVersions}
             disabled={loadingVersions || recompressing}
           />

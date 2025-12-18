@@ -4,6 +4,7 @@ import axios from 'axios';
 interface ServerSettings {
   lmstudioUrl: string;
   lmstudioModel: string;
+  openaiModel: string;
   defaultCompressionMode: 0 | 1 | 2 | 3;
   defaultKeepRecent: number;
 }
@@ -19,6 +20,7 @@ const Settings: React.FC = () => {
   const [settings, setSettings] = useState<ServerSettings>({
     lmstudioUrl: 'http://localhost:1234',
     lmstudioModel: '',
+    openaiModel: 'gpt-4o-mini',
     defaultCompressionMode: 1,
     defaultKeepRecent: 5
   });
@@ -31,6 +33,11 @@ const Settings: React.FC = () => {
   const [unloadOthers, setUnloadOthers] = useState(true);
   const [loadingModel, setLoadingModel] = useState(false);
   const [loadModelStatus, setLoadModelStatus] = useState<string>('');
+  
+  // OpenAI model selection
+  const [openaiModels, setOpenaiModels] = useState<string[]>([]);
+  const [openaiModelsLoading, setOpenaiModelsLoading] = useState(false);
+  const [openaiModelsError, setOpenaiModelsError] = useState<string>('');
 
   // Load settings from server and localStorage
   useEffect(() => {
@@ -132,6 +139,26 @@ const Settings: React.FC = () => {
     } finally {
       setLoadingModel(false);
       setTimeout(() => setLoadModelStatus(''), 5000);
+    }
+  };
+
+  const handleFetchOpenAIModels = async () => {
+    setOpenaiModelsLoading(true);
+    setOpenaiModelsError('');
+    
+    try {
+      const response = await axios.get('http://localhost:3001/api/openai/models');
+      if (response.data.models) {
+        setOpenaiModels(response.data.models);
+        // Auto-select first model if none selected
+        if (!settings.openaiModel && response.data.models.length > 0) {
+          setSettings(prev => ({ ...prev, openaiModel: response.data.models[0] }));
+        }
+      }
+    } catch (error: any) {
+      setOpenaiModelsError(error.response?.data?.error || error.message);
+    } finally {
+      setOpenaiModelsLoading(false);
     }
   };
 
@@ -355,6 +382,75 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
+            {/* OpenAI Model Selection */}
+            <div>
+              <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                <span className="text-2xl">🤖</span> OpenAI Model
+              </h4>
+              <p className="text-sm text-gray-400 mb-4">
+                Select which OpenAI model to use when proxying requests. Click "Fetch Models" to load available models from your API key.
+              </p>
+              
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleFetchOpenAIModels}
+                    disabled={openaiModelsLoading}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    {openaiModelsLoading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        Fetching...
+                      </>
+                    ) : (
+                      <>🔄 Fetch Models</>
+                    )}
+                  </button>
+                  {openaiModels.length > 0 && (
+                    <span className="text-xs text-gray-400 self-center">
+                      {openaiModels.length} models available
+                    </span>
+                  )}
+                </div>
+                
+                {openaiModelsError && (
+                  <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
+                    ❌ {openaiModelsError}
+                  </div>
+                )}
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
+                    Selected Model
+                  </label>
+                  {openaiModels.length > 0 ? (
+                    <select
+                      value={settings.openaiModel}
+                      onChange={(e) => handleChange('openaiModel', e.target.value)}
+                      className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    >
+                      {openaiModels.map(model => (
+                        <option key={model} value={model}>{model}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={settings.openaiModel}
+                      onChange={(e) => handleChange('openaiModel', e.target.value)}
+                      className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      placeholder="gpt-4o-mini"
+                    />
+                  )}
+                  <p className="mt-2 text-xs text-gray-500">
+                    💡 This model is used when the IDE sends an unknown model name (not gpt-*, o1-*)
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* IDE Setup Instructions */}
             <div>
               <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
@@ -373,7 +469,7 @@ const Settings: React.FC = () => {
                 </div>
                 <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
                   <p className="text-sm text-blue-300">
-                    💡 Sessions are automatically created as you chat. Check the Sessions page to view captured conversations.
+                    💡 Use model name <code className="bg-[#1a1a1a] px-1 rounded text-purple-400">localproxy</code> in your IDE to route requests to LM Studio instead of OpenAI.
                   </p>
                 </div>
               </div>
