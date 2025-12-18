@@ -12,6 +12,20 @@ interface ServerSettings {
   lmstudioModel: string;
   defaultCompressionMode: 0 | 1 | 2 | 3;
   defaultKeepRecent: number;
+  modules?: {
+    summy?: { enabled: boolean };
+    tooly?: { enabled: boolean };
+  };
+}
+
+interface DiscoveredModel {
+  id: string;
+  displayName: string;
+  provider: 'lmstudio' | 'openai' | 'azure';
+  status: 'tested' | 'untested' | 'failed' | 'known_good';
+  score?: number;
+  toolCount?: number;
+  totalTools?: number;
 }
 
 const COMPRESSION_MODES = [
@@ -52,6 +66,14 @@ const Settings: React.FC = () => {
   // Azure connection test
   const [azureStatus, setAzureStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
   const [azureError, setAzureError] = useState<string>('');
+  
+  // Module settings
+  const [summyEnabled, setSummyEnabled] = useState(true);
+  const [toolyEnabled, setToolyEnabled] = useState(true);
+  
+  // Discovered models
+  const [discoveredModels, setDiscoveredModels] = useState<DiscoveredModel[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
 
   // Load settings from server and localStorage
   useEffect(() => {
@@ -63,6 +85,10 @@ const Settings: React.FC = () => {
       // Load server settings
       const response = await axios.get('http://localhost:3001/api/settings');
       setSettings(response.data);
+      
+      // Load module settings
+      setSummyEnabled(response.data.modules?.summy?.enabled ?? true);
+      setToolyEnabled(response.data.modules?.tooly?.enabled ?? true);
       
       // Load OpenAI key from localStorage (sensitive data stays local)
       const savedKey = localStorage.getItem('summy-openai-key');
@@ -76,14 +102,35 @@ const Settings: React.FC = () => {
       setIsLoaded(true);
     }
   };
+  
+  const fetchDiscoveredModels = async () => {
+    setModelsLoading(true);
+    try {
+      const response = await axios.get('http://localhost:3001/api/tooly/models');
+      if (response.data.models) {
+        setDiscoveredModels(response.data.models);
+      }
+    } catch (error) {
+      console.error('Failed to fetch models:', error);
+    } finally {
+      setModelsLoading(false);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveStatus('saving');
 
     try {
-      // Save server settings
-      await axios.post('http://localhost:3001/api/settings', settings);
+      // Save server settings with module toggles
+      const settingsToSave = {
+        ...settings,
+        modules: {
+          summy: { enabled: summyEnabled },
+          tooly: { enabled: toolyEnabled }
+        }
+      };
+      await axios.post('http://localhost:3001/api/settings', settingsToSave);
       
       // Save OpenAI key locally
       localStorage.setItem('summy-openai-key', openaiKey);
@@ -249,6 +296,116 @@ const Settings: React.FC = () => {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Module Toggles */}
+            <div className="border border-[#2d2d2d] rounded-lg p-4">
+              <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                <span className="text-2xl">⚡</span> Active Modules
+              </h4>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {/* Summy Toggle */}
+                <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                  summyEnabled 
+                    ? 'border-purple-500 bg-purple-500/10' 
+                    : 'border-[#3d3d3d] hover:border-[#5d5d5d]'
+                }`}>
+                  <input
+                    type="checkbox"
+                    checked={summyEnabled}
+                    onChange={(e) => setSummyEnabled(e.target.checked)}
+                    className="mt-1 w-4 h-4 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
+                  />
+                  <div>
+                    <div className="font-medium text-white">Summy</div>
+                    <div className="text-xs text-gray-400">Context compression & session management</div>
+                  </div>
+                </label>
+                
+                {/* Tooly Toggle */}
+                <label className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                  toolyEnabled 
+                    ? 'border-blue-500 bg-blue-500/10' 
+                    : 'border-[#3d3d3d] hover:border-[#5d5d5d]'
+                }`}>
+                  <input
+                    type="checkbox"
+                    checked={toolyEnabled}
+                    onChange={(e) => setToolyEnabled(e.target.checked)}
+                    className="mt-1 w-4 h-4 rounded border-gray-600 bg-[#0d0d0d] text-blue-500 focus:ring-blue-500"
+                  />
+                  <div>
+                    <div className="font-medium text-white">Tooly</div>
+                    <div className="text-xs text-gray-400">Tool management & MCP integration</div>
+                  </div>
+                </label>
+              </div>
+              
+              {!summyEnabled && !toolyEnabled && (
+                <p className="mt-3 text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-3 py-2">
+                  ⚠️ Both modules disabled - Summy will act as a pure passthrough proxy
+                </p>
+              )}
+            </div>
+
+            {/* Discovered Models */}
+            <div className="border border-[#2d2d2d] rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-medium text-white flex items-center gap-2">
+                  <span className="text-2xl">🎯</span> Discovered Models
+                </h4>
+                <button
+                  type="button"
+                  onClick={fetchDiscoveredModels}
+                  disabled={modelsLoading}
+                  className="px-3 py-1 text-xs bg-[#2d2d2d] text-gray-300 rounded hover:bg-[#3d3d3d] disabled:opacity-50 transition-colors"
+                >
+                  {modelsLoading ? '⏳ Scanning...' : '🔄 Scan'}
+                </button>
+              </div>
+              
+              {discoveredModels.length > 0 ? (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {discoveredModels.map((model) => (
+                    <div
+                      key={model.id}
+                      className="flex items-center justify-between p-3 bg-[#0d0d0d] rounded-lg border border-[#2d2d2d]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`text-lg ${
+                          model.status === 'tested' || model.status === 'known_good' ? 'text-green-400' :
+                          model.status === 'untested' ? 'text-yellow-400' :
+                          'text-red-400'
+                        }`}>
+                          {model.status === 'tested' || model.status === 'known_good' ? '✅' :
+                           model.status === 'untested' ? '⚠️' : '❌'}
+                        </span>
+                        <div>
+                          <p className="text-white text-sm font-medium">{model.displayName}</p>
+                          <p className="text-xs text-gray-500">{model.provider}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {model.score !== undefined && (
+                          <span className="text-xs text-gray-400">
+                            {model.score}/100
+                          </span>
+                        )}
+                        {model.toolCount !== undefined && (
+                          <span className="text-xs px-2 py-0.5 bg-[#2d2d2d] rounded text-gray-400">
+                            🔧 {model.toolCount}/{model.totalTools}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  Click "Scan" to discover available models from your LLM providers
+                </p>
+              )}
             </div>
 
             {/* Azure OpenAI Configuration - only show when Azure is selected */}

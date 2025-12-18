@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ServerStatus from './ServerStatus';
+import { NotificationBell, ToastContainer } from './notifications';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -28,8 +29,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 ✨ Summy
               </Link>
             </div>
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-4">
               <ServerStatus />
+              <NotificationBell />
               <div className="flex space-x-1">
                 <Link
                   to="/"
@@ -91,6 +93,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {children}
       </main>
+
+      {/* Toast notifications */}
+      <ToastContainer />
     </div>
   );
 };
