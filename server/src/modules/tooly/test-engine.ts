@@ -289,30 +289,52 @@ class TestEngine {
   private async loadLMStudioModel(modelId: string, unloadOthers: boolean = true): Promise<void> {
     const client = new LMStudioClient();
 
-    if (unloadOthers) {
-      try {
-        const loadedModels = await client.llm.listLoaded();
-        for (const model of loadedModels) {
-          if (model.identifier !== modelId) {
-            await client.llm.unload(model.identifier);
-            console.log(`[TestEngine] Unloaded ${model.identifier}`);
+    try {
+      const loadedModels = await client.llm.listLoaded();
+      const loadedIds = loadedModels.map(m => m.identifier);
+      
+      // Check if model is already loaded
+      const isAlreadyLoaded = loadedIds.includes(modelId);
+      
+      if (isAlreadyLoaded) {
+        console.log(`[TestEngine] Model ${modelId} is already loaded`);
+        
+        // Still unload others if requested
+        if (unloadOthers) {
+          for (const model of loadedModels) {
+            if (model.identifier !== modelId) {
+              await client.llm.unload(model.identifier);
+              console.log(`[TestEngine] Unloaded ${model.identifier}`);
+            }
           }
         }
-      } catch (error: any) {
-        console.log(`[TestEngine] Could not list/unload models: ${error.message}`);
+        return; // Model already loaded, no need to load again
       }
+
+      // Unload other models if requested
+      if (unloadOthers) {
+        for (const model of loadedModels) {
+          await client.llm.unload(model.identifier);
+          console.log(`[TestEngine] Unloaded ${model.identifier}`);
+        }
+      }
+    } catch (error: any) {
+      console.log(`[TestEngine] Could not list/unload models: ${error.message}`);
     }
 
     // Load the test model
     try {
+      console.log(`[TestEngine] Loading model ${modelId}...`);
       await client.llm.load(modelId, {
         config: { contextLength: 8192 }
       });
+      console.log(`[TestEngine] Model ${modelId} loaded successfully`);
     } catch (error: any) {
       // Model might already be loaded
       if (!error.message.includes('already loaded')) {
         throw error;
       }
+      console.log(`[TestEngine] Model ${modelId} was already loaded`);
     }
   }
 

@@ -100,9 +100,29 @@ class ModelDiscoveryService {
         timeout: 5000
       });
 
+      const rawModels = response.data?.data || [];
+      
+      // Deduplicate models - remove :2, :3, etc. suffixes if base model exists
+      const modelIds = new Set(rawModels.map((m: any) => m.id || m.name));
+      const filteredModels = rawModels.filter((model: any) => {
+        const modelId = model.id || model.name;
+        
+        // Check if this is a duplicate (ends with :N)
+        const match = modelId.match(/^(.+):(\d+)$/);
+        if (match) {
+          const baseId = match[1];
+          // If base model exists, skip this duplicate
+          if (modelIds.has(baseId)) {
+            console.log(`[ModelDiscovery] Skipping duplicate: ${modelId} (base: ${baseId})`);
+            return false;
+          }
+        }
+        return true;
+      });
+
       const models: DiscoveredModel[] = [];
 
-      for (const model of response.data?.data || []) {
+      for (const model of filteredModels) {
         const modelId = model.id || model.name;
         const profile = await this.loadModelProfile(modelId);
 
@@ -119,6 +139,7 @@ class ModelDiscoveryService {
         });
       }
 
+      console.log(`[ModelDiscovery] LM Studio: ${rawModels.length} total, ${models.length} after dedup`);
       return models;
 
     } catch (error: any) {
