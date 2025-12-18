@@ -2,6 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs-extra';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -187,7 +188,6 @@ class DatabaseService {
   constructor() {
     // Ensure data directory exists
     const dataDir = path.dirname(DB_PATH);
-    const fs = require('fs-extra');
     fs.ensureDirSync(dataDir);
 
     // Create database
