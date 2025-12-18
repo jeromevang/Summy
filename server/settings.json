@@ -4,5 +4,13 @@
   "defaultCompressionMode": 0,
   "defaultKeepRecent": 5,
   "openaiModel": "gpt-4o",
-  "provider": "openai"
+  "provider": "lmstudio",
+  "modules": {
+    "summy": {
+      "enabled": false
+    },
+    "tooly": {
+      "enabled": true
+    }
+  }
 }
