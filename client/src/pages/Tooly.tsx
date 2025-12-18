@@ -60,6 +60,7 @@ const Tooly: React.FC = () => {
   const [availableProviders, setAvailableProviders] = useState<{ lmstudio: boolean; openai: boolean; azure: boolean }>({
     lmstudio: false, openai: false, azure: false
   });
+  const [testMode, setTestMode] = useState<'quick' | 'keep_on_success' | 'manual'>('keep_on_success');
 
   // Fetch data on mount
   useEffect(() => {
@@ -133,7 +134,10 @@ const Tooly: React.FC = () => {
       const res = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider: modelProvider || 'lmstudio' })
+        body: JSON.stringify({ 
+          provider: modelProvider || 'lmstudio',
+          testMode: testMode
+        })
       });
       if (res.ok) {
         await fetchModels();
@@ -225,25 +229,43 @@ const Tooly: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">Available Models</h3>
-                {/* Provider Filter */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">Filter:</span>
-                  <select
-                    value={providerFilter}
-                    onChange={(e) => setProviderFilter(e.target.value as any)}
-                    className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
-                  >
-                    <option value="all">All Providers</option>
-                    <option value="lmstudio" disabled={!availableProviders.lmstudio}>
-                      LM Studio {availableProviders.lmstudio ? '' : '(offline)'}
-                    </option>
-                    <option value="openai" disabled={!availableProviders.openai}>
-                      OpenAI {availableProviders.openai ? '' : '(no key)'}
-                    </option>
-                    <option value="azure" disabled={!availableProviders.azure}>
-                      Azure {availableProviders.azure ? '' : '(not configured)'}
-                    </option>
-                  </select>
+                {/* Filters */}
+                <div className="flex items-center gap-4">
+                  {/* Provider Filter */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">Provider:</span>
+                    <select
+                      value={providerFilter}
+                      onChange={(e) => setProviderFilter(e.target.value as any)}
+                      className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
+                    >
+                      <option value="all">All</option>
+                      <option value="lmstudio" disabled={!availableProviders.lmstudio}>
+                        LM Studio {availableProviders.lmstudio ? '' : '(offline)'}
+                      </option>
+                      <option value="openai" disabled={!availableProviders.openai}>
+                        OpenAI {availableProviders.openai ? '' : '(no key)'}
+                      </option>
+                      <option value="azure" disabled={!availableProviders.azure}>
+                        Azure {availableProviders.azure ? '' : '(not configured)'}
+                      </option>
+                    </select>
+                  </div>
+                  
+                  {/* Test Mode */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">Test Mode:</span>
+                    <select
+                      value={testMode}
+                      onChange={(e) => setTestMode(e.target.value as any)}
+                      className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
+                      title="Controls model loading/unloading during tests"
+                    >
+                      <option value="quick">Quick (unload after)</option>
+                      <option value="keep_on_success">Keep on Success</option>
+                      <option value="manual">Manual (no unload)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               {loading ? (

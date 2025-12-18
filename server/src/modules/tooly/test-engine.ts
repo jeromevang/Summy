@@ -8,6 +8,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
+import { LMStudioClient } from '@lmstudio/sdk';
 import { capabilities, ModelProfile } from './capabilities.js';
 import { getToolSchemas } from './tool-prompts.js';
 import { notifications } from '../../services/notifications.js';
@@ -66,6 +67,15 @@ export interface TestRunResult {
   failed: number;
   overallScore: number;
   results: TestResult[];
+}
+
+export type TestMode = 'quick' | 'keep_on_success' | 'manual';
+
+export interface TestOptions {
+  mode?: TestMode;
+  unloadOthersBefore?: boolean;  // Default: true for LM Studio
+  unloadAfterTest?: boolean;     // Default: false
+  unloadOnlyOnFail?: boolean;    // Default: false (used with keep_on_success)
 }
 
 // ============================================================
@@ -274,6 +284,52 @@ class TestEngine {
   }
 
   /**
+   * Load a model in LM Studio, optionally unloading others first
+   */
+  private async loadLMStudioModel(modelId: string, unloadOthers: boolean = true): Promise<void> {
+    const client = new LMStudioClient();
+
+    if (unloadOthers) {
+      try {
+        const loadedModels = await client.llm.listLoaded();
+        for (const model of loadedModels) {
+          if (model.identifier !== modelId) {
+            await client.llm.unload(model.identifier);
+            console.log(`[TestEngine] Unloaded ${model.identifier}`);
+          }
+        }
+      } catch (error: any) {
+        console.log(`[TestEngine] Could not list/unload models: ${error.message}`);
+      }
+    }
+
+    // Load the test model
+    try {
+      await client.llm.load(modelId, {
+        config: { contextLength: 8192 }
+      });
+    } catch (error: any) {
+      // Model might already be loaded
+      if (!error.message.includes('already loaded')) {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Unload a model from LM Studio
+   */
+  private async unloadLMStudioModel(modelId: string): Promise<void> {
+    const client = new LMStudioClient();
+    try {
+      await client.llm.unload(modelId);
+    } catch (error: any) {
+      // Model might not be loaded
+      console.log(`[TestEngine] Could not unload ${modelId}: ${error.message}`);
+    }
+  }
+
+  /**
    * Run all tests for a model
    */
   async runAllTests(
@@ -286,12 +342,30 @@ class TestEngine {
       azureApiKey?: string;
       azureDeploymentName?: string;
       azureApiVersion?: string;
-    }
+    },
+    options: TestOptions = {}
   ): Promise<TestRunResult> {
     const startedAt = new Date().toISOString();
     notifications.modelTestStarted(modelId);
 
-    console.log(`[TestEngine] Starting tests for model: ${modelId}`);
+    // Parse test mode options
+    const mode = options.mode || 'manual';
+    const unloadOthersBefore = options.unloadOthersBefore ?? (mode !== 'manual');
+    const unloadAfterTest = options.unloadAfterTest ?? (mode === 'quick');
+    const unloadOnlyOnFail = options.unloadOnlyOnFail ?? (mode === 'keep_on_success');
+
+    console.log(`[TestEngine] Starting tests for model: ${modelId} (mode: ${mode})`);
+
+    // For LM Studio: load the model and optionally unload others
+    if (provider === 'lmstudio' && unloadOthersBefore) {
+      try {
+        await this.loadLMStudioModel(modelId, true);
+        console.log(`[TestEngine] Loaded model ${modelId}, unloaded others`);
+      } catch (error: any) {
+        console.error(`[TestEngine] Failed to load model: ${error.message}`);
+        // Continue anyway - model might already be loaded
+      }
+    }
 
     const results: TestResult[] = [];
     
@@ -333,6 +407,19 @@ class TestEngine {
 
     // Update model profile
     await this.updateModelProfile(modelId, provider, runResult);
+
+    // For LM Studio: optionally unload after test
+    if (provider === 'lmstudio') {
+      const shouldUnload = unloadAfterTest || (unloadOnlyOnFail && overallScore < 50);
+      if (shouldUnload) {
+        try {
+          await this.unloadLMStudioModel(modelId);
+          console.log(`[TestEngine] Unloaded model ${modelId} after test (score: ${overallScore}%)`);
+        } catch (error: any) {
+          console.error(`[TestEngine] Failed to unload model: ${error.message}`);
+        }
+      }
+    }
 
     notifications.modelTestCompleted(modelId, overallScore);
 
@@ -603,10 +690,26 @@ class TestEngine {
     modelId: string,
     provider: 'lmstudio' | 'openai' | 'azure',
     tools: string[],
-    settings: any
+    settings: any,
+    options: TestOptions = {}
   ): Promise<TestRunResult> {
     const tests = TEST_DEFINITIONS.filter(t => tools.includes(t.tool));
     
+    // Parse test mode options
+    const mode = options.mode || 'manual';
+    const unloadOthersBefore = options.unloadOthersBefore ?? (mode !== 'manual');
+    const unloadAfterTest = options.unloadAfterTest ?? (mode === 'quick');
+    const unloadOnlyOnFail = options.unloadOnlyOnFail ?? (mode === 'keep_on_success');
+
+    // For LM Studio: load the model and optionally unload others
+    if (provider === 'lmstudio' && unloadOthersBefore) {
+      try {
+        await this.loadLMStudioModel(modelId, true);
+      } catch (error: any) {
+        console.error(`[TestEngine] Failed to load model: ${error.message}`);
+      }
+    }
+
     // Create a temporary engine state with filtered tests
     const startedAt = new Date().toISOString();
     const results: TestResult[] = [];
@@ -633,6 +736,19 @@ class TestEngine {
     const overallScore = results.length > 0
       ? Math.round(results.reduce((sum, r) => sum + r.score, 0) / results.length)
       : 0;
+
+    // For LM Studio: optionally unload after test
+    if (provider === 'lmstudio') {
+      const shouldUnload = unloadAfterTest || (unloadOnlyOnFail && overallScore < 50);
+      if (shouldUnload) {
+        try {
+          await this.unloadLMStudioModel(modelId);
+          console.log(`[TestEngine] Unloaded model ${modelId} after test (score: ${overallScore}%)`);
+        } catch (error: any) {
+          console.error(`[TestEngine] Failed to unload model: ${error.message}`);
+        }
+      }
+    }
 
     return {
       modelId,

@@ -1,0 +1,296 @@
+{
+  "modelId": "mungert/osmosis-mcp-4b",
+  "displayName": "mungert/osmosis-mcp-4b",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-18T22:40:50.992Z",
+  "testVersion": 2,
+  "score": 96,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 7624.5,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "file_write": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4440,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "file_patch": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3680,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "file_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3038,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "file_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4589,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 2327,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "git_diff": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2338,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "git_log": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2179,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "git_commit": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2161,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_branch_create": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2216,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_checkout": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_merge": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_rm": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "npm_run": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2827,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "npm_install": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2090,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "http_request": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2671,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "browser_navigate": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 12057,
+      "lastTested": "2025-12-18T22:40:50.992Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [
+    "file_read",
+    "file_write",
+    "file_patch",
+    "file_list",
+    "file_search",
+    "git_diff",
+    "git_log",
+    "git_commit",
+    "git_branch_create",
+    "npm_run",
+    "npm_install",
+    "http_request",
+    "browser_navigate"
+  ],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-rb48aougiscoiquke1aemm\",\"object\":\"chat.completion\",\"created\":1766097597,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to read the contents of a file called \\\"config.json\\\" in the current directory. Let me check the tools available.\\n\\nLooking at the provided tools, there's a function called file_read that takes a path parameter. The description says it reads the contents of a file. So I need to cal"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-5r92u0u7l9gp48yunqlk2\",\"object\":\"chat.completion\",\"created\":1766097601,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants to see the contents of the file at src/utils/helpers.ts. Let me check if I have a tool for that.\\n\\nLooking at the tools provided, there's a function called file_read which takes a path parameter. Perfect, that's exactly what I need here.\\n\\nSo I should call file_read with the path set "
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-8lf17psat99bbf4zpir7lk\",\"object\":\"chat.completion\",\"created\":1766097604,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see. The user wants to create a new file named \\\"hello.js\\\" with the content \\\"console.log('Hello World')\\\". I need to use the file_write function for this.\\n\\nFirst, check the function parameters. The function requires \\\"path\\\" and \\\"content\\\". The path should be \\\"hello.js\\\", and the content "
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-etgh0bq267m2nhvohlp8st\",\"object\":\"chat.completion\",\"created\":1766097608,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let me see. The user wants to change the port number in the \\\"app.js\\\" file from 3000 to 8080.\\n\\nFirst, I need to use the file_patch function provided. The parameters required are path, find, and replace. \\n\\nThe path is clearly \\\"app.js\\\". The text to find would be \\\"3000\\\", and the replacement sho"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-mhshjh4e63e3p07nooif0u\",\"object\":\"chat.completion\",\"created\":1766097612,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants to see all the files in the src directory. Let me check the tools available. There's a function called file_list that lists files in a directory. The parameters include a folder, which defaults to the current directory if not specified.\\n\\nSince the user mentioned \\\"src directory\\\", I "
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-0y4iqpt22axrcrhgngr8nq9\",\"object\":\"chat.completion\",\"created\":1766097615,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants to search for all occurrences of \\\"TODO\\\" in the project files. Let me check the available tools. There's a function called file_search that takes a query and a path. The query is required, and the path is optional but probably needed here.\\n\\nSince the user mentioned \\\"project files,"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-ccmtknl4biv0v3w5doao\",\"object\":\"chat.completion\",\"created\":1766097620,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to check the current git status of the repository. Let me see what tools I have available.\\n\\nLooking at the provided tools, there's a function called git_status. The description says it checks the git repository status, and it doesn't require any parameters. So I don't need to pass a"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-rb2fg9x2icli2vqtc7c8eo\",\"object\":\"chat.completion\",\"created\":1766097622,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user is asking to show the git diff for the file \\\"index.js\\\". Let me check the tools available. There's a function called git_diff that can be used. The parameters for this function include an optional 'file' parameter. Since the user specified \\\"index.js\\\", I should include that in the argument"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-89rcico7bpou2b0n02q44\",\"object\":\"chat.completion\",\"created\":1766097624,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants to see the last 5 commits. Let me check the available tools. There's a function called git_log that views commit history. The parameters include a count, which is the number of commits to show. The user asked for the last 5, so I should set count to 5. The required fields are empty, so "
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-xunmnyozidiph5l86i0vzo\",\"object\":\"chat.completion\",\"created\":1766097626,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants to commit all changes with the message \\\"Fix login bug\\\". Let me check the available tools. There's a function called git_commit that takes a message parameter. The required parameter is the message, which the user has provided. So I need to call git_commit with the message \\\"Fix login"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-x701ixveut4i8r11m61wk\",\"object\":\"chat.completion\",\"created\":1766097629,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants to create a new branch called \\\"feature/user-auth\\\". Let me check the tools available. There's a function named git_branch_create that takes a name parameter. The required parameter is the branch name. So I need to call this function with the name set to \\\"feature/user-auth\\\". That shou"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-519t1erxzzr6hq7bdw0fmt\",\"object\":\"chat.completion\",\"created\":1766097631,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to run the \\\"build\\\" npm script. Let me check the tools available.\\n\\nThere's a function called npm_run that takes a script parameter. The required parameter is \\\"script\\\", which should be the name of the npm script. Since the user specified \\\"build\\\", I need to call this function w"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-gpdgc5dvd31nhvmssy92j\",\"object\":\"chat.completion\",\"created\":1766097634,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants to install the lodash package. Let me check what tools I have available. There's an npm_install function that takes a package name. So I need to call that function with \\\"lodash\\\" as the package parameter. I should make sure the JSON is correctly formatted with the package name in the a"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-f5xeml2jqseopwoay6bor\",\"object\":\"chat.completion\",\"created\":1766097636,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants to fetch data from the URL https://api.example.com/users. Let me check the tools available. There's an http_request function that takes url, method, and body. The required parameter is url, so I need to include that. The method isn't specified, so I should default to GET since that's th"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-vqeqxy7wu8gp1l0gjhobj\",\"object\":\"chat.completion\",\"created\":1766097638,\"model\":\"mungert/osmosis-mcp-4b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to open GitHub's website and get the page title. Let me see what tools I have available.\\n\\nLooking at the provided functions, there's one called browser_navigate. Its description says it can navigate to a webpage. The parameters include url, which is required, and optional ones like"
+    }
+  ]
+}
