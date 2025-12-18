@@ -1699,6 +1699,31 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Server status endpoint for Dashboard
+app.get('/api/status', async (req, res) => {
+  try {
+    const settings = await loadServerSettings();
+    res.json({
+      online: true,
+      port: PORT,
+      ngrokUrl: process.env.NGROK_URL || null,
+      provider: settings.provider || 'lmstudio',
+      model: settings.provider === 'lmstudio' 
+        ? settings.lmstudioModel 
+        : settings.provider === 'azure' 
+          ? settings.azureDeploymentName 
+          : settings.openaiModel
+    });
+  } catch (error) {
+    res.json({
+      online: true,
+      port: PORT,
+      provider: 'unknown',
+      model: 'unknown'
+    });
+  }
+});
+
 // Test route
 app.get('/test-proxy', (req, res) => {
   console.log('🔥 EMERGENCY DEBUG: Test route called');
