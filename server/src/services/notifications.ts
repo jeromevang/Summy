@@ -135,11 +135,12 @@ class NotificationService {
   }
 
   modelTestCompleted(modelId: string, score: number): string {
-    return this.success(
+    return this.notify(
+      'success',
       `🎯 Model test complete: ${modelId}`,
       `Score: ${score}/100`,
       'View Results',
-      `/tools/${encodeURIComponent(modelId)}`
+      `/tooly?model=${encodeURIComponent(modelId)}`
     );
   }
 
