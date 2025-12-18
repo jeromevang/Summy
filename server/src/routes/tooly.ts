@@ -4,6 +4,9 @@
  */
 
 import { Router } from 'express';
+import path from 'path';
+import fs from 'fs-extra';
+import { fileURLToPath } from 'url';
 import { modelDiscovery } from '../services/model-discovery.js';
 import { analytics } from '../services/analytics.js';
 import { db } from '../services/database.js';
@@ -11,6 +14,12 @@ import { capabilities, ALL_TOOLS } from '../modules/tooly/capabilities.js';
 import { testEngine, TEST_DEFINITIONS } from '../modules/tooly/test-engine.js';
 import { rollback } from '../modules/tooly/rollback.js';
 import { mcpClient } from '../modules/tooly/mcp-client.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Settings file path (same as main index.ts)
+const SETTINGS_FILE = path.join(__dirname, '../../settings.json');
 
 const router = Router();
 
@@ -20,45 +29,65 @@ const router = Router();
 
 /**
  * GET /api/tooly/models
- * Discover available models from all providers
+ * Discover available models from providers
+ * Query params:
+ *   - provider: 'all' | 'lmstudio' | 'openai' | 'azure' (default: 'all')
  */
 router.get('/models', async (req, res) => {
   try {
-    const settingsPath = './data/settings.json';
-    const fs = await import('fs-extra');
+    const providerFilter = (req.query.provider as string) || 'all';
     let settings: any = {};
     
     try {
-      if (await fs.pathExists(settingsPath)) {
-        settings = await fs.readJson(settingsPath);
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+        console.log(`[Tooly] Loaded settings, lmstudioUrl: ${settings.lmstudioUrl}`);
       }
-    } catch {
-      // Use defaults
+    } catch (err: any) {
+      console.log(`[Tooly] Error loading settings: ${err.message}`);
     }
 
-    const discovery = await modelDiscovery.discoverAll({
-      lmstudioUrl: settings.lmstudioUrl,
-      openaiApiKey: process.env.OPENAI_API_KEY,
-      azureResourceName: settings.azureResourceName,
-      azureApiKey: settings.azureApiKey,
-      azureDeploymentName: settings.azureDeploymentName
-    });
+    // Discover models based on filter
+    let lmstudioModels: any[] = [];
+    let openaiModels: any[] = [];
+    let azureModels: any[] = [];
 
-    // Combine all models into a single list
+    // Fetch from selected providers
+    if (providerFilter === 'all' || providerFilter === 'lmstudio') {
+      console.log(`[Tooly] Discovering LM Studio models from: ${settings.lmstudioUrl}`);
+      lmstudioModels = await modelDiscovery.discoverLMStudio(settings.lmstudioUrl);
+    }
+    
+    if (providerFilter === 'all' || providerFilter === 'openai') {
+      openaiModels = await modelDiscovery.discoverOpenAI(process.env.OPENAI_API_KEY);
+    }
+    
+    if (providerFilter === 'all' || providerFilter === 'azure') {
+      azureModels = await modelDiscovery.discoverAzure({
+        azureResourceName: settings.azureResourceName,
+        azureApiKey: settings.azureApiKey,
+        azureDeploymentName: settings.azureDeploymentName
+      });
+    }
+
+    // Combine filtered models
     const models = [
-      ...discovery.lmstudio,
-      ...discovery.openai,
-      ...discovery.azure
+      ...lmstudioModels,
+      ...openaiModels,
+      ...azureModels
     ];
+
+    console.log(`[Tooly] Discovered models (filter: ${providerFilter}): LMStudio=${lmstudioModels.length}, OpenAI=${openaiModels.length}, Azure=${azureModels.length}`);
 
     res.json({
       models,
-      lastUpdated: discovery.lastUpdated,
+      lastUpdated: new Date().toISOString(),
       providers: {
-        lmstudio: discovery.lmstudio.length > 0,
-        openai: discovery.openai.length > 0,
-        azure: discovery.azure.length > 0
-      }
+        lmstudio: lmstudioModels.length > 0,
+        openai: openaiModels.length > 0,
+        azure: azureModels.length > 0
+      },
+      filter: providerFilter
     });
   } catch (error: any) {
     console.error('[Tooly] Failed to discover models:', error);
@@ -97,13 +126,11 @@ router.post('/models/:modelId/test', async (req, res) => {
     const { provider = 'lmstudio', tools } = req.body;
     
     // Load settings
-    const settingsPath = './data/settings.json';
-    const fs = await import('fs-extra');
     let settings: any = {};
     
     try {
-      if (await fs.pathExists(settingsPath)) {
-        settings = await fs.readJson(settingsPath);
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
       }
     } catch {
       // Use defaults

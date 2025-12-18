@@ -56,6 +56,10 @@ const Tooly: React.FC = () => {
   const [logs, setLogs] = useState<ExecutionLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [testingModel, setTestingModel] = useState<string | null>(null);
+  const [providerFilter, setProviderFilter] = useState<'all' | 'lmstudio' | 'openai' | 'azure'>('all');
+  const [availableProviders, setAvailableProviders] = useState<{ lmstudio: boolean; openai: boolean; azure: boolean }>({
+    lmstudio: false, openai: false, azure: false
+  });
 
   // Fetch data on mount
   useEffect(() => {
@@ -64,12 +68,21 @@ const Tooly: React.FC = () => {
     fetchLogs();
   }, []);
 
+  // Refetch when provider filter changes
+  useEffect(() => {
+    fetchModels();
+  }, [providerFilter]);
+
   const fetchModels = async () => {
+    setLoading(true);
     try {
-      const res = await fetch('/api/tooly/models');
+      const res = await fetch(`/api/tooly/models?provider=${providerFilter}`);
       if (res.ok) {
         const data = await res.json();
         setModels(data.models || []);
+        if (data.providers) {
+          setAvailableProviders(data.providers);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch models:', error);
@@ -208,7 +221,29 @@ const Tooly: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Model List */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Available Models</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Available Models</h3>
+                {/* Provider Filter */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">Filter:</span>
+                  <select
+                    value={providerFilter}
+                    onChange={(e) => setProviderFilter(e.target.value as any)}
+                    className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
+                  >
+                    <option value="all">All Providers</option>
+                    <option value="lmstudio" disabled={!availableProviders.lmstudio}>
+                      LM Studio {availableProviders.lmstudio ? '' : '(offline)'}
+                    </option>
+                    <option value="openai" disabled={!availableProviders.openai}>
+                      OpenAI {availableProviders.openai ? '' : '(no key)'}
+                    </option>
+                    <option value="azure" disabled={!availableProviders.azure}>
+                      Azure {availableProviders.azure ? '' : '(not configured)'}
+                    </option>
+                  </select>
+                </div>
+              </div>
               {loading ? (
                 <div className="flex items-center justify-center h-32">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>

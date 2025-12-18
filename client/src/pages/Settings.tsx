@@ -103,10 +103,12 @@ const Settings: React.FC = () => {
     }
   };
   
-  const fetchDiscoveredModels = async () => {
+  const fetchDiscoveredModels = async (provider?: string) => {
     setModelsLoading(true);
     try {
-      const response = await axios.get('http://localhost:3001/api/tooly/models');
+      // Use the provided provider or the current settings provider
+      const selectedProvider = provider || settings.provider || 'all';
+      const response = await axios.get(`/api/tooly/models?provider=${selectedProvider}`);
       if (response.data.models) {
         setDiscoveredModels(response.data.models);
       }
