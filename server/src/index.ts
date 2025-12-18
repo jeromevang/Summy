@@ -279,6 +279,7 @@ const segmentMessages = (messages: any[]): MessageSegment[] => {
 interface ServerSettings {
   lmstudioUrl: string;
   lmstudioModel: string;
+  openaiModel: string;
   defaultCompressionMode: 0 | 1 | 2 | 3;
   defaultKeepRecent: number;
 }
@@ -297,6 +298,7 @@ const loadServerSettings = async (): Promise<ServerSettings> => {
   return {
     lmstudioUrl: 'http://localhost:1234',
     lmstudioModel: '',
+    openaiModel: 'gpt-4o-mini',
     defaultCompressionMode: 1,
     defaultKeepRecent: 5
   };
@@ -795,17 +797,101 @@ const proxyToOpenAI = async (req: any, res: any) => {
       }
     }
 
+    // Determine routing: LM Studio or OpenAI
+    const requestedModel = req.body?.model || 'gpt-4o-mini';
+    const isLMStudioRequest = requestedModel.toLowerCase() === 'localproxy';
+    
+    // Load settings for routing decisions
+    const settings = await loadServerSettings();
+    
+    if (isLMStudioRequest) {
+      // ========== ROUTE TO LM STUDIO ==========
+      const lmstudioUrl = `${settings.lmstudioUrl}/v1/chat/completions`;
+      const lmstudioModel = settings.lmstudioModel || 'local-model';
+      
+      addDebugEntry('request', `Proxying to LM Studio: ${requestedModel} -> ${lmstudioModel}`, {
+        originalModel: requestedModel,
+        actualModel: lmstudioModel,
+        lmstudioUrl: settings.lmstudioUrl,
+        streaming: req.isStreaming,
+        messageCount: messagesToSend.length
+      });
+      
+      const modifiedBody = {
+        ...req.body,
+        model: lmstudioModel,
+        messages: messagesToSend
+      };
+      
+      try {
+        const response = await axios({
+          method: 'POST',
+          url: lmstudioUrl,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          data: modifiedBody,
+          timeout: 300000, // 5 min timeout for local models
+          responseType: req.isStreaming ? 'stream' : 'json',
+        });
+        
+        if (req.isStreaming) {
+          res.setHeader('Content-Type', 'text/event-stream');
+          res.setHeader('Cache-Control', 'no-cache');
+          res.setHeader('Connection', 'keep-alive');
+          let fullContent = '';
+          response.data.on('data', (chunk: Buffer) => {
+            const chunkStr = chunk.toString();
+            fullContent += chunkStr;
+            res.write(chunkStr);
+          });
+          response.data.on('end', async () => {
+            const parsedResponse = parseStreamingResponse(fullContent);
+            await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+            res.end();
+          });
+          response.data.on('error', (err: Error) => {
+            console.error('❌ LM STUDIO STREAM ERROR:', err.message);
+            addDebugEntry('error', `LM Studio stream error: ${err.message}`, {});
+            res.end();
+          });
+        } else {
+          await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
+          res.json(response.data);
+        }
+        return; // Exit after LM Studio handling
+      } catch (lmError: any) {
+        console.error('❌ LM STUDIO ERROR:', lmError.message);
+        addDebugEntry('error', `LM Studio error: ${lmError.message}`, {});
+        
+        if (lmError.code === 'ECONNREFUSED') {
+          return res.status(503).json({
+            error: 'LM Studio is not running or not accessible',
+            details: `Could not connect to ${settings.lmstudioUrl}`
+          });
+        }
+        return res.status(500).json({
+          error: lmError.message,
+          details: lmError.response?.data || 'LM Studio request failed'
+        });
+      }
+    }
+    
+    // ========== ROUTE TO OPENAI ==========
     // Map custom model names to real OpenAI models
-    // If model is not a known OpenAI model, default to gpt-4o-mini
     const knownOpenAIModels = [
       'gpt-4', 'gpt-4-turbo', 'gpt-4-turbo-preview', 'gpt-4o', 'gpt-4o-mini',
       'gpt-3.5-turbo', 'gpt-3.5-turbo-16k',
       'o1', 'o1-mini', 'o1-preview'
     ];
-    const requestedModel = req.body?.model || 'gpt-4o-mini';
-    const actualModel = knownOpenAIModels.some(m => requestedModel.startsWith(m)) 
-      ? requestedModel 
-      : 'gpt-4o-mini';
+    
+    // Use settings.openaiModel if available, otherwise map or default
+    let actualModel: string;
+    if (knownOpenAIModels.some(m => requestedModel.startsWith(m))) {
+      actualModel = requestedModel;
+    } else {
+      actualModel = settings.openaiModel || 'gpt-4o-mini';
+    }
     
     // Create modified request body with correct model and potentially compressed messages
     const modifiedBody = {
@@ -1007,6 +1093,46 @@ app.post('/api/settings', async (req, res) => {
   }
 });
 
+// Get available OpenAI models
+app.get('/api/openai/models', async (req, res) => {
+  try {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return res.status(400).json({ error: 'OpenAI API key not configured' });
+    }
+    
+    const response = await axios.get('https://api.openai.com/v1/models', {
+      headers: { 'Authorization': `Bearer ${apiKey}` },
+      timeout: 10000
+    });
+    
+    // Filter to chat-compatible models only
+    const chatModels = response.data.data
+      .filter((m: any) => 
+        m.id.startsWith('gpt-') || 
+        m.id.startsWith('o1') ||
+        m.id.startsWith('chatgpt')
+      )
+      .map((m: any) => m.id)
+      .sort((a: string, b: string) => {
+        // Sort: gpt-4o first, then gpt-4, then gpt-3.5, then o1
+        if (a.startsWith('gpt-4o') && !b.startsWith('gpt-4o')) return -1;
+        if (!a.startsWith('gpt-4o') && b.startsWith('gpt-4o')) return 1;
+        if (a.startsWith('gpt-4') && !b.startsWith('gpt-4')) return -1;
+        if (!a.startsWith('gpt-4') && b.startsWith('gpt-4')) return 1;
+        return a.localeCompare(b);
+      });
+    
+    res.json({ models: chatModels });
+  } catch (error: any) {
+    console.error('Failed to fetch OpenAI models:', error.message);
+    res.status(500).json({ 
+      error: 'Failed to fetch models',
+      details: error.response?.data?.error?.message || error.message
+    });
+  }
+});
+
 // Test LMStudio connection
 app.post('/api/test-lmstudio', async (req, res) => {
   try {
@@ -1135,16 +1261,28 @@ app.post('/api/sessions/:id/compress', async (req, res) => {
       enabled: true
     };
     
-    // Get all messages from all conversation turns
+    // Get all messages from all conversation turns (matching client-side logic exactly)
     const allMessages: any[] = [];
     for (const turn of session.conversations) {
+      // 1. Add user message (last one from the request)
       if (turn.request?.messages) {
-        // Only add messages that aren't already in allMessages (avoid duplicates)
         const lastUserMsg = turn.request.messages.filter((m: any) => m.role === 'user').pop();
         if (lastUserMsg) {
           allMessages.push(lastUserMsg);
         }
+        
+        // 2. Add assistant messages with tool_calls
+        const assistantWithTools = turn.request.messages.find((m: any) => m.role === 'assistant' && m.tool_calls);
+        if (assistantWithTools) {
+          allMessages.push(assistantWithTools);
+        }
+        
+        // 3. Add tool response messages
+        const toolMessages = turn.request.messages.filter((m: any) => m.role === 'tool');
+        allMessages.push(...toolMessages);
       }
+      
+      // 4. Add assistant response
       if (turn.response) {
         if (turn.response.type === 'streaming') {
           allMessages.push({ role: 'assistant', content: turn.response.content });
@@ -1195,15 +1333,28 @@ app.get('/api/sessions/:id/compressions', async (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
     
-    // Extract all messages from conversations
+    // Extract all messages from conversations (matching client-side logic exactly)
     const allMessages: any[] = [];
     for (const turn of session.conversations) {
+      // 1. Add user message (last one from the request)
       if (turn.request?.messages) {
         const lastUserMsg = turn.request.messages.filter((m: any) => m.role === 'user').pop();
         if (lastUserMsg) {
           allMessages.push(lastUserMsg);
         }
+        
+        // 2. Add assistant messages with tool_calls
+        const assistantWithTools = turn.request.messages.find((m: any) => m.role === 'assistant' && m.tool_calls);
+        if (assistantWithTools) {
+          allMessages.push(assistantWithTools);
+        }
+        
+        // 3. Add tool response messages
+        const toolMessages = turn.request.messages.filter((m: any) => m.role === 'tool');
+        allMessages.push(...toolMessages);
       }
+      
+      // 4. Add assistant response
       if (turn.response) {
         if (turn.response.type === 'streaming') {
           allMessages.push({ role: 'assistant', content: turn.response.content });
@@ -1282,15 +1433,28 @@ app.post('/api/sessions/:id/recompress', async (req, res) => {
     delete session.compressedConversations;
     await saveSession(session);
     
-    // Extract all messages
+    // Extract all messages (matching client-side logic exactly)
     const allMessages: any[] = [];
     for (const turn of session.conversations) {
+      // 1. Add user message (last one from the request)
       if (turn.request?.messages) {
         const lastUserMsg = turn.request.messages.filter((m: any) => m.role === 'user').pop();
         if (lastUserMsg) {
           allMessages.push(lastUserMsg);
         }
+        
+        // 2. Add assistant messages with tool_calls
+        const assistantWithTools = turn.request.messages.find((m: any) => m.role === 'assistant' && m.tool_calls);
+        if (assistantWithTools) {
+          allMessages.push(assistantWithTools);
+        }
+        
+        // 3. Add tool response messages
+        const toolMessages = turn.request.messages.filter((m: any) => m.role === 'tool');
+        allMessages.push(...toolMessages);
       }
+      
+      // 4. Add assistant response
       if (turn.response) {
         if (turn.response.type === 'streaming') {
           allMessages.push({ role: 'assistant', content: turn.response.content });

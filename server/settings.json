@@ -1,6 +1,7 @@
 {
   "lmstudioUrl": "http://localhost:1234",
   "lmstudioModel": "qwen2.5-7b-instruct-1m",
-  "defaultCompressionMode": 1,
-  "defaultKeepRecent": 5
+  "defaultCompressionMode": 0,
+  "defaultKeepRecent": 5,
+  "openaiModel": "gpt-4o"
 }
