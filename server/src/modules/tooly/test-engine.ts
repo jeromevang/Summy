@@ -661,7 +661,7 @@ class TestEngine {
       passed: r.passed,
       score: r.score,
       latency: r.latency,
-      response: JSON.stringify(r.response).slice(0, 500),
+      response: r.response ? JSON.stringify(r.response).slice(0, 500) : undefined,
       error: r.error
     }));
 
