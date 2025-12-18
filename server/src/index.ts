@@ -10,6 +10,11 @@ import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 import { LMStudioClient } from '@lmstudio/sdk';
 
+// Import new route modules
+import { toolyRoutes, notificationsRoutes, analyticsRoutes } from './routes/index.js';
+import { notifications } from './services/notifications.js';
+import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
+
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1668,6 +1673,27 @@ app.post('/api/sessions/:id/recompress', async (req, res) => {
 // END SETTINGS API
 // ============================================================
 
+// ============================================================
+// NEW API ROUTES (Tooly, Notifications, Analytics)
+// ============================================================
+
+// Initialize notification service with WebSocket server
+notifications.initialize(wss);
+
+// Register new route modules
+app.use('/api/tooly', toolyRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/analytics', analyticsRoutes);
+
+// Schedule backup cleanup (every hour)
+scheduleBackupCleanup(60 * 60 * 1000);
+
+console.log('✅ New modules registered: Tooly, Notifications, Analytics');
+
+// ============================================================
+// END NEW API ROUTES
+// ============================================================
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -1715,5 +1741,8 @@ server.listen(PORT, () => {
   console.log('  📝 General logging middleware: ACTIVE');
   console.log('  🤖 Manual proxy routes: POST /chat/completions, /v1/chat/completions');
   console.log('  📊 API routes: /api/*');
+  console.log('  🔧 Tooly routes: /api/tooly/*');
+  console.log('  🔔 Notifications: /api/notifications/*');
+  console.log('  📈 Analytics: /api/analytics/*');
   console.log('  🔌 WebSocket: Ready for real-time updates');
 });
