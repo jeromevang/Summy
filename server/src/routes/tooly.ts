@@ -123,7 +123,9 @@ router.get('/models/:modelId', async (req, res) => {
 router.post('/models/:modelId/test', async (req, res) => {
   try {
     const { modelId } = req.params;
-    const { provider = 'lmstudio', tools } = req.body;
+    const body = req.body || {};
+    const provider = body.provider || 'lmstudio';
+    const tools = body.tools;
     
     // Load settings
     let settings: any = {};
