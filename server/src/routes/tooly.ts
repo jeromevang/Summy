@@ -126,6 +126,7 @@ router.post('/models/:modelId/test', async (req, res) => {
     const body = req.body || {};
     const provider = body.provider || 'lmstudio';
     const tools = body.tools;
+    const testMode = body.testMode || 'manual';  // 'quick' | 'keep_on_success' | 'manual'
     
     // Load settings
     let settings: any = {};
@@ -147,11 +148,21 @@ router.post('/models/:modelId/test', async (req, res) => {
       azureApiVersion: settings.azureApiVersion
     };
 
+    // Build test options based on mode
+    const testOptions = {
+      mode: testMode,
+      unloadOthersBefore: testMode !== 'manual',
+      unloadAfterTest: testMode === 'quick',
+      unloadOnlyOnFail: testMode === 'keep_on_success'
+    };
+
+    console.log(`[Tooly] Running tests for ${modelId} with mode: ${testMode}`);
+
     let result;
     if (tools && Array.isArray(tools)) {
-      result = await testEngine.runTestsForTools(modelId, provider, tools, testSettings);
+      result = await testEngine.runTestsForTools(modelId, provider, tools, testSettings, testOptions);
     } else {
-      result = await testEngine.runAllTests(modelId, provider, testSettings);
+      result = await testEngine.runAllTests(modelId, provider, testSettings, testOptions);
     }
 
     res.json(result);

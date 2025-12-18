@@ -1,0 +1,284 @@
+{
+  "modelId": "tinyllama-1.1b-chat-v1.0",
+  "displayName": "tinyllama-1.1b-chat-v1.0",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-18T22:36:54.872Z",
+  "testVersion": 2,
+  "score": 16,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 1541,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 177,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 615,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 958,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 20,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 390,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 360,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 156,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "git_log": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 772,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 228,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 518,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_checkout": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_merge": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_rm": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 20,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 259,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 347,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 687,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 144,
+      "lastTested": "2025-12-18T22:36:54.872Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [
+    "git_log"
+  ],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-sh7rd8sp88l2wfd0ul7djd\",\"object\":\"chat.completion\",\"created\":1766097408,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, here's how you can read the contents of the file named \\\"config.json\\\" in the current directory:\\n\\n```python\\nimport json\\nwith open('config.json', 'r') as f:\\n    config = json.load(f)\\n```\\n\\nThis code reads the contents of the file named \\\"config.json\\\" in the current directory and assigns it to a varia"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-cd4gcvj2ideh270mqixzf9\",\"object\":\"chat.completion\",\"created\":1766097408,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, here is an example of how you can use the `file_read` tool with the `src/utils/helper.ts` file:\\n\\n```typescript\\nimport { file_read } from \\\"../tools\\\";\\n\\nconst contents = await file_read(\\\"./src/utils/helper.ts\\\");\\nconsole.log(contents); // Outputs the contents of ./src/utils/helper.ts\\n```\\n\\nIn this e"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-o7ri6mrhop2l6mrk4vj9q\",\"object\":\"chat.completion\",\"created\":1766097409,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```javascript\\nconsole.log(\\\"Hello World\\\");\\n```\\n\\nThis code creates a new file called \\\"hello.js\\\" and logs the string \\\"Hello World\\\" to the console. This is a simple JavaScript program that simply logs the text \\\"Hello World\\\". The `console.log()` function is used to output the text to the console, which is a"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-l2ib6186ihb2f6cqurf34z\",\"object\":\"chat.completion\",\"created\":1766097409,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"In the file \\\"app.js\\\", change the port number from 3000 to 8080:\\n\\n```javascript\\nconst express = require(\\\"express\\\");\\nconst bodyParser = require(\\\"body-parser\\\");\\nconst cors = require(\\\"cors\\\");\\nconst morgan = require(\\\"morgan\\\");\\nconst path = require(\\\"path\\\");\\nconst fs = require(\\\"fs\\\");\\nconst app = e"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-g8jb4jj51hbn13esjogil\",\"object\":\"chat.completion\",\"created\":1766097410,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, here's an example of a tool call that lists all files in the `src` directory:\\n\\n```json\\n[\\n   {\\n      \\\"type\\\": \\\"function\\\",\\n      \\\"function\\\": {\\n         \\\"name\\\": \\\"file_list\\\",\\n         \\\"description\\\": \\\"List files in the src directory\\\",\\n         \\\"parameters\\\": {\\n            \\\"folder\\\": {\\n  "
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-ciwql60tjbi0vbjqpiso4j\",\"object\":\"chat.completion\",\"created\":1766097411,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Here's an example response to a user requesting the number of occurrences of \\\"TODO\\\" in the project files:\\n\\n\\n[TOOL_RESULT]\\n<result>\\n{\\n  \\\"count\\\": 10\\n}\\n[END_TOOL_RESULT]\\n\\nRule:\\n- Use a tool to count the number of occurrences of a specific keyword or pattern in project files.\\n- Include the path to the"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-19a2eprz34k28rhgyn0smy\",\"object\":\"chat.completion\",\"created\":1766097411,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I do not have access to the specific repository you are referring to. However, here's an example of how a tool request and response might look like for checking the git status:\\n\\ntool request:\\n\\n\\ntool response:\\n[TOOL_RESULT]\\n{\\n  \\\"status\\\": \\\"clean\\\",\\n  \\\"modified\\\": [],\\n  \\\"added\\\": [],\\n  \\\"deleted\\\": ["
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-n8mnbi93ayovvn5yizukn\",\"object\":\"chat.completion\",\"created\":1766097411,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, here's the Git diff for the file \\\"index.js\\\":\\n\\n```\\n$ git diff --stat index.js\\n```\\n\\nThis command will show you the differences between the current working directory and the index.js file. The output will include lines that have been added, removed, or modified since the last commit.\",\"tool_calls\":[]},\""
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-anwz6uuoqf7p0i2iaw03c\",\"object\":\"chat.completion\",\"created\":1766097411,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n[TOOL_RESULT]\\n{\\\"type\\\": \\\"object\\\", \\\"propeties\\\": { \\\"count\\\": 5, \\\"commits\\\": [\\n   {\\\"id\\\": \\\"1234567890\\\", \\\"author\\\": \\\"John Doe\\\", \\\"date\\\": \\\"2021-01-01T00:00:00.000Z\\\", \\\"message\\\": \\\"First commit\\\"},\\n   {\\\"id\\\": \\\"2345678901\\\", \\\"author\\\": \\\"Jane Smith\\\", \\\"date\\\": \\\"2021-01-02T00:00:00.000Z\\\", \\\"mes"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-va37wfu0okcgaxogb07iaj\",\"object\":\"chat.completion\",\"created\":1766097412,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Here's an updated version of the tool request and response format:\\n\\n\\n\\n[TOOL_RESULT]\\n<result>\\nSuccessfully committed changes with message \\\"Fi<|user|> Fixed login bug\\\" to the repository.\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"113780297\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"type\\\":\\\"object\\\",\\\"pr"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ofokfhf0bksphg52xlaoro\",\"object\":\"chat.completion\",\"created\":1766097412,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I am unable to create branches on github or other git hosting services. However, I can provide you with the steps to create a new branch in your local repository:\\n\\n1. Navigate to your github account and click on the \\\"branches\\\" tab at the top of the page.\\n2. Click on the \\\"new branch\\\" button located under th"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-b9gyjn387k47gz7dan1p4\",\"object\":\"chat.completion\",\"created\":1766097413,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, here's an example of how you can use the \\\"npm_run\\\" tool:\\n\\n\\n\\nThis will run the \\\"build\\\" npm script. The tool call will look like this:\\n\\n[TOOL_RESULT]\\n{\\n  \\\"result\\\": {\\n    \\\"message\\\": \\\"Building project...\\\"\\n  }\\n}\\n\\nNote that the result message is included in the output, so you don't need to i"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-1au8ch9szqkh5ywpe9ocgt\",\"object\":\"chat.completion\",\"created\":1766097413,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To install the lodash package in your Node.js project, you can use the npm package manager. Here's how:\\n\\n1. Navigate to your project directory and run the following command:\\n   ```bash\\n   npm install lodash\\n   ```\\n\\n2. Once the installation is complete, you can import the `lodash` module in your code using "
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-repvuqv3nd9wgjsdj1ja4\",\"object\":\"chat.completion\",\"created\":1766097414,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Here's an example of how to use the `Fetc API` to retrieve data from a RESTful API:\\n\\n1. Set up your Fetch.js client:\\n   ```javascript\\n   const fetch = require('node-fetch');\\n   const fetchClient = new Fetch({baseUrl: 'https://api.example.com'});\\n   ```\\n\\n2. Define the API endpoint and request method:\\n   ``"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-tlymjf38d2a3tjfvsp614g\",\"object\":\"chat.completion\",\"created\":1766097414,\"model\":\"tinyllama-1.1b-chat-v1.0\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I do not have access to websites or their content. However, you can visit the website github.com and use a web browser to navigate to its homepage. Once you reach the homepage, you should be able to see the page title displayed in the address bar of your web browser.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reas"
+    }
+  ]
+}
