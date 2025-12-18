@@ -12,5 +12,6 @@
     "tooly": {
       "enabled": true
     }
-  }
+  },
+  "proxyMode": "tooly"
 }
