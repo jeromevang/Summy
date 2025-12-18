@@ -39,7 +39,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
                   }`}
                 >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/sessions"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/sessions'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                >
                   Sessions
+                </Link>
+                <Link
+                  to="/tooly"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/tooly'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                >
+                  Tooly
                 </Link>
                 <Link
                   to="/debug"
