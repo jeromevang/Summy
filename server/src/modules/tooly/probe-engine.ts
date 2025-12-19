@@ -928,7 +928,7 @@ Do NOT output any text outside the JSON array.`
       },
       {
         role: 'user',
-        content: 'Deploy feature: run tests, commit changes, merge to main'
+        content: 'Prepare release: run tests, add all files, commit with message "Release v1.0"'
       }
     ];
 
@@ -967,14 +967,14 @@ Do NOT output any text outside the JSON array.`
         const hasTestStep = steps.some((s: any) => 
           s.action?.includes('test') || s.action?.includes('npm_run')
         );
+        const hasAddStep = steps.some((s: any) => 
+          s.action?.includes('add') || s.action?.includes('git_add')
+        );
         const hasCommitStep = steps.some((s: any) => 
           s.action?.includes('commit') || s.action?.includes('git_commit')
         );
-        const hasMergeStep = steps.some((s: any) => 
-          s.action?.includes('merge') || s.action?.includes('git_merge')
-        );
 
-        const hasAllSteps = hasTestStep && hasCommitStep && hasMergeStep;
+        const hasAllSteps = hasTestStep && hasAddStep && hasCommitStep;
         const hasStepNumbers = steps.every((s: any) => 'step' in s);
 
         return {

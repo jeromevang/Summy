@@ -121,9 +121,6 @@ export const ALL_TOOLS = [
   'git_add',
   'git_branch_create',
   'git_branch_list',
-  // 'git_checkout',  // Removed: can lose uncommitted changes
-  // 'git_merge',     // Removed: complex, can cause conflicts
-  // 'git_rm',        // Removed: deletes files from disk
   
   // NPM Operations
   'npm_run',
@@ -137,6 +134,13 @@ export const ALL_TOOLS = [
   // Other
   'run_python',
   'mcp_rules'
+];
+
+// Dangerous tools that have been removed (filter these from old profiles)
+export const REMOVED_TOOLS = [
+  'git_checkout',  // Can lose uncommitted changes
+  'git_merge',     // Complex, can cause conflicts
+  'git_rm',        // Deletes files from disk
 ];
 
 export const TOOL_CATEGORIES: Record<string, string[]> = {
@@ -226,6 +230,19 @@ class CapabilitiesService {
     try {
       if (await fs.pathExists(profilePath)) {
         const profile = await fs.readJson(profilePath);
+        
+        // Filter out removed dangerous tools from old profiles
+        if (profile.enabledTools) {
+          profile.enabledTools = profile.enabledTools.filter(
+            (t: string) => !REMOVED_TOOLS.includes(t)
+          );
+        }
+        if (profile.capabilities) {
+          for (const tool of REMOVED_TOOLS) {
+            delete profile.capabilities[tool];
+          }
+        }
+        
         this.cache.set(modelId, profile);
         return profile;
       }
