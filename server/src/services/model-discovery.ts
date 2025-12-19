@@ -133,6 +133,9 @@ class ModelDiscoveryService {
       for (const model of filteredModels) {
         const modelId = model.modelKey;
         const profile = await this.loadModelProfile(modelId);
+        
+        // Get quantization from LM Studio API
+        const quantization = await this.getModelQuantization(lmstudioUrl, modelId);
 
         models.push({
           id: modelId,
@@ -149,7 +152,7 @@ class ModelDiscoveryService {
           trainedForToolUse: model.trainedForToolUse,
           vision: model.vision,
           sizeBytes: model.sizeBytes,
-          quantization: this.extractQuantization(modelId)
+          quantization
         });
       }
 
@@ -159,6 +162,28 @@ class ModelDiscoveryService {
     } catch (error: any) {
       console.log('[ModelDiscovery] LM Studio not available:', error.message);
       return [];
+    }
+  }
+
+  /**
+   * Get quantization level from LM Studio API
+   * Uses /api/v0/models/{modelId} endpoint
+   */
+  private async getModelQuantization(lmstudioUrl: string, modelId: string): Promise<string | undefined> {
+    try {
+      // Extract base URL (remove /v1 suffix if present)
+      const baseUrl = lmstudioUrl.replace(/\/v1\/?$/, '');
+      const response = await axios.get(`${baseUrl}/api/v0/models/${encodeURIComponent(modelId)}`, {
+        timeout: 5000
+      });
+      
+      if (response.data?.quantization) {
+        return response.data.quantization;
+      }
+      return undefined;
+    } catch (error: any) {
+      // Silently fail - quantization is optional
+      return undefined;
     }
   }
 
@@ -277,40 +302,6 @@ class ModelDiscoveryService {
       .replace(/-chat$/i, ' (Chat)')
       .replace(/-/g, ' ')
       .replace(/\b\w/g, l => l.toUpperCase());
-  }
-
-  /**
-   * Extract quantization level from model ID
-   * Common patterns: q4_k_m, iq2_m, q8_0, fp16, etc.
-   * Separators can be: - _ or @
-   */
-  private extractQuantization(modelId: string): string | undefined {
-    // Common quantization patterns in model names
-    // Separators: - _ or @
-    const quantPatterns = [
-      // IQ patterns (importance matrix quants) - e.g., @iq2_m, -iq3_xs
-      /[@_-](iq[1-4]_[a-z]+)/i,
-      // Standard Q patterns - e.g., -q4_k_m, @q5_k_s
-      /[@_-](q[2-8]_[kms0-9_]+)/i,
-      /[@_-](q[2-8]_[0-9]+)/i,
-      // FP patterns
-      /[@_-](fp16|fp32|bf16)/i,
-      // Simple Q patterns
-      /[@_-](q[2-8])/i,
-      // GGUF specific
-      /[@_-](f16|f32)/i,
-    ];
-
-    const lowerModelId = modelId.toLowerCase();
-    
-    for (const pattern of quantPatterns) {
-      const match = lowerModelId.match(pattern);
-      if (match) {
-        return match[1].toUpperCase();
-      }
-    }
-    
-    return undefined;
   }
 
   /**
