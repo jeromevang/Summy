@@ -2,15 +2,23 @@
   "name": "summy",
   "version": "1.0.0",
   "description": "Context management middleware for LLM conversations",
+  "workspaces": [
+    "client",
+    "server",
+    "mcp-server"
+  ],
   "scripts": {
     "dev": "npm run dev:client",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run dev",
+    "dev:mcp": "cd mcp-server && npm run dev",
     "kill": "taskkill /F /IM node.exe /T 2>nul || echo No node processes found",
-    "build": "npm run build:server && npm run build:client",
+    "build": "npm run build:server && npm run build:client && npm run build:mcp",
     "build:server": "cd server && npm run build",
     "build:client": "cd client && npm run build",
-    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+    "build:mcp": "cd mcp-server && npm run build",
+    "install:all": "npm install",
+    "postinstall": "cd mcp-server && npx playwright install chromium"
   },
   "keywords": [
     "llm",

@@ -51,6 +51,14 @@ export interface RouterConfig {
   };
 }
 
+export interface RoutingPhase {
+  phase: 'planning' | 'execution' | 'response';
+  systemPrompt: string;
+  model: string;
+  latencyMs: number;
+  reasoning?: string;
+}
+
 export interface RoutingResult {
   mode: 'single' | 'dual';
   mainResponse?: any;
@@ -62,6 +70,9 @@ export interface RoutingResult {
     executor?: number;
     total: number;
   };
+  // NEW: Detailed phase information for debugging/visualization
+  phases: RoutingPhase[];
+  intent?: IntentSchema;
 }
 
 // ============================================================
@@ -151,12 +162,19 @@ class IntentRouter {
 
     // Single model mode: just pass through
     if (!this.config.enableDualModel || !this.mainProfile || !this.executorProfile) {
+      const modelId = this.config.mainModelId || this.config.executorModelId || '';
+      
+      // Extract original system prompt from messages
+      const originalSystemPrompt = messages.find(m => m.role === 'system')?.content || '';
+      
+      const singleStartTime = Date.now();
       const response = await this.callModel(
-        this.config.mainModelId || this.config.executorModelId || '',
+        modelId,
         messages,
         tools,
         this.config.timeout
       );
+      const singleLatency = Date.now() - singleStartTime;
 
       return {
         mode: 'single',
@@ -164,11 +182,18 @@ class IntentRouter {
         toolCalls: response?.choices?.[0]?.message?.tool_calls,
         latency: {
           total: Date.now() - startTime
-        }
+        },
+        phases: [{
+          phase: 'response',
+          systemPrompt: originalSystemPrompt,
+          model: modelId,
+          latencyMs: singleLatency
+        }]
       };
     }
 
     // Dual model mode
+    const phases: RoutingPhase[] = [];
     const mainStartTime = Date.now();
 
     // Step 1: Call Main Model for intent/reasoning (no tools)
@@ -187,6 +212,15 @@ class IntentRouter {
 
     const mainLatency = Date.now() - mainStartTime;
 
+    // Add planning phase
+    phases.push({
+      phase: 'planning',
+      systemPrompt: mainSystemPrompt,
+      model: this.config.mainModelId!,
+      latencyMs: mainLatency,
+      reasoning: mainResponse?.choices?.[0]?.message?.content || ''
+    });
+
     // Extract intent from main model response
     const intent = this.parseIntent(mainResponse);
 
@@ -199,7 +233,9 @@ class IntentRouter {
         latency: {
           main: mainLatency,
           total: Date.now() - startTime
-        }
+        },
+        phases,
+        intent
       };
     }
 
@@ -225,6 +261,14 @@ class IntentRouter {
 
     const executorLatency = Date.now() - executorStartTime;
 
+    // Add execution phase
+    phases.push({
+      phase: 'execution',
+      systemPrompt: executorSystemPrompt,
+      model: this.config.executorModelId!,
+      latencyMs: executorLatency
+    });
+
     return {
       mode: 'dual',
       mainResponse,
@@ -235,7 +279,9 @@ class IntentRouter {
         main: mainLatency,
         executor: executorLatency,
         total: Date.now() - startTime
-      }
+      },
+      phases,
+      intent
     };
   }
 

@@ -28,6 +28,7 @@ import axios from 'axios';
 import { LMStudioClient } from '@lmstudio/sdk';
 import { notifications } from '../../services/notifications.js';
 import { wsBroadcast } from '../../services/ws-broadcast.js';
+import { modelManager } from '../../services/lmstudio-model-manager.js';
 
 // ============================================================
 // TYPES
@@ -433,38 +434,12 @@ class ProbeEngine {
     console.log(`[ProbeEngine] Starting probe tests for ${modelId} (provider: ${provider})`);
     notifications.info(`Starting probe tests for ${modelId}`);
 
-    // For LM Studio: unload all models then load with minimal context
+    // For LM Studio: ensure model is loaded with minimal context via centralized manager
     const contextLength = options.contextLength || 2048;
-    if (provider === 'lmstudio' && settings.lmstudioUrl) {
+    if (provider === 'lmstudio') {
       try {
-        const client = new LMStudioClient();
-        
-        // Unload ALL loaded models first
-        wsBroadcast.broadcastModelLoading(modelId, 'unloading', 'Unloading all models...');
-        try {
-          const loadedModels = await client.llm.listLoaded();
-          for (const model of loadedModels) {
-            try {
-              await client.llm.unload(model.identifier);
-              console.log(`[ProbeEngine] Unloaded ${model.identifier}`);
-            } catch {
-              // Ignore individual unload errors
-            }
-          }
-        } catch {
-          // Ignore list errors
-        }
-        
-        // Load with correct context
-        wsBroadcast.broadcastModelLoading(modelId, 'loading', `Loading model with ${contextLength} context...`);
-        console.log(`[ProbeEngine] Loading model ${modelId} with context ${contextLength}...`);
-        await client.llm.load(modelId, {
-          config: { contextLength }
-        });
-        wsBroadcast.broadcastModelLoading(modelId, 'loaded', `Model loaded with ${contextLength} context`);
-        console.log(`[ProbeEngine] Model ${modelId} loaded with context ${contextLength}`);
+        await modelManager.ensureLoaded(modelId, contextLength);
       } catch (error: any) {
-        wsBroadcast.broadcastModelLoading(modelId, 'failed', error.message);
         console.log(`[ProbeEngine] Could not load model: ${error.message}`);
       }
     }
@@ -2830,37 +2805,12 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     
     console.log(`[ProbeEngine] Quick latency check for ${modelId} at ${contextSize} context`);
 
-    // For LM Studio, unload all models then load the test model
-    if (provider === 'lmstudio' && settings.lmstudioUrl) {
+    // For LM Studio: ensure model is loaded with specified context via centralized manager
+    if (provider === 'lmstudio') {
       try {
-        const client = new LMStudioClient();
-        
-        // Unload ALL loaded models first
-        wsBroadcast.broadcastModelLoading(modelId, 'unloading', `Unloading all models...`);
-        try {
-          const loadedModels = await client.llm.listLoaded();
-          for (const model of loadedModels) {
-            try {
-              await client.llm.unload(model.identifier);
-              console.log(`[ProbeEngine] Unloaded ${model.identifier}`);
-            } catch {
-              // Ignore individual unload errors
-            }
-          }
-        } catch {
-          // Ignore list errors
-        }
-        
-        // Load test model with 2K context
-        wsBroadcast.broadcastModelLoading(modelId, 'loading', `Loading for quick latency check...`);
-        await client.llm.load(modelId, {
-          config: { contextLength: contextSize }
-        });
-        
-        wsBroadcast.broadcastModelLoading(modelId, 'loaded', `Model ready for latency check`);
+        await modelManager.ensureLoaded(modelId, contextSize);
       } catch (error: any) {
         console.log(`[ProbeEngine] Cannot load model: ${error.message}`);
-        wsBroadcast.broadcastModelLoading(modelId, 'failed', error.message);
         throw error;
       }
     }
@@ -2931,23 +2881,11 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     let completedTests = 0;
 
     for (const contextSize of contextSizes) {
-      // For LM Studio, we need to reload model with new context size
-      if (provider === 'lmstudio' && settings.lmstudioUrl) {
+      // For LM Studio, we need to reload model with new context size via centralized manager
+      if (provider === 'lmstudio') {
         try {
-          const client = new LMStudioClient();
-          
-          // Unload current model
-          try {
-            await client.llm.unload(modelId);
-          } catch {
-            // Model might not be loaded
-          }
-
-          // Load with new context size
-          await client.llm.load(modelId, {
-            config: { contextLength: contextSize }
-          });
-
+          // ensureLoaded will unload and reload if context differs
+          await modelManager.ensureLoaded(modelId, contextSize);
           console.log(`[ProbeEngine] Loaded model with context size ${contextSize}`);
         } catch (error: any) {
           console.log(`[ProbeEngine] Cannot load model at context ${contextSize}: ${error.message}`);

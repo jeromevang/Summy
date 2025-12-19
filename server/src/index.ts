@@ -17,6 +17,7 @@ import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
 import { mcpClient } from './modules/tooly/mcp-client.js';
 import { wsBroadcast } from './services/ws-broadcast.js';
 import { systemMetrics } from './services/system-metrics.js';
+import { modelManager } from './services/lmstudio-model-manager.js';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -195,11 +196,39 @@ const addDebugEntry = (type: DebugEntry['type'], message: string, data?: any) =>
 };
 
 // Types
+
+// Tooly execution metadata for debugging/visualization
+interface ToolyPhase {
+  phase: 'planning' | 'execution' | 'response';
+  systemPrompt: string;
+  model: string;
+  latencyMs: number;
+  reasoning?: string;  // For dual mode main model output
+}
+
+interface ToolyToolCall {
+  id: string;
+  name: string;
+  arguments: any;
+  result?: any;
+  status: 'success' | 'failed' | 'timeout' | 'pending';
+  latencyMs?: number;
+  error?: string;
+}
+
+interface ToolyMeta {
+  mode: 'single' | 'dual' | 'passthrough';
+  phases: ToolyPhase[];
+  toolCalls?: ToolyToolCall[];
+  totalLatencyMs?: number;
+}
+
 interface ConversationTurn {
   id: string;
   timestamp: string;
   request: any;
   response?: any;
+  toolyMeta?: ToolyMeta;  // Tooly execution details for debugging
 }
 
 interface CachedCompressions {
@@ -419,51 +448,30 @@ const saveServerSettings = async (settings: ServerSettings): Promise<void> => {
 
 /**
  * Ensures the correct LM Studio model(s) are loaded before proxying requests.
- * If dual mode is enabled, loads both main and executor models.
- * If incorrect models are loaded, unloads all and loads the required ones.
+ * Uses the centralized modelManager for single-model mode.
+ * Note: Dual-model mode requires both models loaded simultaneously.
  */
 const ensureLMStudioModelLoaded = async (settings: ServerSettings): Promise<void> => {
   try {
-    const client = new LMStudioClient();
-    const loadedModels = await client.llm.listLoaded();
-    const loadedIds = loadedModels.map(m => m.identifier);
-    
-    // Determine required models based on mode
-    const requiredModels: string[] = [];
-    if (settings.enableDualModel) {
-      if (settings.mainModelId) requiredModels.push(settings.mainModelId);
-      if (settings.executorModelId) requiredModels.push(settings.executorModelId);
-    } else {
-      if (settings.lmstudioModel) requiredModels.push(settings.lmstudioModel);
-    }
-    
-    // If no models configured, nothing to do
-    if (requiredModels.length === 0) {
-      console.log('[LMStudio] No models configured in settings');
-      return;
-    }
-    
-    // Check if all required models are already loaded
-    const allLoaded = requiredModels.every(m => loadedIds.includes(m));
-    if (allLoaded) {
-      console.log(`[LMStudio] Correct model(s) already loaded: ${requiredModels.join(', ')}`);
-      return;
-    }
-    
-    console.log(`[LMStudio] Model mismatch. Loaded: [${loadedIds.join(', ')}], Required: [${requiredModels.join(', ')}]`);
-    
-    // Unload all currently loaded models
-    for (const model of loadedModels) {
-      console.log(`[LMStudio] Unloading model: ${model.identifier}`);
-      await client.llm.unload(model.identifier);
-    }
-    
-    // Load required models
     const contextLength = settings.defaultContextLength || 8192;
-    for (const modelId of requiredModels) {
-      console.log(`[LMStudio] Loading model: ${modelId} (context: ${contextLength})`);
-      await client.llm.load(modelId, { config: { contextLength } });
-      console.log(`[LMStudio] Model loaded: ${modelId}`);
+    
+    // Determine required model based on mode
+    if (settings.enableDualModel) {
+      // Dual model mode - need to load both models
+      // For now, just ensure the main model is ready via manager
+      // TODO: Add multi-model support to modelManager if needed
+      if (settings.mainModelId) {
+        await modelManager.ensureLoaded(settings.mainModelId, contextLength);
+      }
+      // Note: In dual mode, executor model should be loaded separately
+      // The current modelManager only tracks one model
+    } else {
+      // Single model mode - use modelManager
+      if (settings.lmstudioModel) {
+        await modelManager.ensureLoaded(settings.lmstudioModel, contextLength);
+      } else {
+        console.log('[LMStudio] No model configured in settings');
+      }
     }
   } catch (error: any) {
     // Log warning but don't fail - LM Studio might still work with whatever is loaded
@@ -1471,48 +1479,21 @@ app.post('/api/test-azure', async (req, res) => {
   }
 });
 
-// Load model in LMStudio using SDK
+// Load model in LMStudio using centralized model manager
 app.post('/api/lmstudio/load-model', async (req, res) => {
   try {
-    const { model, unloadOthers } = req.body;
+    const { model, contextLength } = req.body;
     const settings = await loadServerSettings();
     
     if (!model) {
       return res.status(400).json({ success: false, error: 'No model specified' });
     }
     
-    // Use shared LMStudio client
-    const client = getSharedLMStudioClient();
+    const ctx = contextLength || settings.defaultContextLength || 8192;
     
-    // Unload other models if requested
-    if (unloadOthers) {
-      try {
-        const loadedModels = await client.llm.listLoaded();
-        console.log(`[LMStudio] Currently loaded models: ${loadedModels.map(m => m.identifier).join(', ')}`);
-        
-        for (const m of loadedModels) {
-          if (m.identifier !== model && m.path !== model) {
-            try {
-              console.log(`[LMStudio] Unloading model: ${m.identifier}`);
-              await client.llm.unload(m.identifier);
-              console.log(`[LMStudio] Unloaded model: ${m.identifier}`);
-            } catch (unloadErr: any) {
-              console.warn(`[LMStudio] Failed to unload ${m.identifier}:`, unloadErr.message);
-            }
-          }
-        }
-      } catch (listErr: any) {
-        console.warn('[LMStudio] Could not list models for unloading:', listErr.message);
-      }
-    }
-    
-    // Load the requested model
-    console.log(`[LMStudio] Loading model: ${model}`);
-    await client.llm.load(model, {
-      config: {
-        contextLength: 8192
-      }
-    });
+    // Use centralized model manager - it handles unloading and loading
+    console.log(`[LMStudio] Loading model via manager: ${model} (context: ${ctx})`);
+    await modelManager.ensureLoaded(model, ctx);
     
     // Save model to settings
     settings.lmstudioModel = model;
