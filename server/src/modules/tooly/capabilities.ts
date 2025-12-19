@@ -42,11 +42,19 @@ export interface ReasoningProbeResults {
 
 export interface ProbeResults {
   testedAt: string;
+  // Core tool behavior probes (1.1-1.4)
   emitTest: ProbeTestResult;
   schemaTest: ProbeTestResult;
   selectionTest: ProbeTestResult;
   suppressionTest: ProbeTestResult;
+  // Enhanced tool behavior probes (1.5-1.8)
+  nearIdenticalSelectionTest?: ProbeTestResult;
+  multiToolEmitTest?: ProbeTestResult;
+  argumentValidationTest?: ProbeTestResult;
+  schemaReorderTest?: ProbeTestResult;
+  // Reasoning probes (2.x)
   reasoningProbes?: ReasoningProbeResults;
+  // Scores
   toolScore: number;
   reasoningScore: number;
   overallScore: number;

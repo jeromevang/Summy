@@ -279,10 +279,17 @@ router.post('/models/:modelId/probe', async (req, res) => {
     // Build probe results for saving
     const probeResultsToSave: any = {
       testedAt: result.completedAt,
+      // Core tool probes (1.1-1.4)
       emitTest: { passed: result.emitTest.passed, score: result.emitTest.score, details: result.emitTest.details },
       schemaTest: { passed: result.schemaTest.passed, score: result.schemaTest.score, details: result.schemaTest.details },
       selectionTest: { passed: result.selectionTest.passed, score: result.selectionTest.score, details: result.selectionTest.details },
       suppressionTest: { passed: result.suppressionTest.passed, score: result.suppressionTest.score, details: result.suppressionTest.details },
+      // Enhanced tool probes (1.5-1.8)
+      nearIdenticalSelectionTest: result.nearIdenticalSelectionTest ? { passed: result.nearIdenticalSelectionTest.passed, score: result.nearIdenticalSelectionTest.score, details: result.nearIdenticalSelectionTest.details } : undefined,
+      multiToolEmitTest: result.multiToolEmitTest ? { passed: result.multiToolEmitTest.passed, score: result.multiToolEmitTest.score, details: result.multiToolEmitTest.details } : undefined,
+      argumentValidationTest: result.argumentValidationTest ? { passed: result.argumentValidationTest.passed, score: result.argumentValidationTest.score, details: result.argumentValidationTest.details } : undefined,
+      schemaReorderTest: result.schemaReorderTest ? { passed: result.schemaReorderTest.passed, score: result.schemaReorderTest.score, details: result.schemaReorderTest.details } : undefined,
+      // Scores
       toolScore: result.toolScore,
       reasoningScore: result.reasoningScore,
       overallScore: result.overallScore
