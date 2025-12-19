@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 
 // ============================================================
 // TYPES
@@ -159,6 +160,20 @@ const Tooly: React.FC = () => {
     message?: string;
   }>({});
 
+  // System metrics state for CPU/GPU charts
+  const [systemMetrics, setSystemMetrics] = useState<{
+    cpu: number;
+    gpu: number;
+    gpuMemory: number;
+    gpuTemp: number;
+    gpuName: string;
+  }[]>([]);
+
+  // Slow model prompt state
+  const [showSlowModelPrompt, setShowSlowModelPrompt] = useState(false);
+  const [slowModelLatency, setSlowModelLatency] = useState<number>(0);
+  const pendingTestRef = useRef<{ modelId: string; provider: string } | null>(null);
+
   // Keep ref in sync with selectedModel
   useEffect(() => {
     selectedModelRef.current = selectedModel?.modelId || null;
@@ -208,6 +223,13 @@ const Tooly: React.FC = () => {
           if (status === 'loaded' || status === 'failed' || status === 'unloaded') {
             setTimeout(() => setModelLoading({}), 2000);
           }
+        } else if (message.type === 'system_metrics') {
+          const { cpu, gpu, gpuMemory, gpuTemp, gpuName } = message.data;
+          setSystemMetrics(prev => {
+            const newMetrics = [...prev, { cpu, gpu, gpuMemory, gpuTemp, gpuName }];
+            // Keep last 30 data points (30 seconds of history)
+            return newMetrics.slice(-30);
+          });
         }
       } catch (e) {
         // Ignore parse errors
@@ -707,6 +729,136 @@ const Tooly: React.FC = () => {
         )}
       </div>
 
+      {/* System Metrics Charts */}
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[#2d2d2d]">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-gray-400">🖥️ CPU Usage</span>
+            <span className="text-lg font-bold text-purple-400">
+              {systemMetrics[systemMetrics.length - 1]?.cpu ?? 0}%
+            </span>
+          </div>
+          <div className="h-16">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={systemMetrics}>
+                <YAxis domain={[0, 100]} hide />
+                <Line 
+                  type="monotone" 
+                  dataKey="cpu" 
+                  stroke="#8b5cf6" 
+                  strokeWidth={2} 
+                  dot={false}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[#2d2d2d]">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-400">🎮 GPU Usage</span>
+              {systemMetrics[systemMetrics.length - 1]?.gpuTemp > 0 && (
+                <span className={`text-xs ${
+                  systemMetrics[systemMetrics.length - 1]?.gpuTemp > 80 ? 'text-red-400' :
+                  systemMetrics[systemMetrics.length - 1]?.gpuTemp > 60 ? 'text-yellow-400' :
+                  'text-gray-500'
+                }`}>
+                  🌡️ {systemMetrics[systemMetrics.length - 1]?.gpuTemp}°C
+                </span>
+              )}
+            </div>
+            <span className="text-lg font-bold text-green-400">
+              {systemMetrics[systemMetrics.length - 1]?.gpu ?? 0}%
+            </span>
+          </div>
+          <div className="h-16">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={systemMetrics}>
+                <YAxis domain={[0, 100]} hide />
+                <Line 
+                  type="monotone" 
+                  dataKey="gpu" 
+                  stroke="#10b981" 
+                  strokeWidth={2} 
+                  dot={false}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          {systemMetrics[systemMetrics.length - 1]?.gpuName && (
+            <p className="text-xs text-gray-600 mt-1 truncate">
+              {systemMetrics[systemMetrics.length - 1]?.gpuName}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Slow Model Prompt Modal */}
+      {showSlowModelPrompt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1a1a1a] border border-[#3d3d3d] rounded-lg p-6 max-w-md mx-4">
+            <div className="text-center mb-4">
+              <span className="text-4xl">🐢</span>
+              <h3 className="text-lg font-semibold text-white mt-2">This Model is a Bit Slow</h3>
+            </div>
+            <p className="text-gray-400 text-sm mb-2">
+              Initial latency test took <span className="text-yellow-400 font-medium">{(slowModelLatency / 1000).toFixed(1)}s</span> at 2K context.
+            </p>
+            <p className="text-gray-400 text-sm mb-4">
+              Full testing may take a while. This is typical for larger models on consumer hardware.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowSlowModelPrompt(false);
+                  // Mark as too slow and don't run tests
+                  if (pendingTestRef.current) {
+                    setTestProgress(prev => ({
+                      ...prev,
+                      modelId: pendingTestRef.current?.modelId,
+                      latencyProgress: { 
+                        current: 1, 
+                        total: 1, 
+                        currentTest: 'Skipped - too slow for local testing', 
+                        status: 'completed' 
+                      }
+                    }));
+                  }
+                  pendingTestRef.current = null;
+                }}
+                className="flex-1 py-2 bg-[#2d2d2d] hover:bg-[#3d3d3d] text-gray-300 rounded-lg transition-colors"
+              >
+                Cancel Tests
+              </button>
+              <button
+                onClick={async () => {
+                  setShowSlowModelPrompt(false);
+                  if (pendingTestRef.current) {
+                    const { modelId, provider } = pendingTestRef.current;
+                    pendingTestRef.current = null;
+                    // Continue with remaining tests
+                    await runProbeTests(modelId, provider, false);
+                    setTestProgress(prev => ({
+                      ...prev,
+                      modelId,
+                      probeProgress: undefined,
+                      toolsProgress: { current: 0, total: 1, currentTest: 'Starting tool tests...', score: 0, status: 'running' }
+                    }));
+                    await runModelTests(modelId, provider);
+                    setTestProgress({});
+                  }
+                }}
+                className="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+              >
+                Continue Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="flex space-x-1 bg-[#1a1a1a] p-1 rounded-lg border border-[#2d2d2d]">
         {(['models', 'tests', 'logs'] as TabId[]).map((tab) => (
@@ -887,34 +1039,60 @@ const Tooly: React.FC = () => {
                     onClick={async () => {
                       if (!selectedModel) return;
                       
-                      // Initialize progress state - server will send actual totals via WebSocket
+                      // NEW ORDER: latency (quick check) → probe → tools → full latency
+                      
+                      // 1. Quick latency check at 2K context first
                       setTestProgress({
                         modelId: selectedModel.modelId,
-                        probeProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                        latencyProgress: { current: 0, total: 1, currentTest: 'Quick latency check at 2K...', status: 'running' }
                       });
                       
-                      // Order: probe → reasoning → tools → latency
-                      // 1. Run probe tests (includes reasoning) WITHOUT latency
+                      try {
+                        const quickLatencyRes = await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/quick-latency`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ provider: selectedModel.provider })
+                        });
+                        
+                        if (quickLatencyRes.ok) {
+                          const { latency } = await quickLatencyRes.json();
+                          
+                          // If latency > 3 seconds, show prompt
+                          if (latency > 3000) {
+                            setSlowModelLatency(latency);
+                            pendingTestRef.current = { modelId: selectedModel.modelId, provider: selectedModel.provider || 'lmstudio' };
+                            setShowSlowModelPrompt(true);
+                            setTestProgress({});
+                            return; // Stop here, user will decide
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Quick latency check failed:', error);
+                      }
+                      
+                      // 2. Run probe tests (includes reasoning)
+                      setTestProgress(prev => ({
+                        ...prev,
+                        latencyProgress: undefined,
+                        probeProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                      }));
                       await runProbeTests(selectedModel.modelId, selectedModel.provider, false);
                       
-                      // Update for tool tests - server will send actual totals
+                      // 3. Run tool capability tests
                       setTestProgress(prev => ({
                         ...prev,
                         probeProgress: undefined,
                         toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
                       }));
-                      
-                      // 2. Run tool capability tests
                       await runModelTests(selectedModel.modelId, selectedModel.provider);
                       
-                      // Update for latency tests - server will send actual totals
+                      // 4. Run full latency profile
                       setTestProgress(prev => ({
                         ...prev,
                         toolsProgress: undefined,
-                        latencyProgress: { current: 0, total: 1, currentTest: 'Initializing...', status: 'running' }
+                        latencyProgress: { current: 0, total: 1, currentTest: 'Running full latency profile...', status: 'running' }
                       }));
                       
-                      // 3. Run latency profile last
                       try {
                         await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/latency-profile`, {
                           method: 'POST',

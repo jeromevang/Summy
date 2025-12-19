@@ -324,6 +324,47 @@ router.post('/models/:modelId/probe', async (req, res) => {
 });
 
 /**
+ * POST /api/tooly/models/:modelId/quick-latency
+ * Quick latency check at 2K context - used to detect slow models before full testing
+ */
+router.post('/models/:modelId/quick-latency', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const body = req.body || {};
+    const provider = body.provider || 'lmstudio';
+    
+    // Load settings
+    let settings: any = {};
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch {
+      // Use defaults
+    }
+
+    const testSettings = {
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+      openaiApiKey: process.env.OPENAI_API_KEY,
+      azureResourceName: settings.azureResourceName,
+      azureApiKey: settings.azureApiKey,
+      azureDeploymentName: settings.azureDeploymentName,
+      azureApiVersion: settings.azureApiVersion
+    };
+
+    console.log(`[Tooly] Quick latency check for ${modelId} at 2K context`);
+
+    // Run single latency test at 2K context
+    const latency = await probeEngine.runQuickLatencyCheck(modelId, provider, testSettings, 30000);
+
+    res.json({ latency, modelId, contextSize: 2048 });
+  } catch (error: any) {
+    console.error('[Tooly] Quick latency check failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * POST /api/tooly/models/:modelId/latency-profile
  * Run context latency profiling for a model
  */

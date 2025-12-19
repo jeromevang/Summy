@@ -1,0 +1,431 @@
+{
+  "modelId": "llama-3.1-nemotron-70b-instruct-hf@q2_k_l",
+  "displayName": "llama-3.1-nemotron-70b-instruct-hf@q2_k_l",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T16:20:34.493Z",
+  "testVersion": 2,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 1561,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1305,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1316,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1089,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1116,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1100,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1071,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1085,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1078,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1081,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1060,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1085,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 3632.5,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1105,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1109,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1083,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1054,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1214,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1127,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1160,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1183,
+      "lastTested": "2025-12-19T16:20:34.493Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-0cu94tr7u2ttl2and3fagvd\",\"object\":\"chat.completion\",\"created\":1766161202,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":113,\"completion_tokens\":0,\"total_tokens\":113},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7e7m9966swsf23jcwko4cj\",\"object\":\"chat.completion\",\"created\":1766161203,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":112,\"completion_tokens\":0,\"total_tokens\":112},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-59jfr2izt6whx59o0i1we7\",\"object\":\"chat.completion\",\"created\":1766161205,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":141,\"completion_tokens\":0,\"total_tokens\":141},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-o4n8ig4506tytz1so4m9fp\",\"object\":\"chat.completion\",\"created\":1766161207,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":159,\"completion_tokens\":0,\"total_tokens\":159},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-3y9f74v2hi5odxjjwr0vnk\",\"object\":\"chat.completion\",\"created\":1766161208,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":106,\"completion_tokens\":0,\"total_tokens\":106},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vvajp2a745boabplqm3ms\",\"object\":\"chat.completion\",\"created\":1766161209,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":127,\"completion_tokens\":0,\"total_tokens\":127},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-u1uvax82jmj5ypj40rmmn\",\"object\":\"chat.completion\",\"created\":1766161210,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":82,\"completion_tokens\":0,\"total_tokens\":82},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-i7j5wqalefc1x5zms0l0vi\",\"object\":\"chat.completion\",\"created\":1766161211,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":106,\"completion_tokens\":0,\"total_tokens\":106},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-u9hcec4quxkn93ublysk1b\",\"object\":\"chat.completion\",\"created\":1766161212,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":99,\"completion_tokens\":0,\"total_tokens\":99},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-81cpm4c4w14zjueuzw6j9p\",\"object\":\"chat.completion\",\"created\":1766161213,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":105,\"completion_tokens\":0,\"total_tokens\":105},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vm2y61k8i18c4zxgqy26je\",\"object\":\"chat.completion\",\"created\":1766161214,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":107,\"completion_tokens\":0,\"total_tokens\":107},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-xcvk86gqy80pl5cmhfa4e\",\"object\":\"chat.completion\",\"created\":1766161216,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":102,\"completion_tokens\":0,\"total_tokens\":102},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-hrilbenpo5oob2028cw0d\",\"object\":\"chat.completion\",\"created\":1766161217,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":97,\"completion_tokens\":0,\"total_tokens\":97},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-bvt08npuruth6gwqionf8\",\"object\":\"chat.completion\",\"created\":1766161218,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":143,\"completion_tokens\":0,\"total_tokens\":143},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7my2psqcfbqgikjcfbtk5\",\"object\":\"chat.completion\",\"created\":1766161219,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":144,\"completion_tokens\":0,\"total_tokens\":144},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-965o7a5ij3etshe9d4mel\",\"object\":\"chat.completion\",\"created\":1766161220,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":125,\"completion_tokens\":0,\"total_tokens\":125},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-gummpe6ooabjq8ilrbyd4\",\"object\":\"chat.completion\",\"created\":1766161221,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":103,\"completion_tokens\":0,\"total_tokens\":103},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7gl9kg81qxnj941kwoz4p\",\"object\":\"chat.completion\",\"created\":1766161222,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":104,\"completion_tokens\":0,\"total_tokens\":104},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ed0ril5dloblf7as50u0jc\",\"object\":\"chat.completion\",\"created\":1766161223,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" [FUNC_CALL]{\\\"function\\\": \\\"git_add\\\", \\\"parameters\\\": {\\\"file\\\": \\\"index.js\\\"}} [/FUNC_CALL]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":112,\"completion_tokens\":25,\"total_tokens\":137},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-w7khe9oze9p8yulyz1bs9\",\"object\":\"chat.completion\",\"created\":1766161230,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":108,\"completion_tokens\":0,\"total_tokens\":108},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ovd4gnmgsnxmb2tdt1mxr\",\"object\":\"chat.completion\",\"created\":1766161230,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":82,\"completion_tokens\":0,\"total_tokens\":82},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7bbfs72bx1xiaojolvdg\",\"object\":\"chat.completion\",\"created\":1766161232,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":103,\"completion_tokens\":0,\"total_tokens\":103},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-u79gcwdo3he74na0zv54zi\",\"object\":\"chat.completion\",\"created\":1766161233,\"model\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":104,\"completion_tokens\":0,\"total_tokens\":104},\"stats\":{},\"system_fingerprint\":\"llama-3.1-nemotron-70b-instruct-hf@q2_k_l\"}"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T16:19:51.381Z",
+    "emitTest": {
+      "passed": true,
+      "score": 95,
+      "details": "XML format succeeded (OpenAI format failed: Model described the tool instead of calling it)"
+    },
+    "schemaTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "argumentValidationTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "schemaReorderTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted with reordered schema"
+    },
+    "toolScore": 29,
+    "reasoningScore": 69,
+    "overallScore": 49,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 30,
+        "details": "Response contains invalid JSON"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 50,
+        "details": "Unclear action: fs"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 100,
+        "details": "Properly handles edge case with fallback"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384
+    ],
+    "latencies": {
+      "2048": 6545,
+      "4096": 6276,
+      "8192": 6158,
+      "16384": 6382
+    },
+    "maxUsableContext": 16384,
+    "recommendedContext": 16384,
+    "modelMaxContext": 131072,
+    "minLatency": 6158,
+    "isInteractiveSpeed": false,
+    "speedRating": "slow"
+  },
+  "contextLength": 16384
+}
