@@ -1,0 +1,437 @@
+{
+  "modelId": "gpt-oss-coder-20b-i1",
+  "displayName": "gpt-oss-coder-20b-i1",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T17:42:10.312Z",
+  "testVersion": 2,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 3594.5,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 386,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 5128,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1152,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 4219,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 2331,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 397,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1400,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 241,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 777,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 614,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3546,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 1648.5,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 477,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 593,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1787,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 839,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1751,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 5213,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 979,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 599,
+      "lastTested": "2025-12-19T17:42:10.312Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-xjqywavadofjunvpa54yq\",\"object\":\"chat.completion\",\"created\":1766166092,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"# Reasoning\\n\\nThe user wants me to read a file called \\\"config.json\\\". I need to use the provided tool for that. The tool available is file_read from the functions namespace. So I'll call that function with the path set to \\\"config.json\\\".\\n\",\"reasoning\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"u"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-nph8saw82eboq6ioolx4h8\",\"object\":\"chat.completion\",\"created\":1766166093,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Okay, the user wants to see the content of a file located at 'src/utils/helpers.ts'. I have access to a tool called read_file. So I should use that tool to get the content.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":158,\"completion_tokens\":44,\"total_tokens\":202}"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-a745ood3ppie9cjvlydjio\",\"object\":\"chat.completion\",\"created\":1766166094,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to create a JavaScript file hello.js with that content.\",\"reasoning\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":176,\"completion_tokens\":18,\"total_tokens\":194},\"stats\":{},\"system_fingerprint\":\"gpt-oss-coder-20b-i1\"}"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-6580debbtsflleoizexak8\",\"object\":\"chat.completion\",\"created\":1766166094,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"# Reasoning\\n\\nOkay, I need to figure out how to solve this user's request. The user wants me to modify a specific line in a JavaScript file called app.js, changing the port number from 3000 to 8080. Hmm, so I have to edit that file. Let me think about what tools I can use here. Oh right, there's this "
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vk38x3v55ooesnmt8omgr\",\"object\":\"chat.completion\",\"created\":1766166100,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to find all files in the src directory. Use the list_files tool with folder set to \\\"src\\\".\\n<thinking<|message|>The user wants a list of all files in the src directory. I should use the provided tool for listing files. The command is straightforward: call the list_files funct"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-dbeqc1tr7ov8817xjz5r8p\",\"object\":\"chat.completion\",\"created\":1766166101,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>amarium<|message|># Approach\\n\\nTo answer this user query, I need to find all instances of the word \\\"TODO\\\" across the project's files. The user wants a comprehensive search, so I should look through every file in the repository. Since the user didn't specify any particular directory or file type, I'll as"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-j441lzmw84i7kt4hhud7\",\"object\":\"chat.completion\",\"created\":1766166105,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to check git status.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":140,\"completion_tokens\":10,\"total_tokens\":150},\"stats\":{},\"system_fingerprint\":\"gpt-oss-coder-20b-i1\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ariz47zanralkm26nc0pj\",\"object\":\"chat.completion\",\"created\":1766166105,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to provide a git diff for the file index.js. The user asks for the git diff of that specific file. I should use the git_diff tool with the file parameter set to \\\"index.js\\\".\",\"reasoning\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":154"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-wmbuxbsk96atepzgynpn\",\"object\":\"chat.completion\",\"created\":1766166106,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to provide the last five commits. The user asked for the last 5 commits. I should use the git_log function with count=5.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":148,\"completion_tokens\":34,\"total_tokens\":182},\"stats\":{},\"system_fingerprint\":\"gpt-oss-code"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-t7knzsn8zkp3tqx9oq50yh\",\"object\":\"chat.completion\",\"created\":1766166107,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>Okay, I need to respond to this user query. The user wants me to commit all changes with the message \\\"Fix login bug\\\". Hmm, but wait—wait a minute. Wait, the user is asking for a git commit. But as ChatGPT, I don't have direct access to a git repository or any files. Oh right! Becau"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-a7obyppi57qh9rm00ba4n\",\"object\":\"chat.completion\",\"created\":1766166110,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to create a new Git branch named \\\"feature/user-auth\\\". Use the git_branch_create tool.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":154,\"completion_tokens\":24,\"total_tokens\":178},\"stats\":{},\"system_fingerprint\":\"gpt-oss-coder-20b-i1\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-xls0zki2pv8i819ws4j5d\",\"object\":\"chat.completion\",\"created\":1766166111,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>Okay, I need to answer this user's query. They want me to run the 'npm run build' command. Hmm, but wait—wait a minute. The user asked for the \\\"build\\\" script. So I just have to execute that. But wait, what if there's no such script? Or maybe it fails? Oh right, I should handle error"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-qj2909mqtfyx6z12spbe\",\"object\":\"chat.completion\",\"created\":1766166112,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"# Reasoning\\n\\nOkay, I need to install lodash. According to the tools available, there's a function called npm_install that can be used for this purpose. So I'll call that function with the package name 'lodash'.\\n\",\"reasoning\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":144,\"c"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-6qmcj229gxt25as5rvzt3l\",\"object\":\"chat.completion\",\"created\":1766166113,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to provide the JSON data fetched from the given URL. The user wants the data from https://api.example.com/users. I should use the provided tool to make an HTTP request. The tool function is available in the functions namespace. So I'll call that function with the appropriate "
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ihqo25cgmid2yl8q4qlveb\",\"object\":\"chat.completion\",\"created\":1766166118,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to find the page title of GitHub. The user wants the title of the GitHub homepage. I should use the browser_navigate function with url set to \\\"https://github.com\\\" and getContent true, then extract the <title> tag content.\",\"reasoning\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"fi"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ig077nnu1mcdfpdlp8hcjm\",\"object\":\"chat.completion\",\"created\":1766166119,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>Okay, I need to help the user create a new empty file named README.md. The user wants me to use the provided tool for this task. Looking at the available tools, there's a function in the 'functions' namespace called create_new_file. That seems exactly what is needed.\\n\\nSo I just hav"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-q7ymp2g5clhjuxbqhppqb\",\"object\":\"chat.completion\",\"created\":1766166122,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to create a new folder named \\\"components\\\". Use the folder_create tool.\",\"reasoning\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":150,\"completion_tokens\":21,\"total_tokens\":171},\"stats\":{},\"system_fingerprint\":\"gpt-oss-coder-20b-i1\"}"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-anls8j7il40qgzc0fjo6en\",\"object\":\"chat.completion\",\"created\":1766166122,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to process the user's request. The user wants to delete a folder named \\\"temp\\\". According to the system instructions, I should use the provided tool for this. The tool available is folder_delete. So I will call that function with path set to \\\"temp\\\".\\nThe user asked to dele"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-nfr84gpsqm8mavo1ff6df\",\"object\":\"chat.completion\",\"created\":1766166124,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to respond to the user's request. The user says: \\\"Stage the file 'index.js' for commit\\\". They want me to use a tool, specifically the git_add function from the provided tools. So I should call that function with the appropriate arguments. The function requires an object with"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-gzpv0lt8vyl0f442kue97sa\",\"object\":\"chat.completion\",\"created\":1766166125,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to respond with the correct tool. The user wants to \\\"stage all changes for commit\\\". That means using git_add with file set to \\\".\\\". So the answer is a code block calling that function.\\n# Plan\\nThe user wants to stage all changes for commit. According to the tools availab"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-yr2gmrqhhrsdw4kqry1in\",\"object\":\"chat.completion\",\"created\":1766166127,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to list all branches in the current GitHub repo. The user wants a list of all branches. I should use the provided tool for that.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":140,\"completion_tokens\":34,\"total_tokens\":174},\"stats\":{},\"system_fingerprint\":\"gpt"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-obzndiebzsk7twgxge0g3m\",\"object\":\"chat.completion\",\"created\":1766166127,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>Okay, I need to help the user remove the axios package from their project. They want me to use the provided tools. Let's see what tool is available. The user mentioned they have a tool called 'functions' with a method 'npm_uninstall'. So that's exactly what I need.\\n\\nThe user wants "
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-968qao65uewz5ry4ptl2i\",\"object\":\"chat.completion\",\"created\":1766166129,\"model\":\"gpt-oss-coder-20b-i1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<|channel|>am reasoning<|message|>We need to respond with the correct output. The user asks to run a Python script that prints \\\"Hello World\\\". I should use the python tool.\",\"reasoning\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":151,\"completion_tokens\":34,\"total_tokens\":185}"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T17:41:26.896Z",
+    "emitTest": {
+      "passed": false,
+      "score": 10,
+      "details": "Model described the tool instead of calling it"
+    },
+    "schemaTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 85,
+      "details": "No tool called, but response was: \"We have a user query about how to get a list of al\""
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "argumentValidationTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "schemaReorderTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted with reordered schema"
+    },
+    "toolScore": 14,
+    "reasoningScore": 26,
+    "overallScore": 20,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found in response"
+      },
+      "multiStepPlanning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON array found in response"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "contextContinuity": {
+        "passed": false,
+        "score": 40,
+        "details": "Failed to use endpoint from previous context"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 30,
+        "details": "Failed to identify logical conflict"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "edgeCaseHandling": {
+        "passed": false,
+        "score": 30,
+        "details": "Did not address the edge case"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "latencies": {
+      "2048": 3040,
+      "4096": 3026,
+      "8192": 3049,
+      "16384": 3034,
+      "32768": 3121,
+      "65536": 3119,
+      "131072": 4841
+    },
+    "maxUsableContext": 131072,
+    "recommendedContext": 131072,
+    "modelMaxContext": 131072,
+    "minLatency": 3026,
+    "isInteractiveSpeed": true,
+    "speedRating": "acceptable"
+  },
+  "contextLength": 131072
+}

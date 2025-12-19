@@ -379,6 +379,8 @@ const ContextEditor: React.FC = () => {
   const [wsConnected, setWsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [loadingVersions, setLoadingVersions] = useState(false);
+  const [showSystemMessages, setShowSystemMessages] = useState(true);
+  const [systemPromptExpanded, setSystemPromptExpanded] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState(
     `You are a context summarizer. Condense the conversation into a brief summary that preserves key information.
 
@@ -768,6 +770,19 @@ Rules:
             ))}
           </div>
         )}
+        
+        {/* View Options */}
+        <div className="flex items-center gap-4 mt-3 px-8">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showSystemMessages}
+              onChange={(e) => setShowSystemMessages(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-600 bg-[#0d0d0d] text-yellow-500 focus:ring-yellow-500"
+            />
+            <span className="text-sm text-gray-300">Show System Prompts</span>
+          </label>
+        </div>
       </div>
 
       {/* Main Content - Side by Side */}
@@ -777,7 +792,7 @@ Rules:
           <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d]">
             <span className="text-sm font-medium text-gray-300">📝 Original</span>
             <span className="text-xs text-gray-500 ml-2">
-              {allMessages.length} messages • ~{Math.round(JSON.stringify(allMessages).length / 4).toLocaleString()} tokens
+              {allMessages.filter(m => showSystemMessages || m.role !== 'system').length} messages • ~{Math.round(JSON.stringify(allMessages).length / 4).toLocaleString()} tokens
             </span>
           </div>
           <div 
@@ -785,7 +800,36 @@ Rules:
             className="flex-1 overflow-y-auto p-4"
             onScroll={() => handleScroll('left')}
           >
-            {allMessages.map((msg, idx) => (
+            {/* System Prompt Info Box */}
+            {showSystemMessages && allMessages.find(m => m.role === 'system') && (
+              <div className="mb-4 p-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">⚙️</span>
+                    <span className="text-xs font-medium text-yellow-400">Active System Prompt</span>
+                  </div>
+                  <button
+                    onClick={() => setSystemPromptExpanded(!systemPromptExpanded)}
+                    className="text-xs text-gray-400 hover:text-white px-2 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
+                  >
+                    {systemPromptExpanded ? '▼ Collapse' : '▶ Expand'}
+                  </button>
+                </div>
+                {systemPromptExpanded ? (
+                  <div className="text-xs text-gray-300 whitespace-pre-wrap bg-[#0d0d0d] p-3 rounded-lg border border-[#2d2d2d] max-h-60 overflow-y-auto font-mono">
+                    {allMessages.find(m => m.role === 'system')?.content || 'No system prompt'}
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-500 truncate">
+                    {(allMessages.find(m => m.role === 'system')?.content || '').substring(0, 100)}...
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {allMessages
+              .filter(m => showSystemMessages || m.role !== 'system')
+              .map((msg, idx) => (
               <Message
                 key={idx}
                 role={msg.role}
@@ -845,23 +889,54 @@ Rules:
                 </p>
               </div>
             ) : (
-              selectedMessages.map((msg: any, idx: number) => {
-                const isSummary = msg.content?.includes('[SUMMARY]') || msg.content?.includes('[CONVERSATION SUMMARY]');
-                const isPreserved = msg.role === 'tool' || msg.tool_calls;
+              <>
+                {/* System Prompt Info Box */}
+                {showSystemMessages && selectedMessages.find((m: any) => m.role === 'system') && (
+                  <div className="mb-4 p-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">⚙️</span>
+                        <span className="text-xs font-medium text-yellow-400">Active System Prompt</span>
+                      </div>
+                      <button
+                        onClick={() => setSystemPromptExpanded(!systemPromptExpanded)}
+                        className="text-xs text-gray-400 hover:text-white px-2 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
+                      >
+                        {systemPromptExpanded ? '▼ Collapse' : '▶ Expand'}
+                      </button>
+                    </div>
+                    {systemPromptExpanded ? (
+                      <div className="text-xs text-gray-300 whitespace-pre-wrap bg-[#0d0d0d] p-3 rounded-lg border border-[#2d2d2d] max-h-60 overflow-y-auto font-mono">
+                        {selectedMessages.find((m: any) => m.role === 'system')?.content || 'No system prompt'}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-500 truncate">
+                        {(selectedMessages.find((m: any) => m.role === 'system')?.content || '').substring(0, 100)}...
+                      </div>
+                    )}
+                  </div>
+                )}
                 
-                return (
-                  <Message
-                    key={idx}
-                    role={msg.role || 'system'}
-                    content={msg.content || JSON.stringify(msg, null, 2)}
-                    isCompressed={isSummary}
-                    isPreserved={isPreserved && compressionMode > 0}
-                    isTool={msg.role === 'tool' || !!msg.tool_calls}
-                    keywords={compressionMode > 0 ? keywords : []}
-                    keywordMap={keywordMap}
-                  />
-                );
-              })
+                {selectedMessages
+                  .filter((msg: any) => showSystemMessages || msg.role !== 'system')
+                  .map((msg: any, idx: number) => {
+                  const isSummary = msg.content?.includes('[SUMMARY]') || msg.content?.includes('[CONVERSATION SUMMARY]');
+                  const isPreserved = msg.role === 'tool' || msg.tool_calls;
+                  
+                  return (
+                    <Message
+                      key={idx}
+                      role={msg.role || 'system'}
+                      content={msg.content || JSON.stringify(msg, null, 2)}
+                      isCompressed={isSummary}
+                      isPreserved={isPreserved && compressionMode > 0}
+                      isTool={msg.role === 'tool' || !!msg.tool_calls}
+                      keywords={compressionMode > 0 ? keywords : []}
+                      keywordMap={keywordMap}
+                    />
+                  );
+                })}
+              </>
             )}
           </div>
         </div>
@@ -873,6 +948,9 @@ Rules:
           <div className="flex items-center gap-4">
             <span>Viewing: <span className="text-white">{COMPRESSION_MODES[compressionMode].label}</span></span>
             <span>Keep recent: {keepRecent}</span>
+            {session?.conversations?.[session.conversations.length - 1]?.request?.model && (
+              <span>Model: <span className="text-purple-400">{session.conversations[session.conversations.length - 1].request.model}</span></span>
+            )}
             {recompressing && <span className="text-yellow-400">● Re-compressing...</span>}
           </div>
           <div className="flex items-center gap-4">

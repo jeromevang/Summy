@@ -2,9 +2,9 @@
   "modelId": "mistralai/mistral-small-3.2",
   "displayName": "mistralai/mistral-small-3.2",
   "provider": "lmstudio",
-  "testedAt": "2025-12-18T23:08:31.625Z",
-  "testVersion": 2,
-  "score": 75,
+  "testedAt": "2025-12-19T17:26:46.784Z",
+  "testVersion": 3,
+  "score": 76,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -12,172 +12,168 @@
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 2638,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 6404.5,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "file_write": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3099,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 3822,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "file_patch": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 5558,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 6483,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "file_list": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2286,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2645,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "file_search": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1071,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 1077,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "create_new_file": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2957,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "folder_create": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2702,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "folder_delete": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2894,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "git_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 2003,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2284,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2520,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2720,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2393,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2442,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2852,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2877,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "git_add": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 2734.5,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2670,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2960,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "git_branch_list": {
       "supported": false,
-      "score": 0,
+      "score": 45,
       "testsPassed": 0,
-      "testsFailed": 0
-    },
-    "git_checkout": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
-    },
-    "git_merge": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
-    },
-    "git_rm": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "testsFailed": 1,
+      "avgLatency": 2205,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2281,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2650,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2497,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2914,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "npm_uninstall": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
-      "testsFailed": 0
+      "testsFailed": 1,
+      "avgLatency": 1659,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "http_request": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 2216,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 2238,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "browser_navigate": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 6952,
-      "lastTested": "2025-12-18T23:08:31.625Z"
+      "avgLatency": 6602,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "run_python": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3336,
+      "lastTested": "2025-12-19T17:26:46.783Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -191,103 +187,267 @@
     "file_write",
     "file_patch",
     "file_list",
+    "create_new_file",
+    "folder_create",
+    "folder_delete",
     "git_diff",
     "git_log",
     "git_commit",
+    "git_add",
     "git_branch_create",
     "npm_run",
-    "npm_install"
+    "npm_install",
+    "run_python"
   ],
   "testResults": [
     {
       "testId": "file_read_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-rnfzqnxcpjlqmt1rdmn1w\",\"object\":\"chat.completion\",\"created\":1766099267,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"124081676\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"./config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":379,\"completion_tokens\":33,\"total_tokens\":412},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+      "response": "{\"id\":\"chatcmpl-dhvf6wx5gytgcinxz0rjd\",\"object\":\"chat.completion\",\"created\":1766165137,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"757114193\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"./config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":379,\"completion_tokens\":32,\"total_tokens\":411},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
     },
     {
       "testId": "file_read_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-frh1ng069or7stbq4x2mt\",\"object\":\"chat.completion\",\"created\":1766099270,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"720583554\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":378,\"completion_tokens\":35,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small"
+      "response": "{\"id\":\"chatcmpl-f55f28jdt2u0he6cbj0b8\",\"object\":\"chat.completion\",\"created\":1766165140,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"896223655\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":378,\"completion_tokens\":34,\"total_tokens\":412},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small"
     },
     {
       "testId": "file_write_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-rarjznyk07k4u6toij683u\",\"object\":\"chat.completion\",\"created\":1766099273,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"157085233\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":415,\"completion_tokens\":41,\"total_tokens\":456},\"stats\":{},\"syste"
+      "response": "{\"id\":\"chatcmpl-q94kmo2jkea2hrsa23jp1o\",\"object\":\"chat.completion\",\"created\":1766165143,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"220619640\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":415,\"completion_tokens\":40,\"total_tokens\":455},\"stats\":{},\"syste"
     },
     {
       "testId": "file_patch_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-da74a2htsrwtaxzrk5swof\",\"object\":\"chat.completion\",\"created\":1766099276,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help you with that. I'll modify the port number in the \\\"app.js\\\" file for you.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"352546049\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage"
+      "response": "{\"id\":\"chatcmpl-h02yygcu44ipbl2h5l8mud\",\"object\":\"chat.completion\",\"created\":1766165147,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help you with that. I'll modify the port number in the \\\"app.js\\\" file for you.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"314372652\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage"
     },
     {
       "testId": "file_list_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-uv9ofkvhppq2wh0f126gr7\",\"object\":\"chat.completion\",\"created\":1766099281,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"977383743\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":29,\"total_tokens\":396},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+      "response": "{\"id\":\"chatcmpl-i7z6v9euip3w4hr63eoti\",\"object\":\"chat.completion\",\"created\":1766165154,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"380462485\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":28,\"total_tokens\":395},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
     },
     {
       "testId": "file_search_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-h8fjmd95xy0q5tqva6gg7\",\"object\":\"chat.completion\",\"created\":1766099284,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[TOOL_CALLS]file_search<SPECIAL_32>{\\\"query\\\": \\\"TODO\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":399,\"completion_tokens\":11,\"total_tokens\":410},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+      "response": "{\"id\":\"chatcmpl-nt61qt2s2zrxmwlf7ebqgl\",\"object\":\"chat.completion\",\"created\":1766165156,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[TOOL_CALLS]file_search<SPECIAL_32>{\\\"query\\\": \\\"TODO\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":399,\"completion_tokens\":10,\"total_tokens\":409},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-3vgdiucm4lcdvo3h78lpng\",\"object\":\"chat.completion\",\"created\":1766099285,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"719956434\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":336,\"completion_tokens\":25,\"total_tokens\":361},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+      "response": "{\"id\":\"chatcmpl-cxpo63a1qxhz4ja4bqfi7\",\"object\":\"chat.completion\",\"created\":1766165157,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"232837904\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":336,\"completion_tokens\":24,\"total_tokens\":360},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-dw29w6uj8ff4ld3i82ji1\",\"object\":\"chat.completion\",\"created\":1766099287,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"869476585\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":30,\"total_tokens\":397},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+      "response": "{\"id\":\"chatcmpl-ek262y4msjen9io7e7m3v8\",\"object\":\"chat.completion\",\"created\":1766165160,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"366789839\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":29,\"total_tokens\":396},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-eq9eeuhxeppr39g9b6455l\",\"object\":\"chat.completion\",\"created\":1766099289,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"789597699\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":361,\"completion_tokens\":29,\"total_tokens\":390},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+      "response": "{\"id\":\"chatcmpl-7xur7jb71j7j0r2wvcsu19\",\"object\":\"chat.completion\",\"created\":1766165162,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"347726461\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":361,\"completion_tokens\":28,\"total_tokens\":389},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-fputt8g8eivigpw9r44u1a\",\"object\":\"chat.completion\",\"created\":1766099292,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"317339162\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":372,\"completion_tokens\":35,\"total_tokens\":407},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3"
+      "response": "{\"id\":\"chatcmpl-vm1sy2xfizps7m98sc0gq\",\"object\":\"chat.completion\",\"created\":1766165165,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"377281553\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":372,\"completion_tokens\":34,\"total_tokens\":406},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3."
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-im7qbg5c8rkmo00dp0tjr\",\"object\":\"chat.completion\",\"created\":1766099295,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"175765968\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":373,\"completion_tokens\":34,\"total_tokens\":407},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-"
+      "response": "{\"id\":\"chatcmpl-5u0mbp9omt5cq2xu7r4ko7\",\"object\":\"chat.completion\",\"created\":1766165168,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"788591149\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":373,\"completion_tokens\":33,\"total_tokens\":406},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral"
     },
     {
       "testId": "npm_run_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-yi904dkxh7i3tqfbr6ag13\",\"object\":\"chat.completion\",\"created\":1766099297,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"235480307\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":29,\"total_tokens\":397},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+      "response": "{\"id\":\"chatcmpl-08kknbsikvmo3wov7zccx2v\",\"object\":\"chat.completion\",\"created\":1766165171,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"271812885\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":28,\"total_tokens\":396},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
     },
     {
       "testId": "npm_install_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-fnl43mxqvgbws66m6kzgn\",\"object\":\"chat.completion\",\"created\":1766099299,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"862929288\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":364,\"completion_tokens\":32,\"total_tokens\":396},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+      "response": "{\"id\":\"chatcmpl-2rrm2r7cz8hjxu9tp1j\",\"object\":\"chat.completion\",\"created\":1766165173,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"246950313\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":364,\"completion_tokens\":31,\"total_tokens\":395},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
     },
     {
       "testId": "http_request_get",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-ebki385i9nnab4ee1ta1g\",\"object\":\"chat.completion\",\"created\":1766099302,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[TOOL_CALLS]http_request<SPECIAL_32>{\\\"url\\\": \\\"https://api.example.com/users\\\", \\\"method\\\": \\\"GET\\\"}\\n[END_TOOL_REQUEST]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":28,\"total_tokens\":449},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3."
+      "response": "{\"id\":\"chatcmpl-mhn6wvlg2ot5b13g649h\",\"object\":\"chat.completion\",\"created\":1766165176,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[TOOL_CALLS]http_request<SPECIAL_32>{\\\"url\\\": \\\"https://api.example.com/users\\\", \\\"method\\\": \\\"GET\\\"}\\n[END_TOOL_REQUEST]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":27,\"total_tokens\":448},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-ga10r5vngumtom4tu2aw0r\",\"object\":\"chat.completion\",\"created\":1766099304,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm sorry, but I don't have the capability to browse the internet or access specific websites directly. However, I can help guide you on how to open the website https://github.com and find the page title on your own.\\n\\nTo open the website, you can simply type \\\"https://github.com\\\" into the address bar of you"
+      "response": "{\"id\":\"chatcmpl-xsrrpqo5kn45zv2ws1w4u\",\"object\":\"chat.completion\",\"created\":1766165178,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm sorry, but I don't have the capability to browse the internet or access specific websites directly. However, I can help guide you on how to open the website https://github.com and find the page title on your own.\\n\\nTo open the website, you can simply type \\\"https://github.com\\\" into the address bar of your"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-zaww5cjcfnpus73bvvkr4q\",\"object\":\"chat.completion\",\"created\":1766165185,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"683490164\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"./README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":396,\"completion_tokens\":33,\"total_tokens\":429},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-z40rym1s0brs8k0ufcfv1e\",\"object\":\"chat.completion\",\"created\":1766165188,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"279655326\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"./components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":29,\"total_tokens\":398},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3."
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-n3fl7cngi81f1wqy269qt\",\"object\":\"chat.completion\",\"created\":1766165191,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"634059059\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"/temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":370,\"completion_tokens\":31,\"total_tokens\":401},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-jshyw690qg6kxsdqom4jr\",\"object\":\"chat.completion\",\"created\":1766165194,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"619599267\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":377,\"completion_tokens\":32,\"total_tokens\":409},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-8fsjd2r11hh1dymrdri7h4\",\"object\":\"chat.completion\",\"created\":1766165197,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"589003261\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":373,\"completion_tokens\":30,\"total_tokens\":403},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-67n11c4pyf3fyihr0ja7db\",\"object\":\"chat.completion\",\"created\":1766165199,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"593912248\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":336,\"completion_tokens\":25,\"total_tokens\":361},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-yun8cxhlg9obal7ktesb9\",\"object\":\"chat.completion\",\"created\":1766165201,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help you with that. Which version of axios do you want to remove?\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":19,\"total_tokens\":388},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-small-3.2\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-g2kljpxfgordsibib4q7sb\",\"object\":\"chat.completion\",\"created\":1766165203,\"model\":\"mistralai/mistral-small-3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"126697109\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":371,\"completion_tokens\":36,\"total_tokens\":407},\"stats\":{},\"system_fingerprint\":\"mistralai/mistral-sma"
     }
-  ]
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T17:25:30.625Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct tool selected with correct file path"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct: chose search_web for real-time data with appropriate query"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 40,
+      "details": "Only one tool call emitted when two were required"
+    },
+    "argumentValidationTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: all types and nested structures correct"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
+    "toolScore": 94,
+    "reasoningScore": 93,
+    "overallScore": 94,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": true,
+        "score": 80,
+        "details": "Valid intent JSON with reasoning"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly chose read based on condition"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": true,
+        "score": 100,
+        "details": "Provided reasoning before action"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    }
+  },
+  "role": "both",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "latencies": {
+      "2048": 2526,
+      "4096": 2526,
+      "8192": 2826,
+      "16384": 2820,
+      "32768": 3858,
+      "65536": 9440,
+      "131072": 9540
+    },
+    "maxUsableContext": 131072,
+    "recommendedContext": 131072,
+    "modelMaxContext": 131072,
+    "minLatency": 2526,
+    "isInteractiveSpeed": true,
+    "speedRating": "acceptable"
+  },
+  "contextLength": 131072
 }

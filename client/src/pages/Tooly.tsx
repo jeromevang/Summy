@@ -294,8 +294,26 @@ const Tooly: React.FC = () => {
     }
   };
 
+  // Validation error for model selection
+  const [modelValidationError, setModelValidationError] = useState<string>('');
+  
   // Save dual-model configuration
   const saveDualModelConfig = async () => {
+    setModelValidationError('');
+    
+    // Validation
+    if (enableDualModel) {
+      if (!mainModelId || !executorModelId) {
+        setModelValidationError('Please select both Main Model and Executor Model when dual-model routing is enabled.');
+        return;
+      }
+    } else {
+      if (!mainModelId) {
+        setModelValidationError('Please select a model to use.');
+        return;
+      }
+    }
+    
     setSavingDualModel(true);
     try {
       await fetch('/api/settings', {
@@ -304,7 +322,8 @@ const Tooly: React.FC = () => {
         body: JSON.stringify({
           enableDualModel,
           mainModelId,
-          executorModelId
+          executorModelId,
+          lmstudioModel: mainModelId // Sync for backward compatibility
         })
       });
     } catch (error) {
@@ -319,6 +338,57 @@ const Tooly: React.FC = () => {
   
   // Get models suitable for executor role
   const getExecutorModels = () => models.filter(m => m.role === 'executor' || m.role === 'both');
+  
+  // Set model as main and save
+  const setAsMainModel = async (modelId: string) => {
+    setMainModelId(modelId);
+    setModelValidationError('');
+    
+    // Auto-save
+    setSavingDualModel(true);
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enableDualModel,
+          mainModelId: modelId,
+          executorModelId,
+          lmstudioModel: modelId
+        })
+      });
+    } catch (error) {
+      console.error('Failed to save main model:', error);
+    } finally {
+      setSavingDualModel(false);
+    }
+  };
+  
+  // Set model as executor (auto-enables dual model) and save
+  const setAsExecutorModel = async (modelId: string) => {
+    setExecutorModelId(modelId);
+    setEnableDualModel(true); // Auto-enable dual model
+    setModelValidationError('');
+    
+    // Auto-save
+    setSavingDualModel(true);
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enableDualModel: true,
+          mainModelId,
+          executorModelId: modelId,
+          lmstudioModel: mainModelId
+        })
+      });
+    } catch (error) {
+      console.error('Failed to save executor model:', error);
+    } finally {
+      setSavingDualModel(false);
+    }
+  };
 
   // Save system prompt for model
   const saveSystemPrompt = async (modelId: string, prompt: string) => {
@@ -654,58 +724,79 @@ const Tooly: React.FC = () => {
         </div>
       </div>
 
-      {/* Dual-Model Configuration */}
+      {/* Model Selection & Dual-Model Configuration */}
       <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={enableDualModel}
-                onChange={(e) => setEnableDualModel(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
-              />
-              <span className="text-white font-medium">Enable Dual-Model Routing</span>
-            </label>
-          </div>
+          <h3 className="text-white font-medium flex items-center gap-2">
+            <span className="text-lg">🎯</span> Active Model Configuration
+          </h3>
           <button
             onClick={saveDualModelConfig}
             disabled={savingDualModel}
-            className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded disabled:opacity-50"
+            className="px-4 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg disabled:opacity-50 font-medium"
           >
-            {savingDualModel ? 'Saving...' : 'Save Config'}
+            {savingDualModel ? 'Saving...' : 'Save & Apply'}
           </button>
         </div>
         
-        {enableDualModel && (
-          <div className="grid grid-cols-2 gap-4">
-            {/* Main Model */}
-            <div className="p-3 bg-[#0d0d0d] rounded-lg border border-[#2d2d2d]">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg">🧠</span>
-                <span className="text-white font-medium">Main Model (Reasoning)</span>
-              </div>
-              <select
-                value={mainModelId}
-                onChange={(e) => setMainModelId(e.target.value)}
-                className="w-full bg-[#1a1a1a] border border-[#3d3d3d] rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
-              >
-                <option value="">Select model...</option>
-                {getMainModels().map((m) => (
-                  <option key={m.id} value={m.id}>{m.displayName}</option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-2">
-                Handles reasoning, planning. No direct tool access.
-              </p>
-              {getMainModels().length === 0 && (
-                <p className="text-xs text-yellow-400 mt-1">
-                  No models with Main role. Run probe tests first.
-                </p>
-              )}
+        {/* Validation Error */}
+        {modelValidationError && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-400">
+            ❌ {modelValidationError}
+          </div>
+        )}
+        
+        {/* Dual Model Toggle */}
+        <label className="flex items-center gap-3 mb-4 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={enableDualModel}
+            onChange={(e) => {
+              setEnableDualModel(e.target.checked);
+              setModelValidationError('');
+            }}
+            className="w-5 h-5 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
+          />
+          <div>
+            <span className="text-white font-medium">Enable Dual-Model Routing</span>
+            <p className="text-xs text-gray-400">Use separate models for reasoning and tool execution</p>
+          </div>
+        </label>
+        
+        {/* Model Selection */}
+        <div className={`grid ${enableDualModel ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
+          {/* Main Model - Always shown */}
+          <div className="p-3 bg-[#0d0d0d] rounded-lg border border-[#2d2d2d]">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">{enableDualModel ? '🧠' : '🤖'}</span>
+              <span className="text-white font-medium">
+                {enableDualModel ? 'Main Model (Reasoning)' : 'Model'}
+              </span>
             </div>
-            
-            {/* Executor Model */}
+            <select
+              value={mainModelId}
+              onChange={(e) => {
+                setMainModelId(e.target.value);
+                setModelValidationError('');
+              }}
+              className="w-full bg-[#1a1a1a] border border-[#3d3d3d] rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
+            >
+              <option value="">Select model...</option>
+              {models.filter(m => m.provider === 'lmstudio').map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.displayName} {m.maxContextLength ? `(${Math.round(m.maxContextLength / 1024)}K)` : ''}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-2">
+              {enableDualModel 
+                ? 'Handles reasoning, planning. No direct tool access.' 
+                : 'This model handles all requests (reasoning + tools)'}
+            </p>
+          </div>
+          
+          {/* Executor Model - Only shown when dual mode is enabled */}
+          {enableDualModel && (
             <div className="p-3 bg-[#0d0d0d] rounded-lg border border-[#2d2d2d]">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">⚡</span>
@@ -713,30 +804,46 @@ const Tooly: React.FC = () => {
               </div>
               <select
                 value={executorModelId}
-                onChange={(e) => setExecutorModelId(e.target.value)}
+                onChange={(e) => {
+                  setExecutorModelId(e.target.value);
+                  setModelValidationError('');
+                }}
                 className="w-full bg-[#1a1a1a] border border-[#3d3d3d] rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
               >
                 <option value="">Select model...</option>
-                {getExecutorModels().map((m) => (
-                  <option key={m.id} value={m.id}>{m.displayName}</option>
+                {models.filter(m => m.provider === 'lmstudio').map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.displayName} {m.maxContextLength ? `(${Math.round(m.maxContextLength / 1024)}K)` : ''}
+                  </option>
                 ))}
               </select>
               <p className="text-xs text-gray-500 mt-2">
                 Executes tool calls. Schema-aware, deterministic.
               </p>
-              {getExecutorModels().length === 0 && (
-                <p className="text-xs text-yellow-400 mt-1">
-                  No models with Executor role. Run probe tests first.
-                </p>
+            </div>
+          )}
+        </div>
+        
+        {/* Current Active Model Display */}
+        {mainModelId && (
+          <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+            <div className="text-xs text-gray-400 mb-1">Active Model(s):</div>
+            <div className="text-sm text-white">
+              {enableDualModel ? (
+                <>
+                  <span className="text-purple-400">Main:</span> {models.find(m => m.id === mainModelId)?.displayName || mainModelId}
+                  {executorModelId && (
+                    <>
+                      <span className="mx-2 text-gray-500">|</span>
+                      <span className="text-blue-400">Executor:</span> {models.find(m => m.id === executorModelId)?.displayName || executorModelId}
+                    </>
+                  )}
+                </>
+              ) : (
+                <span className="text-green-400">{models.find(m => m.id === mainModelId)?.displayName || mainModelId}</span>
               )}
             </div>
           </div>
-        )}
-        
-        {!enableDualModel && (
-          <p className="text-sm text-gray-500">
-            Single-model mode: The selected provider's model handles both reasoning and tool execution.
-          </p>
         )}
       </div>
 
@@ -1166,10 +1273,38 @@ const Tooly: React.FC = () => {
             {/* Model Details */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">
-                  {selectedModel ? selectedModel.displayName : 'Select a Model'}
-                </h3>
-                {selectedModel && getRoleBadge(selectedModel.role)}
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-white">
+                    {selectedModel ? selectedModel.displayName : 'Select a Model'}
+                  </h3>
+                  {selectedModel && getRoleBadge(selectedModel.role)}
+                </div>
+                {selectedModel && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setAsMainModel(selectedModel.id)}
+                      disabled={savingDualModel}
+                      className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                        mainModelId === selectedModel.id
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-[#2d2d2d] text-gray-300 hover:bg-purple-600/50 hover:text-white'
+                      }`}
+                    >
+                      {mainModelId === selectedModel.id ? '✓ Main' : 'Use as Main'}
+                    </button>
+                    <button
+                      onClick={() => setAsExecutorModel(selectedModel.id)}
+                      disabled={savingDualModel}
+                      className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                        executorModelId === selectedModel.id
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-[#2d2d2d] text-gray-300 hover:bg-blue-600/50 hover:text-white'
+                      }`}
+                    >
+                      {executorModelId === selectedModel.id ? '✓ Executor' : 'Use as Executor'}
+                    </button>
+                  </div>
+                )}
               </div>
               {selectedModel ? (
                 <div className="space-y-4">

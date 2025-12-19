@@ -417,6 +417,61 @@ const saveServerSettings = async (settings: ServerSettings): Promise<void> => {
   await fs.writeJson(SETTINGS_FILE, settings, { spaces: 2 });
 };
 
+/**
+ * Ensures the correct LM Studio model(s) are loaded before proxying requests.
+ * If dual mode is enabled, loads both main and executor models.
+ * If incorrect models are loaded, unloads all and loads the required ones.
+ */
+const ensureLMStudioModelLoaded = async (settings: ServerSettings): Promise<void> => {
+  try {
+    const client = new LMStudioClient();
+    const loadedModels = await client.llm.listLoaded();
+    const loadedIds = loadedModels.map(m => m.identifier);
+    
+    // Determine required models based on mode
+    const requiredModels: string[] = [];
+    if (settings.enableDualModel) {
+      if (settings.mainModelId) requiredModels.push(settings.mainModelId);
+      if (settings.executorModelId) requiredModels.push(settings.executorModelId);
+    } else {
+      if (settings.lmstudioModel) requiredModels.push(settings.lmstudioModel);
+    }
+    
+    // If no models configured, nothing to do
+    if (requiredModels.length === 0) {
+      console.log('[LMStudio] No models configured in settings');
+      return;
+    }
+    
+    // Check if all required models are already loaded
+    const allLoaded = requiredModels.every(m => loadedIds.includes(m));
+    if (allLoaded) {
+      console.log(`[LMStudio] Correct model(s) already loaded: ${requiredModels.join(', ')}`);
+      return;
+    }
+    
+    console.log(`[LMStudio] Model mismatch. Loaded: [${loadedIds.join(', ')}], Required: [${requiredModels.join(', ')}]`);
+    
+    // Unload all currently loaded models
+    for (const model of loadedModels) {
+      console.log(`[LMStudio] Unloading model: ${model.identifier}`);
+      await client.llm.unload(model.identifier);
+    }
+    
+    // Load required models
+    const contextLength = settings.defaultContextLength || 8192;
+    for (const modelId of requiredModels) {
+      console.log(`[LMStudio] Loading model: ${modelId} (context: ${contextLength})`);
+      await client.llm.load(modelId, { config: { contextLength } });
+      console.log(`[LMStudio] Model loaded: ${modelId}`);
+    }
+  } catch (error: any) {
+    // Log warning but don't fail - LM Studio might still work with whatever is loaded
+    console.warn(`[LMStudio] Failed to ensure correct model loaded: ${error.message}`);
+    addDebugEntry('warning', `Failed to auto-load LM Studio model: ${error.message}`, {});
+  }
+};
+
 // Call LMStudio API for summarization
 const callLMStudio = async (
   messages: any[],
@@ -917,6 +972,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
     
     // ========== ROUTE TO LM STUDIO ==========
     if (effectiveProvider === 'lmstudio') {
+      // Ensure correct model is loaded before proxying
+      await ensureLMStudioModelLoaded(settings);
       const lmstudioUrl = `${settings.lmstudioUrl}/v1/chat/completions`;
       const lmstudioModel = settings.lmstudioModel || 'local-model';
       

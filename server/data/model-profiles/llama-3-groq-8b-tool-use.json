@@ -2,8 +2,8 @@
   "modelId": "llama-3-groq-8b-tool-use",
   "displayName": "llama-3-groq-8b-tool-use",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T16:16:00.799Z",
-  "testVersion": 3,
+  "testedAt": "2025-12-19T17:08:11.215Z",
+  "testVersion": 4,
   "score": 85,
   "toolFormat": "openai_tools",
   "capabilities": {
@@ -12,168 +12,168 @@
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 663.5,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 1938,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "file_write": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 952,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 998,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "file_patch": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1086,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 1139,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "file_list": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 620,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 600,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "file_search": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 176,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 154,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "create_new_file": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 648,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 660,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "folder_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 596,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 634,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "folder_delete": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 197,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 184,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "git_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 497,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 513,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 651,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 681,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 609,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 605,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 663,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 687,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "git_add": {
       "supported": true,
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 598,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 646.5,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 674,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 673,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 516,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 544,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 617,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 589,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 618,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 607,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 649,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 613,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 747,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 756,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 855,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 1044,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 743,
-      "lastTested": "2025-12-19T16:16:00.799Z"
+      "avgLatency": 715,
+      "lastTested": "2025-12-19T17:08:11.215Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -206,143 +206,143 @@
       "testId": "file_read_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-aoj1vbhnol28zv5ecbgqq\",\"object\":\"chat.completion\",\"created\":1766160946,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"353925805\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":377,\"completion_tokens\":28,\"total_tokens\":405},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-zaodpf9v19018r72eoig6kh\",\"object\":\"chat.completion\",\"created\":1766164076,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"796886743\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":377,\"completion_tokens\":28,\"total_tokens\":405},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "file_read_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-5ssghca8eil32z6pkdtjs\",\"object\":\"chat.completion\",\"created\":1766160946,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"232312308\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":376,\"completion_tokens\":30,\"total_tokens\":406},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-qyldn12q2yglbzqy53j7\",\"object\":\"chat.completion\",\"created\":1766164076,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"602837937\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":376,\"completion_tokens\":30,\"total_tokens\":406},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "file_write_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-xxjxqay4zdc71nsd37ei1w\",\"object\":\"chat.completion\",\"created\":1766160947,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"576419036\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":412,\"completion_tokens\":39,\"total_tokens\":451},\"stats\":{},\"system_f"
+      "response": "{\"id\":\"chatcmpl-p67mhrc9gmfbjkixpyozvw\",\"object\":\"chat.completion\",\"created\":1766164077,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"468116615\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":412,\"completion_tokens\":39,\"total_tokens\":451},\"stats\":{},\"system_f"
     },
     {
       "testId": "file_patch_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-mbcd3qdnqzvz5pvkrv0ue\",\"object\":\"chat.completion\",\"created\":1766160948,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"565115747\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":437,\"completion_tokens\":42,\"total_tokens\":479},\"stats\":{},\"system_fingerprint\":\""
+      "response": "{\"id\":\"chatcmpl-jldleqrrpft4fv5odlindj\",\"object\":\"chat.completion\",\"created\":1766164078,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"341626135\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":437,\"completion_tokens\":42,\"total_tokens\":479},\"stats\":{},\"system_fingerprint\":"
     },
     {
       "testId": "file_list_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-19ldbxpoxynvqug0jl14sb\",\"object\":\"chat.completion\",\"created\":1766160949,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"535035266\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":365,\"completion_tokens\":27,\"total_tokens\":392},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-51j2n3r45oha7ehohi8dx\",\"object\":\"chat.completion\",\"created\":1766164079,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"427432834\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":365,\"completion_tokens\":27,\"total_tokens\":392},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "file_search_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-0wtwwu76jbxol9cewr4t3ni\",\"object\":\"chat.completion\",\"created\":1766160950,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Could you please specify the directory where these project files are located?\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":397,\"completion_tokens\":13,\"total_tokens\":410},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-vn3v98wt2uevrftcmw8oql\",\"object\":\"chat.completion\",\"created\":1766164080,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Could you please specify the directory where these project files are located?\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":397,\"completion_tokens\":13,\"total_tokens\":410},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-r5t7ra1m3an4a1yejkq6s\",\"object\":\"chat.completion\",\"created\":1766160950,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"544930851\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":23,\"total_tokens\":357},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-6vpyrrnlojjha55l0imdt\",\"object\":\"chat.completion\",\"created\":1766164080,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"891325726\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":23,\"total_tokens\":357},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-pqqex2uzqkm6ft60fof6c\",\"object\":\"chat.completion\",\"created\":1766160950,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"550866317\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":365,\"completion_tokens\":28,\"total_tokens\":393},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-p7a0d2x0rokcgl7l5d0b9\",\"object\":\"chat.completion\",\"created\":1766164080,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"685951038\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":365,\"completion_tokens\":28,\"total_tokens\":393},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-kvmozjh4h38w6qvylqubmj\",\"object\":\"chat.completion\",\"created\":1766160951,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"530242316\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":359,\"completion_tokens\":27,\"total_tokens\":386},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-oye0pgh9iebi83jr6wg76f\",\"object\":\"chat.completion\",\"created\":1766164081,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"868587198\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":359,\"completion_tokens\":27,\"total_tokens\":386},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-khm97jc1h8e5y1o11cjgla\",\"object\":\"chat.completion\",\"created\":1766160952,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"727740554\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":29,\"total_tokens\":398},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-1iy3zd2epwmwq80hhrot3i\",\"object\":\"chat.completion\",\"created\":1766164082,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"935792965\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":29,\"total_tokens\":398},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-kugtzmwru3jks4n3pkyez\",\"object\":\"chat.completion\",\"created\":1766160952,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"188925004\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":371,\"completion_tokens\":30,\"total_tokens\":401},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-"
+      "response": "{\"id\":\"chatcmpl-tcuv06to98v3u9vmls87\",\"object\":\"chat.completion\",\"created\":1766164082,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"528126956\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":371,\"completion_tokens\":30,\"total_tokens\":401},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-u"
     },
     {
       "testId": "npm_run_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-3jzr7fyjczjeq2vwxwyex6\",\"object\":\"chat.completion\",\"created\":1766160953,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"452802655\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":366,\"completion_tokens\":27,\"total_tokens\":393},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-pdmw3m5vzacbcokx3lqxv\",\"object\":\"chat.completion\",\"created\":1766164083,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"397121136\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":366,\"completion_tokens\":27,\"total_tokens\":393},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "npm_install_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ap40s288v4vxpj0lrzvmxe\",\"object\":\"chat.completion\",\"created\":1766160954,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"714712959\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":361,\"completion_tokens\":27,\"total_tokens\":388},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-e4fa24tibac2h2y8mryice\",\"object\":\"chat.completion\",\"created\":1766164084,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"393674437\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":361,\"completion_tokens\":27,\"total_tokens\":388},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "http_request_get",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-m9qeovmzd4rbfp32coxdc6\",\"object\":\"chat.completion\",\"created\":1766160954,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"939394535\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":419,\"completion_tokens\":32,\"total_tokens\":451},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8"
+      "response": "{\"id\":\"chatcmpl-sis8dwy7hwr0nkikqrfluk9\",\"object\":\"chat.completion\",\"created\":1766164084,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"211491577\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":419,\"completion_tokens\":32,\"total_tokens\":451},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-5hqa5ac6chen8isx74r5m\",\"object\":\"chat.completion\",\"created\":1766160955,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"372847391\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":420,\"completion_tokens\":36,\"total_tokens\":456},\"stats\":{},\"system_fingerprint\":\"ll"
+      "response": "{\"id\":\"chatcmpl-ajimtd2mbfhrydbcrod6kq\",\"object\":\"chat.completion\",\"created\":1766164085,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"566661564\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":420,\"completion_tokens\":36,\"total_tokens\":456},\"stats\":{},\"system_fingerprint\":\"l"
     },
     {
       "testId": "create_new_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-47vzgsej3w5qe15zker1e\",\"object\":\"chat.completion\",\"created\":1766160956,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"677117490\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":394,\"completion_tokens\":29,\"total_tokens\":423},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-galup5tfk1utwzi37qjxpb\",\"object\":\"chat.completion\",\"created\":1766164086,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"538265427\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":394,\"completion_tokens\":29,\"total_tokens\":423},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "folder_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-mhgpptjrw4p22ollw88h2t\",\"object\":\"chat.completion\",\"created\":1766160956,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"192411922\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":27,\"total_tokens\":394},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-313ceudos1qzotsl2mc0te\",\"object\":\"chat.completion\",\"created\":1766164087,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"458611834\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":27,\"total_tokens\":394},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "folder_delete_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-60sx5mmeotvf4s3sj4kt2q\",\"object\":\"chat.completion\",\"created\":1766160957,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Could you please provide me with the full path to the \\\"temp\\\" folder?\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":16,\"total_tokens\":384},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-9sp2pxhnx46gzx6qgkxhq\",\"object\":\"chat.completion\",\"created\":1766164087,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Could you please provide me with the full path to the \\\"temp\\\" folder?\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":16,\"total_tokens\":384},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "git_add_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-9z8mbe84ae9kmgu1aepp4\",\"object\":\"chat.completion\",\"created\":1766160957,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"838193061\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":375,\"completion_tokens\":28,\"total_tokens\":403},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-ch6g99rz17fnr2gl1avzo\",\"object\":\"chat.completion\",\"created\":1766164088,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"984745424\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":375,\"completion_tokens\":28,\"total_tokens\":403},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "git_add_all",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-dznd0txa4tfs8t66du5r\",\"object\":\"chat.completion\",\"created\":1766160958,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"231349192\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":371,\"completion_tokens\":26,\"total_tokens\":397},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-m014anxjs0qt8qhy1gz1ls\",\"object\":\"chat.completion\",\"created\":1766164088,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"180237238\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":371,\"completion_tokens\":26,\"total_tokens\":397},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-horj0bc96z4pqyor7ud0ci\",\"object\":\"chat.completion\",\"created\":1766160958,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"811511087\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":24,\"total_tokens\":358},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-x68yb1qir8232hpyvg803\",\"object\":\"chat.completion\",\"created\":1766164089,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"343695922\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":24,\"total_tokens\":358},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-yqljccpjux90lttya33wv6d\",\"object\":\"chat.completion\",\"created\":1766160959,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"592557161\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":28,\"total_tokens\":395},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
+      "response": "{\"id\":\"chatcmpl-rdzo5ovoxlwf1ayrquv\",\"object\":\"chat.completion\",\"created\":1766164089,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"174037465\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":28,\"total_tokens\":395},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\"}"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-5fkklxb97o9zbzbjz9re68\",\"object\":\"chat.completion\",\"created\":1766160960,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"305044891\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":31,\"total_tokens\":399},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use"
+      "response": "{\"id\":\"chatcmpl-wlj7eidgvvg5gd88limbn\",\"object\":\"chat.completion\",\"created\":1766164090,\"model\":\"llama-3-groq-8b-tool-use\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"266021091\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":31,\"total_tokens\":399},\"stats\":{},\"system_fingerprint\":\"llama-3-groq-8b-tool-use\""
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T16:15:42.519Z",
+    "testedAt": "2025-12-19T17:07:53.251Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -432,14 +432,14 @@
       8192
     ],
     "latencies": {
-      "2048": 687,
-      "4096": 653,
-      "8192": 669
+      "2048": 692,
+      "4096": 765,
+      "8192": 720
     },
     "maxUsableContext": 8192,
     "recommendedContext": 8192,
     "modelMaxContext": 8192,
-    "minLatency": 653,
+    "minLatency": 692,
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },

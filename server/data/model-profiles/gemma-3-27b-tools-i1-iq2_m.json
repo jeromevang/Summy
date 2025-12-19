@@ -2,8 +2,8 @@
   "modelId": "gemma-3-27b-tools-i1@iq2_m",
   "displayName": "gemma-3-27b-tools-i1@iq2_m",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T16:00:56.514Z",
-  "testVersion": 3,
+  "testedAt": "2025-12-19T17:00:17.750Z",
+  "testVersion": 4,
   "score": 95,
   "toolFormat": "openai_tools",
   "capabilities": {
@@ -12,168 +12,168 @@
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 6321.5,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 4033.5,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "file_write": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 10762,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 2617,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "file_patch": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 12524,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 2923,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "file_list": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 7492,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1535,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "file_search": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 9277,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1956,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "create_new_file": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 8641,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1946,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "folder_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 7563,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1635,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "folder_delete": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 7732,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1673,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "git_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 6471,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1372,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 8070,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1787,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 7441,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1739,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 8490,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1873,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "git_add": {
       "supported": true,
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 5556.5,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1536.5,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 8875,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1992,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 9508,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1477,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 8108,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1636,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 7750,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1595,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 10799,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1671,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 11368,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 2604,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 9687,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 2090,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 11337,
-      "lastTested": "2025-12-19T16:00:56.514Z"
+      "avgLatency": 1965,
+      "lastTested": "2025-12-19T17:00:17.750Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -208,143 +208,143 @@
       "testId": "file_read_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-5y32qzjt4l64i6oxmiqvhi\",\"object\":\"chat.completion\",\"created\":1766159860,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"221753530\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":436,\"completion_tokens\":34,\"total_tokens\":470},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-qqlj5zgl4nteyonrcr1so\",\"object\":\"chat.completion\",\"created\":1766163574,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"813061688\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":436,\"completion_tokens\":34,\"total_tokens\":470},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "file_read_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-b3xv9k2bfzjkmhp4bxjebs\",\"object\":\"chat.completion\",\"created\":1766159869,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"259737342\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":438,\"completion_tokens\":38,\"total_tokens\":476},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq"
+      "response": "{\"id\":\"chatcmpl-rfc46qvhmkdzqm1gyvqp08\",\"object\":\"chat.completion\",\"created\":1766163576,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"939925687\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":438,\"completion_tokens\":38,\"total_tokens\":476},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq"
     },
     {
       "testId": "file_write_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-8qea9iettq4xr7gv4t7u8\",\"object\":\"chat.completion\",\"created\":1766159873,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"852926303\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":477,\"completion_tokens\":47,\"total_tokens\":524},\"stats\":{},\"system_"
+      "response": "{\"id\":\"chatcmpl-q0q9dk6a6jjbmz0a6f5v\",\"object\":\"chat.completion\",\"created\":1766163578,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"482697406\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":477,\"completion_tokens\":47,\"total_tokens\":524},\"stats\":{},\"system_f"
     },
     {
       "testId": "file_patch_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-ayx87shml68weozhl5foa\",\"object\":\"chat.completion\",\"created\":1766159884,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"238173306\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":510,\"completion_tokens\":49,\"total_tokens\":559},\"stats\":{},\"system_fingerprint\""
+      "response": "{\"id\":\"chatcmpl-gdy3nmck54v8lw4lvpmhjk\",\"object\":\"chat.completion\",\"created\":1766163581,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"783493327\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":510,\"completion_tokens\":49,\"total_tokens\":559},\"stats\":{},\"system_fingerprint"
     },
     {
       "testId": "file_list_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-aodr6568m5o9rgs6i9ql2w\",\"object\":\"chat.completion\",\"created\":1766159896,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"359475213\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":31,\"total_tokens\":452},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-8ibz4m3vzs19xbxan69fc\",\"object\":\"chat.completion\",\"created\":1766163584,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"516457180\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":31,\"total_tokens\":452},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "file_search_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-aqbgcch25njgvr4gv97i8h\",\"object\":\"chat.completion\",\"created\":1766159904,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"681491817\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":459,\"completion_tokens\":37,\"total_tokens\":496},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@"
+      "response": "{\"id\":\"chatcmpl-05pv99wc8limgzpxkx515b\",\"object\":\"chat.completion\",\"created\":1766163585,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"835818301\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":459,\"completion_tokens\":37,\"total_tokens\":496},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-eopqkukndbw7m7h0h78ygn\",\"object\":\"chat.completion\",\"created\":1766159913,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"117322065\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":385,\"completion_tokens\":28,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-l3tiasclulkb1tuxcdtg6i\",\"object\":\"chat.completion\",\"created\":1766163587,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"814968677\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":385,\"completion_tokens\":28,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-nwxys9bwt2dlbn0olq79f\",\"object\":\"chat.completion\",\"created\":1766159920,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"926886965\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":422,\"completion_tokens\":33,\"total_tokens\":455},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-61erj4rvhtlw2nnzzzvmri\",\"object\":\"chat.completion\",\"created\":1766163588,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"750127925\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":422,\"completion_tokens\":33,\"total_tokens\":455},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-mzcmzsxke5azxhva81rqwr\",\"object\":\"chat.completion\",\"created\":1766159928,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"790818337\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":415,\"completion_tokens\":32,\"total_tokens\":447},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-33gsxhpjpyw4hkm39jib3l\",\"object\":\"chat.completion\",\"created\":1766163590,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"905984059\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":415,\"completion_tokens\":32,\"total_tokens\":447},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-rmcth7qcpio5tp3jwczphv\",\"object\":\"chat.completion\",\"created\":1766159935,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"837364925\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":427,\"completion_tokens\":34,\"total_tokens\":461},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m"
+      "response": "{\"id\":\"chatcmpl-r8t6boprdnplgrz4y2ec4\",\"object\":\"chat.completion\",\"created\":1766163592,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"849490367\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":427,\"completion_tokens\":34,\"total_tokens\":461},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\""
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-s5y15f9poeqmlsjrxu9l8\",\"object\":\"chat.completion\",\"created\":1766159944,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"319521887\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":38,\"total_tokens\":470},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i"
+      "response": "{\"id\":\"chatcmpl-fityhlo8y18u6l7zg1sr0n\",\"object\":\"chat.completion\",\"created\":1766163594,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"384343971\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":38,\"total_tokens\":470},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-"
     },
     {
       "testId": "npm_run_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ubpig44uynit6693k5t2c\",\"object\":\"chat.completion\",\"created\":1766159952,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"621472453\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":32,\"total_tokens\":456},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-gzcp13c9nc542w7rfh57t2\",\"object\":\"chat.completion\",\"created\":1766163596,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"838465004\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":32,\"total_tokens\":456},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "npm_install_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ml8vxxinp41ym3nv5yrzv\",\"object\":\"chat.completion\",\"created\":1766159961,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"735061704\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":420,\"completion_tokens\":32,\"total_tokens\":452},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-2clu8vtn27npwta7rvy2h9\",\"object\":\"chat.completion\",\"created\":1766163598,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"457207777\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":420,\"completion_tokens\":32,\"total_tokens\":452},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "http_request_get",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-8hgutcw4qarzu26erucmk\",\"object\":\"chat.completion\",\"created\":1766159968,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"754960516\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":488,\"completion_tokens\":46,\"total_tokens\":534},\"stats\":{},\"system_fingerpr"
+      "response": "{\"id\":\"chatcmpl-jvez08makiggu2qud4eoah\",\"object\":\"chat.completion\",\"created\":1766163599,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"985173821\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":488,\"completion_tokens\":46,\"total_tokens\":534},\"stats\":{},\"system_fingerp"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-auk2p31dkdb2lo5atv9eix\",\"object\":\"chat.completion\",\"created\":1766159980,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"351695607\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":486,\"completion_tokens\":39,\"total_tokens\":525},\"stats\":{},\"system_fingerprint\":"
+      "response": "{\"id\":\"chatcmpl-9ad4pmfxkkpcprfi1ym7ng\",\"object\":\"chat.completion\",\"created\":1766163602,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"535207444\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":486,\"completion_tokens\":39,\"total_tokens\":525},\"stats\":{},\"system_fingerprint\":"
     },
     {
       "testId": "create_new_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-4y8emd5z4po4edl01uvxfk\",\"object\":\"chat.completion\",\"created\":1766159989,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"517340166\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":458,\"completion_tokens\":35,\"total_tokens\":493},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-2iisk10ul3uvcgh8n0kpae\",\"object\":\"chat.completion\",\"created\":1766163604,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"375191587\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":458,\"completion_tokens\":35,\"total_tokens\":493},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "folder_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-xa7v69pmlgi6epeklvuf3b\",\"object\":\"chat.completion\",\"created\":1766159998,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"351388165\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":31,\"total_tokens\":456},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-a398r19bdvfz41dv9niqsh\",\"object\":\"chat.completion\",\"created\":1766163606,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"757859935\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":31,\"total_tokens\":456},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "folder_delete_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-md5btivgak8gbmtab1swjc\",\"object\":\"chat.completion\",\"created\":1766160006,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"243642996\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":426,\"completion_tokens\":32,\"total_tokens\":458},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-jjt5xq5ln180yw0ub7wlxn\",\"object\":\"chat.completion\",\"created\":1766163607,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"102623152\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":426,\"completion_tokens\":32,\"total_tokens\":458},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "git_add_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-0co8ec9qi8tcdvsj7uic8c9\",\"object\":\"chat.completion\",\"created\":1766160013,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"504287548\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":434,\"completion_tokens\":33,\"total_tokens\":467},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-n4zsqlfu13szprv4etq3h\",\"object\":\"chat.completion\",\"created\":1766163609,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"446168065\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":434,\"completion_tokens\":33,\"total_tokens\":467},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "git_add_all",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-b0krrenvg9laa184impcc\",\"object\":\"chat.completion\",\"created\":1766160021,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"449783093\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":429,\"completion_tokens\":31,\"total_tokens\":460},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-i558y1i8nn5bucdl1182\",\"object\":\"chat.completion\",\"created\":1766163611,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"759717751\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":429,\"completion_tokens\":31,\"total_tokens\":460},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-ndm6vmvx1nkhhmh31ajm3\",\"object\":\"chat.completion\",\"created\":1766160024,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"689458506\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":386,\"completion_tokens\":30,\"total_tokens\":416},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-h3gdepv76z5dg3ixxzsor9\",\"object\":\"chat.completion\",\"created\":1766163612,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"225023128\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":386,\"completion_tokens\":30,\"total_tokens\":416},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-dfy4wk0a6dhzzgmtig9gl\",\"object\":\"chat.completion\",\"created\":1766160034,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"465805328\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":32,\"total_tokens\":456},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
+      "response": "{\"id\":\"chatcmpl-dx6803jw1cm05m37zy708\",\"object\":\"chat.completion\",\"created\":1766163614,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"519674251\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":32,\"total_tokens\":456},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq2_m\"}"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-7v22a06av2p5a3uzb3fon8\",\"object\":\"chat.completion\",\"created\":1766160045,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"963792635\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":426,\"completion_tokens\":37,\"total_tokens\":463},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tool"
+      "response": "{\"id\":\"chatcmpl-26gr9umkmintgt7r15wxa\",\"object\":\"chat.completion\",\"created\":1766163615,\"model\":\"gemma-3-27b-tools-i1@iq2_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"101683125\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":426,\"completion_tokens\":37,\"total_tokens\":463},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools"
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T15:57:11.216Z",
+    "testedAt": "2025-12-19T16:59:30.427Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -431,17 +431,23 @@
     "testedContextSizes": [
       2048,
       4096,
-      8192
+      8192,
+      16384,
+      32768,
+      65536
     ],
     "latencies": {
-      "2048": 1476,
-      "4096": 1482,
-      "8192": 1483
+      "2048": 1638,
+      "4096": 1776,
+      "8192": 1704,
+      "16384": 8069,
+      "32768": 13199,
+      "65536": 7941
     },
-    "maxUsableContext": 8192,
-    "recommendedContext": 8192,
+    "maxUsableContext": 65536,
+    "recommendedContext": 65536,
     "modelMaxContext": 131072,
-    "minLatency": 1476,
+    "minLatency": 1638,
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },

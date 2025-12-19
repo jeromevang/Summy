@@ -1,0 +1,461 @@
+{
+  "modelId": "nvidia/nemotron-3-nano",
+  "displayName": "nvidia/nemotron-3-nano",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T17:33:33.924Z",
+  "testVersion": 2,
+  "score": 88,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 9674.5,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "file_write": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 8273,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 63,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 8991,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "file_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 5446,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "file_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 15385,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "create_new_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4865,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "folder_create": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 5801,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "folder_delete": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 5486,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 6123,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "git_diff": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4916,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "git_log": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 5088,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "git_commit": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 5008,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "git_add": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 4692,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "git_branch_create": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4605,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3670,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "npm_run": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4576,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "npm_install": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4273,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "npm_uninstall": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4809,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "http_request": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 7165,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 16828,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "run_python": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 13013,
+      "lastTested": "2025-12-19T17:33:33.924Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [
+    "file_read",
+    "file_write",
+    "file_list",
+    "file_search",
+    "create_new_file",
+    "folder_create",
+    "folder_delete",
+    "git_diff",
+    "git_log",
+    "git_commit",
+    "git_add",
+    "git_branch_create",
+    "npm_run",
+    "npm_install",
+    "npm_uninstall",
+    "http_request",
+    "run_python"
+  ],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ez0zeamggxsbiqbhebkog\",\"object\":\"chat.completion\",\"created\":1766165460,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants me to read the contents of a file called \\\"config.json\\\" in the current directory. Let me check the tools available. There's a function named file_read that takes a path parameter. Since the file is in the current directory, the path should just be \\\"config.json\\\". I need to call this function w"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-6keznhjznui84lw0zee1q8\",\"object\":\"chat.completion\",\"created\":1766165465,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to see the contents of the file at src/utils/helpers.ts. Let me check the tools available. There's a function called file_read that takes a path parameter. I need to call that with the given path. I should make sure the path is correctly formatted. The user provided the path directly, so I can "
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-15w2eg8ttltk62uzdtuqh\",\"object\":\"chat.completion\",\"created\":1766165470,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants me to create a new file called \\\"hello.js\\\" with the content \\\"console.log(\\\"Hello World\\\")\\\". Let me check the tools available. There's a function called file_write that takes a path and content. So I need to use that. The path should be \\\"hello.js\\\" and the content is the string provided. I sh"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 63,
+      "response": "{\"id\":\"chatcmpl-nflljlrxpciaric7n38fje\",\"object\":\"chat.completion\",\"created\":1766165478,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to change the port number in app.js from 3000 to 8080. Let me see how to approach this.\\n\\nFirst, I need to check if there's a tool available for modifying files. The provided tools include a function called file_patch, which takes a path, find text, and replace text. That's exactly what's need"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-g6h4siid3z6xatxgm5fkzp\",\"object\":\"chat.completion\",\"created\":1766165487,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to see all files in the src directory. Let me check the tools available. There's a function called file_list that lists files in a directory. The parameters include a folder, which defaults to the current directory if not specified. Since the user specified the src directory, I should call file"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-b5m1b5h1ige0s3bsk03ya3i\",\"object\":\"chat.completion\",\"created\":1766165492,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to search for all occurrences of \\\"TODO\\\" in the project files. Let me check the available tools. There's a function called file_search that takes a query and a path. The query is required, and the path is optional. Since the user didn't specify a particular directory, maybe I should search th"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-rkzoiupw20pxl2gp65udxg\",\"object\":\"chat.completion\",\"created\":1766165508,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants me to check the current git status of the repository. Let me see what tools I have available. There's a function called git_status that's supposed to check the git repository status. The parameters for that function are empty, so I don't need any arguments. I should just call that function. I d"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-a02buxc67da2bpn7yon8b3\",\"object\":\"chat.completion\",\"created\":1766165514,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to see the git diff for the file \\\"index.js\\\". Let me check the tools available. There's a function called git_diff that takes an optional file parameter. Since the user specified \\\"index.js\\\", I should call that function with the file argument set to \\\"index.js\\\". I don't need any other parame"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-0ulns5n21ybiv2jzc055r4h\",\"object\":\"chat.completion\",\"created\":1766165519,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to see the last 5 commits. Let me check the tools available. There's a function called git_log that takes a count parameter. The description says it views commit history. So I need to call git_log with count set to 5. The parameters are optional, but since the user specified 5, I should includ"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ybda01ku5nfv1a7l5ps4a\",\"object\":\"chat.completion\",\"created\":1766165524,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to commit all changes with the message \\\"Fix login bug\\\". Let me check the tools available. There's a git_commit function that takes a message parameter. Since the user specified to commit all changes, I don't need any arguments other than the message. The function requires the message, so I sho"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ppoi2v9tpresin7qp84wbj\",\"object\":\"chat.completion\",\"created\":1766165529,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to create a new branch called \\\"feature/user-auth\\\". Let me check the tools available. There's a function called git_branch_create that takes a name parameter. The required parameter is the branch name. So I need to call that function with the name \\\"feature/user-auth\\\". I should make sure the "
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-6rbyomebydvmxel8fn0ig\",\"object\":\"chat.completion\",\"created\":1766165534,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants me to run the \\\"build\\\" npm script. Let me check the tools available. There's a function called npm_run that takes a script name as a parameter. Since the user specified \\\"build\\\", I need to call that function with the script argument set to \\\"build\\\". I should make sure that the parameters are "
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-g6m0i41zmj2vly0sz5iad\",\"object\":\"chat.completion\",\"created\":1766165538,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to install the lodash package. Let me check the tools available. There's an npm_install function that takes a package name. So I need to call that function with \\\"lodash\\\" as the argument. I should make sure the parameters are correctly formatted. The required field is \\\"package\\\", so the argume"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-cye9lyg9f1i2q4hhwpum9x\",\"object\":\"chat.completion\",\"created\":1766165542,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants me to fetch data from the URL https://api.example.com/users. Let me check the tools available. There's an HTTP request function that takes a URL, method, and body. The required parameter is the URL. Since the user didn't specify a method, I should default to GET, which is common for fetching da"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-sgak7cvzxhc1xf4mr005a3\",\"object\":\"chat.completion\",\"created\":1766165550,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants me to open the website https://github.com and get the page title. Let me check the tools available. There's a function called browser_navigate that takes a URL, a clickSelector, and a getContent parameter. The required parameter is the URL. Since the user wants the page title, I need to navigat"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-xmooxbuv1ugoo0lashm4b\",\"object\":\"chat.completion\",\"created\":1766165566,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to create a new empty file called \\\"README.md\\\". Let me check the tools available. There's a function called create_new_file that takes a path and optional content. Since the user specified an empty file, I don't need to provide any content. The path should be \\\"README.md\\\". I just need to call "
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-yiz7rcgs72nnnnj5ky2kx\",\"object\":\"chat.completion\",\"created\":1766165571,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to create a new folder called \\\"components\\\". Let me check the tools available. There's a function called folder_create that takes a path parameter. The required parameter is the path, which should be a string. Since the user specified the folder name as \\\"components\\\", I need to use that as the"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-jorj4s31y7t1egoaglf3s\",\"object\":\"chat.completion\",\"created\":1766165577,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to delete the folder named \\\"temp\\\". Let me check the tools available. There's a function called folder_delete that takes a path parameter. The required parameter is the path to the directory. Since the user specified the folder name as \\\"temp\\\", I need to use that as the path. I should call the"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-hnztmz7dl5gn1z4fihrlw\",\"object\":\"chat.completion\",\"created\":1766165583,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to stage the file \\\"index.js\\\" for commit. Let me check the available tools. There's a function called git_add that stages files. The parameters require a file path, which can be \\\".\\\" for all files. Since the user specified \\\"index.js\\\", I should call git_add with that file. I need to make sure"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-5ijt506jgasi03gmvraes\",\"object\":\"chat.completion\",\"created\":1766165588,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to stage all changes for commit. Let me check the available tools. There's a function called git_add that stages files. The parameters require a file path, and if it's \\\".\\\", it stages all. So I need to call git_add with \\\".\\\" as the argument. That should stage everything. I'll make sure to form"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-wv5ho39osb88ifhujssn3k\",\"object\":\"chat.completion\",\"created\":1766165592,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to see all the branches in the repository. Let me check the tools available. There's a function called git_branch_list that lists all branches. It doesn't require any parameters. Since the user is asking for all branches, I should call that function. I don't need any additional information, so "
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-w2onn93olhg7x72hjk8323\",\"object\":\"chat.completion\",\"created\":1766165596,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants to remove the axios package from their project. Let me check the tools available. There's an npm_uninstall function that takes a package name. Since axios is the package they mentioned, I should call that function with \\\"axios\\\" as the argument. I need to make sure the parameters are correctly "
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-276xyov6qtlp9h2ij15p8q\",\"object\":\"chat.completion\",\"created\":1766165600,\"model\":\"nvidia/nemotron-3-nano\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, the user wants me to run a Python script that prints \\\"Hello World\\\". Let me check the tools available. There's a function called run_python which takes a code parameter. So I need to generate the code that prints \\\"Hello World\\\" and pass it to that function.\\n\\nWait, the function's parameters require a \\\"cod"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T17:30:50.350Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
+    },
+    "schemaTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "selectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct tool selected with correct file path"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 70,
+      "details": "No tool called but mentioned tools in response"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct: chose search_web for real-time data with appropriate query"
+    },
+    "multiToolEmitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: emitted 2 read_file calls with correct paths"
+    },
+    "argumentValidationTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: all types and nested structures correct"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
+    "toolScore": 81,
+    "reasoningScore": 83,
+    "overallScore": 82,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 30,
+        "details": "Response contains invalid JSON"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly chose read based on condition"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 80,
+        "details": "Identified conflict in text response"
+      },
+      "explanation": {
+        "passed": true,
+        "score": 100,
+        "details": "Provided reasoning before action"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072,
+      262144,
+      524288,
+      1048576
+    ],
+    "latencies": {
+      "2048": 5509,
+      "4096": 5491,
+      "8192": 5482,
+      "16384": 5418,
+      "32768": 5469,
+      "65536": 5429,
+      "131072": 5522,
+      "262144": 5467,
+      "524288": 7973,
+      "1048576": 5655
+    },
+    "maxUsableContext": 1048576,
+    "recommendedContext": 1048576,
+    "modelMaxContext": 1048576,
+    "minLatency": 5418,
+    "isInteractiveSpeed": false,
+    "speedRating": "slow"
+  },
+  "contextLength": 1048576
+}

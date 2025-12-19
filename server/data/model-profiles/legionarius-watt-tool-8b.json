@@ -1,0 +1,441 @@
+{
+  "modelId": "legionarius/watt-tool-8b",
+  "displayName": "legionarius/watt-tool-8b",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T18:27:13.250Z",
+  "testVersion": 2,
+  "score": 14,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 1953,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 219,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "file_patch": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 946,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "file_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 632,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "file_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 820,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 148,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 126,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 127,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 100,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 135,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 127,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 144,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 115,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 155,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 109,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 127,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 126,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 135,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 177,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 206,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 161,
+      "lastTested": "2025-12-19T18:27:13.250Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [
+    "file_patch",
+    "file_list",
+    "file_search"
+  ],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-9ohdx0gwdmsc5y1ab4fs75\",\"object\":\"chat.completion\",\"created\":1766168827,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[FILE_READ]\\n{\\\"name\\\": \\\"file_read\\\", \\\"arguments\\\": {\\\"path\\\":\\\"./config.json\\\"}}\\n[END_TOOL_REQUEST]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":378,\"completion_tokens\":26,\"total_tokens\":404},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-14vpks2m7te07r47gubxsmp\",\"object\":\"chat.completion\",\"created\":1766168828,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[FILE_READ]\\n{\\\"name\\\": \\\"file_read\\\", \\\"arguments\\\": {\\\"path\\\":\\\"src/utils/helpers.ts\\\"}}\\n[END_TOOL_REQUEST]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":377,\"completion_tokens\":27,\"total_tokens\":404},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-24gfkahpw7vb3xqultcs2\",\"object\":\"chat.completion\",\"created\":1766168828,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[file_write(path=\\\"hello.js\\\", content=\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":413,\"completion_tokens\":16,\"total_tokens\":429},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-kxdyexgr63g5t1hcnmbru7\",\"object\":\"chat.completion\",\"created\":1766168828,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"881885641\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":438,\"completion_tokens\":37,\"total_tokens\":475},\"stats\":{},\"system_fingerprint\":"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ohqmbzrce7f47kqncwkpr4\",\"object\":\"chat.completion\",\"created\":1766168829,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"461890810\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":366,\"completion_tokens\":26,\"total_tokens\":392},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-20suph5nn064xeayrozg7\",\"object\":\"chat.completion\",\"created\":1766168830,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"395030384\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\"/home/user/project\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":398,\"completion_tokens\":32,\"total_tokens\":430},\"stats\":{},\"system_fingerprint\":\"legiona"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-66u77agbc511udm0npttdi\",\"object\":\"chat.completion\",\"created\":1766168830,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_status()]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":335,\"completion_tokens\":4,\"total_tokens\":339},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-8dmsx3herqfpdl4imvvx9\",\"object\":\"chat.completion\",\"created\":1766168831,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_diff(file=\\\"index.js\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":366,\"completion_tokens\":8,\"total_tokens\":374},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-yl54zgy56rccr60lk5366n\",\"object\":\"chat.completion\",\"created\":1766168831,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_log(count=5)]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":360,\"completion_tokens\":7,\"total_tokens\":367},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-zeumjuveqhglomtpysqo1h\",\"object\":\"chat.completion\",\"created\":1766168831,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_commit(message=\\\"Fix login bug\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":370,\"completion_tokens\":9,\"total_tokens\":379},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-00n0esagvpx1ao1kvoiodp9h\",\"object\":\"chat.completion\",\"created\":1766168831,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_branch_create(name=\\\"feature/user-auth\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":372,\"completion_tokens\":10,\"total_tokens\":382},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-do1dl2y7zos2s1xtj6uz6i\",\"object\":\"chat.completion\",\"created\":1766168831,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[npm_run(script=\\\"build\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":7,\"total_tokens\":374},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-a546qw0ldiflvgst96s7no\",\"object\":\"chat.completion\",\"created\":1766168831,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[npm_install(package=\\\"lodash\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":362,\"completion_tokens\":7,\"total_tokens\":369},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-9blf9gnedouuiag7b4klys\",\"object\":\"chat.completion\",\"created\":1766168831,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[http_request(url=\\\"https://api.example.com/users\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":420,\"completion_tokens\":12,\"total_tokens\":432},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-pdcqb7qerlj4j5tq729ir\",\"object\":\"chat.completion\",\"created\":1766168832,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[browser_navigate(url=\\\"https://github.com\\\", getContent=True)]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":14,\"total_tokens\":435},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-hsrtad0sk44p3g1g1tu1s9\",\"object\":\"chat.completion\",\"created\":1766168832,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[create_new_file(path=\\\"README.md\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":395,\"completion_tokens\":9,\"total_tokens\":404},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-s9gl1yhwv58rymdr63h47g\",\"object\":\"chat.completion\",\"created\":1766168832,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[folder_create(path=\\\"components\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":7,\"total_tokens\":375},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-cf9d8noygvrhejt0wtc5ld\",\"object\":\"chat.completion\",\"created\":1766168832,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[folder_delete(path=\\\"temp\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":7,\"total_tokens\":376},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-669r3ttgvdvhp3sb6m51vv\",\"object\":\"chat.completion\",\"created\":1766168832,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_add(file=\\\"index.js\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":376,\"completion_tokens\":8,\"total_tokens\":384},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-5rkw4imwn5i5u9z2dc63ag\",\"object\":\"chat.completion\",\"created\":1766168832,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_add(file=\\\"..\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":372,\"completion_tokens\":7,\"total_tokens\":379},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vqbfqffnjujxh42z7umfnj\",\"object\":\"chat.completion\",\"created\":1766168832,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_branch_list()]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":335,\"completion_tokens\":5,\"total_tokens\":340},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-j9hf6veklgc3mlqluduvz4\",\"object\":\"chat.completion\",\"created\":1766168832,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[npm_uninstall(package=\\\"axios\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":8,\"total_tokens\":376},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-yvt64vz6u0f97akl4mgjaj\",\"object\":\"chat.completion\",\"created\":1766168833,\"model\":\"legionarius/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[run_python(code=\\\"print('Hello World')\\\"]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":11,\"total_tokens\":380},\"stats\":{},\"system_fingerprint\":\"legionarius/watt-tool-8b\"}"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T18:27:04.006Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 40,
+      "details": "Only one tool call emitted when two were required"
+    },
+    "argumentValidationTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
+    "toolScore": 57,
+    "reasoningScore": 47,
+    "overallScore": 52,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found in response"
+      },
+      "multiStepPlanning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON array found in response"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 80,
+        "details": "Remembered endpoint, method may differ"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    }
+  },
+  "role": "executor",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "latencies": {
+      "2048": 674,
+      "4096": 709,
+      "8192": 717,
+      "16384": 661,
+      "32768": 842,
+      "65536": 875,
+      "131072": 2472
+    },
+    "maxUsableContext": 131072,
+    "recommendedContext": 131072,
+    "modelMaxContext": 131072,
+    "minLatency": 661,
+    "isInteractiveSpeed": true,
+    "speedRating": "good"
+  },
+  "contextLength": 131072
+}

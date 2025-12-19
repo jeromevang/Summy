@@ -1,0 +1,437 @@
+{
+  "modelId": "openai/gpt-oss-20b",
+  "displayName": "openai/gpt-oss-20b",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T17:39:37.562Z",
+  "testVersion": 2,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 2903,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 245,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 361,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 209,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 238,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 235,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 224,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 230,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 252,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 312,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 288,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 254,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 293.5,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 277,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 208,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 235,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 290,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 220,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 233,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 205,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 223,
+      "lastTested": "2025-12-19T17:39:37.562Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-fzzmp4x3yrm7v59f3e6ltp\",\"object\":\"chat.completion\",\"created\":1766165971,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call function file_read.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":160,\"completion_tokens\":11,\"total_tokens\":171},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-bodahct11ujui257mf2kz\",\"object\":\"chat.completion\",\"created\":1766165972,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We should use file_read.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":158,\"completion_tokens\":9,\"total_tokens\":167},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-fj75z5kbtxdmzcarkodjd\",\"object\":\"chat.completion\",\"created\":1766165972,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to use file_write.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":176,\"completion_tokens\":9,\"total_tokens\":185},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-c3jdk5g5oekmq6n12mqlye\",\"object\":\"chat.completion\",\"created\":1766165972,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to patch app.js. Use function file_patch.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":182,\"completion_tokens\":15,\"total_tokens\":197},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-8e131n2c1od6msf6q7i4pv\",\"object\":\"chat.completion\",\"created\":1766165972,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to call function.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":154,\"completion_tokens\":8,\"total_tokens\":162},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-cv6lpl94n5mhz1u0s642a4\",\"object\":\"chat.completion\",\"created\":1766165973,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call function.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":165,\"completion_tokens\":9,\"total_tokens\":174},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-lvcf8fa4qqgs3nmslzjxz\",\"object\":\"chat.completion\",\"created\":1766165973,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call git_status.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":140,\"completion_tokens\":10,\"total_tokens\":150},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-4zhhnpxkuak9vejtxii35f\",\"object\":\"chat.completion\",\"created\":1766165973,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call git_diff with file index.js.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":154,\"completion_tokens\":14,\"total_tokens\":168},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7g25alaylca9kj3gaqmsmc\",\"object\":\"chat.completion\",\"created\":1766165973,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to call git_log with count=5.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":148,\"completion_tokens\":13,\"total_tokens\":161},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-apb5nz622swusy4cfo2qso\",\"object\":\"chat.completion\",\"created\":1766165974,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call git_commit.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":152,\"completion_tokens\":10,\"total_tokens\":162},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-owo9iulb93ywijebiau9\",\"object\":\"chat.completion\",\"created\":1766165974,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call function git_branch_create.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":154,\"completion_tokens\":12,\"total_tokens\":166},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-f6da9qag3gjpvgz6pyxjl7\",\"object\":\"chat.completion\",\"created\":1766165974,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call function.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":149,\"completion_tokens\":9,\"total_tokens\":158},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-9fivtephs8h0mc9ue6ra3ui\",\"object\":\"chat.completion\",\"created\":1766165974,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to call npm_install with package \\\"lodash\\\".\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":144,\"completion_tokens\":13,\"total_tokens\":157},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-xuzrdpe1y79nwdvehhyf\",\"object\":\"chat.completion\",\"created\":1766165975,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to call http_request.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":171,\"completion_tokens\":9,\"total_tokens\":180},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ezjon7x10xieoq9wx3wl2i\",\"object\":\"chat.completion\",\"created\":1766165975,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to browse.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":174,\"completion_tokens\":7,\"total_tokens\":181},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-8zqz2xa7fjt9tswz88gyfv\",\"object\":\"chat.completion\",\"created\":1766165975,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call function.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":162,\"completion_tokens\":9,\"total_tokens\":171},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-tfzicgkvoex1ep39f4tr8\",\"object\":\"chat.completion\",\"created\":1766165975,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to call folder_create.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":150,\"completion_tokens\":9,\"total_tokens\":159},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-xx97wiczzhtiqz9cz8spea\",\"object\":\"chat.completion\",\"created\":1766165976,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call function.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":151,\"completion_tokens\":9,\"total_tokens\":160},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-46cl9440ivemn2klbmyxzm\",\"object\":\"chat.completion\",\"created\":1766165976,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call git_add with file \\\"index.js\\\".\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":156,\"completion_tokens\":15,\"total_tokens\":171},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-j4ypztahv2qdokuvgfp9ed\",\"object\":\"chat.completion\",\"created\":1766165976,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to call git_add with file=\\\".\\\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":152,\"completion_tokens\":13,\"total_tokens\":165},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-tawv8obmdrlnvqepk2uyo\",\"object\":\"chat.completion\",\"created\":1766165976,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to call function.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":140,\"completion_tokens\":8,\"total_tokens\":148},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-fy09ot5n3lcb0txdzk65jq\",\"object\":\"chat.completion\",\"created\":1766165977,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"Need to call function.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":150,\"completion_tokens\":8,\"total_tokens\":158},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-inq7fhvc9lkby1a4a10god\",\"object\":\"chat.completion\",\"created\":1766165977,\"model\":\"openai/gpt-oss-20b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"We need to run python.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":151,\"completion_tokens\":9,\"total_tokens\":160},\"stats\":{},\"system_fingerprint\":\"openai/gpt-oss-20b\"}"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T17:39:26.318Z",
+    "emitTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "schemaTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 85,
+      "details": "No tool called, but response was: \"\""
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "argumentValidationTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "schemaReorderTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted with reordered schema"
+    },
+    "toolScore": 13,
+    "reasoningScore": 23,
+    "overallScore": 18,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found in response"
+      },
+      "multiStepPlanning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON array found in response"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "contextContinuity": {
+        "passed": false,
+        "score": 20,
+        "details": "No context retention"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 30,
+        "details": "Failed to identify logical conflict"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "edgeCaseHandling": {
+        "passed": false,
+        "score": 30,
+        "details": "Did not address the edge case"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "latencies": {
+      "2048": 375,
+      "4096": 388,
+      "8192": 354,
+      "16384": 367,
+      "32768": 377,
+      "65536": 422,
+      "131072": 1041
+    },
+    "maxUsableContext": 131072,
+    "recommendedContext": 131072,
+    "modelMaxContext": 131072,
+    "minLatency": 354,
+    "isInteractiveSpeed": true,
+    "speedRating": "excellent"
+  },
+  "contextLength": 131072
+}

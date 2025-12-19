@@ -2,9 +2,9 @@
   "modelId": "qwen2.5-coder-1.5b-instruct",
   "displayName": "qwen2.5-coder-1.5b-instruct",
   "provider": "lmstudio",
-  "testedAt": "2025-12-18T22:36:17.147Z",
-  "testVersion": 2,
-  "score": 76,
+  "testedAt": "2025-12-19T17:58:21.617Z",
+  "testVersion": 3,
+  "score": 81,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -12,172 +12,168 @@
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 1104.5,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 1150,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "file_write": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 220,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 827,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "file_patch": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 243,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 954,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "file_list": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 197,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 515,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "file_search": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 218,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 685,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "create_new_file": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 553,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "folder_create": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 454,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "folder_delete": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 509,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "git_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 171,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 346,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 226,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 545,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 200,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 487,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 212,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 568,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "git_add": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 495.5,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 206,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 516,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "git_branch_list": {
       "supported": false,
-      "score": 0,
+      "score": 45,
       "testsPassed": 0,
-      "testsFailed": 0
-    },
-    "git_checkout": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
-    },
-    "git_merge": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
-    },
-    "git_rm": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "testsFailed": 1,
+      "avgLatency": 364,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "npm_run": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 136,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 109,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "npm_install": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 112,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 107,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "npm_uninstall": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 529,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 185,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 586,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "browser_navigate": {
       "supported": false,
       "score": 20,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 149,
-      "lastTested": "2025-12-18T22:36:17.147Z"
+      "avgLatency": 321,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "run_python": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 602,
+      "lastTested": "2025-12-19T17:58:21.617Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -192,102 +188,263 @@
     "file_patch",
     "file_list",
     "file_search",
+    "create_new_file",
+    "folder_create",
+    "folder_delete",
     "git_diff",
     "git_log",
     "git_commit",
+    "git_add",
     "git_branch_create",
-    "http_request"
+    "npm_uninstall",
+    "http_request",
+    "run_python"
   ],
   "testResults": [
     {
       "testId": "file_read_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-g00pbnnf1b7qvwscmftam9\",\"object\":\"chat.completion\",\"created\":1766097374,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"524905543\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":375,\"completion_tokens\":32,\"total_tokens\":407},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+      "response": "{\"id\":\"chatcmpl-ypuwf6c2jxq24vhvycz5sg\",\"object\":\"chat.completion\",\"created\":1766167089,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"792911924\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":375,\"completion_tokens\":31,\"total_tokens\":406},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
     },
     {
       "testId": "file_read_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-77f0sedh27h40d6w5247ti\",\"object\":\"chat.completion\",\"created\":1766097374,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"873233647\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":374,\"completion_tokens\":34,\"total_tokens\":408},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-ins"
+      "response": "{\"id\":\"chatcmpl-g4nu44cwoy595bspyd7z\",\"object\":\"chat.completion\",\"created\":1766167090,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"724934948\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":374,\"completion_tokens\":33,\"total_tokens\":407},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instr"
     },
     {
       "testId": "file_write_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-s9scxv0gqehqsq63q2jfej\",\"object\":\"chat.completion\",\"created\":1766097374,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"144039134\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":410,\"completion_tokens\":42,\"total_tokens\":452},\"stats\":{},\"syste"
+      "response": "{\"id\":\"chatcmpl-q0czjfl81m5sw0d4i6966\",\"object\":\"chat.completion\",\"created\":1766167091,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"479873537\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":410,\"completion_tokens\":41,\"total_tokens\":451},\"stats\":{},\"system"
     },
     {
       "testId": "file_patch_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-nb1tokrysbgsa9vbco5x5p\",\"object\":\"chat.completion\",\"created\":1766097374,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"727159677\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":439,\"completion_tokens\":49,\"total_tokens\":488},\"stats\":{},\"system_fingerprin"
+      "response": "{\"id\":\"chatcmpl-np35d8vtu1rdpwnqehyy\",\"object\":\"chat.completion\",\"created\":1766167091,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"663865758\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":439,\"completion_tokens\":48,\"total_tokens\":487},\"stats\":{},\"system_fingerprint\""
     },
     {
       "testId": "file_list_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ez65qhbgf5v1hmey27twruj\",\"object\":\"chat.completion\",\"created\":1766097375,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"504736979\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":363,\"completion_tokens\":31,\"total_tokens\":394},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+      "response": "{\"id\":\"chatcmpl-tjdwbief5z0af0bbkpzhda\",\"object\":\"chat.completion\",\"created\":1766167092,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"490549239\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":363,\"completion_tokens\":30,\"total_tokens\":393},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
     },
     {
       "testId": "file_search_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-c5dqrqub475dwdf9jo9gfv\",\"object\":\"chat.completion\",\"created\":1766097375,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"118620452\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\"/path/to/project\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":395,\"completion_tokens\":38,\"total_tokens\":433},\"stats\":{},\"system_fingerprint\":\"qwen2"
+      "response": "{\"id\":\"chatcmpl-xh05hos9nxohjco29uy2w\",\"object\":\"chat.completion\",\"created\":1766167093,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"698838913\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\"/path/to/project\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":395,\"completion_tokens\":37,\"total_tokens\":432},\"stats\":{},\"system_fingerprint\":\"qwen2."
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-nqrt7gjxoq22m5lf37cx7h\",\"object\":\"chat.completion\",\"created\":1766097375,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"370492616\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":332,\"completion_tokens\":24,\"total_tokens\":356},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+      "response": "{\"id\":\"chatcmpl-5046vfghf5gnzq7yp8b61f\",\"object\":\"chat.completion\",\"created\":1766167094,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"768800365\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":332,\"completion_tokens\":23,\"total_tokens\":355},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-syhc4xquvwn5yig7ulole\",\"object\":\"chat.completion\",\"created\":1766097375,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"755069236\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":363,\"completion_tokens\":32,\"total_tokens\":395},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+      "response": "{\"id\":\"chatcmpl-3fbb9fnhp9a6vbbtor3bu6\",\"object\":\"chat.completion\",\"created\":1766167094,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"527684376\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":363,\"completion_tokens\":31,\"total_tokens\":394},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2i6lmvlgupo2a3jco76w98\",\"object\":\"chat.completion\",\"created\":1766097375,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"396993315\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":357,\"completion_tokens\":31,\"total_tokens\":388},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+      "response": "{\"id\":\"chatcmpl-kys3gf8uvankv1u4koxdc\",\"object\":\"chat.completion\",\"created\":1766167094,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"110536791\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":357,\"completion_tokens\":30,\"total_tokens\":387},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2sgzj46560xsxxyy2zplq\",\"object\":\"chat.completion\",\"created\":1766097376,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"769211511\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":33,\"total_tokens\":400},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruc"
+      "response": "{\"id\":\"chatcmpl-ntdoi8plbvaxx071rkvkdk\",\"object\":\"chat.completion\",\"created\":1766167095,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"271315415\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":32,\"total_tokens\":399},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instru"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2wyghzcvxf8av2809bdpua\",\"object\":\"chat.completion\",\"created\":1766097376,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"304465907\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":33,\"total_tokens\":402},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5"
+      "response": "{\"id\":\"chatcmpl-odwjjitqxjspj8133bijks\",\"object\":\"chat.completion\",\"created\":1766167095,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"817553013\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":32,\"total_tokens\":401},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5"
     },
     {
       "testId": "npm_run_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-d23ke37vakeghma4i0ymb\",\"object\":\"chat.completion\",\"created\":1766097376,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```json\\n{\\n  \\\"name\\\": \\\"npm_run\\\",\\n  \\\"arguments\\\": {\\n    \\\"script\\\": \\\"build\\\"\\n  }\\n}\\n```\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":364,\"completion_tokens\":29,\"total_tokens\":393},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+      "response": "{\"id\":\"chatcmpl-05xskp9a7ajyqpo8xyjmtq\",\"object\":\"chat.completion\",\"created\":1766167096,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```json\\n{\\n  \\\"name\\\": \\\"npm_run\\\",\\n  \\\"arguments\\\": {\\n    \\\"script\\\": \\\"build\\\"\\n  }\\n}\\n```\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":364,\"completion_tokens\":28,\"total_tokens\":392},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
     },
     {
       "testId": "npm_install_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-tegmkt0p5d98ej353l5vcv\",\"object\":\"chat.completion\",\"created\":1766097376,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```json\\n{\\n  \\\"name\\\": \\\"npm_install\\\",\\n  \\\"arguments\\\": {\\n    \\\"package\\\": \\\"lodash\\\"\\n  }\\n}\\n```\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":359,\"completion_tokens\":29,\"total_tokens\":388},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+      "response": "{\"id\":\"chatcmpl-0ev2bejhm8ktff91jmvig6f\",\"object\":\"chat.completion\",\"created\":1766167096,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```json\\n{\\n  \\\"name\\\": \\\"npm_install\\\",\\n  \\\"arguments\\\": {\\n    \\\"package\\\": \\\"lodash\\\"\\n  }\\n}\\n```\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":359,\"completion_tokens\":28,\"total_tokens\":387},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
     },
     {
       "testId": "http_request_get",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-iy80b3nrf7jxmxi468mf5\",\"object\":\"chat.completion\",\"created\":1766097376,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"145246977\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":417,\"completion_tokens\":35,\"total_tokens\":452},\"stats\":{},\"system_fingerprint\":\"qwen2.5-code"
+      "response": "{\"id\":\"chatcmpl-jm1mg5z5hx8k6coawpuioe\",\"object\":\"chat.completion\",\"created\":1766167096,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"879675551\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":417,\"completion_tokens\":34,\"total_tokens\":451},\"stats\":{},\"system_fingerprint\":\"qwen2.5-cod"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": false,
       "score": 20,
-      "response": "{\"id\":\"chatcmpl-03o3jhhepto4pehk9zaof2k\",\"object\":\"chat.completion\",\"created\":1766097376,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"686227579\",\"function\":{\"name\":\"open_browser\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":418,\"completion_tokens\":24,\"total_tokens\":442},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+      "response": "{\"id\":\"chatcmpl-s1ebzdyzuvwzoh1wpliwp\",\"object\":\"chat.completion\",\"created\":1766167097,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"235221211\",\"function\":{\"name\":\"open_browser\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":418,\"completion_tokens\":23,\"total_tokens\":441},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-8x3wypeen1deor5l0lh86a\",\"object\":\"chat.completion\",\"created\":1766167097,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"292674916\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":392,\"completion_tokens\":31,\"total_tokens\":423},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-xffnmur4htag1bq84qxknm\",\"object\":\"chat.completion\",\"created\":1766167098,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"528063811\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":365,\"completion_tokens\":29,\"total_tokens\":394},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\""
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-w86i1zzzxlm6rgnm0fb5tg\",\"object\":\"chat.completion\",\"created\":1766167098,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"650800127\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":366,\"completion_tokens\":29,\"total_tokens\":395},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-2d76oox34ypxa149s56yp\",\"object\":\"chat.completion\",\"created\":1766167099,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"287365258\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":373,\"completion_tokens\":31,\"total_tokens\":404},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-za112beou88ui83q3sskgh\",\"object\":\"chat.completion\",\"created\":1766167099,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"670774990\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":29,\"total_tokens\":398},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-yaukirr6r1hv5qkl3cuqfh\",\"object\":\"chat.completion\",\"created\":1766167100,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"863199182\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":332,\"completion_tokens\":24,\"total_tokens\":356},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ywkxz8dcn0hpau6pob70ta\",\"object\":\"chat.completion\",\"created\":1766167100,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"544470165\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":365,\"completion_tokens\":30,\"total_tokens\":395},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-instruct\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-hcs403p37khzxssdnte7gq\",\"object\":\"chat.completion\",\"created\":1766167101,\"model\":\"qwen2.5-coder-1.5b-instruct\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"488118532\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":366,\"completion_tokens\":33,\"total_tokens\":399},\"stats\":{},\"system_fingerprint\":\"qwen2.5-coder-1.5b-in"
     }
-  ]
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T17:58:07.933Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct tool selected with correct file path"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct: chose search_web for real-time data with appropriate query"
+    },
+    "multiToolEmitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: emitted 2 read_file calls with correct paths"
+    },
+    "argumentValidationTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: all types and nested structures correct"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
+    "toolScore": 100,
+    "reasoningScore": 65,
+    "overallScore": 83,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 30,
+        "details": "Response contains invalid JSON"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 70,
+        "details": "2 steps planned"
+      },
+      "conditionalReasoning": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly chose read based on condition"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 30,
+        "details": "Failed to identify logical conflict"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 100,
+        "details": "Properly handles edge case with fallback"
+      }
+    }
+  },
+  "role": "executor",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "latencies": {
+      "2048": 623,
+      "4096": 611,
+      "8192": 539,
+      "16384": 539,
+      "32768": 543
+    },
+    "maxUsableContext": 32768,
+    "recommendedContext": 32768,
+    "modelMaxContext": 32768,
+    "minLatency": 539,
+    "isInteractiveSpeed": true,
+    "speedRating": "good"
+  },
+  "contextLength": 32768
 }
