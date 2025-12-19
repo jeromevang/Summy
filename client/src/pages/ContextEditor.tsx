@@ -147,6 +147,285 @@ const CodeBlock = ({ language, children }: { language: string; children: string 
   );
 };
 
+// ============================================================
+// TOOL CALL CARD COMPONENT
+// ============================================================
+
+interface ToolCallInfo {
+  id: string;
+  name: string;
+  arguments: Record<string, any>;
+}
+
+interface ToolResultInfo {
+  tool_call_id: string;
+  content: string;
+  name?: string;
+}
+
+// Parse tool calls from assistant message
+const parseToolCalls = (msg: any): ToolCallInfo[] => {
+  if (!msg.tool_calls || !Array.isArray(msg.tool_calls)) return [];
+  
+  return msg.tool_calls.map((tc: any) => ({
+    id: tc.id || 'unknown',
+    name: tc.function?.name || tc.name || 'unknown_tool',
+    arguments: typeof tc.function?.arguments === 'string' 
+      ? (() => { try { return JSON.parse(tc.function.arguments); } catch { return { raw: tc.function.arguments }; } })()
+      : tc.function?.arguments || tc.arguments || {}
+  }));
+};
+
+// Tool Call Card - Shows tool execution with args and results
+const ToolCallCard = ({ 
+  toolCall, 
+  result,
+  isExpanded: defaultExpanded = false 
+}: { 
+  toolCall: ToolCallInfo; 
+  result?: ToolResultInfo;
+  isExpanded?: boolean;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [copiedArgs, setCopiedArgs] = useState(false);
+  const [copiedResult, setCopiedResult] = useState(false);
+  
+  // Determine status based on result
+  const hasResult = !!result;
+  const isError = result?.content?.toLowerCase().includes('error') || 
+                  result?.content?.toLowerCase().includes('failed') ||
+                  result?.content?.toLowerCase().includes('exception');
+  const status = !hasResult ? 'pending' : isError ? 'failed' : 'success';
+  
+  const statusColors = {
+    success: { border: 'border-green-500/40', bg: 'bg-green-500/5', icon: '✅', text: 'text-green-400' },
+    failed: { border: 'border-red-500/40', bg: 'bg-red-500/5', icon: '❌', text: 'text-red-400' },
+    pending: { border: 'border-yellow-500/40', bg: 'bg-yellow-500/5', icon: '⏳', text: 'text-yellow-400' }
+  };
+  
+  const colors = statusColors[status];
+  
+  // Format arguments for display
+  const formatArgs = (args: Record<string, any>): string => {
+    try {
+      return JSON.stringify(args, null, 2);
+    } catch {
+      return String(args);
+    }
+  };
+  
+  // Truncate long content
+  const truncateContent = (content: string, maxLength: number = 500): string => {
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength) + '\n... (truncated)';
+  };
+  
+  // Get a preview of the arguments
+  const getArgsPreview = (): string => {
+    const entries = Object.entries(toolCall.arguments);
+    if (entries.length === 0) return 'No arguments';
+    
+    return entries
+      .slice(0, 2)
+      .map(([key, value]) => {
+        const strValue = typeof value === 'string' ? value : JSON.stringify(value);
+        const truncated = strValue.length > 40 ? strValue.slice(0, 40) + '...' : strValue;
+        return `${key}: ${truncated}`;
+      })
+      .join(', ') + (entries.length > 2 ? `, +${entries.length - 2} more` : '');
+  };
+  
+  return (
+    <div className={`mb-3 rounded-lg border ${colors.border} ${colors.bg} overflow-hidden`}>
+      {/* Header */}
+      <div 
+        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/5"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-lg">{colors.icon}</span>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-white">🔧 {toolCall.name}</span>
+              <span className={`text-xs px-1.5 py-0.5 rounded ${colors.bg} ${colors.text} border ${colors.border}`}>
+                {status.toUpperCase()}
+              </span>
+            </div>
+            {!isExpanded && (
+              <p className="text-xs text-gray-500 mt-0.5 truncate max-w-md">
+                {getArgsPreview()}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">
+            {isExpanded ? '▼' : '▶'}
+          </span>
+        </div>
+      </div>
+      
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="border-t border-[#2d2d2d]">
+          {/* Arguments Section */}
+          <div className="px-4 py-3 border-b border-[#2d2d2d]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-blue-400">📥 Arguments</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(formatArgs(toolCall.arguments));
+                  setCopiedArgs(true);
+                  setTimeout(() => setCopiedArgs(false), 2000);
+                }}
+                className="text-xs text-gray-400 hover:text-white px-2 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
+              >
+                {copiedArgs ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
+            <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-3 rounded-lg overflow-x-auto font-mono max-h-48 overflow-y-auto">
+              {formatArgs(toolCall.arguments)}
+            </pre>
+          </div>
+          
+          {/* Result Section */}
+          {result && (
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-xs font-medium ${isError ? 'text-red-400' : 'text-green-400'}`}>
+                  {isError ? '⚠️ Error' : '📤 Result'}
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(result.content);
+                    setCopiedResult(true);
+                    setTimeout(() => setCopiedResult(false), 2000);
+                  }}
+                  className="text-xs text-gray-400 hover:text-white px-2 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
+                >
+                  {copiedResult ? '✓ Copied' : 'Copy'}
+                </button>
+              </div>
+              <pre className={`text-xs bg-[#0d0d0d] p-3 rounded-lg overflow-x-auto font-mono max-h-64 overflow-y-auto whitespace-pre-wrap ${isError ? 'text-red-300' : 'text-gray-300'}`}>
+                {truncateContent(result.content, 2000)}
+              </pre>
+              
+              {/* Error hints for failed tool calls */}
+              {isError && (
+                <div className="mt-3 p-2 rounded bg-red-500/10 border border-red-500/20">
+                  <p className="text-xs text-red-400 font-medium mb-1">💡 Possible causes:</p>
+                  <ul className="text-xs text-red-300/80 list-disc list-inside space-y-0.5">
+                    {result.content.toLowerCase().includes('enoent') && (
+                      <li>File or directory does not exist</li>
+                    )}
+                    {result.content.toLowerCase().includes('permission') && (
+                      <li>Insufficient permissions to access the resource</li>
+                    )}
+                    {result.content.toLowerCase().includes('timeout') && (
+                      <li>Operation timed out - MCP server may be slow or unresponsive</li>
+                    )}
+                    {result.content.toLowerCase().includes('connection') && (
+                      <li>MCP server connection issue - check if server is running</li>
+                    )}
+                    {!result.content.toLowerCase().includes('enoent') && 
+                     !result.content.toLowerCase().includes('permission') &&
+                     !result.content.toLowerCase().includes('timeout') &&
+                     !result.content.toLowerCase().includes('connection') && (
+                      <li>Check tool arguments and MCP server logs for details</li>
+                    )}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* No result yet */}
+          {!result && (
+            <div className="px-4 py-3 text-xs text-gray-500 italic">
+              Awaiting tool result...
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================
+// SYSTEM PROMPT CARD COMPONENT  
+// ============================================================
+
+const SystemPromptCard = ({ 
+  content, 
+  source,
+  isExpanded: defaultExpanded = false 
+}: { 
+  content: string;
+  source?: string;
+  isExpanded?: boolean;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [copied, setCopied] = useState(false);
+  
+  const truncatedContent = content.length > 150 
+    ? content.substring(0, 150) + '...' 
+    : content;
+  
+  return (
+    <div className="mb-4 rounded-lg border border-yellow-500/30 bg-yellow-500/5 overflow-hidden">
+      {/* Header */}
+      <div 
+        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/5"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-sm">⚙️</span>
+          <div>
+            <span className="text-xs font-medium text-yellow-400">System Prompt</span>
+            {source && (
+              <span className="text-xs text-gray-500 ml-2">({source})</span>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(content);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            className="text-xs text-gray-400 hover:text-white px-2 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
+          >
+            {copied ? '✓ Copied' : 'Copy'}
+          </button>
+          <span className="text-xs text-gray-500">
+            {isExpanded ? '▼' : '▶'}
+          </span>
+        </div>
+      </div>
+      
+      {/* Content */}
+      <div className="px-4 pb-3">
+        {isExpanded ? (
+          <pre className="text-xs text-gray-300 whitespace-pre-wrap bg-[#0d0d0d] p-3 rounded-lg border border-[#2d2d2d] max-h-96 overflow-y-auto font-mono">
+            {content}
+          </pre>
+        ) : (
+          <p className="text-xs text-gray-500 truncate">
+            {truncatedContent}
+          </p>
+        )}
+        <p className="text-xs text-gray-600 mt-2">
+          {content.length.toLocaleString()} characters
+        </p>
+      </div>
+    </div>
+  );
+};
+
 // Message component for both panels
 const Message = ({ 
   role, 
@@ -599,36 +878,127 @@ Rules:
   const getAllMessages = (): any[] => {
     if (!session) return [];
     const messages: any[] = [];
+    let seenSystemPrompts = new Set<string>();
     
     for (const turn of session.conversations) {
-      // Add user message
-      const userMsg = getUserMessage(turn);
-      if (userMsg) {
-        messages.push({ role: 'user', content: userMsg });
-      }
-      
-      // Add assistant message (check for tool calls)
+      // Extract system message (usually first in request messages)
       if (turn.request?.messages) {
-        const assistantWithTools = turn.request.messages.find(m => m.role === 'assistant' && m.tool_calls);
-        if (assistantWithTools) {
-          messages.push(assistantWithTools);
+        const systemMsg = turn.request.messages.find(m => m.role === 'system');
+        if (systemMsg && systemMsg.content) {
+          // Create a hash to avoid duplicates (system prompts often repeat)
+          const promptHash = systemMsg.content.substring(0, 200);
+          if (!seenSystemPrompts.has(promptHash)) {
+            seenSystemPrompts.add(promptHash);
+            messages.push({ 
+              role: 'system', 
+              content: systemMsg.content,
+              _meta: { turnId: turn.id, timestamp: turn.timestamp }
+            });
+          }
         }
       }
       
-      // Add tool responses
+      // Add user message
+      const userMsg = getUserMessage(turn);
+      if (userMsg) {
+        messages.push({ 
+          role: 'user', 
+          content: userMsg,
+          _meta: { turnId: turn.id, timestamp: turn.timestamp }
+        });
+      }
+      
+      // Add assistant message with tool calls (keep full structure for ToolCallCard)
+      if (turn.request?.messages) {
+        const assistantWithTools = turn.request.messages.find(m => m.role === 'assistant' && m.tool_calls);
+        if (assistantWithTools) {
+          messages.push({
+            ...assistantWithTools,
+            _meta: { turnId: turn.id, timestamp: turn.timestamp, hasToolCalls: true }
+          });
+        }
+      }
+      
+      // Add tool responses (keep full structure for matching with tool calls)
       if (turn.request?.messages) {
         const toolMessages = turn.request.messages.filter(m => m.role === 'tool');
-        messages.push(...toolMessages);
+        for (const toolMsg of toolMessages) {
+          messages.push({
+            ...toolMsg,
+            _meta: { turnId: turn.id, timestamp: turn.timestamp }
+          });
+        }
       }
       
       // Add assistant response
       const assistantMsg = getAssistantMessage(turn);
       if (assistantMsg) {
-        messages.push({ role: 'assistant', content: assistantMsg });
+        messages.push({ 
+          role: 'assistant', 
+          content: assistantMsg,
+          _meta: { turnId: turn.id, timestamp: turn.timestamp }
+        });
       }
     }
     
     return messages;
+  };
+  
+  // Group tool calls with their results for display
+  const groupToolCallsWithResults = (messages: any[]): any[] => {
+    const grouped: any[] = [];
+    let i = 0;
+    
+    while (i < messages.length) {
+      const msg = messages[i];
+      
+      // If this is an assistant message with tool_calls, group with following tool results
+      if (msg.role === 'assistant' && msg.tool_calls && Array.isArray(msg.tool_calls)) {
+        const toolCalls = parseToolCalls(msg);
+        const toolResults: Map<string, ToolResultInfo> = new Map();
+        
+        // Look ahead for tool results
+        let j = i + 1;
+        while (j < messages.length && messages[j].role === 'tool') {
+          const toolResult = messages[j];
+          if (toolResult.tool_call_id) {
+            toolResults.set(toolResult.tool_call_id, {
+              tool_call_id: toolResult.tool_call_id,
+              content: toolResult.content || '',
+              name: toolResult.name
+            });
+          }
+          j++;
+        }
+        
+        // Create grouped tool call entry
+        grouped.push({
+          role: 'tool_group',
+          toolCalls,
+          toolResults,
+          _meta: msg._meta
+        });
+        
+        i = j; // Skip past the tool results we just processed
+      } else if (msg.role === 'tool') {
+        // Orphan tool result (no preceding assistant with tool_calls)
+        // This can happen, so we'll show it as a standalone
+        grouped.push({
+          role: 'tool_result_orphan',
+          content: msg.content,
+          tool_call_id: msg.tool_call_id,
+          name: msg.name,
+          _meta: msg._meta
+        });
+        i++;
+      } else {
+        // Regular message
+        grouped.push(msg);
+        i++;
+      }
+    }
+    
+    return grouped;
   };
 
   // Get messages for the selected compression mode
@@ -663,8 +1033,10 @@ Rules:
   }
 
   const allMessages = getAllMessages();
+  const groupedMessages = groupToolCallsWithResults(allMessages);
 
   const selectedMessages = getSelectedMessages();
+  const groupedSelectedMessages = groupToolCallsWithResults(selectedMessages);
 
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white">
@@ -792,7 +1164,9 @@ Rules:
           <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d]">
             <span className="text-sm font-medium text-gray-300">📝 Original</span>
             <span className="text-xs text-gray-500 ml-2">
-              {allMessages.filter(m => showSystemMessages || m.role !== 'system').length} messages • ~{Math.round(JSON.stringify(allMessages).length / 4).toLocaleString()} tokens
+              {groupedMessages.filter(m => showSystemMessages || m.role !== 'system').length} items 
+              {' '}({groupedMessages.filter(m => m.role === 'tool_group').reduce((acc, m) => acc + m.toolCalls.length, 0)} tool calls)
+              {' '}• ~{Math.round(JSON.stringify(allMessages).length / 4).toLocaleString()} tokens
             </span>
           </div>
           <div 
@@ -800,45 +1174,64 @@ Rules:
             className="flex-1 overflow-y-auto p-4"
             onScroll={() => handleScroll('left')}
           >
-            {/* System Prompt Info Box */}
-            {showSystemMessages && allMessages.find(m => m.role === 'system') && (
-              <div className="mb-4 p-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">⚙️</span>
-                    <span className="text-xs font-medium text-yellow-400">Active System Prompt</span>
-                  </div>
-                  <button
-                    onClick={() => setSystemPromptExpanded(!systemPromptExpanded)}
-                    className="text-xs text-gray-400 hover:text-white px-2 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
-                  >
-                    {systemPromptExpanded ? '▼ Collapse' : '▶ Expand'}
-                  </button>
-                </div>
-                {systemPromptExpanded ? (
-                  <div className="text-xs text-gray-300 whitespace-pre-wrap bg-[#0d0d0d] p-3 rounded-lg border border-[#2d2d2d] max-h-60 overflow-y-auto font-mono">
-                    {allMessages.find(m => m.role === 'system')?.content || 'No system prompt'}
-                  </div>
-                ) : (
-                  <div className="text-xs text-gray-500 truncate">
-                    {(allMessages.find(m => m.role === 'system')?.content || '').substring(0, 100)}...
-                  </div>
-                )}
-              </div>
-            )}
-            
-            {allMessages
-              .filter(m => showSystemMessages || m.role !== 'system')
-              .map((msg, idx) => (
-              <Message
-                key={idx}
-                role={msg.role}
-                content={msg.content || JSON.stringify(msg.tool_calls || msg, null, 2)}
-                isTool={msg.role === 'tool' || !!msg.tool_calls}
-                keywords={compressionMode > 0 ? keywords : []}
-                keywordMap={keywordMap}
-              />
-            ))}
+            {groupedMessages
+              .filter(m => showSystemMessages || (m.role !== 'system'))
+              .map((msg, idx) => {
+                // System Prompt - use new SystemPromptCard
+                if (msg.role === 'system') {
+                  return (
+                    <SystemPromptCard
+                      key={`system-${idx}`}
+                      content={msg.content}
+                      source="Conversation"
+                    />
+                  );
+                }
+                
+                // Tool Group - show tool calls with results using ToolCallCard
+                if (msg.role === 'tool_group') {
+                  return (
+                    <div key={`toolgroup-${idx}`} className="mb-2">
+                      {msg.toolCalls.map((tc: ToolCallInfo, tcIdx: number) => (
+                        <ToolCallCard
+                          key={`tc-${idx}-${tcIdx}`}
+                          toolCall={tc}
+                          result={msg.toolResults.get(tc.id)}
+                        />
+                      ))}
+                    </div>
+                  );
+                }
+                
+                // Orphan tool result
+                if (msg.role === 'tool_result_orphan') {
+                  return (
+                    <div key={`orphan-${idx}`} className="mb-2 p-3 rounded-lg border border-orange-500/30 bg-orange-500/5">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm">🔧</span>
+                        <span className="text-xs font-medium text-orange-400">
+                          Tool Result {msg.name ? `(${msg.name})` : ''}
+                        </span>
+                      </div>
+                      <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-2 rounded overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto">
+                        {msg.content}
+                      </pre>
+                    </div>
+                  );
+                }
+                
+                // Regular message
+                return (
+                  <Message
+                    key={idx}
+                    role={msg.role}
+                    content={msg.content || ''}
+                    isTool={false}
+                    keywords={compressionMode > 0 ? keywords : []}
+                    keywordMap={keywordMap}
+                  />
+                );
+              })}
           </div>
         </div>
 
@@ -890,52 +1283,70 @@ Rules:
               </div>
             ) : (
               <>
-                {/* System Prompt Info Box */}
-                {showSystemMessages && selectedMessages.find((m: any) => m.role === 'system') && (
-                  <div className="mb-4 p-3 rounded-lg border border-yellow-500/30 bg-yellow-500/5">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">⚙️</span>
-                        <span className="text-xs font-medium text-yellow-400">Active System Prompt</span>
-                      </div>
-                      <button
-                        onClick={() => setSystemPromptExpanded(!systemPromptExpanded)}
-                        className="text-xs text-gray-400 hover:text-white px-2 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
-                      >
-                        {systemPromptExpanded ? '▼ Collapse' : '▶ Expand'}
-                      </button>
-                    </div>
-                    {systemPromptExpanded ? (
-                      <div className="text-xs text-gray-300 whitespace-pre-wrap bg-[#0d0d0d] p-3 rounded-lg border border-[#2d2d2d] max-h-60 overflow-y-auto font-mono">
-                        {selectedMessages.find((m: any) => m.role === 'system')?.content || 'No system prompt'}
-                      </div>
-                    ) : (
-                      <div className="text-xs text-gray-500 truncate">
-                        {(selectedMessages.find((m: any) => m.role === 'system')?.content || '').substring(0, 100)}...
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {selectedMessages
-                  .filter((msg: any) => showSystemMessages || msg.role !== 'system')
+                {groupedSelectedMessages
+                  .filter((m: any) => showSystemMessages || m.role !== 'system')
                   .map((msg: any, idx: number) => {
-                  const isSummary = msg.content?.includes('[SUMMARY]') || msg.content?.includes('[CONVERSATION SUMMARY]');
-                  const isPreserved = msg.role === 'tool' || msg.tool_calls;
-                  
-                  return (
-                    <Message
-                      key={idx}
-                      role={msg.role || 'system'}
-                      content={msg.content || JSON.stringify(msg, null, 2)}
-                      isCompressed={isSummary}
-                      isPreserved={isPreserved && compressionMode > 0}
-                      isTool={msg.role === 'tool' || !!msg.tool_calls}
-                      keywords={compressionMode > 0 ? keywords : []}
-                      keywordMap={keywordMap}
-                    />
-                  );
-                })}
+                    // System Prompt - use new SystemPromptCard
+                    if (msg.role === 'system') {
+                      return (
+                        <SystemPromptCard
+                          key={`system-${idx}`}
+                          content={msg.content}
+                          source={compressionMode > 0 ? 'Compressed' : 'Conversation'}
+                        />
+                      );
+                    }
+                    
+                    // Tool Group - show tool calls with results using ToolCallCard
+                    if (msg.role === 'tool_group') {
+                      return (
+                        <div key={`toolgroup-${idx}`} className="mb-2">
+                          {msg.toolCalls.map((tc: ToolCallInfo, tcIdx: number) => (
+                            <ToolCallCard
+                              key={`tc-${idx}-${tcIdx}`}
+                              toolCall={tc}
+                              result={msg.toolResults.get(tc.id)}
+                            />
+                          ))}
+                        </div>
+                      );
+                    }
+                    
+                    // Orphan tool result
+                    if (msg.role === 'tool_result_orphan') {
+                      return (
+                        <div key={`orphan-${idx}`} className="mb-2 p-3 rounded-lg border border-orange-500/30 bg-orange-500/5">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm">🔧</span>
+                            <span className="text-xs font-medium text-orange-400">
+                              Tool Result {msg.name ? `(${msg.name})` : ''}
+                            </span>
+                            {compressionMode > 0 && (
+                              <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-400">PRESERVED</span>
+                            )}
+                          </div>
+                          <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-2 rounded overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto">
+                            {msg.content}
+                          </pre>
+                        </div>
+                      );
+                    }
+                    
+                    // Regular message
+                    const isSummary = msg.content?.includes('[SUMMARY]') || msg.content?.includes('[CONVERSATION SUMMARY]');
+                    
+                    return (
+                      <Message
+                        key={idx}
+                        role={msg.role || 'assistant'}
+                        content={msg.content || ''}
+                        isCompressed={isSummary}
+                        isTool={false}
+                        keywords={compressionMode > 0 ? keywords : []}
+                        keywordMap={keywordMap}
+                      />
+                    );
+                  })}
               </>
             )}
           </div>
