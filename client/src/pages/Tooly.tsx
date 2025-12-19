@@ -745,42 +745,27 @@ const Tooly: React.FC = () => {
                               <p className="text-white font-medium">{model.displayName}</p>
                               {getRoleBadge(model.role)}
                             </div>
-                            <p className="text-gray-500 text-xs">{model.provider}</p>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <span>{model.provider}</span>
+                              {model.maxContextLength && (
+                                <>
+                                  <span>•</span>
+                                  <span>{(model.maxContextLength / 1024).toFixed(0)}K ctx</span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        <div className="text-right flex items-center gap-2">
+                        <div className="text-right">
                           {model.score !== undefined ? (
                             <div className="text-right">
-                              <p className="text-white">{model.score}/100</p>
+                              <p className="text-white font-medium">{model.score}/100</p>
                               <p className="text-gray-500 text-xs">
                                 🔧 {model.toolCount}/{model.totalTools}
                               </p>
                             </div>
-                          ) : null}
-                          {!model.role && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                runProbeTests(model.id, model.provider);
-                              }}
-                              disabled={probingModel === model.id}
-                              className="px-3 py-1 text-xs bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 disabled:opacity-50"
-                              title="Run probe tests to determine model role"
-                            >
-                              {probingModel === model.id ? 'Probing...' : 'Probe'}
-                            </button>
-                          )}
-                          {model.score === undefined && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                runModelTests(model.id, model.provider);
-                              }}
-                              disabled={testingModel === model.id}
-                              className="px-3 py-1 text-xs bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 disabled:opacity-50"
-                            >
-                              {testingModel === model.id ? 'Testing...' : 'Test Tools'}
-                            </button>
+                          ) : (
+                            <span className="text-gray-500 text-xs">Not tested</span>
                           )}
                         </div>
                       </div>
@@ -800,25 +785,48 @@ const Tooly: React.FC = () => {
               </div>
               {selectedModel ? (
                 <div className="space-y-4">
-                  {/* Role & Score */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                      <span className="text-gray-400 text-sm">Tool Score</span>
-                      <p className="text-2xl font-bold text-white">
+                  {/* Scores - 3 columns */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="p-3 bg-[#2d2d2d] rounded-lg text-center">
+                      <span className="text-gray-400 text-xs">🔧 Tool</span>
+                      <p className="text-xl font-bold text-white">
                         {testProgress.toolsProgress?.modelId === selectedModel.modelId && testProgress.toolsProgress?.status === 'running'
                           ? testProgress.toolsProgress.score
-                          : selectedModel.score}/100
+                          : selectedModel.score ?? 0}
                       </p>
                     </div>
-                    <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                      <span className="text-gray-400 text-sm">Probe Score</span>
-                      <p className="text-2xl font-bold text-white">
+                    <div className="p-3 bg-[#2d2d2d] rounded-lg text-center">
+                      <span className="text-gray-400 text-xs">🔬 Probe</span>
+                      <p className="text-xl font-bold text-white">
                         {testProgress.probeProgress?.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running'
                           ? testProgress.probeProgress.score
-                          : selectedModel.probeResults?.overallScore ?? '-'}/100
+                          : selectedModel.probeResults?.toolScore ?? 0}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-[#2d2d2d] rounded-lg text-center">
+                      <span className="text-gray-400 text-xs">🧠 Reason</span>
+                      <p className="text-xl font-bold text-white">
+                        {selectedModel.probeResults?.reasoningScore ?? 0}
                       </p>
                     </div>
                   </div>
+
+                  {/* Run All Tests Button */}
+                  <button
+                    onClick={async () => {
+                      if (!selectedModel) return;
+                      // Run probe tests (includes reasoning)
+                      await runProbeTests(selectedModel.modelId, selectedModel.provider);
+                      // Run tool tests
+                      await runModelTests(selectedModel.modelId, selectedModel.provider);
+                    }}
+                    disabled={probingModel === selectedModel.modelId || testingModel === selectedModel.modelId}
+                    className="w-full py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    {probingModel === selectedModel.modelId || testingModel === selectedModel.modelId 
+                      ? '⏳ Running Tests...' 
+                      : '🚀 Run All Tests'}
+                  </button>
 
                   {/* Test Progress Bars */}
                   {(testProgress.probeProgress?.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running') && (
@@ -1041,7 +1049,7 @@ const Tooly: React.FC = () => {
                   {/* Tool Categories with Toggles */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-400 mb-2">Tool Capabilities</h4>
-                    <div className="space-y-1 max-h-48 overflow-y-auto">
+                    <div className="space-y-1 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
                       {Object.entries(selectedModel.capabilities).map(([tool, cap]) => (
                         <div key={tool} className="flex items-center justify-between py-1">
                           <div className="flex items-center gap-2">
