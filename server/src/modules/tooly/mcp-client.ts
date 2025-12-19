@@ -5,10 +5,20 @@
 
 import { spawn, ChildProcess } from 'child_process';
 import { createInterface, Interface } from 'readline';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { notifications } from '../../services/notifications.js';
 import { errorHandler } from '../../services/error-handler.js';
+import { capabilities, ALL_TOOLS } from './capabilities.js';
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Default MCP server path (relative to this file: server/src/modules/tooly -> mcp-server)
+const DEFAULT_MCP_SERVER_PATH = path.resolve(__dirname, '../../../../mcp-server');
 
 // ============================================================
 // TYPES
@@ -50,13 +60,14 @@ class MCPClient {
   private requestTimeout: number;
 
   constructor(
-    mcpServerPath: string = 'C:\\Users\\Jerome\\Documents\\Projects\\MCPServer',
+    mcpServerPath: string = DEFAULT_MCP_SERVER_PATH,
     mcpHttpUrl: string = 'http://localhost:3002',
     requestTimeout: number = 30000
   ) {
     this.mcpServerPath = mcpServerPath;
     this.mcpHttpUrl = mcpHttpUrl;
     this.requestTimeout = requestTimeout;
+    console.log(`[MCP Client] MCP server path: ${this.mcpServerPath}`);
   }
 
   /**
@@ -122,7 +133,8 @@ class MCPClient {
   private async spawnChildProcess(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        this.process = spawn('node', ['server.js'], {
+        // Use npx tsx to run TypeScript directly
+        this.process = spawn('npx', ['tsx', 'src/server.ts'], {
           cwd: this.mcpServerPath,
           stdio: ['pipe', 'pipe', 'pipe'],
           shell: true
@@ -249,6 +261,53 @@ class MCPClient {
     } finally {
       this.reconnecting = false;
     }
+  }
+
+  /**
+   * Resolve a tool name alias to the actual MCP tool name
+   * If the model called a native tool name, find the corresponding MCP tool
+   */
+  async resolveToolAlias(toolName: string, modelId?: string): Promise<string> {
+    // If it's already a valid MCP tool, return as-is
+    if (ALL_TOOLS.includes(toolName)) {
+      return toolName;
+    }
+    
+    // If no modelId provided, can't do alias lookup
+    if (!modelId) {
+      console.log(`[MCP] No model ID for alias resolution, using tool name as-is: ${toolName}`);
+      return toolName;
+    }
+    
+    try {
+      const profile = await capabilities.getProfile(modelId);
+      if (!profile) {
+        console.log(`[MCP] No profile found for ${modelId}, using tool name as-is: ${toolName}`);
+        return toolName;
+      }
+      
+      // Search through capabilities to find which MCP tool has this as an alias
+      for (const [mcpTool, cap] of Object.entries(profile.capabilities)) {
+        if (cap.nativeAliases && cap.nativeAliases.includes(toolName)) {
+          console.log(`[MCP] Resolved alias "${toolName}" -> "${mcpTool}" for model ${modelId}`);
+          return mcpTool;
+        }
+      }
+      
+      console.log(`[MCP] No alias found for "${toolName}" in model ${modelId}, using as-is`);
+      return toolName;
+    } catch (error: any) {
+      console.log(`[MCP] Error resolving alias: ${error.message}, using tool name as-is`);
+      return toolName;
+    }
+  }
+
+  /**
+   * Execute a tool with automatic alias resolution
+   */
+  async executeToolWithAlias(name: string, args: Record<string, any> = {}, modelId?: string): Promise<MCPToolResult> {
+    const resolvedName = await this.resolveToolAlias(name, modelId);
+    return this.executeTool(resolvedName, args);
   }
 
   /**

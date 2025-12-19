@@ -22,6 +22,7 @@ export interface ToolCapability {
   avgLatency?: number;
   lastTested?: string;
   notes?: string;
+  nativeAliases?: string[];  // Model's native tool names that map to this MCP tool
 }
 
 export interface ProbeTestResult {
@@ -87,6 +88,10 @@ export interface ModelProfile {
   
   // Context latency profiling
   contextLatency?: ContextLatencyData;
+  
+  // Native tool discovery results
+  discoveredNativeTools?: string[];  // ALL tools the model claims to support
+  unmappedNativeTools?: string[];    // Tools that couldn't be matched to any MCP tool
   
   capabilities: Record<string, ToolCapability>;
   enabledTools: string[];

@@ -59,13 +59,15 @@ interface ModelProfile {
   testedAt: string;
   score: number;
   enabledTools: string[];
-  capabilities: Record<string, { supported: boolean; score: number }>;
+  capabilities: Record<string, { supported: boolean; score: number; nativeAliases?: string[] }>;
   contextLength?: number;
   maxContextLength?: number;
   role?: 'main' | 'executor' | 'both' | 'none';
   probeResults?: ProbeResults;
   contextLatency?: ContextLatencyData;
   systemPrompt?: string;
+  discoveredNativeTools?: string[];  // ALL tools the model claims to support
+  unmappedNativeTools?: string[];    // Tools that couldn't be matched to any MCP tool
 }
 
 interface DiscoveredModel {
@@ -421,8 +423,14 @@ const Tooly: React.FC = () => {
       }
       
       if (toolsRes.ok) {
-        const tools = await toolsRes.json();
-        setMcpTools(tools.tools || []);
+        const data = await toolsRes.json();
+        // Handle nested structure: { tools: { tools: [...] } } or { tools: [...] }
+        const toolsArray = Array.isArray(data.tools) 
+          ? data.tools 
+          : (data.tools?.tools || []);
+        // Extract tool names from the tool objects
+        const toolNames = toolsArray.map((t: { name: string }) => t.name);
+        setMcpTools(toolNames);
       }
     } catch (error) {
       console.error('Failed to fetch MCP status:', error);
@@ -1000,7 +1008,7 @@ const Tooly: React.FC = () => {
         {activeTab === 'models' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Model List */}
-            <div>
+            <div className="flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-white">Available Models</h3>
                 {/* Filters */}
@@ -1205,7 +1213,7 @@ const Tooly: React.FC = () => {
                   No models discovered. Check your LLM provider settings.
                 </p>
               ) : (
-                <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
+                <div className="space-y-2 flex-1 max-h-[calc(100vh-340px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
                   {models.map((model) => (
                     <div
                       key={model.id}
@@ -1271,7 +1279,7 @@ const Tooly: React.FC = () => {
             </div>
 
             {/* Model Details */}
-            <div>
+            <div className="flex flex-col max-h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-semibold text-white">
@@ -1739,37 +1747,142 @@ const Tooly: React.FC = () => {
                     </p>
                   </div>
 
+                  {/* Native Tool Calls Section */}
+                  <div className="p-3 bg-[#2d2d2d] rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Native Tool Calls</h4>
+                    {(() => {
+                      // Use discoveredNativeTools if available, otherwise fall back to collecting from nativeAliases
+                      const discoveredTools = selectedModel.discoveredNativeTools || [];
+                      const unmappedTools = selectedModel.unmappedNativeTools || [];
+                      
+                      // Build mapping of native tool -> MCP tool
+                      const mappedTools: Record<string, string> = {};
+                      Object.entries(selectedModel.capabilities).forEach(([tool, cap]) => {
+                        if (cap.nativeAliases && cap.nativeAliases.length > 0) {
+                          cap.nativeAliases.forEach(alias => {
+                            mappedTools[alias] = tool;
+                          });
+                        }
+                      });
+                      
+                      // If no discovered tools and no mapped aliases, show empty state
+                      if (discoveredTools.length === 0 && Object.keys(mappedTools).length === 0) {
+                        return (
+                          <p className="text-xs text-gray-500 italic">
+                            No native tool calls detected. Run the 🔧 Tools test to discover what tools this model claims to support.
+                          </p>
+                        );
+                      }
+                      
+                      // Use discoveredTools if available, otherwise use keys from mappedTools
+                      const allTools = discoveredTools.length > 0 
+                        ? discoveredTools 
+                        : Object.keys(mappedTools);
+                      
+                      // Handler to update alias mapping
+                      const updateAlias = async (nativeToolName: string, newMcpTool: string | null) => {
+                        try {
+                          const response = await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/alias`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ nativeToolName, mcpTool: newMcpTool })
+                          });
+                          
+                          if (response.ok) {
+                            // Refresh the model profile
+                            const profileResponse = await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}`);
+                            if (profileResponse.ok) {
+                              const updatedProfile = await profileResponse.json();
+                              setSelectedModel(updatedProfile);
+                            }
+                          }
+                        } catch (error) {
+                          console.error('Failed to update alias:', error);
+                        }
+                      };
+                      
+                      return (
+                        <div>
+                          <p className="text-[10px] text-gray-500 mb-2">
+                            Tools the model claims to support ({allTools.length} discovered). Click dropdown to reassign:
+                          </p>
+                          <div className="space-y-1.5 max-h-40 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#4d4d4d] scrollbar-track-transparent">
+                            {allTools.map((tool) => {
+                              const mapsTo = mappedTools[tool];
+                              const isUnmapped = unmappedTools.includes(tool) || !mapsTo;
+                              
+                              return (
+                                <div
+                                  key={tool}
+                                  className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border ${
+                                    isUnmapped 
+                                      ? 'bg-orange-500/10 border-orange-500/20' 
+                                      : 'bg-purple-500/10 border-purple-500/20'
+                                  }`}
+                                >
+                                  <span className={`text-xs font-medium min-w-[120px] ${isUnmapped ? 'text-orange-300' : 'text-purple-300'}`}>
+                                    {tool}
+                                  </span>
+                                  <span className="text-[10px] text-gray-500">→</span>
+                                  <select
+                                    value={mapsTo || ''}
+                                    onChange={(e) => updateAlias(tool, e.target.value || null)}
+                                    className="flex-1 text-xs bg-[#252525] border border-gray-700 rounded px-1.5 py-0.5 text-gray-300 focus:outline-none focus:border-purple-500"
+                                  >
+                                    <option value="">⚠️ Unmapped</option>
+                                    {Array.isArray(mcpTools) && mcpTools.map((mcpTool) => (
+                                      <option key={mcpTool} value={mcpTool}>
+                                        {mcpTool}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {unmappedTools.length > 0 && (
+                            <p className="text-[10px] text-orange-400/70 mt-2">
+                              ⚠️ {unmappedTools.length} tool(s) have no MCP server equivalent
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+
                   {/* Tool Categories with Toggles */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-400 mb-2">Tool Capabilities</h4>
-                    <div className="space-y-1 max-h-48 overflow-y-auto pr-2 scrollbar-thin">
+                  <div className="p-3 bg-[#2d2d2d] rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Tool Configuration</h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#4d4d4d] scrollbar-track-transparent">
                       {Object.entries(selectedModel.capabilities).map(([tool, cap]) => (
-                        <div key={tool} className="flex items-center justify-between py-1">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              checked={selectedModel.enabledTools?.includes(tool) || false}
-                              onChange={async (e) => {
-                                try {
-                                  await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/tools/${tool}`, {
-                                    method: 'PUT',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ enabled: e.target.checked })
-                                  });
-                                  await fetchModelProfile(selectedModel.modelId);
-                                } catch (error) {
-                                  console.error('Failed to toggle tool:', error);
-                                }
-                              }}
-                              className="w-3 h-3 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
-                            />
-                            <span className={`text-xs ${cap.supported ? 'text-white' : 'text-gray-500'}`}>
-                              {tool}
+                        <div key={tool} className="p-2 bg-[#1a1a1a] rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={selectedModel.enabledTools?.includes(tool) || false}
+                                onChange={async (e) => {
+                                  try {
+                                    await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/tools/${tool}`, {
+                                      method: 'PUT',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ enabled: e.target.checked })
+                                    });
+                                    await fetchModelProfile(selectedModel.modelId);
+                                  } catch (error) {
+                                    console.error('Failed to toggle tool:', error);
+                                  }
+                                }}
+                                className="w-3 h-3 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
+                              />
+                              <span className={`text-xs font-medium ${cap.supported ? 'text-white' : 'text-gray-500'}`}>
+                                {tool}
+                              </span>
+                            </div>
+                            <span className={`text-xs ${cap.score >= 70 ? 'text-green-400' : cap.score >= 40 ? 'text-yellow-400' : 'text-red-400'}`}>
+                              {cap.score}%
                             </span>
                           </div>
-                          <span className={`text-xs ${cap.score >= 70 ? 'text-green-400' : cap.score >= 40 ? 'text-yellow-400' : 'text-red-400'}`}>
-                            {cap.score}%
-                          </span>
                         </div>
                       ))}
                     </div>

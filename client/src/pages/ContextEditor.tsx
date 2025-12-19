@@ -30,6 +30,32 @@ interface ContextSession {
   compressedConversations?: any[];
 }
 
+// Tooly phase information
+interface ToolyPhase {
+  phase: 'planning' | 'execution' | 'response';
+  systemPrompt: string;
+  model: string;
+  latencyMs: number;
+  reasoning?: string;
+}
+
+interface ToolyToolCallMeta {
+  id: string;
+  name: string;
+  arguments: any;
+  result?: any;
+  status: 'success' | 'failed' | 'timeout' | 'pending';
+  latencyMs?: number;
+  error?: string;
+}
+
+interface ToolyMeta {
+  mode: 'single' | 'dual' | 'passthrough';
+  phases: ToolyPhase[];
+  toolCalls?: ToolyToolCallMeta[];
+  totalLatencyMs?: number;
+}
+
 interface ConversationTurn {
   id: string;
   timestamp: string;
@@ -45,6 +71,7 @@ interface ConversationTurn {
     finish_reason?: string;
     choices?: Array<{ message?: { content: string }; finish_reason?: string }>;
   };
+  toolyMeta?: ToolyMeta;
 }
 
 // Keyword colors for highlighting
@@ -426,6 +453,388 @@ const SystemPromptCard = ({
   );
 };
 
+// ============================================================
+// TIMELINE COMPONENTS FOR TURN VISUALIZATION
+// ============================================================
+
+// Timeline Phase Component - shows a processing phase (planning/execution/response)
+const TimelinePhase = ({ 
+  phase, 
+  isExpanded: defaultExpanded = false 
+}: { 
+  phase: ToolyPhase; 
+  isExpanded?: boolean;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [copied, setCopied] = useState(false);
+  
+  const phaseConfig = {
+    planning: { icon: '🧠', label: 'Planning', colors: 'text-blue-400 border-blue-500/30 bg-blue-500/5' },
+    execution: { icon: '⚡', label: 'Execution', colors: 'text-orange-400 border-orange-500/30 bg-orange-500/5' },
+    response: { icon: '💬', label: 'Response', colors: 'text-green-400 border-green-500/30 bg-green-500/5' }
+  };
+  
+  const config = phaseConfig[phase.phase] || phaseConfig.response;
+  
+  return (
+    <div className="relative pl-8 pb-3">
+      {/* Timeline dot */}
+      <div className="absolute left-5 w-3 h-3 rounded-full bg-[#2d2d2d] border-2 border-purple-500 -translate-x-1/2" />
+      
+      {/* Phase card */}
+      <div className={`rounded-lg border ${config.colors}`}>
+        <div 
+          className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-white/5"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex items-center gap-2">
+            <span>{config.icon}</span>
+            <span className="text-xs font-medium">{config.label}</span>
+            <span className="text-xs text-gray-500 font-mono">{phase.model}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">{phase.latencyMs}ms</span>
+            <span className="text-xs text-gray-500">{isExpanded ? '▼' : '▶'}</span>
+          </div>
+        </div>
+        
+        {isExpanded && (
+          <div className="px-3 pb-3 border-t border-[#2d2d2d] space-y-2">
+            {/* System Prompt */}
+            <div className="mt-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs text-yellow-400">⚙️ System Prompt</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(phase.systemPrompt);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="text-xs text-gray-400 hover:text-white px-1.5 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
+                >
+                  {copied ? '✓' : 'Copy'}
+                </button>
+              </div>
+              <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded max-h-48 overflow-y-auto whitespace-pre-wrap font-mono">
+                {phase.systemPrompt || '(No system prompt)'}
+              </pre>
+            </div>
+            
+            {/* Reasoning (for planning phase) */}
+            {phase.reasoning && (
+              <div className="mt-2">
+                <div className="text-xs text-blue-400 mb-1">💭 AI Reasoning</div>
+                <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded max-h-48 overflow-y-auto whitespace-pre-wrap font-mono">
+                  {phase.reasoning}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Timeline Tool Call Component - shows a tool execution with status
+const TimelineToolCall = ({ 
+  toolCall 
+}: { 
+  toolCall: ToolyToolCallMeta;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [copiedArgs, setCopiedArgs] = useState(false);
+  const [copiedResult, setCopiedResult] = useState(false);
+  
+  const statusConfig = {
+    success: { icon: '✅', colors: 'text-green-400 border-green-500/30 bg-green-500/5', dot: 'bg-green-500' },
+    failed: { icon: '❌', colors: 'text-red-400 border-red-500/30 bg-red-500/5', dot: 'bg-red-500' },
+    timeout: { icon: '⏳', colors: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/5', dot: 'bg-yellow-500' },
+    pending: { icon: '⏳', colors: 'text-gray-400 border-gray-500/30 bg-gray-500/5', dot: 'bg-gray-500' }
+  };
+  
+  const config = statusConfig[toolCall.status] || statusConfig.pending;
+  
+  return (
+    <div className="relative pl-8 pb-3">
+      {/* Timeline dot */}
+      <div className={`absolute left-5 w-3 h-3 rounded-full ${config.dot} -translate-x-1/2`} />
+      
+      {/* Tool call card */}
+      <div className={`rounded-lg border ${config.colors}`}>
+        <div 
+          className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-white/5"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex items-center gap-2">
+            <span>🔧</span>
+            <span className="text-xs font-medium">{toolCall.name}</span>
+            <span>{config.icon}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {toolCall.latencyMs && (
+              <span className="text-xs text-gray-500">{toolCall.latencyMs}ms</span>
+            )}
+            <span className="text-xs text-gray-500">{isExpanded ? '▼' : '▶'}</span>
+          </div>
+        </div>
+        
+        {isExpanded && (
+          <div className="px-3 pb-3 border-t border-[#2d2d2d] space-y-2">
+            {/* Arguments */}
+            <div className="mt-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs text-blue-400">📥 Arguments</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(JSON.stringify(toolCall.arguments, null, 2));
+                    setCopiedArgs(true);
+                    setTimeout(() => setCopiedArgs(false), 2000);
+                  }}
+                  className="text-xs text-gray-400 hover:text-white px-1.5 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
+                >
+                  {copiedArgs ? '✓' : 'Copy'}
+                </button>
+              </div>
+              <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded overflow-x-auto font-mono max-h-32 overflow-y-auto">
+                {JSON.stringify(toolCall.arguments, null, 2)}
+              </pre>
+            </div>
+            
+            {/* Result */}
+            {toolCall.result !== undefined && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className={`text-xs ${toolCall.status === 'failed' ? 'text-red-400' : 'text-green-400'}`}>
+                    {toolCall.status === 'failed' ? '⚠️ Error' : '📤 Result'}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const resultStr = typeof toolCall.result === 'string' 
+                        ? toolCall.result 
+                        : JSON.stringify(toolCall.result, null, 2);
+                      navigator.clipboard.writeText(resultStr);
+                      setCopiedResult(true);
+                      setTimeout(() => setCopiedResult(false), 2000);
+                    }}
+                    className="text-xs text-gray-400 hover:text-white px-1.5 py-0.5 rounded bg-[#2d2d2d] hover:bg-[#3d3d3d]"
+                  >
+                    {copiedResult ? '✓' : 'Copy'}
+                  </button>
+                </div>
+                <pre className={`text-xs p-2 rounded overflow-x-auto max-h-48 overflow-y-auto font-mono whitespace-pre-wrap ${
+                  toolCall.status === 'failed' ? 'text-red-300 bg-red-500/10' : 'text-gray-400 bg-[#0a0a0a]'
+                }`}>
+                  {typeof toolCall.result === 'string' 
+                    ? toolCall.result 
+                    : JSON.stringify(toolCall.result, null, 2)}
+                </pre>
+              </div>
+            )}
+            
+            {/* Error message */}
+            {toolCall.error && (
+              <div className="p-2 rounded bg-red-500/10 border border-red-500/20">
+                <p className="text-xs text-red-400">{toolCall.error}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Processing Timeline - shows all phases and tool calls in a turn
+const ProcessingTimeline = ({ 
+  turn 
+}: { 
+  turn: ConversationTurn;
+}) => {
+  const toolyMeta = turn.toolyMeta;
+  
+  // Also extract tool calls from the request messages if toolyMeta not available
+  const requestToolCalls = turn.request?.messages
+    ?.filter(m => m.role === 'assistant' && m.tool_calls)
+    ?.flatMap(m => m.tool_calls || []) || [];
+  
+  const toolResults = turn.request?.messages
+    ?.filter(m => m.role === 'tool') || [];
+  
+  // Merge tool calls with results
+  const mergedToolCalls: ToolyToolCallMeta[] = toolyMeta?.toolCalls || requestToolCalls.map(tc => {
+    const result = toolResults.find(tr => tr.tool_call_id === tc.id);
+    const isError = result?.content?.toLowerCase().includes('error') || 
+                    result?.content?.toLowerCase().includes('failed');
+    return {
+      id: tc.id || 'unknown',
+      name: tc.function?.name || tc.name || 'unknown',
+      arguments: typeof tc.function?.arguments === 'string' 
+        ? (() => { try { return JSON.parse(tc.function.arguments); } catch { return { raw: tc.function.arguments }; } })()
+        : tc.function?.arguments || tc.arguments || {},
+      result: result?.content,
+      status: result ? (isError ? 'failed' : 'success') : 'pending',
+      latencyMs: undefined
+    } as ToolyToolCallMeta;
+  });
+  
+  const hasPhases = toolyMeta?.phases && toolyMeta.phases.length > 0;
+  const hasToolCalls = mergedToolCalls.length > 0;
+  
+  if (!hasPhases && !hasToolCalls) {
+    // Extract system prompt from request if available
+    const systemPrompt = turn.request?.messages?.find(m => m.role === 'system')?.content;
+    if (!systemPrompt) {
+      return null;
+    }
+    
+    // Show just the system prompt as a simple phase
+    return (
+      <div className="border-t border-[#2d2d2d] bg-[#0d0d0d]">
+        <div className="px-4 py-2 border-b border-[#2d2d2d]">
+          <span className="text-xs font-medium text-gray-400">📋 Processing Details</span>
+        </div>
+        <div className="relative px-4 py-3">
+          <div className="absolute left-7 top-3 bottom-3 w-0.5 bg-[#2d2d2d]" />
+          <TimelinePhase 
+            phase={{
+              phase: 'response',
+              systemPrompt: systemPrompt,
+              model: turn.request?.model || 'unknown',
+              latencyMs: 0
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="border-t border-[#2d2d2d] bg-[#0d0d0d]">
+      {/* Timeline header */}
+      <div className="px-4 py-2 border-b border-[#2d2d2d] flex items-center gap-2">
+        <span className="text-xs font-medium text-gray-400">📋 Processing Steps</span>
+        <span className="text-xs text-gray-600">
+          {toolyMeta?.mode && `(${toolyMeta.mode} mode)`}
+          {hasPhases && ` • ${toolyMeta?.phases.length} phases`}
+          {hasToolCalls && ` • ${mergedToolCalls.length} tool calls`}
+        </span>
+      </div>
+      
+      {/* Timeline items */}
+      <div className="relative px-4 py-3">
+        {/* Vertical line */}
+        <div className="absolute left-7 top-3 bottom-3 w-0.5 bg-[#2d2d2d]" />
+        
+        {/* Phases */}
+        {toolyMeta?.phases?.map((phase, idx) => (
+          <TimelinePhase 
+            key={`phase-${idx}`}
+            phase={phase}
+          />
+        ))}
+        
+        {/* Tool calls */}
+        {mergedToolCalls.map((tc, idx) => (
+          <TimelineToolCall 
+            key={`tc-${tc.id}-${idx}`}
+            toolCall={tc}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Turn Card - wraps a complete conversation turn with expandable details
+const TurnCard = ({ 
+  turn,
+  turnIndex,
+  isExpanded,
+  onToggle,
+  getUserMessage: getUserMsg,
+  getAssistantMessage: getAssistantMsg
+}: { 
+  turn: ConversationTurn;
+  turnIndex: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+  getUserMessage: (turn: ConversationTurn) => string;
+  getAssistantMessage: (turn: ConversationTurn) => string;
+}) => {
+  const userMessage = getUserMsg(turn);
+  const assistantMessage = getAssistantMsg(turn);
+  
+  // Check if this turn has tool calls
+  const hasToolCalls = turn.request?.messages?.some(m => m.role === 'assistant' && m.tool_calls?.length > 0) ||
+                       turn.toolyMeta?.toolCalls?.length;
+  const toolCallCount = turn.toolyMeta?.toolCalls?.length || 
+                        turn.request?.messages?.filter(m => m.role === 'assistant' && m.tool_calls)
+                          .flatMap(m => m.tool_calls || []).length || 0;
+  
+  const mode = turn.toolyMeta?.mode;
+  
+  return (
+    <div className="mb-3 rounded-lg border border-[#2d2d2d] overflow-hidden bg-[#1a1a1a]">
+      {/* Header */}
+      <div 
+        className="flex items-center justify-between px-4 py-2 bg-[#1a1a1a] cursor-pointer hover:bg-[#252525]"
+        onClick={onToggle}
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium text-gray-400">Turn {turnIndex + 1}</span>
+          {hasToolCalls && (
+            <span className="text-xs px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">
+              🔧 {toolCallCount} tool{toolCallCount !== 1 ? 's' : ''}
+            </span>
+          )}
+          {mode && mode !== 'passthrough' && (
+            <span className="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">
+              {mode === 'dual' ? '🔀 Dual' : '📍 Single'}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">
+            {new Date(turn.timestamp).toLocaleTimeString()}
+          </span>
+          <span className="text-xs text-gray-500">{isExpanded ? '▼' : '▶'}</span>
+        </div>
+      </div>
+      
+      {/* User Message */}
+      <div className="px-4 py-3 border-t border-[#2d2d2d] bg-blue-600/10">
+        <div className="text-xs text-blue-400 mb-1">👤 User</div>
+        <div className="text-sm text-gray-200 whitespace-pre-wrap break-words">
+          {userMessage.length > 500 && !isExpanded 
+            ? userMessage.substring(0, 500) + '...' 
+            : userMessage}
+        </div>
+      </div>
+      
+      {/* Expanded Details (Processing Timeline) */}
+      {isExpanded && (
+        <ProcessingTimeline turn={turn} />
+      )}
+      
+      {/* Assistant Response */}
+      {assistantMessage && (
+        <div className="px-4 py-3 border-t border-[#2d2d2d]">
+          <div className="text-xs text-purple-400 mb-1">✨ Assistant</div>
+          <div className="text-sm text-gray-200 whitespace-pre-wrap break-words">
+            {assistantMessage.length > 500 && !isExpanded 
+              ? assistantMessage.substring(0, 500) + '...' 
+              : assistantMessage}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Message component for both panels
 const Message = ({ 
   role, 
@@ -677,6 +1086,23 @@ Rules:
 - Output ONLY the summary block, nothing else`
   );
   const [showPromptEditor, setShowPromptEditor] = useState(false);
+  
+  // View mode: 'messages' = flat message view, 'timeline' = turn-based timeline view
+  const [viewMode, setViewMode] = useState<'messages' | 'timeline'>('timeline');
+  const [expandedTurns, setExpandedTurns] = useState<Set<string>>(new Set());
+  
+  // Toggle turn expansion
+  const toggleTurn = (turnId: string) => {
+    setExpandedTurns(prev => {
+      const next = new Set(prev);
+      if (next.has(turnId)) {
+        next.delete(turnId);
+      } else {
+        next.add(turnId);
+      }
+      return next;
+    });
+  };
 
   // Load compression versions
   const loadCompressionVersions = async () => {
@@ -1145,6 +1571,32 @@ Rules:
         
         {/* View Options */}
         <div className="flex items-center gap-4 mt-3 px-8">
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-1 bg-[#1a1a1a] rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('timeline')}
+              className={`px-3 py-1 text-xs rounded ${
+                viewMode === 'timeline' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+              }`}
+            >
+              📋 Timeline
+            </button>
+            <button
+              onClick={() => setViewMode('messages')}
+              className={`px-3 py-1 text-xs rounded ${
+                viewMode === 'messages' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+              }`}
+            >
+              💬 Messages
+            </button>
+          </div>
+          
+          <div className="w-px h-5 bg-[#2d2d2d]" />
+          
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -1164,7 +1616,9 @@ Rules:
           <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d]">
             <span className="text-sm font-medium text-gray-300">📝 Original</span>
             <span className="text-xs text-gray-500 ml-2">
-              {groupedMessages.filter(m => showSystemMessages || m.role !== 'system').length} items 
+              {viewMode === 'timeline' 
+                ? `${session?.conversations.length || 0} turns`
+                : `${groupedMessages.filter(m => showSystemMessages || m.role !== 'system').length} items`}
               {' '}({groupedMessages.filter(m => m.role === 'tool_group').reduce((acc, m) => acc + m.toolCalls.length, 0)} tool calls)
               {' '}• ~{Math.round(JSON.stringify(allMessages).length / 4).toLocaleString()} tokens
             </span>
@@ -1174,7 +1628,21 @@ Rules:
             className="flex-1 overflow-y-auto p-4"
             onScroll={() => handleScroll('left')}
           >
-            {groupedMessages
+            {/* Timeline View - Turn-based with expandable details */}
+            {viewMode === 'timeline' && session?.conversations.map((turn, idx) => (
+              <TurnCard
+                key={turn.id}
+                turn={turn}
+                turnIndex={idx}
+                isExpanded={expandedTurns.has(turn.id)}
+                onToggle={() => toggleTurn(turn.id)}
+                getUserMessage={getUserMessage}
+                getAssistantMessage={getAssistantMessage}
+              />
+            ))}
+            
+            {/* Messages View - Flat message list */}
+            {viewMode === 'messages' && groupedMessages
               .filter(m => showSystemMessages || (m.role !== 'system'))
               .map((msg, idx) => {
                 // System Prompt - use new SystemPromptCard

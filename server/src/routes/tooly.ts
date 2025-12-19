@@ -151,7 +151,6 @@ router.post('/models/:modelId/test', async (req, res) => {
     const provider = body.provider || 'lmstudio';
     const tools = body.tools;
     const testMode = body.testMode || 'manual';  // 'quick' | 'keep_on_success' | 'manual'
-    const unloadFirst = body.unloadFirst !== false;  // Default true for clean slate
     
     // Load settings
     let settings: any = {};
@@ -164,24 +163,8 @@ router.post('/models/:modelId/test', async (req, res) => {
       // Use defaults
     }
 
-    // Unload all models from LM Studio before testing (clean slate)
-    if (provider === 'lmstudio' && unloadFirst) {
-      try {
-        console.log(`[Tooly] Unloading all models from LM Studio before tool tests...`);
-        const client = new LMStudioClient();
-        const loadedModels = await client.llm.listLoaded();
-        for (const model of loadedModels) {
-          try {
-            await client.llm.unload(model.identifier);
-            console.log(`[Tooly] Unloaded: ${model.identifier}`);
-          } catch (e: any) {
-            console.log(`[Tooly] Could not unload ${model.identifier}: ${e.message}`);
-          }
-        }
-      } catch (e: any) {
-        console.log(`[Tooly] Could not connect to LM Studio to unload models: ${e.message}`);
-      }
-    }
+    // Note: Model loading/unloading is now handled by the centralized modelManager
+    // in test-engine.ts via modelManager.ensureLoaded()
 
     const testSettings = {
       lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
@@ -240,24 +223,8 @@ router.post('/models/:modelId/probe', async (req, res) => {
       // Use defaults
     }
 
-    // Unload all models from LM Studio before testing (clean slate)
-    if (provider === 'lmstudio') {
-      try {
-        console.log(`[Tooly] Unloading all models from LM Studio before probe tests...`);
-        const client = new LMStudioClient();
-        const loadedModels = await client.llm.listLoaded();
-        for (const model of loadedModels) {
-          try {
-            await client.llm.unload(model.identifier);
-            console.log(`[Tooly] Unloaded: ${model.identifier}`);
-          } catch (e: any) {
-            console.log(`[Tooly] Could not unload ${model.identifier}: ${e.message}`);
-          }
-        }
-      } catch (e: any) {
-        console.log(`[Tooly] Could not connect to LM Studio to unload models: ${e.message}`);
-      }
-    }
+    // Note: Model loading/unloading is now handled by the centralized modelManager
+    // in probe-engine.ts via modelManager.ensureLoaded()
 
     const testSettings = {
       lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
@@ -484,6 +451,79 @@ router.delete('/models/:modelId/context-length', async (req, res) => {
     res.json({ success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to remove context length:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/tooly/models/:modelId/alias
+ * Update a native tool alias mapping
+ * Body: { nativeToolName: string, mcpTool: string | null }
+ * If mcpTool is null, removes the alias (marks as unmapped)
+ */
+router.put('/models/:modelId/alias', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { nativeToolName, mcpTool } = req.body;
+    
+    if (!nativeToolName || typeof nativeToolName !== 'string') {
+      res.status(400).json({ error: 'Missing or invalid nativeToolName' });
+      return;
+    }
+    
+    // Get or create profile
+    let profile = await capabilities.getProfile(modelId);
+    if (!profile) {
+      res.status(404).json({ error: 'Model profile not found' });
+      return;
+    }
+    
+    // Remove the alias from ALL MCP tools first
+    for (const tool of ALL_TOOLS) {
+      if (profile.capabilities[tool]?.nativeAliases) {
+        profile.capabilities[tool].nativeAliases = 
+          profile.capabilities[tool].nativeAliases!.filter(a => a !== nativeToolName);
+      }
+    }
+    
+    // Also update unmappedNativeTools
+    if (!profile.unmappedNativeTools) {
+      profile.unmappedNativeTools = [];
+    }
+    
+    // If mcpTool is provided, add the alias to that tool
+    if (mcpTool && ALL_TOOLS.includes(mcpTool)) {
+      if (!profile.capabilities[mcpTool]) {
+        profile.capabilities[mcpTool] = { supported: false, score: 0, testsPassed: 0, testsFailed: 0 };
+      }
+      if (!profile.capabilities[mcpTool].nativeAliases) {
+        profile.capabilities[mcpTool].nativeAliases = [];
+      }
+      if (!profile.capabilities[mcpTool].nativeAliases!.includes(nativeToolName)) {
+        profile.capabilities[mcpTool].nativeAliases!.push(nativeToolName);
+      }
+      
+      // Remove from unmapped if it was there
+      profile.unmappedNativeTools = profile.unmappedNativeTools.filter(t => t !== nativeToolName);
+      
+      console.log(`[Tooly] Alias updated: "${nativeToolName}" -> "${mcpTool}" for ${modelId}`);
+    } else {
+      // Mark as unmapped
+      if (!profile.unmappedNativeTools.includes(nativeToolName)) {
+        profile.unmappedNativeTools.push(nativeToolName);
+      }
+      console.log(`[Tooly] Alias removed: "${nativeToolName}" is now unmapped for ${modelId}`);
+    }
+    
+    await capabilities.saveProfile(profile);
+    
+    res.json({ 
+      success: true, 
+      nativeToolName,
+      mcpTool: mcpTool || null
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to update alias:', error);
     res.status(500).json({ error: error.message });
   }
 });
