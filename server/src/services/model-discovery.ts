@@ -33,6 +33,7 @@ export interface DiscoveredModel {
   maxContextLength?: number;
   trainedForToolUse?: boolean;
   vision?: boolean;
+  sizeBytes?: number;
 }
 
 export interface ModelDiscoveryResult {
@@ -145,7 +146,8 @@ class ModelDiscoveryService {
           role: profile?.role,
           maxContextLength: model.maxContextLength,
           trainedForToolUse: model.trainedForToolUse,
-          vision: model.vision
+          vision: model.vision,
+          sizeBytes: model.sizeBytes
         });
       }
 
