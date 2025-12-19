@@ -128,19 +128,20 @@ class ModelDiscoveryService {
         return true;
       });
 
+      // First pass: collect models with SDK quantization
+      const modelsWithoutQuant: { modelId: string; index: number }[] = [];
       const models: DiscoveredModel[] = [];
 
       for (const model of filteredModels) {
         const modelId = model.modelKey;
         const profile = await this.loadModelProfile(modelId);
         
-        // Try to get quantization from SDK first, fallback to API if not available
+        // Try to get quantization from SDK first
         // Cast to any to check for quantization property (may not be in SDK types yet)
         // Quantization can be string or object {name, bits}
         const sdkQuantization = this.extractQuantizationString((model as any).quantization);
-        const quantization = sdkQuantization || await this.getModelQuantization(lmstudioUrl, modelId);
 
-        models.push({
+        const entry: DiscoveredModel = {
           id: modelId,
           displayName: model.displayName || this.formatModelName(modelId),
           provider: 'lmstudio',
@@ -155,8 +156,31 @@ class ModelDiscoveryService {
           trainedForToolUse: model.trainedForToolUse,
           vision: model.vision,
           sizeBytes: model.sizeBytes,
-          quantization
-        });
+          quantization: sdkQuantization
+        };
+        
+        if (!sdkQuantization) {
+          modelsWithoutQuant.push({ modelId, index: models.length });
+        }
+        
+        models.push(entry);
+      }
+
+      // Second pass: fetch quantization for models without SDK data (in parallel, limit 10 at a time)
+      if (modelsWithoutQuant.length > 0) {
+        console.log(`[ModelDiscovery] Fetching quantization for ${modelsWithoutQuant.length} models...`);
+        const batchSize = 10;
+        for (let i = 0; i < modelsWithoutQuant.length; i += batchSize) {
+          const batch = modelsWithoutQuant.slice(i, i + batchSize);
+          const results = await Promise.all(
+            batch.map(({ modelId }) => this.getModelQuantization(lmstudioUrl, modelId))
+          );
+          results.forEach((quant, j) => {
+            if (quant) {
+              models[batch[j].index].quantization = quant;
+            }
+          });
+        }
       }
 
       console.log(`[ModelDiscovery] LM Studio: ${rawModels.length} total, ${models.length} after dedup`);
