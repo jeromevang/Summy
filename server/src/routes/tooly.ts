@@ -151,6 +151,7 @@ router.post('/models/:modelId/test', async (req, res) => {
     const provider = body.provider || 'lmstudio';
     const tools = body.tools;
     const testMode = body.testMode || 'manual';  // 'quick' | 'keep_on_success' | 'manual'
+    const unloadFirst = body.unloadFirst !== false;  // Default true for clean slate
     
     // Load settings
     let settings: any = {};
@@ -161,6 +162,25 @@ router.post('/models/:modelId/test', async (req, res) => {
       }
     } catch {
       // Use defaults
+    }
+
+    // Unload all models from LM Studio before testing (clean slate)
+    if (provider === 'lmstudio' && unloadFirst) {
+      try {
+        console.log(`[Tooly] Unloading all models from LM Studio before tool tests...`);
+        const client = new LMStudioClient();
+        const loadedModels = await client.llm.listLoaded();
+        for (const model of loadedModels) {
+          try {
+            await client.llm.unload(model.identifier);
+            console.log(`[Tooly] Unloaded: ${model.identifier}`);
+          } catch (e: any) {
+            console.log(`[Tooly] Could not unload ${model.identifier}: ${e.message}`);
+          }
+        }
+      } catch (e: any) {
+        console.log(`[Tooly] Could not connect to LM Studio to unload models: ${e.message}`);
+      }
     }
 
     const testSettings = {
@@ -218,6 +238,25 @@ router.post('/models/:modelId/probe', async (req, res) => {
       }
     } catch {
       // Use defaults
+    }
+
+    // Unload all models from LM Studio before testing (clean slate)
+    if (provider === 'lmstudio') {
+      try {
+        console.log(`[Tooly] Unloading all models from LM Studio before probe tests...`);
+        const client = new LMStudioClient();
+        const loadedModels = await client.llm.listLoaded();
+        for (const model of loadedModels) {
+          try {
+            await client.llm.unload(model.identifier);
+            console.log(`[Tooly] Unloaded: ${model.identifier}`);
+          } catch (e: any) {
+            console.log(`[Tooly] Could not unload ${model.identifier}: ${e.message}`);
+          }
+        }
+      } catch (e: any) {
+        console.log(`[Tooly] Could not connect to LM Studio to unload models: ${e.message}`);
+      }
     }
 
     const testSettings = {
