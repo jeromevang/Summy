@@ -23,10 +23,17 @@ interface ReasoningProbeResults {
 
 interface ProbeResults {
   testedAt: string;
+  // Core tool probes (1.1 - 1.4)
   emitTest: ProbeTestResult;
   schemaTest: ProbeTestResult;
   selectionTest: ProbeTestResult;
   suppressionTest: ProbeTestResult;
+  // Enhanced tool probes (1.5 - 1.8)
+  nearIdenticalSelectionTest?: ProbeTestResult;
+  multiToolEmitTest?: ProbeTestResult;
+  argumentValidationTest?: ProbeTestResult;
+  schemaReorderTest?: ProbeTestResult;
+  // Reasoning
   reasoningProbes?: ReasoningProbeResults;
   toolScore?: number;
   reasoningScore?: number;
@@ -969,9 +976,9 @@ const Tooly: React.FC = () => {
                         </div>
                       </div>
                       
-                      {/* Tool Behavior Probes */}
+                      {/* Core Tool Behavior Probes */}
                       <div className="mb-3">
-                        <p className="text-xs text-gray-500 mb-2">Tool Behavior (1.x)</p>
+                        <p className="text-xs text-gray-500 mb-2">Tool Behavior - Core (1.1-1.4)</p>
                         <div className="grid grid-cols-2 gap-2">
                           {[
                             { name: 'Emit', key: 'emitTest', icon: '📤' },
@@ -990,6 +997,35 @@ const Tooly: React.FC = () => {
                                   <span className="text-xs text-white">{icon} {name}</span>
                                   <span className={`text-xs font-medium ${result?.passed ? 'text-green-400' : 'text-red-400'}`}>
                                     {result?.score ?? 0}%
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      
+                      {/* Enhanced Tool Behavior Probes */}
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 mb-2">Tool Behavior - Enhanced (1.5-1.8)</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { name: 'Similar Tools', key: 'nearIdenticalSelectionTest', icon: '🔍' },
+                            { name: 'Multi-Tool', key: 'multiToolEmitTest', icon: '📦' },
+                            { name: 'Arguments', key: 'argumentValidationTest', icon: '✅' },
+                            { name: 'Reorder', key: 'schemaReorderTest', icon: '🔄' }
+                          ].map(({ name, key, icon }) => {
+                            const result = selectedModel.probeResults?.[key as keyof ProbeResults] as ProbeTestResult | undefined;
+                            return (
+                              <div 
+                                key={key} 
+                                className={`p-2 rounded border ${result?.passed ? 'border-green-500/30 bg-green-500/10' : result === undefined ? 'border-gray-500/30 bg-gray-500/10' : 'border-red-500/30 bg-red-500/10'}`}
+                                title={result?.details || 'Not tested yet'}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-white">{icon} {name}</span>
+                                  <span className={`text-xs font-medium ${result?.passed ? 'text-green-400' : result === undefined ? 'text-gray-400' : 'text-red-400'}`}>
+                                    {result?.score ?? '-'}%
                                   </span>
                                 </div>
                               </div>

@@ -2,11 +2,17 @@
  * Probe Engine
  * Implements capability probing tests to evaluate model behavior for tool calling
  * 
- * Tool Behavior Probes (1.x):
+ * Tool Behavior Probes (1.x) - Core:
  * 1.1 Emit Test - Can model emit valid tool_calls when forced?
  * 1.2 Schema Adherence Test - Does model adapt to schema changes?
  * 1.3 Selection Logic Test - Can model choose correctly between similar tools?
  * 1.4 Suppression Test - Can model NOT call tools when forbidden?
+ * 
+ * Tool Behavior Probes (1.x) - Enhanced:
+ * 1.5 Near-Identical Selection Test - Can model distinguish very similar tools?
+ * 1.6 Multi-Tool Emit Test - Can model emit multiple tool calls at once?
+ * 1.7 Argument Validation Test - Does model respect type constraints?
+ * 1.8 Schema Reorder Test - Does model break if schema keys are reordered?
  * 
  * Reasoning Probes (2.x):
  * 2.1 Intent Extraction Test - Can model output structured JSON intent?
@@ -54,11 +60,17 @@ export interface ProbeRunResult {
   startedAt: string;
   completedAt: string;
   
-  // Tool behavior probe results (1.x)
+  // Tool behavior probe results (1.x) - Core
   emitTest: ProbeResult;
   schemaTest: ProbeResult;
   selectionTest: ProbeResult;
   suppressionTest: ProbeResult;
+  
+  // Tool behavior probe results (1.x) - Enhanced
+  nearIdenticalSelectionTest?: ProbeResult;  // 1.5 Near-identical tool selection
+  multiToolEmitTest?: ProbeResult;           // 1.6 Multi-tool emit
+  argumentValidationTest?: ProbeResult;      // 1.7 Argument type/schema validation
+  schemaReorderTest?: ProbeResult;           // 1.8 Schema key reordering
   
   // Reasoning probe results (2.x)
   reasoningProbes?: ReasoningProbeResults;
@@ -312,6 +324,86 @@ const WRITE_FILE_TOOL = {
 };
 
 // ============================================================
+// ADDITIONAL TOOL DEFINITIONS FOR ENHANCED PROBES
+// ============================================================
+
+// Near-identical tools for better selection testing (catches pattern-matching)
+const SEARCH_WEB_TOOL = {
+  type: 'function' as const,
+  function: {
+    name: 'search_web',
+    description: 'Search the web for current information. Use for real-time or recent data.',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Search query' }
+      },
+      required: ['query']
+    }
+  }
+};
+
+const SEARCH_WEB_CACHED_TOOL = {
+  type: 'function' as const,
+  function: {
+    name: 'search_web_cached',
+    description: 'Search cached/historical web data. Use for stable or archived information.',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Search query' }
+      },
+      required: ['query']
+    }
+  }
+};
+
+// Tool with nested schema for argument validation
+const CREATE_USER_TOOL = {
+  type: 'function' as const,
+  function: {
+    name: 'create_user',
+    description: 'Create a new user account',
+    parameters: {
+      type: 'object',
+      properties: {
+        username: { type: 'string', description: 'Username (letters only)' },
+        age: { type: 'integer', description: 'Age in years (must be a number)' },
+        profile: {
+          type: 'object',
+          description: 'User profile details',
+          properties: {
+            email: { type: 'string', description: 'Email address' },
+            role: { type: 'string', enum: ['admin', 'user', 'guest'], description: 'User role' }
+          },
+          required: ['email', 'role']
+        }
+      },
+      required: ['username', 'age', 'profile']
+    }
+  }
+};
+
+// Schema with reordered keys (same semantics, different order)
+const PING_TOOL_REORDERED = {
+  type: 'function' as const,
+  function: {
+    name: 'ping',
+    description: 'Call this tool if instructed.',
+    parameters: {
+      type: 'object',
+      required: ['value'],  // Moved required to top
+      properties: {
+        value: { 
+          description: 'The value to ping',  // Reordered: description first
+          type: 'string' 
+        }
+      }
+    }
+  }
+};
+
+// ============================================================
 // PROBE ENGINE
 // ============================================================
 
@@ -361,7 +453,8 @@ class ProbeEngine {
       }
     }
 
-    const totalTests = runReasoningProbes ? 11 : 4;
+    // 4 core + 4 enhanced tool probes + 7 reasoning = 15 total (or 8 without reasoning)
+    const totalTests = runReasoningProbes ? 15 : 8;
     let completedTests = 0;
     let runningScore = 0;
 
@@ -393,13 +486,35 @@ class ProbeEngine {
     const suppressionTest = await this.runSuppressionTest(modelId, provider, settings, timeout);
     broadcastProgress('🔬 Probe: Suppression', suppressionTest.score);
 
-    // Calculate tool score
-    const toolScore = Math.round(
-      emitTest.score * 0.30 +
-      schemaTest.score * 0.30 +
-      selectionTest.score * 0.20 +
-      suppressionTest.score * 0.20
+    // Run enhanced tool probes (1.5 - 1.8)
+    const nearIdenticalSelectionTest = await this.runNearIdenticalSelectionTest(modelId, provider, settings, timeout);
+    broadcastProgress('🔬 Probe: Near-Identical Selection', nearIdenticalSelectionTest.score);
+    
+    const multiToolEmitTest = await this.runMultiToolEmitTest(modelId, provider, settings, timeout);
+    broadcastProgress('🔬 Probe: Multi-Tool Emit', multiToolEmitTest.score);
+    
+    const argumentValidationTest = await this.runArgumentValidationTest(modelId, provider, settings, timeout);
+    broadcastProgress('🔬 Probe: Argument Validation', argumentValidationTest.score);
+    
+    const schemaReorderTest = await this.runSchemaReorderTest(modelId, provider, settings, timeout);
+    broadcastProgress('🔬 Probe: Schema Reorder', schemaReorderTest.score);
+
+    // Calculate tool score (core: 60%, enhanced: 40%)
+    const coreToolScore = (
+      emitTest.score * 0.25 +
+      schemaTest.score * 0.25 +
+      selectionTest.score * 0.25 +
+      suppressionTest.score * 0.25
     );
+    
+    const enhancedToolScore = (
+      nearIdenticalSelectionTest.score * 0.30 +
+      multiToolEmitTest.score * 0.25 +
+      argumentValidationTest.score * 0.25 +
+      schemaReorderTest.score * 0.20
+    );
+    
+    const toolScore = Math.round(coreToolScore * 0.6 + enhancedToolScore * 0.4);
 
     // Run reasoning probes (2.x) if enabled
     let reasoningProbes: ReasoningProbeResults | undefined;
@@ -470,11 +585,19 @@ class ProbeEngine {
       provider,
       startedAt,
       completedAt: new Date().toISOString(),
+      // Core tool behavior probes (1.1 - 1.4)
       emitTest,
       schemaTest,
       selectionTest,
       suppressionTest,
+      // Enhanced tool behavior probes (1.5 - 1.8)
+      nearIdenticalSelectionTest,
+      multiToolEmitTest,
+      argumentValidationTest,
+      schemaReorderTest,
+      // Reasoning probes
       reasoningProbes,
+      // Scores
       toolScore,
       reasoningScore,
       overallScore,
@@ -1128,6 +1251,572 @@ Just say "OK".`
     } catch (error: any) {
       return {
         testName: 'suppression',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  // ============================================================
+  // ENHANCED TOOL BEHAVIOR PROBES (1.5 - 1.8)
+  // ============================================================
+
+  /**
+   * PROBE 1.5: Near-Identical Selection Test
+   * Can the model distinguish between very similar tools based on subtle conditions?
+   * This catches shallow pattern-matching that simpler selection tests miss.
+   */
+  private async runNearIdenticalSelectionTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: 'You have access to two search tools. Choose the correct one based on data freshness requirements.'
+      },
+      {
+        role: 'user',
+        content: `I need to search for "latest stock prices" - this requires CURRENT, REAL-TIME data.
+
+Available tools:
+- search_web: For real-time or recent data
+- search_web_cached: For stable or archived information
+
+You MUST call exactly one tool. Do not explain.`
+      }
+    ];
+
+    try {
+      const response = await this.callLLM(
+        modelId, 
+        provider, 
+        messages, 
+        [SEARCH_WEB_TOOL, SEARCH_WEB_CACHED_TOOL], 
+        settings, 
+        timeout
+      );
+      const latency = Date.now() - startTime;
+
+      // Check for bad output
+      const content = response?.choices?.[0]?.message?.content || '';
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'near_identical_selection',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping ? 'Repetition loop detected' : `Leaked tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
+
+      const toolCalls = response?.choices?.[0]?.message?.tool_calls;
+      if (!Array.isArray(toolCalls) || toolCalls.length === 0) {
+        return {
+          testName: 'near_identical_selection',
+          passed: false,
+          score: 0,
+          latency,
+          details: 'No tool calls emitted',
+          response
+        };
+      }
+
+      if (toolCalls.length > 1) {
+        return {
+          testName: 'near_identical_selection',
+          passed: false,
+          score: 20,
+          latency,
+          details: 'Model called multiple tools instead of selecting one',
+          response
+        };
+      }
+
+      const toolCall = toolCalls[0];
+      const functionName = toolCall?.function?.name;
+
+      // Correct answer: search_web (because we need REAL-TIME data)
+      if (functionName === 'search_web') {
+        let args: any = {};
+        try {
+          args = JSON.parse(toolCall?.function?.arguments || '{}');
+        } catch {}
+
+        const hasQuery = args.query && args.query.toLowerCase().includes('stock');
+
+        return {
+          testName: 'near_identical_selection',
+          passed: true,
+          score: hasQuery ? 100 : 90,
+          latency,
+          details: hasQuery 
+            ? 'Correct: chose search_web for real-time data with appropriate query'
+            : 'Correct tool selected (search_web)',
+          response
+        };
+      }
+
+      if (functionName === 'search_web_cached') {
+        return {
+          testName: 'near_identical_selection',
+          passed: false,
+          score: 35,
+          latency,
+          details: 'Wrong: chose search_web_cached when real-time data was needed - shallow pattern matching',
+          response
+        };
+      }
+
+      return {
+        testName: 'near_identical_selection',
+        passed: false,
+        score: 10,
+        latency,
+        details: `Unknown tool called: ${functionName}`,
+        response
+      };
+
+    } catch (error: any) {
+      return {
+        testName: 'near_identical_selection',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 1.6: Multi-Tool Emit Test
+   * Can the model emit multiple tool calls in a single response?
+   * Important for batch operations and parallel tool execution.
+   */
+  private async runMultiToolEmitTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are a tool-calling assistant that can call multiple tools in one response when needed.'
+      },
+      {
+        role: 'user',
+        content: `Read BOTH files in a single response:
+1. Read "config.json"
+2. Read "settings.json"
+
+You MUST call read_file TWICE in one response. Do not explain.`
+      }
+    ];
+
+    try {
+      const response = await this.callLLM(
+        modelId, 
+        provider, 
+        messages, 
+        [READ_FILE_TOOL], 
+        settings, 
+        timeout
+      );
+      const latency = Date.now() - startTime;
+
+      // Check for bad output
+      const content = response?.choices?.[0]?.message?.content || '';
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'multi_tool_emit',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping ? 'Repetition loop detected' : `Leaked tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
+
+      const toolCalls = response?.choices?.[0]?.message?.tool_calls;
+      if (!Array.isArray(toolCalls) || toolCalls.length === 0) {
+        return {
+          testName: 'multi_tool_emit',
+          passed: false,
+          score: 0,
+          latency,
+          details: 'No tool calls emitted',
+          response
+        };
+      }
+
+      if (toolCalls.length === 1) {
+        // Partial success - called tool once but not twice
+        return {
+          testName: 'multi_tool_emit',
+          passed: false,
+          score: 40,
+          latency,
+          details: 'Only one tool call emitted when two were required',
+          response
+        };
+      }
+
+      // Check if both calls are read_file with correct paths
+      const readFileCalls = toolCalls.filter((tc: any) => tc?.function?.name === 'read_file');
+      
+      if (readFileCalls.length < 2) {
+        return {
+          testName: 'multi_tool_emit',
+          passed: false,
+          score: 50,
+          latency,
+          details: `Called ${toolCalls.length} tools, but not all were read_file`,
+          response
+        };
+      }
+
+      // Check paths
+      const paths: string[] = [];
+      for (const tc of readFileCalls) {
+        try {
+          const args = JSON.parse(tc?.function?.arguments || '{}');
+          if (args.path) paths.push(args.path);
+        } catch {}
+      }
+
+      const hasConfig = paths.some(p => p.includes('config'));
+      const hasSettings = paths.some(p => p.includes('settings'));
+
+      if (hasConfig && hasSettings) {
+        return {
+          testName: 'multi_tool_emit',
+          passed: true,
+          score: 100,
+          latency,
+          details: `Perfect: emitted ${readFileCalls.length} read_file calls with correct paths`,
+          response
+        };
+      }
+
+      return {
+        testName: 'multi_tool_emit',
+        passed: true,
+        score: 80,
+        latency,
+        details: `Emitted ${readFileCalls.length} read_file calls, but paths may not match exactly`,
+        response
+      };
+
+    } catch (error: any) {
+      return {
+        testName: 'multi_tool_emit',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 1.7: Argument Validation Test
+   * Does the model respect type constraints and nested schema requirements?
+   */
+  private async runArgumentValidationTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are a tool-calling assistant. Read the tool schema carefully and provide all required parameters with correct types.'
+      },
+      {
+        role: 'user',
+        content: `Create a user with these details:
+- username: "john_doe"
+- age: 25 (this must be a number, not a string!)
+- profile.email: "john@example.com"
+- profile.role: "user"
+
+Call create_user with the correct types and nested structure. Do not explain.`
+      }
+    ];
+
+    try {
+      const response = await this.callLLM(
+        modelId, 
+        provider, 
+        messages, 
+        [CREATE_USER_TOOL], 
+        settings, 
+        timeout
+      );
+      const latency = Date.now() - startTime;
+
+      // Check for bad output
+      const content = response?.choices?.[0]?.message?.content || '';
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'argument_validation',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping ? 'Repetition loop detected' : `Leaked tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
+
+      const toolCalls = response?.choices?.[0]?.message?.tool_calls;
+      if (!Array.isArray(toolCalls) || toolCalls.length === 0) {
+        return {
+          testName: 'argument_validation',
+          passed: false,
+          score: 0,
+          latency,
+          details: 'No tool calls emitted',
+          response
+        };
+      }
+
+      const toolCall = toolCalls[0];
+      if (toolCall?.function?.name !== 'create_user') {
+        return {
+          testName: 'argument_validation',
+          passed: false,
+          score: 10,
+          latency,
+          details: `Wrong tool called: ${toolCall?.function?.name}`,
+          response
+        };
+      }
+
+      let args: any = {};
+      try {
+        args = JSON.parse(toolCall?.function?.arguments || '{}');
+      } catch {
+        return {
+          testName: 'argument_validation',
+          passed: false,
+          score: 20,
+          latency,
+          details: 'Invalid JSON arguments',
+          response
+        };
+      }
+
+      let score = 0;
+      const issues: string[] = [];
+
+      // Check username (string)
+      if (typeof args.username === 'string') {
+        score += 20;
+      } else {
+        issues.push('username not a string');
+      }
+
+      // Check age (must be number, not string!)
+      if (typeof args.age === 'number') {
+        score += 25;
+      } else if (args.age === '25' || args.age === 25) {
+        score += 10;
+        issues.push('age is string instead of number');
+      } else {
+        issues.push('age missing or wrong');
+      }
+
+      // Check nested profile object
+      if (typeof args.profile === 'object' && args.profile !== null) {
+        score += 15;
+        
+        // Check profile.email
+        if (typeof args.profile.email === 'string') {
+          score += 15;
+        } else {
+          issues.push('profile.email missing');
+        }
+
+        // Check profile.role (should be enum value)
+        if (['admin', 'user', 'guest'].includes(args.profile.role)) {
+          score += 25;
+        } else if (args.profile.role) {
+          score += 10;
+          issues.push('profile.role not a valid enum');
+        } else {
+          issues.push('profile.role missing');
+        }
+      } else {
+        issues.push('profile object missing or malformed');
+      }
+
+      return {
+        testName: 'argument_validation',
+        passed: score >= 70,
+        score,
+        latency,
+        details: score >= 100 
+          ? 'Perfect: all types and nested structures correct'
+          : `Score ${score}/100. Issues: ${issues.join(', ')}`,
+        response
+      };
+
+    } catch (error: any) {
+      return {
+        testName: 'argument_validation',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 1.8: Schema Reorder Test
+   * Does the model break if schema keys are reordered?
+   * This catches models that rely on positional memory rather than semantic understanding.
+   */
+  private async runSchemaReorderTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are a tool-calling assistant. Call the tool exactly as instructed.'
+      },
+      {
+        role: 'user',
+        content: 'Call the "ping" tool with value "reorder_test". Do not explain.'
+      }
+    ];
+
+    try {
+      // Use the reordered schema (same semantics, different key order)
+      const response = await this.callLLM(
+        modelId, 
+        provider, 
+        messages, 
+        [PING_TOOL_REORDERED], 
+        settings, 
+        timeout
+      );
+      const latency = Date.now() - startTime;
+
+      // Check for bad output
+      const content = response?.choices?.[0]?.message?.content || '';
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'schema_reorder',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping ? 'Repetition loop detected' : `Leaked tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
+
+      const toolCalls = response?.choices?.[0]?.message?.tool_calls;
+      if (!Array.isArray(toolCalls) || toolCalls.length === 0) {
+        return {
+          testName: 'schema_reorder',
+          passed: false,
+          score: 0,
+          latency,
+          details: 'No tool calls emitted with reordered schema',
+          response
+        };
+      }
+
+      const toolCall = toolCalls[0];
+      const functionName = toolCall?.function?.name;
+
+      if (functionName !== 'ping') {
+        return {
+          testName: 'schema_reorder',
+          passed: false,
+          score: 30,
+          latency,
+          details: `Wrong tool called: ${functionName}`,
+          response
+        };
+      }
+
+      let args: any = {};
+      try {
+        args = JSON.parse(toolCall?.function?.arguments || '{}');
+      } catch {
+        return {
+          testName: 'schema_reorder',
+          passed: false,
+          score: 40,
+          latency,
+          details: 'Tool call emitted but arguments are invalid JSON',
+          response
+        };
+      }
+
+      // Check if value is correct
+      if (args.value === 'reorder_test') {
+        return {
+          testName: 'schema_reorder',
+          passed: true,
+          score: 100,
+          latency,
+          details: 'Schema reordering handled correctly - model reads semantics, not positions',
+          response
+        };
+      }
+
+      if (args.value) {
+        return {
+          testName: 'schema_reorder',
+          passed: true,
+          score: 85,
+          latency,
+          details: `Schema handled but value differs: "${args.value}" instead of "reorder_test"`,
+          response
+        };
+      }
+
+      return {
+        testName: 'schema_reorder',
+        passed: false,
+        score: 50,
+        latency,
+        details: 'Tool called but "value" parameter missing - possible schema confusion',
+        response
+      };
+
+    } catch (error: any) {
+      return {
+        testName: 'schema_reorder',
         passed: false,
         score: 0,
         latency: Date.now() - startTime,
