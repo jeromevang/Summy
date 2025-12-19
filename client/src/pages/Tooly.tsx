@@ -822,10 +822,22 @@ const Tooly: React.FC = () => {
                   <button
                     onClick={async () => {
                       if (!selectedModel) return;
-                      // Run probe tests (includes reasoning) with latency profile
-                      await runProbeTests(selectedModel.modelId, selectedModel.provider, true);
-                      // Run tool tests
+                      // Order: probe → reasoning → tools → latency
+                      // 1. Run probe tests (includes reasoning) WITHOUT latency
+                      await runProbeTests(selectedModel.modelId, selectedModel.provider, false);
+                      // 2. Run tool capability tests
                       await runModelTests(selectedModel.modelId, selectedModel.provider);
+                      // 3. Run latency profile last
+                      try {
+                        await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/latency-profile`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ provider: selectedModel.provider })
+                        });
+                        await fetchModelProfile(selectedModel.modelId);
+                      } catch (error) {
+                        console.error('Failed to run latency profile:', error);
+                      }
                     }}
                     disabled={probingModel === selectedModel.modelId || testingModel === selectedModel.modelId}
                     className="w-full py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"

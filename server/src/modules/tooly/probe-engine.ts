@@ -338,6 +338,26 @@ class ProbeEngine {
     console.log(`[ProbeEngine] Starting probe tests for ${modelId} (provider: ${provider})`);
     notifications.info(`Starting probe tests for ${modelId}`);
 
+    // For LM Studio: load model with minimal context
+    const contextLength = options.contextLength || 2048;
+    if (provider === 'lmstudio' && settings.lmstudioUrl) {
+      try {
+        const client = new LMStudioClient();
+        console.log(`[ProbeEngine] Loading model ${modelId} with context ${contextLength}...`);
+        await client.llm.load(modelId, {
+          config: { contextLength }
+        });
+        console.log(`[ProbeEngine] Model ${modelId} loaded with context ${contextLength}`);
+      } catch (error: any) {
+        // Model might already be loaded or other error
+        if (!error.message?.includes('already loaded')) {
+          console.log(`[ProbeEngine] Could not load model: ${error.message}`);
+        } else {
+          console.log(`[ProbeEngine] Model ${modelId} was already loaded`);
+        }
+      }
+    }
+
     const totalTests = runReasoningProbes ? 11 : 4;
     let completedTests = 0;
     let runningScore = 0;
