@@ -115,7 +115,23 @@ router.get('/models/:modelId', async (req, res) => {
       return;
     }
     
-    res.json(profile);
+    // Get maxContextLength from LM Studio if available
+    let maxContextLength: number | undefined;
+    try {
+      const settings = await fs.readJson(SETTINGS_FILE).catch(() => ({}));
+      if (settings.lmstudioUrl) {
+        const axios = (await import('axios')).default;
+        const modelsRes = await axios.get(`${settings.lmstudioUrl}/api/v0/models`, { timeout: 3000 });
+        const model = modelsRes.data?.data?.find((m: any) => m.id === modelId);
+        if (model?.max_context_length) {
+          maxContextLength = model.max_context_length;
+        }
+      }
+    } catch (e) {
+      // Ignore - maxContextLength will be undefined
+    }
+    
+    res.json({ ...profile, maxContextLength });
   } catch (error: any) {
     console.error('[Tooly] Failed to get model profile:', error);
     res.status(500).json({ error: error.message });

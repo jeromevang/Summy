@@ -48,6 +48,7 @@ interface ModelProfile {
   enabledTools: string[];
   capabilities: Record<string, { supported: boolean; score: number }>;
   contextLength?: number;
+  maxContextLength?: number;
   role?: 'main' | 'executor' | 'both' | 'none';
   probeResults?: ProbeResults;
   contextLatency?: ContextLatencyData;
@@ -63,6 +64,7 @@ interface DiscoveredModel {
   toolCount?: number;
   totalTools?: number;
   role?: 'main' | 'executor' | 'both' | 'none';
+  maxContextLength?: number;
 }
 
 interface TestDefinition {
@@ -851,14 +853,21 @@ const Tooly: React.FC = () => {
                   <div className="p-3 bg-[#2d2d2d] rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-gray-400">Context Length</span>
-                      {selectedModel.contextLength && (
-                        <button
-                          onClick={() => removeContextLength(selectedModel.modelId)}
-                          className="text-xs text-red-400 hover:text-red-300"
-                        >
-                          Remove custom
-                        </button>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {selectedModel.maxContextLength && (
+                          <span className="text-xs text-gray-500">
+                            max: {selectedModel.maxContextLength.toLocaleString()}
+                          </span>
+                        )}
+                        {selectedModel.contextLength && (
+                          <button
+                            onClick={() => removeContextLength(selectedModel.modelId)}
+                            className="text-xs text-red-400 hover:text-red-300"
+                          >
+                            Remove custom
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <select
@@ -870,14 +879,24 @@ const Tooly: React.FC = () => {
                         }}
                         className="flex-1 bg-[#0d0d0d] border border-[#3d3d3d] rounded px-2 py-1 text-white text-sm focus:border-purple-500 focus:outline-none"
                       >
-                        <option value={2048}>2,048 (2K)</option>
-                        <option value={4096}>4,096 (4K)</option>
-                        <option value={8192}>8,192 (8K)</option>
-                        <option value={16384}>16,384 (16K)</option>
-                        <option value={32768}>32,768 (32K)</option>
-                        <option value={65536}>65,536 (64K)</option>
-                        <option value={131072}>131,072 (128K)</option>
-                        <option value={1048576}>1,048,576 (1M)</option>
+                        {(() => {
+                          const maxCtx = selectedModel.maxContextLength || 1048576;
+                          const allSizes = [
+                            { value: 2048, label: '2,048 (2K)' },
+                            { value: 4096, label: '4,096 (4K)' },
+                            { value: 8192, label: '8,192 (8K)' },
+                            { value: 16384, label: '16,384 (16K)' },
+                            { value: 32768, label: '32,768 (32K)' },
+                            { value: 65536, label: '65,536 (64K)' },
+                            { value: 131072, label: '131,072 (128K)' },
+                            { value: 1048576, label: '1,048,576 (1M)' },
+                          ];
+                          return allSizes
+                            .filter(size => size.value <= maxCtx)
+                            .map(size => (
+                              <option key={size.value} value={size.value}>{size.label}</option>
+                            ));
+                        })()}
                       </select>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">

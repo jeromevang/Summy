@@ -29,6 +29,7 @@ export interface DiscoveredModel {
   testedAt?: string;
   error?: string;
   role?: 'main' | 'executor' | 'both' | 'none';
+  maxContextLength?: number;
 }
 
 export interface ModelDiscoveryResult {
@@ -92,12 +93,14 @@ class ModelDiscoveryService {
 
   /**
    * Discover LM Studio models
+   * Uses /api/v0/models which provides max_context_length
    */
   async discoverLMStudio(lmstudioUrl?: string): Promise<DiscoveredModel[]> {
     if (!lmstudioUrl) return [];
 
     try {
-      const response = await axios.get(`${lmstudioUrl}/v1/models`, {
+      // Use v0 API which returns max_context_length
+      const response = await axios.get(`${lmstudioUrl}/api/v0/models`, {
         timeout: 5000
       });
 
@@ -137,7 +140,8 @@ class ModelDiscoveryService {
           totalTools: 22,
           avgLatency: profile?.avgLatency,
           testedAt: profile?.testedAt,
-          role: profile?.role
+          role: profile?.role,
+          maxContextLength: model.max_context_length
         });
       }
 
