@@ -12,6 +12,7 @@ import { analytics } from '../services/analytics.js';
 import { db } from '../services/database.js';
 import { capabilities, ALL_TOOLS } from '../modules/tooly/capabilities.js';
 import { testEngine, TEST_DEFINITIONS } from '../modules/tooly/test-engine.js';
+import { probeEngine } from '../modules/tooly/probe-engine.js';
 import { rollback } from '../modules/tooly/rollback.js';
 import { mcpClient } from '../modules/tooly/mcp-client.js';
 
@@ -169,6 +170,119 @@ router.post('/models/:modelId/test', async (req, res) => {
     res.json(result);
   } catch (error: any) {
     console.error('[Tooly] Failed to run tests:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/models/:modelId/probe
+ * Run probe tests (emit, schema, selection, suppression) for a model
+ * This determines the model's role (main, executor, both, none)
+ */
+router.post('/models/:modelId/probe', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const body = req.body || {};
+    const provider = body.provider || 'lmstudio';
+    const runLatencyProfile = body.runLatencyProfile || false;
+    
+    // Load settings
+    let settings: any = {};
+    
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch {
+      // Use defaults
+    }
+
+    const testSettings = {
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+      openaiApiKey: process.env.OPENAI_API_KEY,
+      azureResourceName: settings.azureResourceName,
+      azureApiKey: settings.azureApiKey,
+      azureDeploymentName: settings.azureDeploymentName,
+      azureApiVersion: settings.azureApiVersion
+    };
+
+    console.log(`[Tooly] Running probe tests for ${modelId}`);
+
+    const result = await probeEngine.runAllProbes(modelId, provider, testSettings, {
+      contextLength: settings.defaultContextLength || 8192,
+      timeout: 30000,
+      runLatencyProfile
+    });
+
+    // Save probe results to model profile
+    await capabilities.updateProbeResults(
+      modelId,
+      {
+        testedAt: result.completedAt,
+        emitTest: { passed: result.emitTest.passed, score: result.emitTest.score, details: result.emitTest.details },
+        schemaTest: { passed: result.schemaTest.passed, score: result.schemaTest.score, details: result.schemaTest.details },
+        selectionTest: { passed: result.selectionTest.passed, score: result.selectionTest.score, details: result.selectionTest.details },
+        suppressionTest: { passed: result.suppressionTest.passed, score: result.suppressionTest.score, details: result.suppressionTest.details },
+        overallScore: result.overallScore
+      },
+      result.role,
+      result.contextLatency
+    );
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to run probe tests:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/models/:modelId/latency-profile
+ * Run context latency profiling for a model
+ */
+router.post('/models/:modelId/latency-profile', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const body = req.body || {};
+    const provider = body.provider || 'lmstudio';
+    
+    // Load settings
+    let settings: any = {};
+    
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch {
+      // Use defaults
+    }
+
+    const testSettings = {
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+      openaiApiKey: process.env.OPENAI_API_KEY,
+      azureResourceName: settings.azureResourceName,
+      azureApiKey: settings.azureApiKey,
+      azureDeploymentName: settings.azureDeploymentName,
+      azureApiVersion: settings.azureApiVersion
+    };
+
+    console.log(`[Tooly] Running latency profile for ${modelId}`);
+
+    const result = await probeEngine.runContextLatencyProfile(modelId, provider, testSettings, 30000);
+
+    // Update profile with latency data
+    let profile = await capabilities.getProfile(modelId);
+    if (profile) {
+      profile.contextLatency = result;
+      if (!profile.contextLength) {
+        profile.contextLength = result.recommendedContext;
+      }
+      await capabilities.saveProfile(profile);
+    }
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to run latency profile:', error);
     res.status(500).json({ error: error.message });
   }
 });
