@@ -1564,59 +1564,119 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     return response.data;
   }
 
+  // Known max context sizes for popular models
+  private static readonly KNOWN_MODEL_CONTEXTS: Record<string, number> = {
+    // DeepSeek models
+    'deepseek-coder-6.7b': 16384,
+    'deepseek-coder-33b': 16384,
+    'deepseek-coder': 16384,
+    
+    // Qwen models
+    'qwen2.5-coder-0.5b': 32768,
+    'qwen2.5-coder-1.5b': 32768,
+    'qwen2.5-coder-7b': 131072,
+    'qwen2.5-coder-14b': 131072,
+    'qwen2.5-coder-32b': 131072,
+    'qwen3-4b': 32768,
+    'qwen3-8b': 32768,
+    'qwen3-14b': 32768,
+    'qwen2.5-7b-instruct-1m': 1048576,
+    
+    // Phi models
+    'phi-3-mini-4k': 4096,
+    'phi-3.1-mini-128k': 131072,
+    
+    // TinyLlama
+    'tinyllama-1.1b': 2048,
+    
+    // LLaMA models
+    'llama-3-8b': 8192,
+    'llama-3.1': 131072,
+    'llama-3.2': 131072,
+    'meta-llama-3-8b': 8192,
+    
+    // Mistral models
+    'mistral-7b': 32768,
+    'mistral-small': 32768,
+    'ministral-3': 32768,
+    'mixtral-8x7b': 32768,
+    
+    // StarCoder
+    'starcoder2-15b': 16384,
+    
+    // WizardCoder
+    'wizardcoder-15b': 8192,
+    
+    // Osmosis
+    'osmosis-mcp-4b': 8192,
+    'osmosis-structure-0.6b': 2048,
+    
+    // Nvidia
+    'nemotron-nano-12b': 8192,
+    'nemotron-70b': 131072,
+    
+    // Functionary
+    'functionary': 8192,
+  };
+
   /**
-   * Get the model's maximum context size from LM Studio
+   * Get the model's maximum context size
    */
   private async getModelMaxContext(
     modelId: string, 
     settings: any
-  ): Promise<number | null> {
-    if (!settings.lmstudioUrl) return null;
-
-    try {
-      const client = new LMStudioClient();
-      
-      // Try to get info from loaded models first
-      const loadedModels = await client.llm.listLoaded();
-      const loadedModel = loadedModels.find(m => 
-        m.identifier === modelId || m.path === modelId || m.identifier.includes(modelId)
-      );
-      
-      if (loadedModel) {
-        // Check if the loaded model has context info
-        console.log(`[ProbeEngine] Loaded model info:`, JSON.stringify(loadedModel, null, 2));
-        
-        // Try to get contextLength from the loaded model's config
-        const modelInfo = loadedModel as any;
-        if (modelInfo.contextLength) {
-          return modelInfo.contextLength;
-        }
+  ): Promise<number> {
+    const modelIdLower = modelId.toLowerCase();
+    
+    // 1. First check if context size is encoded in the model name
+    const contextMatch = modelIdLower.match(/(\d+)k(?:-|$|instruct)/);
+    if (contextMatch) {
+      const contextK = parseInt(contextMatch[1]);
+      if (contextK > 0) {
+        const context = contextK * 1024;
+        console.log(`[ProbeEngine] Extracted context ${context} from model name: ${modelId}`);
+        return context;
       }
-
-      // Try REST API to get model details
-      const response = await axios.get(`${settings.lmstudioUrl}/v1/models`, {
-        timeout: 5000
-      });
-
-      const models = response.data?.data || [];
-      const model = models.find((m: any) => 
-        m.id === modelId || m.id?.includes(modelId)
-      );
-
-      if (model) {
-        console.log(`[ProbeEngine] Model info from API:`, JSON.stringify(model, null, 2));
-        
-        // LM Studio may return context_length or max_tokens
-        if (model.context_length) return model.context_length;
-        if (model.max_tokens) return model.max_tokens;
-        if (model.max_context_length) return model.max_context_length;
-      }
-
-      return null;
-    } catch (error: any) {
-      console.log(`[ProbeEngine] Could not get model max context: ${error.message}`);
-      return null;
     }
+
+    // Special case for 1M context models
+    if (modelIdLower.includes('1m')) {
+      console.log(`[ProbeEngine] Detected 1M context model: ${modelId}`);
+      return 1048576;
+    }
+
+    // 2. Check known models lookup table
+    for (const [pattern, context] of Object.entries(ProbeEngine.KNOWN_MODEL_CONTEXTS)) {
+      if (modelIdLower.includes(pattern.toLowerCase())) {
+        console.log(`[ProbeEngine] Found known model pattern '${pattern}': ${context}`);
+        return context;
+      }
+    }
+
+    // 3. Try LM Studio SDK for loaded model info
+    if (settings.lmstudioUrl) {
+      try {
+        const client = new LMStudioClient();
+        const loadedModels = await client.llm.listLoaded();
+        const loadedModel = loadedModels.find(m => 
+          m.identifier === modelId || m.path === modelId || m.identifier.includes(modelId)
+        );
+        
+        if (loadedModel) {
+          const modelInfo = loadedModel as any;
+          if (modelInfo.contextLength) {
+            console.log(`[ProbeEngine] Got context from SDK: ${modelInfo.contextLength}`);
+            return modelInfo.contextLength;
+          }
+        }
+      } catch (error: any) {
+        console.log(`[ProbeEngine] SDK error: ${error.message}`);
+      }
+    }
+
+    // 4. Default fallback - assume 8192 as a safe default
+    console.log(`[ProbeEngine] Could not determine max context for ${modelId}, defaulting to 8192`);
+    return 8192;
   }
 
   /**
@@ -1638,21 +1698,11 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     console.log(`[ProbeEngine] Starting context latency profiling for ${modelId}`);
 
     // First, get the model's max context size
-    let modelMaxContext: number | null = null;
-    
-    if (provider === 'lmstudio') {
-      modelMaxContext = await this.getModelMaxContext(modelId, settings);
-      if (modelMaxContext) {
-        console.log(`[ProbeEngine] Model max context from API: ${modelMaxContext}`);
-      } else {
-        console.log(`[ProbeEngine] Could not determine model max context, will test until failure`);
-      }
-    }
+    const modelMaxContext = await this.getModelMaxContext(modelId, settings);
+    console.log(`[ProbeEngine] Model max context: ${modelMaxContext}`);
 
     // Filter context sizes to only test up to model's max
-    const contextSizes = modelMaxContext 
-      ? allContextSizes.filter(size => size <= modelMaxContext)
-      : allContextSizes;
+    const contextSizes = allContextSizes.filter(size => size <= modelMaxContext);
 
     console.log(`[ProbeEngine] Will test context sizes: ${contextSizes.join(', ')}`);
 
@@ -1721,7 +1771,7 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
       latencies,
       maxUsableContext,
       recommendedContext,
-      modelMaxContext: modelMaxContext || undefined
+      modelMaxContext
     };
   }
 
