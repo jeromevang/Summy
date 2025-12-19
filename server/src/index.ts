@@ -1214,6 +1214,24 @@ app.post('/api/settings', async (req, res) => {
   }
 });
 
+// LM Studio status check using SDK
+app.get('/api/lmstudio/status', async (req, res) => {
+  try {
+    const client = new LMStudioClient();
+    const loadedModels = await client.llm.listLoaded();
+    res.json({ 
+      connected: true, 
+      loadedModels: loadedModels.length,
+      models: loadedModels.map(m => m.identifier)
+    });
+  } catch (error: any) {
+    res.json({ 
+      connected: false, 
+      reason: error.message 
+    });
+  }
+});
+
 // Get available OpenAI models
 app.get('/api/openai/models', async (req, res) => {
   try {

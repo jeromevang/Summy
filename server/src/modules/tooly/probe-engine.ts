@@ -1565,46 +1565,38 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
   }
 
   /**
-   * Get the model's maximum context size from LM Studio v0 API
+   * Get the model's maximum context size using LM Studio SDK
    */
   private async getModelMaxContext(
     modelId: string, 
     settings: any
   ): Promise<number> {
-    if (!settings.lmstudioUrl) {
-      console.log(`[ProbeEngine] No LM Studio URL, defaulting to 8192`);
-      return 8192;
-    }
-
     try {
-      // Use LM Studio v0 API which returns max_context_length
-      const response = await axios.get(`${settings.lmstudioUrl}/api/v0/models`, {
-        timeout: 5000
-      });
-
-      const models = response.data?.data || [];
-      const model = models.find((m: any) => m.id === modelId);
-
-      if (model && model.max_context_length) {
-        console.log(`[ProbeEngine] Got max_context_length from API: ${model.max_context_length} for ${modelId}`);
-        return model.max_context_length;
+      const client = new LMStudioClient();
+      const models = await client.system.listDownloadedModels("llm");
+      
+      // Find exact match
+      const model = models.find(m => m.modelKey === modelId);
+      if (model?.maxContextLength) {
+        console.log(`[ProbeEngine] Got maxContextLength from SDK: ${model.maxContextLength} for ${modelId}`);
+        return model.maxContextLength;
       }
 
       // Try partial match if exact match failed
-      const partialMatch = models.find((m: any) => 
-        m.id?.includes(modelId) || modelId.includes(m.id)
+      const partialMatch = models.find(m => 
+        m.modelKey?.includes(modelId) || modelId.includes(m.modelKey)
       );
 
-      if (partialMatch && partialMatch.max_context_length) {
-        console.log(`[ProbeEngine] Got max_context_length from partial match: ${partialMatch.max_context_length} for ${modelId}`);
-        return partialMatch.max_context_length;
+      if (partialMatch?.maxContextLength) {
+        console.log(`[ProbeEngine] Got maxContextLength from partial match: ${partialMatch.maxContextLength} for ${modelId}`);
+        return partialMatch.maxContextLength;
       }
 
-      console.log(`[ProbeEngine] Model ${modelId} not found in API, defaulting to 8192`);
+      console.log(`[ProbeEngine] Model ${modelId} not found via SDK, defaulting to 8192`);
       return 8192;
 
     } catch (error: any) {
-      console.log(`[ProbeEngine] Error fetching model info: ${error.message}, defaulting to 8192`);
+      console.log(`[ProbeEngine] SDK error: ${error.message}, defaulting to 8192`);
       return 8192;
     }
   }

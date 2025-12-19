@@ -7,6 +7,7 @@ import { Router } from 'express';
 import path from 'path';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
+import { LMStudioClient } from '@lmstudio/sdk';
 import { modelDiscovery } from '../services/model-discovery.js';
 import { analytics } from '../services/analytics.js';
 import { db } from '../services/database.js';
@@ -115,23 +116,24 @@ router.get('/models/:modelId', async (req, res) => {
       return;
     }
     
-    // Get maxContextLength from LM Studio if available
+    // Get model info from LM Studio SDK if available
     let maxContextLength: number | undefined;
+    let trainedForToolUse: boolean | undefined;
+    let vision: boolean | undefined;
     try {
-      const settings = await fs.readJson(SETTINGS_FILE).catch(() => ({}));
-      if (settings.lmstudioUrl) {
-        const axios = (await import('axios')).default;
-        const modelsRes = await axios.get(`${settings.lmstudioUrl}/api/v0/models`, { timeout: 3000 });
-        const model = modelsRes.data?.data?.find((m: any) => m.id === modelId);
-        if (model?.max_context_length) {
-          maxContextLength = model.max_context_length;
-        }
+      const client = new LMStudioClient();
+      const models = await client.system.listDownloadedModels("llm");
+      const model = models.find(m => m.modelKey === modelId);
+      if (model) {
+        maxContextLength = model.maxContextLength;
+        trainedForToolUse = model.trainedForToolUse;
+        vision = model.vision;
       }
     } catch (e) {
-      // Ignore - maxContextLength will be undefined
+      // Ignore - SDK not available
     }
     
-    res.json({ ...profile, maxContextLength });
+    res.json({ ...profile, maxContextLength, trainedForToolUse, vision });
   } catch (error: any) {
     console.error('[Tooly] Failed to get model profile:', error);
     res.status(500).json({ error: error.message });
