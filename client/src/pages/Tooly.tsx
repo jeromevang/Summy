@@ -790,7 +790,7 @@ const Tooly: React.FC = () => {
                     <div className="p-3 bg-[#2d2d2d] rounded-lg text-center">
                       <span className="text-gray-400 text-xs">🔧 Tool</span>
                       <p className="text-xl font-bold text-white">
-                        {testProgress.toolsProgress?.modelId === selectedModel.modelId && testProgress.toolsProgress?.status === 'running'
+                        {testProgress.modelId === selectedModel.modelId && testProgress.toolsProgress?.status === 'running'
                           ? testProgress.toolsProgress.score
                           : selectedModel.score ?? 0}
                       </p>
@@ -798,7 +798,7 @@ const Tooly: React.FC = () => {
                     <div className="p-3 bg-[#2d2d2d] rounded-lg text-center">
                       <span className="text-gray-400 text-xs">🔬 Probe</span>
                       <p className="text-xl font-bold text-white">
-                        {testProgress.probeProgress?.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running'
+                        {testProgress.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running'
                           ? testProgress.probeProgress.score
                           : selectedModel.probeResults?.toolScore ?? 0}
                       </p>
@@ -829,7 +829,7 @@ const Tooly: React.FC = () => {
                   </button>
 
                   {/* Test Progress Bars */}
-                  {(testProgress.probeProgress?.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running') && (
+                  {(testProgress.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running') && (
                     <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-purple-400">🔬 Probe Test Running</span>
@@ -847,7 +847,7 @@ const Tooly: React.FC = () => {
                     </div>
                   )}
 
-                  {(testProgress.toolsProgress?.modelId === selectedModel.modelId && testProgress.toolsProgress?.status === 'running') && (
+                  {(testProgress.modelId === selectedModel.modelId && testProgress.toolsProgress?.status === 'running') && (
                     <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-blue-400">🔧 Tool Test Running</span>
@@ -865,7 +865,7 @@ const Tooly: React.FC = () => {
                     </div>
                   )}
 
-                  {(testProgress.latencyProgress?.modelId === selectedModel.modelId && testProgress.latencyProgress?.status === 'running') && (
+                  {(testProgress.modelId === selectedModel.modelId && testProgress.latencyProgress?.status === 'running') && (
                     <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-green-400">⏱️ Latency Test Running</span>
