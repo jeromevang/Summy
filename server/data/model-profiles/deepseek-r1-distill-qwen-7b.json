@@ -2,8 +2,8 @@
   "modelId": "deepseek-r1-distill-qwen-7b",
   "displayName": "deepseek-r1-distill-qwen-7b",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T15:50:20.297Z",
-  "testVersion": 3,
+  "testedAt": "2025-12-19T16:55:41.802Z",
+  "testVersion": 4,
   "score": 80,
   "toolFormat": "openai_tools",
   "capabilities": {
@@ -12,168 +12,168 @@
       "score": 50,
       "testsPassed": 1,
       "testsFailed": 1,
-      "avgLatency": 4103.5,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 4782.5,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "file_write": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3362,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2845,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "file_patch": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3142,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2880,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "file_list": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1966,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 1870,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "file_search": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2122,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 1921,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "create_new_file": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1893,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 1879,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "folder_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1801,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 1722,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "folder_delete": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2863,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2702,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "git_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3710,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 3168,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2048,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 1758,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1025,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 884,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2365,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2211,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "git_add": {
       "supported": false,
       "score": 50,
       "testsPassed": 1,
       "testsFailed": 1,
-      "avgLatency": 3198.5,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 3010.5,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2089,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2056,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1805,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 1797,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2014,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 1918,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "npm_install": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 2869,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2773,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1281,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 1247,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2825,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2406,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "browser_navigate": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3046,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2890,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2458,
-      "lastTested": "2025-12-19T15:50:20.297Z"
+      "avgLatency": 2321,
+      "lastTested": "2025-12-19T16:55:41.802Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -204,143 +204,143 @@
       "testId": "file_read_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-1a4u0du1irqkfcshryde3\",\"object\":\"chat.completion\",\"created\":1766159360,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" \\n\\nOkay, so I need to figure out how to read the contents of a file called \\\"config.json\\\" using the provided tool. Let me break this down step by step.\\n\\nFirst, looking at the instructions, there's a function called file_read which can be used to read a file. The parameters for this function require an obje"
+      "response": "{\"id\":\"chatcmpl-0ntfpqgakxlai4b473vv62\",\"object\":\"chat.completion\",\"created\":1766163287,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" \\n\\nOkay, so I need to figure out how to read the contents of a file called \\\"config.json\\\" using the provided tool. Let me break this down step by step.\\n\\nFirst, looking at the instructions, there's a function called file_read which can be used to read a file. The parameters for this function require an obj"
     },
     {
       "testId": "file_read_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2jioomik2iie3es2s1wbmr\",\"object\":\"chat.completion\",\"created\":1766159365,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" but I don't have access to that file yet. How can I proceed?\\n\\nOkay, so I'm trying to figure out how to check if there's an error in the file src/utils/helpers.ts without actually accessing it. Hmm, maybe I can use some of the tools available to me.\\n\\nWait, there's a function called file_read which can read"
+      "response": "{\"id\":\"chatcmpl-ictkqw5jjpdeijkhuukbqf\",\"object\":\"chat.completion\",\"created\":1766163291,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" but I don't have access to that file yet. How can I proceed?\\n\\nOkay, so I'm trying to figure out how to check if there's an error in the file src/utils/helpers.ts without actually accessing it. Hmm, maybe I can use some of the tools available to me.\\n\\nWait, there's a function called file_read which can read"
     },
     {
       "testId": "file_write_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-vci6xhdpoq8fbxau2xq5e\",\"object\":\"chat.completion\",\"created\":1766159369,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a new file called \\\"hello.js\\\" and have its content be \\\"console.log('Hello World');\\\". Let me think about how to do this using the tools available.\\n\\nFirst, looking at the tools provided, there's a function called file_write. It can write content to a file, creating it if it"
+      "response": "{\"id\":\"chatcmpl-0h3kkfda9hjqn178vxl3vjl\",\"object\":\"chat.completion\",\"created\":1766163294,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a new file called \\\"hello.js\\\" and have its content be \\\"console.log('Hello World');\\\". Let me think about how to do this using the tools available.\\n\\nFirst, looking at the tools provided, there's a function called file_write. It can write content to a file, creating it if "
     },
     {
       "testId": "file_patch_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-tpb0lkzr6fp2belie24mda\",\"object\":\"chat.completion\",\"created\":1766159372,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To address the request of changing the port number in app.js from 3000 to 8080, I need to use the available tool, which is the file_patch function. \\n\\nFirst, I'll identify the exact location where the port number is defined in app.js. Typically, this would be at the beginning of the server declaration, such "
+      "response": "{\"id\":\"chatcmpl-l1ydqjrscgnf3ejvm7v7g\",\"object\":\"chat.completion\",\"created\":1766163297,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To address the request of changing the port number in app.js from 3000 to 8080, I need to use the available tool, which is the file_patch function. \\n\\nFirst, I'll identify the exact location where the port number is defined in app.js. Typically, this would be at the beginning of the server declaration, such a"
     },
     {
       "testId": "file_list_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-mtgr9gbx3spkgn3z3pgt0b\",\"object\":\"chat.completion\",\"created\":1766159375,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show me all files in the src directory, I need to use the \\\"file_list\\\" tool provided. \\n\\nFirst, I'll identify which parameters are required for this tool. The tool expects a \\\"folder\\\" parameter, which defaults to the current directory if not specified.\\n\\nSince the user specifically asked for files in t"
+      "response": "{\"id\":\"chatcmpl-5qzkc9aasmctkll13emdpp\",\"object\":\"chat.completion\",\"created\":1766163300,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show me all files in the src directory, I need to use the \\\"file_list\\\" tool provided. \\n\\nFirst, I'll identify which parameters are required for this tool. The tool expects a \\\"folder\\\" parameter, which defaults to the current directory if not specified.\\n\\nSince the user specifically asked for files in t"
     },
     {
       "testId": "file_search_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-qqy6ypqdr9jqe37qu4qh2\",\"object\":\"chat.completion\",\"created\":1766159377,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to search through multiple project files for any occurrence of the text \\\"TODO\\\". \\n\\nFirst, I'll use the `file_search` tool by providing it with two parameters: the query set to \\\"TODO\\\" and the path where all the project files are located. This will allow me to scan each file th"
+      "response": "{\"id\":\"chatcmpl-55rwz8y0uc26fw0bzdwsc6\",\"object\":\"chat.completion\",\"created\":1766163302,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to search through multiple project files for any occurrence of the text \\\"TODO\\\". \\n\\nFirst, I'll use the `file_search` tool by providing it with two parameters: the query set to \\\"TODO\\\" and the path where all the project files are located. This will allow me to scan each file t"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-kytz4wf48mr03n2gzf1xk\",\"object\":\"chat.completion\",\"created\":1766159379,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To check the current git status, I should use the \\\"git_status\\\" function provided by the toolset. The function requires parameters that define what kind of status report is needed. Typically, Git provides information about stages, commits, branches, and merged files. \\n\\nI need to specify which parts of the r"
+      "response": "{\"id\":\"chatcmpl-6y4nq21tdxftw34n4ohu9a\",\"object\":\"chat.completion\",\"created\":1766163304,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To check the current git status, I should use the \\\"git_status\\\" function provided by the toolset. The function requires parameters that define what kind of status report is needed. Typically, Git provides information about stages, commits, branches, and merged files. \\n\\nI need to specify which parts of the "
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-5w03pmq8itf9vwzs41nevr\",\"object\":\"chat.completion\",\"created\":1766159383,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show the git diff for the file \\\"index.js\\\", I should use the `git_diff` tool. \\n\\nFirst, I need to call the tool with the appropriate parameters. The tool requires a `file` parameter set to \\\"index.js\\\". Since this is optional, but in this case, it's necessary because we're looking at a specific file.\\n\\n"
+      "response": "{\"id\":\"chatcmpl-a2hs0dmdxr465gza1vftn\",\"object\":\"chat.completion\",\"created\":1766163307,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show the git diff for the file \\\"index.js\\\", I should use the `git_diff` tool. \\n\\nFirst, I need to call the tool with the appropriate parameters. The tool requires a `file` parameter set to \\\"index.js\\\". Since this is optional, but in this case, it's necessary because we're looking at a specific file.\\n\\nS"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ufmt5qmoid8wgvzpp9ublk\",\"object\":\"chat.completion\",\"created\":1766159385,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show the last 5 commits, I can use the git_log tool by setting the count parameter to 5.\\n</think>\\n\\nTo display the last five commits in your repository using the git_log tool:\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"559129781\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":\\\"5\\\"}\"}}]},\"logprobs"
+      "response": "{\"id\":\"chatcmpl-jgowur947yofp15zqlspc6\",\"object\":\"chat.completion\",\"created\":1766163308,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show the last 5 commits, I can use the git_log tool by setting the count parameter to 5.\\n</think>\\n\\nTo display the last five commits in your repository using the git_log tool:\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"586082409\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":\\\"5\\\"}\"}}]},\"logprobs"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-1xaus6c8szl0oo4dbu5a9t\",\"object\":\"chat.completion\",\"created\":1766159386,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to commit changes related to fixing a login bug. The user has provided a specific tool called `git_commit` which allows me to make commits with messages. \\n\\nFirst, I should check if there are any existing parameters required for the `git_commit` function. According to the descri"
+      "response": "{\"id\":\"chatcmpl-xs1pjqk6npm9pvanvw0c5f\",\"object\":\"chat.completion\",\"created\":1766163309,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to commit changes related to fixing a login bug. The user has provided a specific tool called `git_commit` which allows me to make commits with messages. \\n\\nFirst, I should check if there are any existing parameters required for the `git_commit` function. According to the descri"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-gxtx3fw1h5olo3u38jbuo9\",\"object\":\"chat.completion\",\"created\":1766159388,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user wants to create a new branch named \\\"feature/user-auth\\\". Looking at the available tools, there's a \\\"git_branch_create\\\" function that can be used for this purpose. \\n\\nI need to structure the tool request correctly. According to the instructions, I should use the exact format with \\\"TOOL_REQUEST\\\" "
+      "response": "{\"id\":\"chatcmpl-fkogy9b0ihwlop87gjnzxf\",\"object\":\"chat.completion\",\"created\":1766163312,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user wants to create a new branch named \\\"feature/user-auth\\\". Looking at the available tools, there's a \\\"git_branch_create\\\" function that can be used for this purpose. \\n\\nI need to structure the tool request correctly. According to the instructions, I should use the exact format with \\\"TOOL_REQUEST\\\" "
     },
     {
       "testId": "npm_run_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-vgtoufbs0ir6l9qwj079u\",\"object\":\"chat.completion\",\"created\":1766159391,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user has requested to run the \\\"build\\\" npm script using the provided tool, which is called \\\"npm_run\\\". To execute this, I need to structure the request correctly according to the specified format.\\n\\nFirst, identify the tool and its function. The tool is \\\"npm_run\\\", and it requires a parameter named \\\"s"
+      "response": "{\"id\":\"chatcmpl-0aihnsipjqj1vi71u0uhi9\",\"object\":\"chat.completion\",\"created\":1766163314,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user has requested to run the \\\"build\\\" npm script using the provided tool, which is called \\\"npm_run\\\". To execute this, I need to structure the request correctly according to the specified format.\\n\\nFirst, identify the tool and its function. The tool is \\\"npm_run\\\", and it requires a parameter named \\\""
     },
     {
       "testId": "npm_install_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-j5yg66aqxlxq1klcvvk3m\",\"object\":\"chat.completion\",\"created\":1766159393,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to figure out how to install the lodash package using the provided tools. The user has given me access to an npm_install tool which can be used to install any npm package by specifying its name as a parameter.\\n\\nFirst, I should identify if lodash is available on npm. From my know"
+      "response": "{\"id\":\"chatcmpl-73rc7bh5dbesmohdn5cxvp\",\"object\":\"chat.completion\",\"created\":1766163316,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to figure out how to install the lodash package using the provided tools. The user has given me access to an npm_install tool which can be used to install any npm package by specifying its name as a parameter.\\n\\nFirst, I should identify if lodash is available on npm. From my kno"
     },
     {
       "testId": "http_request_get",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-1mnb7lq58lweu8cm28yng5\",\"object\":\"chat.completion\",\"created\":1766159395,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To fetch data from the provided URL, I need to use the `http_request` function. This function allows me to make an HTTP request by specifying the URL, method, and body. Since no body is required for fetching user data, I'll set it to an empty string.\\n\\nI should ensure that all required parameters are include"
+      "response": "{\"id\":\"chatcmpl-wg95amdhjorcvey2vnz77t\",\"object\":\"chat.completion\",\"created\":1766163318,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To fetch data from the provided URL, I need to use the `http_request` function. This function allows me to make an HTTP request by specifying the URL, method, and body. Since no body is required for fetching user data, I'll set it to an empty string.\\n\\nI should ensure that all required parameters are include"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-7l0x28ypbwt31579kscpxg\",\"object\":\"chat.completion\",\"created\":1766159398,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to open the GitHub homepage at https://github.com and retrieve its title using the provided tool.\\n\\nFirst, I'll identify which tool is suitable for this task. The available tool is \\\"browser_navigate,\\\" which allows navigating to a webpage and optionally clicking elements or ret"
+      "response": "{\"id\":\"chatcmpl-j2bv0rd86z8kulxbeag2o9\",\"object\":\"chat.completion\",\"created\":1766163321,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to open the GitHub homepage at https://github.com and retrieve its title using the provided tool.\\n\\nFirst, I'll identify which tool is suitable for this task. The available tool is \\\"browser_navigate,\\\" which allows navigating to a webpage and optionally clicking elements or ret"
     },
     {
       "testId": "create_new_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-jlwodn5h3on7fub1m86ujd\",\"object\":\"chat.completion\",\"created\":1766159401,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To create a new empty file named \\\"README.md\\\", I should use the `create_new_file` function provided by the toolset. \\n\\nFirst, I need to identify the required parameters for this function. According to the description, the function requires a \\\"path\\\" parameter which specifies where the file will be created."
+      "response": "{\"id\":\"chatcmpl-o62qcwinsa7hrgbt7r2go\",\"object\":\"chat.completion\",\"created\":1766163324,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To create a new empty file named \\\"README.md\\\", I should use the `create_new_file` function provided by the toolset. \\n\\nFirst, I need to identify the required parameters for this function. According to the description, the function requires a \\\"path\\\" parameter which specifies where the file will be created. "
     },
     {
       "testId": "folder_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-v1cusiz20688lxr445tape\",\"object\":\"chat.completion\",\"created\":1766159403,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To create a new folder named \\\"components\\\", I will use the `folder_create` function provided in the available tools. \\n\\nThe required parameter for this function is the path where the new directory should be created. Since the user wants the folder to be named \\\"components\\\", I need to specify the correct pa"
+      "response": "{\"id\":\"chatcmpl-7xiv1uinaeba7xi81qvqka\",\"object\":\"chat.completion\",\"created\":1766163325,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To create a new folder named \\\"components\\\", I will use the `folder_create` function provided in the available tools. \\n\\nThe required parameter for this function is the path where the new directory should be created. Since the user wants the folder to be named \\\"components\\\", I need to specify the correct pa"
     },
     {
       "testId": "folder_delete_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-v7wn9o7vuxbf1cmkei26ul\",\"object\":\"chat.completion\",\"created\":1766159405,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To delete the folder named \\\"temp\\\", I should use the `folder_delete` tool provided in the available tools list. \\n\\nFirst, I need to identify which parameters are required for this tool. Looking at the description of the `folder_delete` function, it requires a single parameter called \\\"path\\\". This path shou"
+      "response": "{\"id\":\"chatcmpl-jg5w8tj81a90nhmoewrp11\",\"object\":\"chat.completion\",\"created\":1766163327,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To delete the folder named \\\"temp\\\", I should use the `folder_delete` tool provided in the available tools list. \\n\\nFirst, I need to identify which parameters are required for this tool. Looking at the description of the `folder_delete` function, it requires a single parameter called \\\"path\\\". This path shou"
     },
     {
       "testId": "git_add_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-asm71ieajtkujef9x987yh\",\"object\":\"chat.completion\",\"created\":1766159408,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to stage the file \\\"index.js\\\" for a commit using the provided tool. Let me start by understanding what's being asked here. The user wants to use the git_add function to stage their JavaScript file so it can be included in the commit.\\n\\nFirst, I'll look at the tools "
+      "response": "{\"id\":\"chatcmpl-7p588w2uumdod5l5yypjsn\",\"object\":\"chat.completion\",\"created\":1766163330,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to stage the file \\\"index.js\\\" for a commit using the provided tool. Let me start by understanding what's being asked here. The user wants to use the git_add function to stage their JavaScript file so it can be included in the commit.\\n\\nFirst, I'll look at the tools "
     },
     {
       "testId": "git_add_all",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-db9ybwsmwq4711y8ltujob\",\"object\":\"chat.completion\",\"created\":1766159412,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To stage all changes for the current commit, I should use the `git_add` function provided by the toolset. This function allows me to specify which files or directories need to be added to the working directory so they can be included in the upcoming commit.\\n\\nI'll structure my request as follows:\\n\\n \\n\\nThi"
+      "response": "{\"id\":\"chatcmpl-cp2n2gotgmjcp72155wn0k\",\"object\":\"chat.completion\",\"created\":1766163334,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To stage all changes for the current commit, I should use the `git_add` function provided by the toolset. This function allows me to specify which files or directories need to be added to the working directory so they can be included in the upcoming commit.\\n\\nI'll structure my request as follows:\\n\\n \\n\\nThi"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-yicms5l0xt67nvlks1woj\",\"object\":\"chat.completion\",\"created\":1766159414,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show me all the branches in this repository, I should use the `git_branch_list` function provided by the available tools. \\n\\nFirst, I need to call the tool using the correct format: \\n```\\n```\\n\\nAfter executing this command, it will return a list of all the branches in my current repository. I can then pr"
+      "response": "{\"id\":\"chatcmpl-ywo2lotcbfsvvjmg71jud\",\"object\":\"chat.completion\",\"created\":1766163336,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show me all the branches in this repository, I should use the `git_branch_list` function provided by the available tools. \\n\\nFirst, I need to call the tool using the correct format: \\n```\\n```\\n\\nAfter executing this command, it will return a list of all the branches in my current repository. I can then pr"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-h40wkqrwq5vuucj57agoxn\",\"object\":\"chat.completion\",\"created\":1766159416,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To remove the axios package, I need to use the npm_uninstall tool. First, I'll identify the correct package name in npm. Since it's called axios, I'll provide \\\"axios\\\" as the argument. \\n\\nI should make sure that all required parameters are included and correctly formatted within the JSON structure. Once sub"
+      "response": "{\"id\":\"chatcmpl-7ztpmx9yczta5g9mggszz6\",\"object\":\"chat.completion\",\"created\":1766163338,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To remove the axios package, I need to use the npm_uninstall tool. First, I'll identify the correct package name in npm. Since it's called axios, I'll provide \\\"axios\\\" as the argument. \\n\\nI should make sure that all required parameters are included and correctly formatted within the JSON structure. Once sub"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-8yi225tsti2zxh3zksmt6\",\"object\":\"chat.completion\",\"created\":1766159417,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user has requested to run a Python script that prints \\\"Hello World\\\". To fulfill this, I should use the available tool which is the \\\"run_python\\\" function. \\n\\nFirst, I need to structure the request correctly according to the specified format. The tool requires a code parameter which contains the Python "
+      "response": "{\"id\":\"chatcmpl-chgjy8oczfgfpzfpih5j\",\"object\":\"chat.completion\",\"created\":1766163339,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user has requested to run a Python script that prints \\\"Hello World\\\". To fulfill this, I should use the available tool which is the \\\"run_python\\\" function. \\n\\nFirst, I need to structure the request correctly according to the specified format. The tool requires a code parameter which contains the Python s"
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T15:49:17.097Z",
+    "testedAt": "2025-12-19T16:54:44.575Z",
     "emitTest": {
       "passed": false,
       "score": 40,
@@ -434,18 +434,18 @@
       131072
     ],
     "latencies": {
-      "2048": 680,
-      "4096": 764,
-      "8192": 922,
-      "16384": 755,
-      "32768": 684,
-      "65536": 665,
-      "131072": 749
+      "2048": 668,
+      "4096": 685,
+      "8192": 721,
+      "16384": 669,
+      "32768": 676,
+      "65536": 687,
+      "131072": 688
     },
     "maxUsableContext": 131072,
     "recommendedContext": 131072,
     "modelMaxContext": 131072,
-    "minLatency": 665,
+    "minLatency": 668,
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },

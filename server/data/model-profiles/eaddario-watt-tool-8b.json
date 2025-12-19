@@ -1,0 +1,440 @@
+{
+  "modelId": "eaddario/watt-tool-8b",
+  "displayName": "eaddario/watt-tool-8b",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T18:26:18.474Z",
+  "testVersion": 2,
+  "score": 9,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 1459.5,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 195,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "file_patch": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 908,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 108,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "file_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 590,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 139,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 114,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 115,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 92,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 120,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 116,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 131,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 99,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 139,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 98,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 115,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 116,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 124,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 158,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 187,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 148,
+      "lastTested": "2025-12-19T18:26:18.474Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [
+    "file_patch",
+    "file_search"
+  ],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-r362s23sujfi85elxui5g8\",\"object\":\"chat.completion\",\"created\":1766168774,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[FILE_READ]\\n{\\\"path\\\": \\\"config.json\\\"}\\n[END_FILE_READ]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":378,\"completion_tokens\":16,\"total_tokens\":394},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-m4ritpuatcczicndlqek2\",\"object\":\"chat.completion\",\"created\":1766168774,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[FILE_READ]\\n{\\\"name\\\": \\\"file_read\\\", \\\"arguments\\\": {\\\"path\\\":\\\"src/utils/helpers.ts\\\"}}\\n[END_TOOL_REQUEST]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":377,\"completion_tokens\":27,\"total_tokens\":404},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-c0xlvectfr7ak2w5fjoal4\",\"object\":\"chat.completion\",\"created\":1766168774,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[file_write(path=\\\"hello.js\\\", content=\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":413,\"completion_tokens\":16,\"total_tokens\":429},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-3wg2aqjgvjefxgsoftfxha\",\"object\":\"chat.completion\",\"created\":1766168774,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"338871973\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":438,\"completion_tokens\":37,\"total_tokens\":475},\"stats\":{},\"system_fingerprint\":\"ea"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-qm9lu6ib8w5a1ek1fognr\",\"object\":\"chat.completion\",\"created\":1766168775,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[file_list(folder=\\\"src\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":366,\"completion_tokens\":6,\"total_tokens\":372},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-zau7hzgfefpha6wi7eg\",\"object\":\"chat.completion\",\"created\":1766168775,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"219950900\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":398,\"completion_tokens\":26,\"total_tokens\":424},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-5yh21te2s9enxun4al0tnp\",\"object\":\"chat.completion\",\"created\":1766168776,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_status()]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":335,\"completion_tokens\":4,\"total_tokens\":339},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7e1c0js7t738sho5cw6k6a\",\"object\":\"chat.completion\",\"created\":1766168776,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_diff(file=\\\"index.js\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":366,\"completion_tokens\":8,\"total_tokens\":374},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-44sv4jfojmc9wbwxs62mkl\",\"object\":\"chat.completion\",\"created\":1766168776,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_log(count=5)]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":360,\"completion_tokens\":7,\"total_tokens\":367},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-6iflrpi5hpqx3lh5fe4wum\",\"object\":\"chat.completion\",\"created\":1766168776,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_commit(message=\\\"Fix login bug\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":370,\"completion_tokens\":9,\"total_tokens\":379},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-11vnksy0le6nm4wexv0hycj\",\"object\":\"chat.completion\",\"created\":1766168776,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_branch_create(name=\\\"feature/user-auth\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":372,\"completion_tokens\":10,\"total_tokens\":382},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vg5oymyjlpgh0r2ul93af\",\"object\":\"chat.completion\",\"created\":1766168776,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[npm_run(script=\\\"build\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":7,\"total_tokens\":374},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-gya8fmfg1eqvb34uynt9gn\",\"object\":\"chat.completion\",\"created\":1766168777,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[npm_install(package=\\\"lodash\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":362,\"completion_tokens\":7,\"total_tokens\":369},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-x5m478b75uvrnmvq5w5ci\",\"object\":\"chat.completion\",\"created\":1766168777,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[http_request(url=\\\"https://api.example.com/users\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":420,\"completion_tokens\":12,\"total_tokens\":432},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-l8mrlvk6kggajekc0nrid\",\"object\":\"chat.completion\",\"created\":1766168777,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[browser_navigate(url=\\\"https://github.com\\\", getContent=True)]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":14,\"total_tokens\":435},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-6uiyir4d81iouvn9dlml2l\",\"object\":\"chat.completion\",\"created\":1766168777,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[create_new_file(path=\\\"README.md\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":395,\"completion_tokens\":9,\"total_tokens\":404},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-apffcnggfrrwx7ua8p08cb\",\"object\":\"chat.completion\",\"created\":1766168777,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[folder_create(path=\\\"components\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":7,\"total_tokens\":375},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ou4s73f3drer33mgaqhli\",\"object\":\"chat.completion\",\"created\":1766168777,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[folder_delete(path=\\\"temp\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":7,\"total_tokens\":376},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-5m4zc8s2skd52dkjdmbj9\",\"object\":\"chat.completion\",\"created\":1766168777,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_add(file=\\\"index.js\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":376,\"completion_tokens\":8,\"total_tokens\":384},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-hwqnbyxlqf9oh3sxfraz08\",\"object\":\"chat.completion\",\"created\":1766168778,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_add(file=\\\"\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":372,\"completion_tokens\":6,\"total_tokens\":378},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-0oe00lpl7j1owikvuo8lvs\",\"object\":\"chat.completion\",\"created\":1766168778,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[git_branch_list()]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":335,\"completion_tokens\":5,\"total_tokens\":340},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-wxxvsqxgk9ek9pgnqeu\",\"object\":\"chat.completion\",\"created\":1766168778,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[npm_uninstall(package=\\\"axios\\\")]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":8,\"total_tokens\":376},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vc8q2r2i2dp5i1i121svz\",\"object\":\"chat.completion\",\"created\":1766168778,\"model\":\"eaddario/watt-tool-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"[run_python(code=\\\"print('Hello World')\\\"]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":369,\"completion_tokens\":11,\"total_tokens\":380},\"stats\":{},\"system_fingerprint\":\"eaddario/watt-tool-8b\"}"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T18:26:11.259Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "argumentValidationTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
+    "toolScore": 53,
+    "reasoningScore": 50,
+    "overallScore": 52,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found in response"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "contextContinuity": {
+        "passed": false,
+        "score": 20,
+        "details": "No context retention"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    }
+  },
+  "role": "executor",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "latencies": {
+      "2048": 677,
+      "4096": 635,
+      "8192": 624,
+      "16384": 642,
+      "32768": 676,
+      "65536": 613,
+      "131072": 2500
+    },
+    "maxUsableContext": 131072,
+    "recommendedContext": 131072,
+    "modelMaxContext": 131072,
+    "minLatency": 613,
+    "isInteractiveSpeed": true,
+    "speedRating": "good"
+  },
+  "contextLength": 131072
+}

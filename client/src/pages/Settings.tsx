@@ -12,7 +12,6 @@ interface ServerSettings {
   lmstudioModel: string;
   defaultCompressionMode: 0 | 1 | 2 | 3;
   defaultKeepRecent: number;
-  defaultContextLength: number;
   modules?: {
     summy?: { enabled: boolean };
     tooly?: { enabled: boolean };
@@ -37,8 +36,7 @@ const Settings: React.FC = () => {
     lmstudioUrl: 'http://localhost:1234',
     lmstudioModel: '',
     defaultCompressionMode: 1,
-    defaultKeepRecent: 5,
-    defaultContextLength: 8192
+    defaultKeepRecent: 5
   });
   const [openaiKey, setOpenaiKey] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -112,7 +110,6 @@ const Settings: React.FC = () => {
   const handleTestLMStudio = async () => {
     setLmstudioStatus('testing');
     setLmstudioError('');
-    setLmstudioModels([]);
 
     try {
       const response = await axios.post('http://localhost:3001/api/test-lmstudio', {
@@ -420,7 +417,7 @@ const Settings: React.FC = () => {
                   )}
                   {lmstudioStatus === 'connected' && (
                     <p className="mt-2 text-sm text-green-400">
-                      ✓ Connected to LM Studio. Go to <a href="/tooly" className="underline text-purple-400 hover:text-purple-300">Model Hub</a> to manage models.
+                      ✓ Connected to LM Studio. Go to <a href="/tooly" className="underline text-purple-400 hover:text-purple-300">Model Hub</a> to select and manage models.
                     </p>
                   )}
                 </div>
@@ -479,38 +476,6 @@ const Settings: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
                     The last N messages will never be compressed
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Default Context Length */}
-            <div>
-              <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                <span className="text-2xl">📏</span> Default Context Length
-              </h4>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Context Window Size (tokens)
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <select
-                      value={settings.defaultContextLength}
-                      onChange={(e) => handleChange('defaultContextLength', parseInt(e.target.value))}
-                      className="flex-1 bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-3 py-2 text-white focus:border-purple-500 focus:outline-none"
-                    >
-                      <option value={2048}>2,048 tokens (2K)</option>
-                      <option value={4096}>4,096 tokens (4K)</option>
-                      <option value={8192}>8,192 tokens (8K)</option>
-                      <option value={16384}>16,384 tokens (16K)</option>
-                      <option value={32768}>32,768 tokens (32K)</option>
-                      <option value={65536}>65,536 tokens (64K)</option>
-                      <option value={131072}>131,072 tokens (128K)</option>
-                    </select>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Default context length for LM Studio models. Can be overridden per model in Tooly.
                   </p>
                 </div>
               </div>
@@ -602,19 +567,21 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Save Button */}
-            <div className="flex items-center justify-between pt-4 border-t border-[#2d2d2d]">
-              <div className="text-sm">
-                {saveStatus === 'saving' && <span className="text-gray-400">💾 Saving...</span>}
-                {saveStatus === 'saved' && <span className="text-green-400">✅ Settings saved!</span>}
-                {saveStatus === 'error' && <span className="text-red-400">❌ Failed to save</span>}
+            <div className="pt-4 border-t border-[#2d2d2d]">
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  {saveStatus === 'saving' && <span className="text-gray-400">💾 Saving...</span>}
+                  {saveStatus === 'saved' && <span className="text-green-400">✅ Settings saved!</span>}
+                  {saveStatus === 'error' && <span className="text-red-400">❌ Failed to save</span>}
+                </div>
+                <button
+                  type="submit"
+                  disabled={saveStatus === 'saving'}
+                  className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+                >
+                  {saveStatus === 'saving' ? 'Saving...' : 'Save Settings'}
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={saveStatus === 'saving'}
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
-              >
-                {saveStatus === 'saving' ? 'Saving...' : 'Save Settings'}
-              </button>
             </div>
           </form>
         </div>

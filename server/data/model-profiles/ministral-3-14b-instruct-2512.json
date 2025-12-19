@@ -1,0 +1,453 @@
+{
+  "modelId": "ministral-3-14b-instruct-2512",
+  "displayName": "ministral-3-14b-instruct-2512",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T17:16:41.953Z",
+  "testVersion": 2,
+  "score": 95,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 3246,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "file_write": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1737,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "file_patch": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2015,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "file_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 751,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "file_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 777,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "create_new_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 871,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "folder_create": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 748,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "folder_delete": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 783,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 457,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "git_diff": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 813,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "git_log": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 772,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "git_commit": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 952,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "git_add": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 735.5,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "git_branch_create": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 975,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 508,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "npm_run": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 772,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "npm_install": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 756,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "npm_uninstall": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 804,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "http_request": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1436,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "browser_navigate": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1356,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "run_python": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1189,
+      "lastTested": "2025-12-19T17:16:41.953Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [
+    "file_read",
+    "file_write",
+    "file_patch",
+    "file_list",
+    "file_search",
+    "create_new_file",
+    "folder_create",
+    "folder_delete",
+    "git_diff",
+    "git_log",
+    "git_commit",
+    "git_add",
+    "git_branch_create",
+    "npm_run",
+    "npm_install",
+    "npm_uninstall",
+    "http_request",
+    "browser_navigate",
+    "run_python"
+  ],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-iuzajyw4dx9obxepsdwhk\",\"object\":\"chat.completion\",\"created\":1766164579,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"767465201\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":106,\"completion_tokens\":11,\"total_tokens\":117},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\""
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-e1dw0ykzzq97wv56b81b6x\",\"object\":\"chat.completion\",\"created\":1766164580,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"212912575\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":105,\"completion_tokens\":13,\"total_tokens\":118},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-inst"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-gwiwz2m3vrixlwohz8fg6h\",\"object\":\"chat.completion\",\"created\":1766164581,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"415984264\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\");\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":135,\"completion_tokens\":24,\"total_tokens\":159},\"stats\":{},\"sy"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-0gnf2uy1kuq5rx9rk0281p\",\"object\":\"chat.completion\",\"created\":1766164583,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"146104682\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":157,\"completion_tokens\":30,\"total_tokens\":187},\"stats\":{},\"system_fingerpr"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-rdwkxkm0bufvnh3ftavzi\",\"object\":\"chat.completion\",\"created\":1766164585,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"665489645\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":98,\"completion_tokens\":10,\"total_tokens\":108},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-c2s2586n8xg59od2tnxv\",\"object\":\"chat.completion\",\"created\":1766164586,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"256567626\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":120,\"completion_tokens\":10,\"total_tokens\":130},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-5y5z55m1umsuu3yga3udac\",\"object\":\"chat.completion\",\"created\":1766164587,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"772476074\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":75,\"completion_tokens\":5,\"total_tokens\":80},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-u7yv95ky85idi5t8rmvuj\",\"object\":\"chat.completion\",\"created\":1766164587,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"530049278\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":98,\"completion_tokens\":11,\"total_tokens\":109},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-mcb4duue65d860uygacodn\",\"object\":\"chat.completion\",\"created\":1766164588,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"204572969\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":92,\"completion_tokens\":10,\"total_tokens\":102},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-7tk1klk76nvd7ufumefzis\",\"object\":\"chat.completion\",\"created\":1766164589,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"422404870\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":99,\"completion_tokens\":13,\"total_tokens\":112},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-bglls06qa9nt0dlclg7rhc\",\"object\":\"chat.completion\",\"created\":1766164590,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"845300193\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":100,\"completion_tokens\":13,\"total_tokens\":113},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-lj1zto48las577vck2eugq\",\"object\":\"chat.completion\",\"created\":1766164591,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"907931174\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":95,\"completion_tokens\":10,\"total_tokens\":105},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ihiyo5rnvjilo0jrn48ff9\",\"object\":\"chat.completion\",\"created\":1766164592,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"193103553\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":91,\"completion_tokens\":10,\"total_tokens\":101},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\""
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-xwnsrhmvlrp7ws2u3cnr8\",\"object\":\"chat.completion\",\"created\":1766164592,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"940234391\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":136,\"completion_tokens\":21,\"total_tokens\":157},\"stats\":{},\"system_finge"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-g2ij5rw912lchpdp8fb1j5\",\"object\":\"chat.completion\",\"created\":1766164594,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"623951586\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":138,\"completion_tokens\":20,\"total_tokens\":158},\"stats\":{},\"system_fingerprin"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-itdl74uf17kqzdse20a0a\",\"object\":\"chat.completion\",\"created\":1766164595,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"698573322\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":117,\"completion_tokens\":12,\"total_tokens\":129},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-t434m02mti8hufhvp1vxor\",\"object\":\"chat.completion\",\"created\":1766164596,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"929112794\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":96,\"completion_tokens\":10,\"total_tokens\":106},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-25"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-24wfj0xpw968ypzwixezce\",\"object\":\"chat.completion\",\"created\":1766164597,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"436765422\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":97,\"completion_tokens\":10,\"total_tokens\":107},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-w9ufnr96tltvxspk7mpxhf\",\"object\":\"chat.completion\",\"created\":1766164597,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"214987282\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":104,\"completion_tokens\":11,\"total_tokens\":115},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-zehu0d624ubylqjc4amf7\",\"object\":\"chat.completion\",\"created\":1766164598,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"218441045\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":100,\"completion_tokens\":9,\"total_tokens\":109},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-xu72kpw91u5s0x32fx0r\",\"object\":\"chat.completion\",\"created\":1766164599,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"763817935\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":75,\"completion_tokens\":6,\"total_tokens\":81},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-e3etic78t6ep0na6l5prm\",\"object\":\"chat.completion\",\"created\":1766164599,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"561477208\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":96,\"completion_tokens\":11,\"total_tokens\":107},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-instruct-2512\""
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-hjqti140z3hm5r4dijc5\",\"object\":\"chat.completion\",\"created\":1766164600,\"model\":\"ministral-3-14b-instruct-2512\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"685909492\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":98,\"completion_tokens\":17,\"total_tokens\":115},\"stats\":{},\"system_fingerprint\":\"ministral-3-14b-"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T17:16:14.608Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct tool selected with correct file path"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct: chose search_web for real-time data with appropriate query"
+    },
+    "multiToolEmitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: emitted 2 read_file calls with correct paths"
+    },
+    "argumentValidationTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: all types and nested structures correct"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
+    "toolScore": 100,
+    "reasoningScore": 68,
+    "overallScore": 84,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 30,
+        "details": "Response contains invalid JSON"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 70,
+        "details": "3 steps planned"
+      },
+      "conditionalReasoning": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly chose read based on condition"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 80,
+        "details": "Identified conflict in text response"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    }
+  },
+  "role": "executor",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "latencies": {
+      "2048": 823,
+      "4096": 856,
+      "8192": 822,
+      "16384": 862,
+      "32768": 897
+    },
+    "maxUsableContext": 32768,
+    "recommendedContext": 32768,
+    "modelMaxContext": 262144,
+    "minLatency": 822,
+    "isInteractiveSpeed": true,
+    "speedRating": "good"
+  },
+  "contextLength": 32768
+}

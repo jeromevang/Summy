@@ -1,0 +1,441 @@
+{
+  "modelId": "qwen2.5-7b-instruct-1m",
+  "displayName": "qwen2.5-7b-instruct-1m",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T17:56:31.050Z",
+  "testVersion": 2,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 2407,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 326,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 609,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1251,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3524,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 864,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1891,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 829,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1150,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1316,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 508,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1200,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 1557.5,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1128,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 666,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1201,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1555,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 2003,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1787,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 139,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 184,
+      "lastTested": "2025-12-19T17:56:31.050Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-h91wqpt9jni4w1h5lehf8v\",\"object\":\"chat.completion\",\"created\":1766166963,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To read the contents of a file named \\\"config.json\\\" in the current directory, you can use Python's built-in `json` library along with the `open()` function. Here is how you could do it:\\n\\n```python\\nimport json\\n\\ntry:\\n    with open('config.json', 'r') as file:\\n        config = json.load(file)\\n        print(co"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-d5wr4r7orirqxvh1k7sz0l\",\"object\":\"chat.completion\",\"created\":1766166965,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help with that. However, I don't have direct access to files or systems outside of this environment. Could you please provide the content of `src/utils/helpers.ts`? If you're unable to do that, perhaps you could describe the file and its contents, and I'll assist you based on that information.\",\"tool_ca"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7mugikx53q93jt2bzcass2\",\"object\":\"chat.completion\",\"created\":1766166965,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```javascript\\n// hello.js\\nconsole.log(\\\"Hello World\\\");\\n```\\n\\nThis JavaScript file, `hello.js`, contains a single line of code that logs \\\"Hello World\\\" to the console when executed.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":90,\"completion_tokens\":41,\"total_tokens\":131}"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-de7mr0tj285eoy29yxkgp\",\"object\":\"chat.completion\",\"created\":1766166966,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help with that. Please provide the content of your `app.js` file or share it here so I can make the necessary changes for you. If you have the file locally, you can also upload it and I'll assist you in modifying it. Once you provide the relevant portion of the code where the port number is set, I will u"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ukqm3uuqrvfbf99a5wc6f4\",\"object\":\"chat.completion\",\"created\":1766166966,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To show you all the files in the `src` directory, I would typically use a command like `ls src` on Unix-based systems (like Linux and macOS) or `dir src\\\\*` on Windows. However, since I don't have direct access to your file system, you can run this command in your terminal or command prompt.\\n\\nIf you're using a sp"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-g2164eegyfp9tunijoh98v\",\"object\":\"chat.completion\",\"created\":1766166967,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To search for all occurrences of \\\"TODO\\\" in your project files, you can use a text editor or an integrated development environment (IDE) that supports searching within multiple files. Here are some steps and tools you can use:\\n\\n### Using a Text Editor:\\n1. **Sublime Text**: \\n   - Open the command palette (`Ctrl"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-n85ur9l9vxj70rffkphfyj\",\"object\":\"chat.completion\",\"created\":1766166971,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To check the current Git status of a repository, you would typically run the `git status` command from within the directory of that repository. Since I don't have direct access to your local machine or any specific repositories, you can execute this command in your terminal or command prompt.\\n\\nHere’s how you do i"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-4u8zncfy5znurawbzn9yt\",\"object\":\"chat.completion\",\"created\":1766166972,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To provide you with a `git diff` for the file `\\\"index.js\\\"`, I would need to have access to your local Git repository or at least the content of that specific file before and after the changes. Since I can't directly interact with your system, please follow these steps:\\n\\n1. Open your terminal.\\n2. Navigate to the"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ncieo8nu6lkwfuilh1gvpd\",\"object\":\"chat.completion\",\"created\":1766166973,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help with that. However, I need to clarify - are you referring to the last five commits from a specific repository or project? If so, could you please provide the URL of the repository or any other relevant details? If not specified, I will demonstrate using a hypothetical example.\\n\",\"tool_calls\":[]},\""
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-nobb8f4j98vdciwwexx9p\",\"object\":\"chat.completion\",\"created\":1766166974,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"It seems like you're trying to commit a change in a version control system, possibly Git. However, I don't have direct access to your local machine or repository to perform this action for you.\\n\\nIf you want to commit changes with the message \\\"Fix login bug\\\", you can do it by running the following command in your"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-sxft8wlahs200qp36m4e8\",\"object\":\"chat.completion\",\"created\":1766166975,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can guide you on how to create a new branch named \\\"feature/user-auth\\\" using the command line interface (CLI). Here are the steps:\\n\\n1. Open your terminal or command prompt.\\n2. Navigate to your repository directory where you want to create this branch.\\n3. Run the following command:\\n   ```bash\\n   git ch"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-xlulph836smh9ysnzvtw4g\",\"object\":\"chat.completion\",\"created\":1766166976,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To run the `build` npm script, you would typically execute it in your terminal or command prompt from the root directory of your project. Here's how you can do that:\\n\\n1. **Open Terminal/Command Prompt**: Navigate to the directory where your `package.json` file is located.\\n\\n2. **Run the Script**:\\n   - For a typ"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-fs29xkaqgmbsa3ujrbw8f8\",\"object\":\"chat.completion\",\"created\":1766166978,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To install the lodash package, you can use npm (Node Package Manager) if you are working within a Node.js environment. Here’s how you can do it:\\n\\n1. **Open your terminal or command prompt**.\\n2. Run the following command:\\n   ```bash\\n   npm install lodash\\n   ```\\n\\nThis will add lodash to your project's `node_m"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-q0saq61sexh22evo5mdpqt\",\"object\":\"chat.completion\",\"created\":1766166979,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To fetch data from the URL `https://api.example.com/users`, you can use a tool like `requests` in Python. However, since I don't have direct access to external tools or the internet, I'll provide you with a sample code snippet that you can run on your local machine or any environment where you have internet access "
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-h3mcmqgu2ravqfw21dsp3i\",\"object\":\"chat.completion\",\"created\":1766166981,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The page title of the website <https://github.com> is \\\"GitHub\\\".\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":83,\"completion_tokens\":16,\"total_tokens\":99},\"stats\":{},\"system_fingerprint\":\"qwen2.5-7b-instruct-1m\"}"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-le17dodn3p9xvun755va0e\",\"object\":\"chat.completion\",\"created\":1766166981,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To create a new empty file named \\\"README.md\\\", you can use the following command in your terminal or command prompt:\\n\\n```bash\\ntouch README.md\\n```\\n\\nThis command is available on Unix-based systems like macOS and Linux. If you're using Windows, you can achieve the same result by opening File Explorer, navigatin"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-uh28y0vrtj8n2z768tczw\",\"object\":\"chat.completion\",\"created\":1766166982,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help you create a new folder named \\\"components\\\". However, since I don't have direct access to your file system, you will need to create this folder manually. Here’s how you can do it on different operating systems:\\n\\n### For Windows:\\n1. Click on the Start menu.\\n2. Right-click on 'This PC' or 'Comput"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-4lcxkyqar48p0r4aqq5zwd\",\"object\":\"chat.completion\",\"created\":1766166984,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I can help you delete a folder, but I need to clarify a few things first:\\n\\n1. **Which directory is the \\\"temp\\\" folder located in?** Is it on your desktop, in your Documents folder, or somewhere else?\\n2. **Do you want me to delete this folder immediately, or do you need assistance navigating to its location firs"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-yxvs5y7mvs8it2wgttrd4e\",\"object\":\"chat.completion\",\"created\":1766166985,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"It seems like you're asking me to stage a file named `index.js` for a commit. However, I don't have direct access to your local environment or any version control system (like Git) without the appropriate tools and permissions.\\n\\nIf you want to stage the `index.js` file for a commit using Git, you would typically "
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-nu3k2mxqqqrges8mvp7ox\",\"object\":\"chat.completion\",\"created\":1766166986,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"It seems like you're asking about staging changes for a commit, which is typically done in version control systems like Git. Here's how you can stage all changes for a commit:\\n\\n1. **Open your terminal or command prompt**.\\n2. **Navigate to the root directory of your repository** where you want to make this change."
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ldcbqmtf9liwhjfy9c1qok\",\"object\":\"chat.completion\",\"created\":1766166988,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To show you all the branches in a specific GitHub repository, I would need to know which repository you're referring to. Could you please provide the URL or the name of the repository? Once you give me that information, I can fetch and display the list of branches for you. If you prefer not to share the repository "
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-idljgsh1c2l6thgarprj6n\",\"object\":\"chat.completion\",\"created\":1766166988,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To remove the `axios` package from your project, you'll need to follow these steps:\\n\\n1. **Identify Dependencies**: First, check if there are any other packages that depend on `axios`. You can do this by looking at your `package.json` file or using a tool like `npm ls axios`.\\n\\n2. **Uninstall Axios**: Use the fol"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-dexi3kh2adsu4nct1hv7w\",\"object\":\"chat.completion\",\"created\":1766166990,\"model\":\"qwen2.5-7b-instruct-1m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```py\\nprint(\\\"Hello World\\\")\\n```\\n```output\\nHello World\\n```\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":80,\"completion_tokens\":17,\"total_tokens\":97},\"stats\":{},\"system_fingerprint\":\"qwen2.5-7b-instruct-1m\"}"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T17:56:00.926Z",
+    "emitTest": {
+      "passed": true,
+      "score": 95,
+      "details": "XML format succeeded (OpenAI format failed: Model described the tool instead of calling it)"
+    },
+    "schemaTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "argumentValidationTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "schemaReorderTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted with reordered schema"
+    },
+    "toolScore": 29,
+    "reasoningScore": 58,
+    "overallScore": 44,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 30,
+        "details": "Response contains invalid JSON"
+      },
+      "multiStepPlanning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON array found in response"
+      },
+      "conditionalReasoning": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly chose read based on condition"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 60,
+        "details": "Remembered endpoint but no JSON"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072,
+      262144,
+      524288
+    ],
+    "latencies": {
+      "2048": 564,
+      "4096": 570,
+      "8192": 566,
+      "16384": 567,
+      "32768": 575,
+      "65536": 582,
+      "131072": 648,
+      "262144": 1137,
+      "524288": 1381
+    },
+    "maxUsableContext": 524288,
+    "recommendedContext": 524288,
+    "modelMaxContext": 1010000,
+    "minLatency": 564,
+    "isInteractiveSpeed": true,
+    "speedRating": "good"
+  },
+  "contextLength": 524288
+}
