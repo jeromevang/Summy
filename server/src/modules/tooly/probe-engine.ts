@@ -2118,7 +2118,7 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     settings: any,
     timeout: number
   ): Promise<ContextLatencyResult> {
-    const allContextSizes = [2048, 4096, 8192, 16384, 32768, 65536, 131072];
+    const baseContextSizes = [2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576];
     const latencies: Record<number, number> = {};
     const testedContextSizes: number[] = [];
     let maxUsableContext = 2048;
@@ -2130,10 +2130,16 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     const modelMaxContext = await this.getModelMaxContext(modelId, settings);
     console.log(`[ProbeEngine] Model max context: ${modelMaxContext}`);
 
-    // Filter context sizes to only test up to model's max
-    const contextSizes = allContextSizes.filter(size => size <= modelMaxContext);
+    // Filter context sizes to only test up to model's max, and include the model's max if not in the list
+    let contextSizes = baseContextSizes.filter(size => size <= modelMaxContext);
+    
+    // Add the model's actual max context if it's not already in the list (test the full capability)
+    if (modelMaxContext > 0 && !contextSizes.includes(modelMaxContext)) {
+      contextSizes.push(modelMaxContext);
+      contextSizes.sort((a, b) => a - b);
+    }
 
-    console.log(`[ProbeEngine] Will test context sizes: ${contextSizes.join(', ')}`);
+    console.log(`[ProbeEngine] Will test context sizes: ${contextSizes.map(s => s >= 1024 ? `${s/1024}K` : s).join(', ')}`);
 
     // Broadcast initial progress
     wsBroadcast.broadcastProgress('latency', modelId, {
