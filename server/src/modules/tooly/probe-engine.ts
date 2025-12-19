@@ -76,6 +76,7 @@ export interface ContextLatencyResult {
   latencies: Record<number, number>;  // context size -> latency in ms
   maxUsableContext: number;           // Largest context under 30s
   recommendedContext: number;         // Suggested context size
+  modelMaxContext?: number;           // Model's reported max context (if available)
 }
 
 export interface ProbeOptions {
@@ -1564,6 +1565,61 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
   }
 
   /**
+   * Get the model's maximum context size from LM Studio
+   */
+  private async getModelMaxContext(
+    modelId: string, 
+    settings: any
+  ): Promise<number | null> {
+    if (!settings.lmstudioUrl) return null;
+
+    try {
+      const client = new LMStudioClient();
+      
+      // Try to get info from loaded models first
+      const loadedModels = await client.llm.listLoaded();
+      const loadedModel = loadedModels.find(m => 
+        m.identifier === modelId || m.path === modelId || m.identifier.includes(modelId)
+      );
+      
+      if (loadedModel) {
+        // Check if the loaded model has context info
+        console.log(`[ProbeEngine] Loaded model info:`, JSON.stringify(loadedModel, null, 2));
+        
+        // Try to get contextLength from the loaded model's config
+        const modelInfo = loadedModel as any;
+        if (modelInfo.contextLength) {
+          return modelInfo.contextLength;
+        }
+      }
+
+      // Try REST API to get model details
+      const response = await axios.get(`${settings.lmstudioUrl}/v1/models`, {
+        timeout: 5000
+      });
+
+      const models = response.data?.data || [];
+      const model = models.find((m: any) => 
+        m.id === modelId || m.id?.includes(modelId)
+      );
+
+      if (model) {
+        console.log(`[ProbeEngine] Model info from API:`, JSON.stringify(model, null, 2));
+        
+        // LM Studio may return context_length or max_tokens
+        if (model.context_length) return model.context_length;
+        if (model.max_tokens) return model.max_tokens;
+        if (model.max_context_length) return model.max_context_length;
+      }
+
+      return null;
+    } catch (error: any) {
+      console.log(`[ProbeEngine] Could not get model max context: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
    * Run context latency profiling
    * Tests model at increasing context sizes, early exit if >30s
    */
@@ -1573,13 +1629,32 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     settings: any,
     timeout: number
   ): Promise<ContextLatencyResult> {
-    const contextSizes = [2048, 4096, 8192, 16384, 32768, 65536, 131072];
+    const allContextSizes = [2048, 4096, 8192, 16384, 32768, 65536, 131072];
     const latencies: Record<number, number> = {};
     const testedContextSizes: number[] = [];
     let maxUsableContext = 2048;
     const maxLatencyThreshold = 30000; // 30 seconds
 
     console.log(`[ProbeEngine] Starting context latency profiling for ${modelId}`);
+
+    // First, get the model's max context size
+    let modelMaxContext: number | null = null;
+    
+    if (provider === 'lmstudio') {
+      modelMaxContext = await this.getModelMaxContext(modelId, settings);
+      if (modelMaxContext) {
+        console.log(`[ProbeEngine] Model max context from API: ${modelMaxContext}`);
+      } else {
+        console.log(`[ProbeEngine] Could not determine model max context, will test until failure`);
+      }
+    }
+
+    // Filter context sizes to only test up to model's max
+    const contextSizes = modelMaxContext 
+      ? allContextSizes.filter(size => size <= modelMaxContext)
+      : allContextSizes;
+
+    console.log(`[ProbeEngine] Will test context sizes: ${contextSizes.join(', ')}`);
 
     for (const contextSize of contextSizes) {
       // For LM Studio, we need to reload model with new context size
@@ -1602,7 +1677,8 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
           console.log(`[ProbeEngine] Loaded model with context size ${contextSize}`);
         } catch (error: any) {
           console.log(`[ProbeEngine] Cannot load model at context ${contextSize}: ${error.message}`);
-          break; // Stop testing larger contexts
+          // If we can't load at this size, it's likely the max - stop here
+          break;
         }
       }
 
@@ -1644,7 +1720,8 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
       testedContextSizes,
       latencies,
       maxUsableContext,
-      recommendedContext
+      recommendedContext,
+      modelMaxContext: modelMaxContext || undefined
     };
   }
 

@@ -117,24 +117,6 @@
       "testsPassed": 0,
       "testsFailed": 0
     },
-    "git_checkout": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
-    },
-    "git_merge": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
-    },
-    "git_rm": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
-    },
     "npm_run": {
       "supported": false,
       "score": 0,
@@ -353,5 +335,24 @@
       }
     }
   },
-  "role": "executor"
+  "role": "executor",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "latencies": {
+      "2048": 1024,
+      "4096": 964,
+      "8192": 968,
+      "16384": 970,
+      "32768": 3989
+    },
+    "maxUsableContext": 32768,
+    "recommendedContext": 32768
+  },
+  "contextLength": 32768
 }
