@@ -76,6 +76,7 @@ export interface TestOptions {
   unloadOthersBefore?: boolean;  // Default: true for LM Studio
   unloadAfterTest?: boolean;     // Default: false
   unloadOnlyOnFail?: boolean;    // Default: false (used with keep_on_success)
+  contextLength?: number;        // Context length for model loading (default: 8192)
 }
 
 // ============================================================
@@ -286,7 +287,7 @@ class TestEngine {
   /**
    * Load a model in LM Studio, optionally unloading others first
    */
-  private async loadLMStudioModel(modelId: string, unloadOthers: boolean = true): Promise<void> {
+  private async loadLMStudioModel(modelId: string, unloadOthers: boolean = true, contextLength: number = 8192): Promise<void> {
     const client = new LMStudioClient();
 
     try {
@@ -324,9 +325,9 @@ class TestEngine {
 
     // Load the test model
     try {
-      console.log(`[TestEngine] Loading model ${modelId}...`);
+      console.log(`[TestEngine] Loading model ${modelId} with context length ${contextLength}...`);
       await client.llm.load(modelId, {
-        config: { contextLength: 8192 }
+        config: { contextLength }
       });
       console.log(`[TestEngine] Model ${modelId} loaded successfully`);
     } catch (error: any) {
@@ -375,13 +376,25 @@ class TestEngine {
     const unloadOthersBefore = options.unloadOthersBefore ?? (mode !== 'manual');
     const unloadAfterTest = options.unloadAfterTest ?? (mode === 'quick');
     const unloadOnlyOnFail = options.unloadOnlyOnFail ?? (mode === 'keep_on_success');
+    
+    // Get context length from options, model profile, or default
+    let contextLength = options.contextLength || 8192;
+    try {
+      const profile = await capabilities.getProfile(modelId);
+      if (profile?.contextLength) {
+        contextLength = profile.contextLength;
+        console.log(`[TestEngine] Using custom context length ${contextLength} from model profile`);
+      }
+    } catch {
+      // Use default if profile not found
+    }
 
-    console.log(`[TestEngine] Starting tests for model: ${modelId} (mode: ${mode})`);
+    console.log(`[TestEngine] Starting tests for model: ${modelId} (mode: ${mode}, context: ${contextLength})`);
 
     // For LM Studio: load the model and optionally unload others
     if (provider === 'lmstudio' && unloadOthersBefore) {
       try {
-        await this.loadLMStudioModel(modelId, true);
+        await this.loadLMStudioModel(modelId, true, contextLength);
         console.log(`[TestEngine] Loaded model ${modelId}, unloaded others`);
       } catch (error: any) {
         console.error(`[TestEngine] Failed to load model: ${error.message}`);
@@ -723,10 +736,21 @@ class TestEngine {
     const unloadAfterTest = options.unloadAfterTest ?? (mode === 'quick');
     const unloadOnlyOnFail = options.unloadOnlyOnFail ?? (mode === 'keep_on_success');
 
+    // Get context length from options, model profile, or default
+    let contextLength = options.contextLength || 8192;
+    try {
+      const profile = await capabilities.getProfile(modelId);
+      if (profile?.contextLength) {
+        contextLength = profile.contextLength;
+      }
+    } catch {
+      // Use default if profile not found
+    }
+
     // For LM Studio: load the model and optionally unload others
     if (provider === 'lmstudio' && unloadOthersBefore) {
       try {
-        await this.loadLMStudioModel(modelId, true);
+        await this.loadLMStudioModel(modelId, true, contextLength);
       } catch (error: any) {
         console.error(`[TestEngine] Failed to load model: ${error.message}`);
       }

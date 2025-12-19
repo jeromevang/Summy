@@ -153,7 +153,8 @@ router.post('/models/:modelId/test', async (req, res) => {
       mode: testMode,
       unloadOthersBefore: testMode !== 'manual',
       unloadAfterTest: testMode === 'quick',
-      unloadOnlyOnFail: testMode === 'keep_on_success'
+      unloadOnlyOnFail: testMode === 'keep_on_success',
+      contextLength: settings.defaultContextLength || 8192
     };
 
     console.log(`[Tooly] Running tests for ${modelId} with mode: ${testMode}`);
@@ -202,6 +203,44 @@ router.put('/models/:modelId/prompt', async (req, res) => {
     res.json({ success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to update prompt:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/tooly/models/:modelId/context-length
+ * Update custom context length for a model
+ */
+router.put('/models/:modelId/context-length', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { contextLength } = req.body;
+    
+    if (!contextLength || typeof contextLength !== 'number') {
+      res.status(400).json({ error: 'Invalid context length' });
+      return;
+    }
+    
+    await capabilities.updateContextLength(modelId, contextLength);
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to update context length:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/tooly/models/:modelId/context-length
+ * Remove custom context length (revert to global default)
+ */
+router.delete('/models/:modelId/context-length', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    
+    await capabilities.removeContextLength(modelId);
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to remove context length:', error);
     res.status(500).json({ error: error.message });
   }
 });
