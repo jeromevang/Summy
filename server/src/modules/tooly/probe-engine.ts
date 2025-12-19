@@ -21,6 +21,7 @@
 import axios from 'axios';
 import { LMStudioClient } from '@lmstudio/sdk';
 import { notifications } from '../../services/notifications.js';
+import { wsBroadcast } from '../../services/ws-broadcast.js';
 
 // ============================================================
 // TYPES
@@ -184,11 +185,37 @@ class ProbeEngine {
     console.log(`[ProbeEngine] Starting probe tests for ${modelId} (provider: ${provider})`);
     notifications.info(`Starting probe tests for ${modelId}`);
 
+    const totalTests = runReasoningProbes ? 11 : 4;
+    let completedTests = 0;
+    let runningScore = 0;
+
+    const broadcastProgress = (testName: string, score?: number) => {
+      completedTests++;
+      if (score !== undefined) {
+        runningScore = Math.round((runningScore * (completedTests - 1) + score) / completedTests);
+      }
+      wsBroadcast.broadcastProgress('probe', modelId, {
+        current: completedTests,
+        total: totalTests,
+        currentTest: testName,
+        score: runningScore,
+        status: 'running'
+      });
+    };
+
     // Run tool behavior probes (1.x)
+    wsBroadcast.broadcastProgress('probe', modelId, { current: 0, total: totalTests, currentTest: 'Emit Test', status: 'running' });
     const emitTest = await this.runEmitTest(modelId, provider, settings, timeout);
+    broadcastProgress('Emit Test', emitTest.score);
+    
     const schemaTest = await this.runSchemaAdherenceTest(modelId, provider, settings, timeout);
+    broadcastProgress('Schema Adherence', schemaTest.score);
+    
     const selectionTest = await this.runSelectionLogicTest(modelId, provider, settings, timeout);
+    broadcastProgress('Selection Logic', selectionTest.score);
+    
     const suppressionTest = await this.runSuppressionTest(modelId, provider, settings, timeout);
+    broadcastProgress('Suppression', suppressionTest.score);
 
     // Calculate tool score
     const toolScore = Math.round(
@@ -206,12 +233,25 @@ class ProbeEngine {
       console.log(`[ProbeEngine] Running reasoning probes for ${modelId}`);
       
       const intentExtraction = await this.runIntentExtractionTest(modelId, provider, settings, timeout);
+      broadcastProgress('Intent Extraction', intentExtraction.score);
+      
       const multiStepPlanning = await this.runMultiStepPlanningTest(modelId, provider, settings, timeout);
+      broadcastProgress('Multi-step Planning', multiStepPlanning.score);
+      
       const conditionalReasoning = await this.runConditionalReasoningTest(modelId, provider, settings, timeout);
+      broadcastProgress('Conditional Reasoning', conditionalReasoning.score);
+      
       const contextContinuity = await this.runContextContinuityTest(modelId, provider, settings, timeout);
+      broadcastProgress('Context Continuity', contextContinuity.score);
+      
       const logicalConsistency = await this.runLogicalConsistencyTest(modelId, provider, settings, timeout);
+      broadcastProgress('Logical Consistency', logicalConsistency.score);
+      
       const explanation = await this.runExplanationTest(modelId, provider, settings, timeout);
+      broadcastProgress('Explanation', explanation.score);
+      
       const edgeCaseHandling = await this.runEdgeCaseHandlingTest(modelId, provider, settings, timeout);
+      broadcastProgress('Edge Case Handling', edgeCaseHandling.score);
 
       reasoningProbes = {
         intentExtraction,
@@ -268,6 +308,15 @@ class ProbeEngine {
 
     console.log(`[ProbeEngine] Completed probe tests for ${modelId}: tool=${toolScore}, reasoning=${reasoningScore}, overall=${overallScore}, role=${role}`);
     notifications.success(`Probe tests completed for ${modelId}: ${role} role, score ${overallScore}/100`);
+
+    // Broadcast completion
+    wsBroadcast.broadcastProgress('probe', modelId, {
+      current: totalTests,
+      total: totalTests,
+      currentTest: 'Complete',
+      score: overallScore,
+      status: 'completed'
+    });
 
     return result;
   }
@@ -1628,6 +1677,16 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
 
     console.log(`[ProbeEngine] Will test context sizes: ${contextSizes.join(', ')}`);
 
+    // Broadcast initial progress
+    wsBroadcast.broadcastProgress('latency', modelId, {
+      current: 0,
+      total: contextSizes.length,
+      currentTest: `Context sizes: ${contextSizes.length}`,
+      status: 'running'
+    });
+
+    let completedTests = 0;
+
     for (const contextSize of contextSizes) {
       // For LM Studio, we need to reload model with new context size
       if (provider === 'lmstudio' && settings.lmstudioUrl) {
@@ -1668,8 +1727,17 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
         const latency = Date.now() - startTime;
         latencies[contextSize] = latency;
         testedContextSizes.push(contextSize);
+        completedTests++;
 
         console.log(`[ProbeEngine] Context ${contextSize}: ${latency}ms`);
+
+        // Broadcast progress
+        wsBroadcast.broadcastProgress('latency', modelId, {
+          current: completedTests,
+          total: contextSizes.length,
+          currentTest: `${contextSize / 1024}K: ${latency}ms`,
+          status: 'running'
+        });
 
         if (latency < maxLatencyThreshold) {
           maxUsableContext = contextSize;
@@ -1687,6 +1755,14 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
 
     // Recommended context is the largest usable one
     const recommendedContext = maxUsableContext;
+
+    // Broadcast completion
+    wsBroadcast.broadcastProgress('latency', modelId, {
+      current: completedTests,
+      total: contextSizes.length,
+      currentTest: `Recommended: ${recommendedContext / 1024}K`,
+      status: 'completed'
+    });
 
     return {
       testedContextSizes,

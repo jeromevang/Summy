@@ -15,6 +15,7 @@ import { toolyRoutes, notificationsRoutes, analyticsRoutes } from './routes/inde
 import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
 import { mcpClient } from './modules/tooly/mcp-client.js';
+import { wsBroadcast } from './services/ws-broadcast.js';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -148,6 +149,7 @@ setInterval(broadcastStatus, 5000);
 wss.on('connection', async (ws) => {
   console.log('[WS] Client connected');
   wsClients.add(ws);
+  wsBroadcast.registerClient(ws);
 
   // Send initial full status
   const status = await getFullStatus();
@@ -160,11 +162,13 @@ wss.on('connection', async (ws) => {
   ws.on('close', () => {
     console.log('[WS] Client disconnected');
     wsClients.delete(ws);
+    wsBroadcast.unregisterClient(ws);
   });
 
   ws.on('error', (error) => {
     console.error('[WS] Connection error:', error);
     wsClients.delete(ws);
+    wsBroadcast.unregisterClient(ws);
   });
 });
 

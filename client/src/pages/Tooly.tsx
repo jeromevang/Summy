@@ -127,6 +127,47 @@ const Tooly: React.FC = () => {
   const [logStatusFilter, setLogStatusFilter] = useState<'all' | 'success' | 'failed' | 'timeout'>('all');
   const [logToolFilter, setLogToolFilter] = useState<string>('');
 
+  // Test progress state
+  const [testProgress, setTestProgress] = useState<{
+    probeProgress?: { current: number; total: number; currentTest: string; score: number; status: string };
+    toolsProgress?: { current: number; total: number; currentTest: string; score: number; status: string };
+    latencyProgress?: { current: number; total: number; currentTest: string; status: string };
+    modelId?: string;
+  }>({});
+
+  // Listen for WebSocket progress updates
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:3001');
+    
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'test_progress') {
+          const { testType, modelId, current, total, currentTest, score, status } = message.data;
+          setTestProgress(prev => ({
+            ...prev,
+            modelId,
+            [`${testType}Progress`]: { current, total, currentTest, score, status }
+          }));
+          
+          // Refresh model list when test completes
+          if (status === 'completed') {
+            setTimeout(() => {
+              fetchModels();
+              if (modelId === selectedModel?.modelId) {
+                fetchModelProfile(modelId);
+              }
+            }, 500);
+          }
+        }
+      } catch (e) {
+        // Ignore parse errors
+      }
+    };
+
+    return () => ws.close();
+  }, [selectedModel?.modelId]);
+
   // Persist filter selections to localStorage
   useEffect(() => {
     localStorage.setItem('tooly_providerFilter', providerFilter);
@@ -343,9 +384,42 @@ const Tooly: React.FC = () => {
         setSelectedModel(profile);
         setEditingSystemPrompt(profile.systemPrompt || '');
         setShowSystemPromptEditor(false);
+      } else if (res.status === 404) {
+        // Model not tested yet - show default profile
+        const model = models.find(m => m.id === modelId);
+        const defaultProfile: ModelProfile = {
+          modelId,
+          displayName: model?.displayName || modelId,
+          provider: model?.provider || 'lmstudio',
+          testedAt: '',
+          score: 0,
+          enabledTools: [],
+          capabilities: {},
+          maxContextLength: model?.maxContextLength
+        };
+        setSelectedModel(defaultProfile);
+        setEditingSystemPrompt('');
+        setShowSystemPromptEditor(false);
       }
     } catch (error) {
       console.error('Failed to fetch model profile:', error);
+      // Still show default profile on error
+      const model = models.find(m => m.id === modelId);
+      if (model) {
+        const defaultProfile: ModelProfile = {
+          modelId,
+          displayName: model.displayName || modelId,
+          provider: model.provider || 'lmstudio',
+          testedAt: '',
+          score: 0,
+          enabledTools: [],
+          capabilities: {},
+          maxContextLength: model.maxContextLength
+        };
+        setSelectedModel(defaultProfile);
+        setEditingSystemPrompt('');
+        setShowSystemPromptEditor(false);
+      }
     }
   };
 
@@ -730,15 +804,76 @@ const Tooly: React.FC = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 bg-[#2d2d2d] rounded-lg">
                       <span className="text-gray-400 text-sm">Tool Score</span>
-                      <p className="text-2xl font-bold text-white">{selectedModel.score}/100</p>
+                      <p className="text-2xl font-bold text-white">
+                        {testProgress.toolsProgress?.modelId === selectedModel.modelId && testProgress.toolsProgress?.status === 'running'
+                          ? testProgress.toolsProgress.score
+                          : selectedModel.score}/100
+                      </p>
                     </div>
                     <div className="p-3 bg-[#2d2d2d] rounded-lg">
                       <span className="text-gray-400 text-sm">Probe Score</span>
                       <p className="text-2xl font-bold text-white">
-                        {selectedModel.probeResults?.overallScore ?? '-'}/100
+                        {testProgress.probeProgress?.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running'
+                          ? testProgress.probeProgress.score
+                          : selectedModel.probeResults?.overallScore ?? '-'}/100
                       </p>
                     </div>
                   </div>
+
+                  {/* Test Progress Bars */}
+                  {(testProgress.probeProgress?.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running') && (
+                    <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-purple-400">🔬 Probe Test Running</span>
+                        <span className="text-xs text-gray-400">
+                          {testProgress.probeProgress.current}/{testProgress.probeProgress.total}
+                        </span>
+                      </div>
+                      <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2">
+                        <div 
+                          className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${(testProgress.probeProgress.current / testProgress.probeProgress.total) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500">{testProgress.probeProgress.currentTest}</p>
+                    </div>
+                  )}
+
+                  {(testProgress.toolsProgress?.modelId === selectedModel.modelId && testProgress.toolsProgress?.status === 'running') && (
+                    <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-blue-400">🔧 Tool Test Running</span>
+                        <span className="text-xs text-gray-400">
+                          {testProgress.toolsProgress.current}/{testProgress.toolsProgress.total}
+                        </span>
+                      </div>
+                      <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2">
+                        <div 
+                          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${(testProgress.toolsProgress.current / testProgress.toolsProgress.total) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500">{testProgress.toolsProgress.currentTest}</p>
+                    </div>
+                  )}
+
+                  {(testProgress.latencyProgress?.modelId === selectedModel.modelId && testProgress.latencyProgress?.status === 'running') && (
+                    <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-green-400">⏱️ Latency Test Running</span>
+                        <span className="text-xs text-gray-400">
+                          {testProgress.latencyProgress.current}/{testProgress.latencyProgress.total}
+                        </span>
+                      </div>
+                      <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2">
+                        <div 
+                          className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${(testProgress.latencyProgress.current / testProgress.latencyProgress.total) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500">{testProgress.latencyProgress.currentTest}</p>
+                    </div>
+                  )}
 
                   {/* Probe Results */}
                   {selectedModel.probeResults && (

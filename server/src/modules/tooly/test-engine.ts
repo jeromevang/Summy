@@ -12,6 +12,7 @@ import { LMStudioClient } from '@lmstudio/sdk';
 import { capabilities, ModelProfile } from './capabilities.js';
 import { getToolSchemas } from './tool-prompts.js';
 import { notifications } from '../../services/notifications.js';
+import { wsBroadcast } from '../../services/ws-broadcast.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -513,12 +514,36 @@ class TestEngine {
     }
 
     const results: TestResult[] = [];
+    const totalTests = TEST_DEFINITIONS.length;
+    let completedTests = 0;
+    let runningScore = 0;
+
+    // Broadcast initial progress
+    wsBroadcast.broadcastProgress('tools', modelId, {
+      current: 0,
+      total: totalTests,
+      currentTest: TEST_DEFINITIONS[0]?.tool || 'Starting...',
+      score: 0,
+      status: 'running'
+    });
     
     for (const test of TEST_DEFINITIONS) {
       try {
         const result = await this.runSingleTest(test, modelId, provider, settings);
         results.push(result);
+        completedTests++;
+        runningScore = Math.round(results.reduce((sum, r) => sum + r.score, 0) / completedTests);
+        
         console.log(`[TestEngine] ${test.id}: ${result.passed ? '✅ PASS' : '❌ FAIL'} (${result.score}%)`);
+
+        // Broadcast progress
+        wsBroadcast.broadcastProgress('tools', modelId, {
+          current: completedTests,
+          total: totalTests,
+          currentTest: test.tool,
+          score: runningScore,
+          status: 'running'
+        });
       } catch (error: any) {
         results.push({
           testId: test.id,
@@ -529,7 +554,18 @@ class TestEngine {
           checks: [],
           error: error.message
         });
+        completedTests++;
+        runningScore = Math.round(results.reduce((sum, r) => sum + r.score, 0) / completedTests);
         console.error(`[TestEngine] ${test.id}: ❌ ERROR - ${error.message}`);
+
+        // Broadcast progress even on error
+        wsBroadcast.broadcastProgress('tools', modelId, {
+          current: completedTests,
+          total: totalTests,
+          currentTest: test.tool,
+          score: runningScore,
+          status: 'running'
+        });
       }
     }
 
@@ -567,6 +603,15 @@ class TestEngine {
     }
 
     notifications.modelTestCompleted(modelId, overallScore);
+
+    // Broadcast completion
+    wsBroadcast.broadcastProgress('tools', modelId, {
+      current: totalTests,
+      total: totalTests,
+      currentTest: 'Complete',
+      score: overallScore,
+      status: 'completed'
+    });
 
     return runResult;
   }
