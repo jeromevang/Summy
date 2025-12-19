@@ -1,0 +1,410 @@
+{
+  "modelId": "functionary-small-v2.4",
+  "displayName": "functionary-small-v2.4",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T14:38:53.455Z",
+  "testVersion": 3,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 177,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 296,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 330,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 153,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 212,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 194,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 149,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 149,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 105,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 172,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 153,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 161,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 134,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 194,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 127,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 157,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 168,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 175,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 275,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 253,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 203,
+      "lastTested": "2025-12-19T14:38:53.455Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-t5fadcmy5tsqky6ln6pv7\",\"object\":\"chat.completion\",\"created\":1766155129,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" file_read\\n<|content|> {\\\"path\\\": \\\"./config.json\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":472,\"completion_tokens\":13,\"total_tokens\":485},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-x20zil5kpafe9c4hvhls\",\"object\":\"chat.completion\",\"created\":1766155129,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" file_read\\n<|content|> {\\\"path\\\": \\\"src/utils/helpers.ts\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":474,\"completion_tokens\":17,\"total_tokens\":491},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-a27z0r2heyashiklmww2l\",\"object\":\"chat.completion\",\"created\":1766155129,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" file_write\\n<|content|> {\\\"path\\\": \\\"hello.js\\\", \\\"content\\\": \\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":515,\"completion_tokens\":27,\"total_tokens\":542},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-1h1fmvrgwctjn13cfb2zf\",\"object\":\"chat.completion\",\"created\":1766155129,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" file_patch\\n<|content|> {\\\"path\\\": \\\"app.js\\\", \\\"find\\\": \\\"3000\\\", \\\"replace\\\": \\\"8080\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":547,\"completion_tokens\":31,\"total_tokens\":578},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-26eeplvvt4mj51clg02ru\",\"object\":\"chat.completion\",\"created\":1766155130,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" file_list\\n<|content|> {\\\"folder\\\": \\\"src\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":457,\"completion_tokens\":11,\"total_tokens\":468},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-b9vk8zobb2l6pmne0xcbwr\",\"object\":\"chat.completion\",\"created\":1766155130,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" file_search\\n<|content|> {\\\"query\\\": \\\"TODO\\\", \\\"path\\\": \\\"/project\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":498,\"completion_tokens\":18,\"total_tokens\":516},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-yujziwxj8lp2b8f20o6tl\",\"object\":\"chat.completion\",\"created\":1766155130,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" git_status\\n<|content|> {}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":6,\"total_tokens\":427},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-60wcj7mi9i5pq1hgfz54ed\",\"object\":\"chat.completion\",\"created\":1766155130,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" git_diff\\n<|content|> {\\\"file\\\": \\\"index.js\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":459,\"completion_tokens\":13,\"total_tokens\":472},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-l44liaje80o1ifn01j65x2\",\"object\":\"chat.completion\",\"created\":1766155130,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" git_log\\n<|content|> {\\\"count\\\": 5}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":453,\"completion_tokens\":11,\"total_tokens\":464},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vidcu8kn59kxm0ubvuegxi\",\"object\":\"chat.completion\",\"created\":1766155130,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" git_commit\\n<|content|> {\\\"message\\\": \\\"Fix login bug\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":463,\"completion_tokens\":13,\"total_tokens\":476},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-wmi5dx1txxdfi0nybyxpbq\",\"object\":\"chat.completion\",\"created\":1766155131,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" git_branch_create\\n<|content|> {\\\"name\\\": \\\"feature/user-auth\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":468,\"completion_tokens\":17,\"total_tokens\":485},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-u4qh9239vjg3nuo1gqp2d\",\"object\":\"chat.completion\",\"created\":1766155131,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" npm_run\\n<|content|> {\\\"script\\\": \\\"build\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":463,\"completion_tokens\":12,\"total_tokens\":475},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-sl81qd8ocwmcpt6den3vqb\",\"object\":\"chat.completion\",\"created\":1766155131,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" npm_install\\n<|content|> {\\\"package\\\": \\\"lodash\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":458,\"completion_tokens\":14,\"total_tokens\":472},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-f5nje6bfu6b5csl8bni2ak\",\"object\":\"chat.completion\",\"created\":1766155131,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" http_request\\n<|content|> {\\\"url\\\": \\\"https://api.example.com/users\\\", \\\"method\\\": \\\"GET\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":526,\"completion_tokens\":25,\"total_tokens\":551},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-2aiqhu9lxi8zioamtegk3j\",\"object\":\"chat.completion\",\"created\":1766155131,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" browser_navigate\\n<|content|> {\\\"url\\\": \\\"https://github.com\\\", \\\"getContent\\\": true}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":526,\"completion_tokens\":22,\"total_tokens\":548},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7vttn9ngimxa722nbo9jbk\",\"object\":\"chat.completion\",\"created\":1766155132,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" create_new_file\\n<|content|> {\\\"path\\\": \\\"README.md\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":495,\"completion_tokens\":16,\"total_tokens\":511},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vve5ow9i8gszndufewtxd\",\"object\":\"chat.completion\",\"created\":1766155132,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" folder_create\\n<|content|> {\\\"path\\\": \\\"/components\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":461,\"completion_tokens\":11,\"total_tokens\":472},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-r25r4qg9nngp0pzj2hjig\",\"object\":\"chat.completion\",\"created\":1766155132,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" folder_delete\\n<|content|> {\\\"path\\\": \\\"/temp\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":462,\"completion_tokens\":11,\"total_tokens\":473},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-8nv5yzgwd7uofg36wlkfe\",\"object\":\"chat.completion\",\"created\":1766155132,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" git_add\\n<|content|> {\\\"file\\\": \\\"index.js\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":470,\"completion_tokens\":13,\"total_tokens\":483},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-s9yat1rice8xs1b3bj92u\",\"object\":\"chat.completion\",\"created\":1766155132,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" git_add\\n<|content|> {\\\"file\\\": \\\".\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":465,\"completion_tokens\":11,\"total_tokens\":476},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-05obc8fob9sbrtiusp2l8tm\",\"object\":\"chat.completion\",\"created\":1766155132,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" git_branch_list\\n<|content|> {}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":422,\"completion_tokens\":8,\"total_tokens\":430},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-3ppmtoqpu4pjfsk6aays7f\",\"object\":\"chat.completion\",\"created\":1766155133,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" npm_uninstall\\n<|content|> {\\\"package\\\": \\\"axios\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":464,\"completion_tokens\":14,\"total_tokens\":478},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ag9tz9cp6v92h8vm97b2q9\",\"object\":\"chat.completion\",\"created\":1766155133,\"model\":\"functionary-small-v2.4\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" run_python\\n<|content|> {\\\"code\\\": \\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":462,\"completion_tokens\":17,\"total_tokens\":479},\"stats\":{},\"system_fingerprint\":\"functionary-small-v2.4\"}"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T14:38:46.272Z",
+    "emitTest": {
+      "passed": false,
+      "score": 10,
+      "details": "Leaked control tokens: <|content|>"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 85,
+      "details": "No tool called, but response was: \" all\n<|content|> OK\""
+    },
+    "toolScore": 50,
+    "reasoningScore": 0,
+    "overallScore": 25,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 0,
+        "details": "Leaked control tokens: <|content|>"
+      },
+      "multiStepPlanning": {
+        "passed": false,
+        "score": 0,
+        "details": "Leaked control tokens: <|content|>"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 0,
+        "details": "Leaked control tokens: <|content|>"
+      },
+      "contextContinuity": {
+        "passed": false,
+        "score": 0,
+        "details": "Leaked control tokens: <|content|>"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 0,
+        "details": "Leaked control tokens: <|content|>"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 0,
+        "details": "Leaked control tokens: <|content|>"
+      },
+      "edgeCaseHandling": {
+        "passed": false,
+        "score": 0,
+        "details": "Leaked control tokens: <|content|>"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "latencies": {
+      "2048": 203,
+      "4096": 199,
+      "8192": 199,
+      "16384": 197,
+      "32768": 205
+    },
+    "maxUsableContext": 32768,
+    "recommendedContext": 32768,
+    "modelMaxContext": 32768
+  },
+  "contextLength": 32768
+}

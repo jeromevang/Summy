@@ -845,11 +845,32 @@ const Tooly: React.FC = () => {
                   <button
                     onClick={async () => {
                       if (!selectedModel) return;
+                      
+                      // Initialize progress state so progress bars show immediately
+                      setTestProgress({
+                        modelId: selectedModel.modelId,
+                        probeProgress: { current: 0, total: 11, currentTest: 'Starting probe tests...', score: 0, status: 'running' }
+                      });
+                      
                       // Order: probe → reasoning → tools → latency
                       // 1. Run probe tests (includes reasoning) WITHOUT latency
                       await runProbeTests(selectedModel.modelId, selectedModel.provider, false);
+                      
+                      // Update for tool tests
+                      setTestProgress({
+                        modelId: selectedModel.modelId,
+                        toolsProgress: { current: 0, total: 22, currentTest: 'Starting tool tests...', score: 0, status: 'running' }
+                      });
+                      
                       // 2. Run tool capability tests
                       await runModelTests(selectedModel.modelId, selectedModel.provider);
+                      
+                      // Update for latency tests
+                      setTestProgress({
+                        modelId: selectedModel.modelId,
+                        latencyProgress: { current: 0, total: 7, currentTest: 'Starting latency tests...', status: 'running' }
+                      });
+                      
                       // 3. Run latency profile last
                       try {
                         await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/latency-profile`, {
@@ -861,6 +882,9 @@ const Tooly: React.FC = () => {
                       } catch (error) {
                         console.error('Failed to run latency profile:', error);
                       }
+                      
+                      // Clear progress on completion
+                      setTestProgress({});
                     }}
                     disabled={probingModel === selectedModel.modelId || testingModel === selectedModel.modelId}
                     className="w-full py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
@@ -1127,14 +1151,26 @@ const Tooly: React.FC = () => {
                   {/* Actions */}
                   <div className="flex gap-2 flex-wrap">
                     <button
-                      onClick={() => runProbeTests(selectedModel.modelId, selectedModel.provider, true)}
+                      onClick={() => {
+                        setTestProgress({
+                          modelId: selectedModel.modelId,
+                          probeProgress: { current: 0, total: 11, currentTest: 'Starting...', score: 0, status: 'running' }
+                        });
+                        runProbeTests(selectedModel.modelId, selectedModel.provider, true);
+                      }}
                       disabled={probingModel === selectedModel.modelId}
                       className="flex-1 py-2 px-3 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 disabled:opacity-50 text-sm"
                     >
                       {probingModel === selectedModel.modelId ? 'Probing...' : '🧪 Probes'}
                     </button>
                     <button
-                      onClick={() => runModelTests(selectedModel.modelId, selectedModel.provider)}
+                      onClick={() => {
+                        setTestProgress({
+                          modelId: selectedModel.modelId,
+                          toolsProgress: { current: 0, total: 22, currentTest: 'Starting...', score: 0, status: 'running' }
+                        });
+                        runModelTests(selectedModel.modelId, selectedModel.provider);
+                      }}
                       disabled={testingModel === selectedModel.modelId}
                       className="flex-1 py-2 px-3 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 disabled:opacity-50 text-sm"
                     >
@@ -1142,6 +1178,10 @@ const Tooly: React.FC = () => {
                     </button>
                     <button
                       onClick={async () => {
+                        setTestProgress({
+                          modelId: selectedModel.modelId,
+                          latencyProgress: { current: 0, total: 7, currentTest: 'Starting...', status: 'running' }
+                        });
                         try {
                           await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/latency-profile`, {
                             method: 'POST',
@@ -1152,6 +1192,7 @@ const Tooly: React.FC = () => {
                         } catch (error) {
                           console.error('Failed to run latency profile:', error);
                         }
+                        setTestProgress({});
                       }}
                       className="flex-1 py-2 px-3 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30 text-sm"
                     >
