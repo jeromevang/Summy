@@ -142,29 +142,7 @@ Rules:
 - Shows local branches
 - Current branch is marked`,
 
-  git_checkout: `### git_checkout
-Switch to an existing branch.
-Parameters:
-- branch (required): The branch name to switch to
-Rules:
-- Branch must exist
-- Stash or commit changes first`,
-
-  git_merge: `### git_merge
-Merge a branch into the current branch.
-Parameters:
-- branch (required): The branch to merge from
-Rules:
-- May result in merge conflicts
-- Verify you're on the correct target branch`,
-
-  git_rm: `### git_rm
-Remove a file from git tracking.
-Parameters:
-- file (required): The file to remove
-Rules:
-- Removes from git and filesystem
-- Use with caution`,
+  // NOTE: git_checkout, git_merge, git_rm have been removed for safety
 
   // ========== NPM OPERATIONS ==========
   npm_run: `### npm_run
