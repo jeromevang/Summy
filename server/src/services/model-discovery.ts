@@ -24,6 +24,8 @@ export interface DiscoveredModel {
   provider: 'lmstudio' | 'openai' | 'azure';
   status: ModelStatus;
   score?: number;
+  toolScore?: number;
+  reasoningScore?: number;
   toolCount?: number;
   totalTools?: number;
   avgLatency?: number;
@@ -147,6 +149,8 @@ class ModelDiscoveryService {
           provider: 'lmstudio',
           status: profile ? (profile.score >= 50 ? 'tested' : 'failed') : 'untested',
           score: profile?.score,
+          toolScore: profile?.probeResults?.toolScore,
+          reasoningScore: profile?.probeResults?.reasoningScore,
           toolCount: profile?.enabledTools?.length,
           totalTools: 22,
           avgLatency: profile?.avgLatency,

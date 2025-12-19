@@ -273,11 +273,11 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T11:59:15.717Z",
+    "testedAt": "2025-12-19T15:40:51.269Z",
     "emitTest": {
       "passed": true,
       "score": 100,
-      "details": "Valid tool call with correct parameters"
+      "details": "Valid tool call with correct parameters (OpenAI format)"
     },
     "schemaTest": {
       "passed": true,
@@ -285,18 +285,38 @@
       "details": "Perfect schema adherence - read schema and used correct field names and values"
     },
     "selectionTest": {
-      "passed": false,
-      "score": 0,
-      "details": "Test failed"
+      "passed": true,
+      "score": 100,
+      "details": "Correct tool selected with correct file path"
     },
     "suppressionTest": {
       "passed": false,
       "score": 0,
       "details": "Model called a tool when explicitly forbidden - uncontrollable"
     },
-    "toolScore": 60,
-    "reasoningScore": 69,
-    "overallScore": 65,
+    "nearIdenticalSelectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct: chose search_web for real-time data with appropriate query"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 50,
+      "details": "Called 2 tools, but not all were read_file"
+    },
+    "argumentValidationTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: all types and nested structures correct"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
+    "toolScore": 80,
+    "reasoningScore": 65,
+    "overallScore": 73,
     "reasoningProbes": {
       "intentExtraction": {
         "passed": true,
@@ -305,8 +325,8 @@
       },
       "multiStepPlanning": {
         "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
+        "score": 70,
+        "details": "2 steps planned"
       },
       "conditionalReasoning": {
         "passed": false,
