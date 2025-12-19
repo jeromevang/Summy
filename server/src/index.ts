@@ -87,18 +87,29 @@ const broadcastToClients = (type: string, data: any) => {
   });
 };
 
+// Shared LMStudio client instance (reused to avoid creating new connections)
+let sharedLMStudioClient: LMStudioClient | null = null;
+
+const getSharedLMStudioClient = () => {
+  if (!sharedLMStudioClient) {
+    sharedLMStudioClient = new LMStudioClient();
+  }
+  return sharedLMStudioClient;
+};
+
 // Get full status including MCP and LM Studio
 const getFullStatus = async () => {
   let lmstudioConnected = false;
   let lmstudioModels: string[] = [];
   
   try {
-    const client = new LMStudioClient();
+    const client = getSharedLMStudioClient();
     const loadedModels = await client.llm.listLoaded();
     lmstudioConnected = true;
     lmstudioModels = loadedModels.map(m => m.identifier);
   } catch {
     lmstudioConnected = false;
+    sharedLMStudioClient = null; // Reset on error to reconnect next time
   }
 
   const mcpStatus = mcpClient.getStatus();
@@ -1265,7 +1276,7 @@ app.post('/api/settings', async (req, res) => {
 // LM Studio status check using SDK
 app.get('/api/lmstudio/status', async (req, res) => {
   try {
-    const client = new LMStudioClient();
+    const client = getSharedLMStudioClient();
     const loadedModels = await client.llm.listLoaded();
     res.json({ 
       connected: true, 
@@ -1273,6 +1284,7 @@ app.get('/api/lmstudio/status', async (req, res) => {
       models: loadedModels.map(m => m.identifier)
     });
   } catch (error: any) {
+    sharedLMStudioClient = null; // Reset on error
     res.json({ 
       connected: false, 
       reason: error.message 
@@ -1399,8 +1411,8 @@ app.post('/api/lmstudio/load-model', async (req, res) => {
       return res.status(400).json({ success: false, error: 'No model specified' });
     }
     
-    // Connect to LMStudio via SDK
-    const client = new LMStudioClient();
+    // Use shared LMStudio client
+    const client = getSharedLMStudioClient();
     
     // Unload other models if requested
     if (unloadOthers) {

@@ -1,0 +1,209 @@
+{
+  "modelId": "cursorcore-qw2.5-7b",
+  "displayName": "cursorcore-qw2.5-7b",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T13:02:55.114Z",
+  "testVersion": 1,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [],
+  "probeResults": {
+    "testedAt": "2025-12-19T13:02:55.113Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct tool selected with correct file path"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "toolScore": 100,
+    "reasoningScore": 69,
+    "overallScore": 85,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 50,
+        "details": "JSON parsed but missing required fields (action, tool)"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 30,
+        "details": "Failed to identify logical conflict"
+      },
+      "explanation": {
+        "passed": true,
+        "score": 100,
+        "details": "Provided reasoning before action"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 80,
+        "details": "Addresses edge case without explicit fallback"
+      }
+    }
+  },
+  "role": "executor"
+}
