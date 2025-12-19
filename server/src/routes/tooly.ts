@@ -354,8 +354,9 @@ router.post('/models/:modelId/quick-latency', async (req, res) => {
 
     console.log(`[Tooly] Quick latency check for ${modelId} at 2K context`);
 
-    // Run single latency test at 2K context
-    const latency = await probeEngine.runQuickLatencyCheck(modelId, provider, testSettings, 30000);
+    // Run single latency test at 2K context with 12s timeout
+    // If it takes longer than 10s, client will show slow model warning
+    const latency = await probeEngine.runQuickLatencyCheck(modelId, provider, testSettings, 12000);
 
     res.json({ latency, modelId, contextSize: 2048 });
   } catch (error: any) {
