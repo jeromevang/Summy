@@ -446,6 +446,24 @@ const Tooly: React.FC = () => {
           <p className="text-gray-400 text-sm">Model Capabilities, Probing & Tool Management</p>
         </div>
         <div className="flex items-center gap-4">
+          {/* MCP Status Indicator */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">MCP:</span>
+            <button
+              onClick={toggleMcpConnection}
+              disabled={mcpConnecting}
+              className={`flex items-center gap-1.5 px-2 py-1 text-xs rounded transition-colors ${
+                mcpStatus.connected 
+                  ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                  : 'bg-gray-600/30 text-gray-400 hover:bg-gray-600/40'
+              } disabled:opacity-50`}
+              title={mcpStatus.connected ? `Connected (${mcpTools.length} tools)` : 'Click to connect'}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${mcpStatus.connected ? 'bg-green-400' : 'bg-gray-500'}`}></span>
+              {mcpConnecting ? '...' : mcpStatus.connected ? 'On' : 'Off'}
+            </button>
+          </div>
+          
           {/* Proxy Mode Selector */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">Mode:</span>
@@ -559,49 +577,6 @@ const Tooly: React.FC = () => {
         )}
       </div>
 
-      {/* MCP Server Status */}
-      <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <span className="text-lg">🔌</span>
-            <span className="text-white font-medium">MCP Server</span>
-            <span className={`px-2 py-0.5 text-xs rounded ${mcpStatus.connected ? 'bg-green-500/20 text-green-400' : 'bg-gray-600/50 text-gray-400'}`}>
-              {mcpStatus.connected ? 'Connected' : 'Disconnected'}
-            </span>
-            {mcpStatus.mode && mcpStatus.mode !== 'none' && (
-              <span className="text-xs text-gray-500">({mcpStatus.mode})</span>
-            )}
-          </div>
-          <button
-            onClick={toggleMcpConnection}
-            disabled={mcpConnecting}
-            className={`px-3 py-1 text-sm rounded ${
-              mcpStatus.connected 
-                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
-                : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
-            } disabled:opacity-50`}
-          >
-            {mcpConnecting ? '...' : mcpStatus.connected ? 'Disconnect' : 'Connect'}
-          </button>
-        </div>
-        
-        {mcpStatus.connected && mcpTools.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-[#2d2d2d]">
-            <p className="text-xs text-gray-500 mb-2">Available Tools ({mcpTools.length})</p>
-            <div className="flex flex-wrap gap-1">
-              {mcpTools.slice(0, 15).map(tool => (
-                <span key={tool} className="px-2 py-0.5 text-xs bg-[#2d2d2d] text-gray-300 rounded">
-                  {tool}
-                </span>
-              ))}
-              {mcpTools.length > 15 && (
-                <span className="px-2 py-0.5 text-xs text-gray-500">+{mcpTools.length - 15} more</span>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
       {/* Tabs */}
       <div className="flex space-x-1 bg-[#1a1a1a] p-1 rounded-lg border border-[#2d2d2d]">
         {(['models', 'tests', 'logs'] as TabId[]).map((tab) => (
@@ -676,7 +651,7 @@ const Tooly: React.FC = () => {
                   No models discovered. Check your LLM provider settings.
                 </p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
                   {models.map((model) => (
                     <div
                       key={model.id}

@@ -341,18 +341,17 @@
       2048,
       4096,
       8192,
-      16384,
-      32768
+      16384
     ],
     "latencies": {
-      "2048": 985,
-      "4096": 969,
+      "2048": 994,
+      "4096": 970,
       "8192": 970,
-      "16384": 968,
-      "32768": 3868
+      "16384": 973
     },
-    "maxUsableContext": 32768,
-    "recommendedContext": 32768
+    "maxUsableContext": 16384,
+    "recommendedContext": 16384,
+    "modelMaxContext": 16384
   },
-  "contextLength": 32768
+  "contextLength": 16384
 }
