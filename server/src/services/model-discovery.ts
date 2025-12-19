@@ -136,7 +136,8 @@ class ModelDiscoveryService {
         
         // Try to get quantization from SDK first, fallback to API if not available
         // Cast to any to check for quantization property (may not be in SDK types yet)
-        const sdkQuantization = (model as any).quantization;
+        // Quantization can be string or object {name, bits}
+        const sdkQuantization = this.extractQuantizationString((model as any).quantization);
         const quantization = sdkQuantization || await this.getModelQuantization(lmstudioUrl, modelId);
 
         models.push({
@@ -170,6 +171,7 @@ class ModelDiscoveryService {
   /**
    * Get quantization level from LM Studio API
    * Uses /api/v0/models/{modelId} endpoint
+   * Quantization can be a string or an object {name, bits}
    */
   private async getModelQuantization(lmstudioUrl: string, modelId: string): Promise<string | undefined> {
     try {
@@ -179,14 +181,31 @@ class ModelDiscoveryService {
         timeout: 5000
       });
       
-      if (response.data?.quantization) {
-        return response.data.quantization;
+      const quant = response.data?.quantization;
+      if (quant) {
+        // Handle both string and object {name, bits} format
+        if (typeof quant === 'string') {
+          return quant;
+        } else if (quant.name) {
+          return quant.name;
+        }
       }
       return undefined;
     } catch (error: any) {
       // Silently fail - quantization is optional
       return undefined;
     }
+  }
+
+  /**
+   * Extract quantization string from SDK or API response
+   * Handles both string and object {name, bits} formats
+   */
+  private extractQuantizationString(quant: any): string | undefined {
+    if (!quant) return undefined;
+    if (typeof quant === 'string') return quant;
+    if (quant.name) return quant.name;
+    return undefined;
   }
 
   /**
