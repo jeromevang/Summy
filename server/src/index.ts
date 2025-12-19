@@ -301,6 +301,17 @@ interface ServerSettings {
   // Compression defaults
   defaultCompressionMode: 0 | 1 | 2 | 3;
   defaultKeepRecent: number;
+  
+  // Context settings
+  defaultContextLength?: number;
+  
+  // Proxy mode: 'passthrough' | 'summy' | 'tooly' | 'both'
+  proxyMode?: 'passthrough' | 'summy' | 'tooly' | 'both';
+  
+  // Dual model configuration
+  enableDualModel?: boolean;
+  mainModelId?: string;
+  executorModelId?: string;
 }
 
 const SETTINGS_FILE = path.join(__dirname, '../settings.json');
@@ -324,7 +335,12 @@ const loadServerSettings = async (): Promise<ServerSettings> => {
     lmstudioUrl: 'http://localhost:1234',
     lmstudioModel: '',
     defaultCompressionMode: 1,
-    defaultKeepRecent: 5
+    defaultKeepRecent: 5,
+    defaultContextLength: 8192,
+    proxyMode: 'both',
+    enableDualModel: false,
+    mainModelId: '',
+    executorModelId: ''
   };
 };
 
@@ -938,7 +954,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
             'Content-Type': 'application/json',
           },
           data: modifiedBody,
-          timeout: 120000,
+          timeout: 30000, // 30 second production timeout
           responseType: req.isStreaming ? 'stream' : 'json',
         });
         
@@ -1022,7 +1038,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
         'Content-Type': 'application/json',
       },
       data: modifiedBody,
-      timeout: 120000,
+      timeout: 30000, // 30 second production timeout
       responseType: req.isStreaming ? 'stream' : 'json',
     });
 

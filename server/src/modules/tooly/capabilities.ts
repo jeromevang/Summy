@@ -24,6 +24,22 @@ export interface ToolCapability {
   notes?: string;
 }
 
+export interface ProbeResults {
+  testedAt: string;
+  emitTest: { passed: boolean; score: number; details: string };
+  schemaTest: { passed: boolean; score: number; details: string };
+  selectionTest: { passed: boolean; score: number; details: string };
+  suppressionTest: { passed: boolean; score: number; details: string };
+  overallScore: number;
+}
+
+export interface ContextLatencyData {
+  testedContextSizes: number[];
+  latencies: Record<number, number>;
+  maxUsableContext: number;
+  recommendedContext: number;
+}
+
 export interface ModelProfile {
   modelId: string;
   displayName: string;
@@ -35,6 +51,15 @@ export interface ModelProfile {
   systemPrompt?: string;   // Custom system prompt for this model
   avgLatency?: number;
   contextLength?: number;  // Custom context length override for this model
+  
+  // Role assignment from probe tests
+  role?: 'main' | 'executor' | 'both' | 'none';
+  
+  // Probe test results
+  probeResults?: ProbeResults;
+  
+  // Context latency profiling
+  contextLatency?: ContextLatencyData;
   
   capabilities: Record<string, ToolCapability>;
   enabledTools: string[];
@@ -436,6 +461,44 @@ class CapabilitiesService {
       .replace(/[^a-z0-9-_.]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
+  }
+
+  /**
+   * Update probe results and role assignment
+   */
+  async updateProbeResults(
+    modelId: string,
+    probeResults: ProbeResults,
+    role: 'main' | 'executor' | 'both' | 'none',
+    contextLatency?: ContextLatencyData
+  ): Promise<void> {
+    let profile = await this.getProfile(modelId);
+    if (!profile) {
+      // Create a basic profile if it doesn't exist
+      profile = this.createEmptyProfile(modelId, modelId, 'lmstudio');
+    }
+
+    profile.probeResults = probeResults;
+    profile.role = role;
+    
+    if (contextLatency) {
+      profile.contextLatency = contextLatency;
+      // Auto-set recommended context if not manually overridden
+      if (!profile.contextLength) {
+        profile.contextLength = contextLatency.recommendedContext;
+      }
+    }
+
+    await this.saveProfile(profile);
+    console.log(`[Capabilities] Updated probe results for ${modelId}: role=${role}`);
+  }
+
+  /**
+   * Get models by role
+   */
+  async getModelsByRole(role: 'main' | 'executor' | 'both' | 'none'): Promise<ModelProfile[]> {
+    const allProfiles = await this.getAllProfiles();
+    return allProfiles.filter(p => p.role === role || (role === 'main' && p.role === 'both') || (role === 'executor' && p.role === 'both'));
   }
 
   /**

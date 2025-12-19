@@ -19,16 +19,6 @@ interface ServerSettings {
   };
 }
 
-interface DiscoveredModel {
-  id: string;
-  displayName: string;
-  provider: 'lmstudio' | 'openai' | 'azure';
-  status: 'tested' | 'untested' | 'failed' | 'known_good';
-  score?: number;
-  toolCount?: number;
-  totalTools?: number;
-}
-
 const COMPRESSION_MODES = [
   { value: 0, label: 'None', description: 'No compression applied' },
   { value: 1, label: 'Light', description: 'Summarize text, preserve all tools' },
@@ -60,11 +50,6 @@ const Settings: React.FC = () => {
   const [loadingModel, setLoadingModel] = useState(false);
   const [loadModelStatus, setLoadModelStatus] = useState<string>('');
   
-  // OpenAI model selection
-  const [openaiModels, setOpenaiModels] = useState<string[]>([]);
-  const [openaiModelsLoading, setOpenaiModelsLoading] = useState(false);
-  const [openaiModelsError, setOpenaiModelsError] = useState<string>('');
-  
   // Azure connection test
   const [azureStatus, setAzureStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
   const [azureError, setAzureError] = useState<string>('');
@@ -72,10 +57,6 @@ const Settings: React.FC = () => {
   // Module settings
   const [summyEnabled, setSummyEnabled] = useState(true);
   const [toolyEnabled, setToolyEnabled] = useState(true);
-  
-  // Discovered models
-  const [discoveredModels, setDiscoveredModels] = useState<DiscoveredModel[]>([]);
-  const [modelsLoading, setModelsLoading] = useState(false);
 
   // Load settings from server and localStorage
   useEffect(() => {
@@ -105,22 +86,6 @@ const Settings: React.FC = () => {
     }
   };
   
-  const fetchDiscoveredModels = async (provider?: string) => {
-    setModelsLoading(true);
-    try {
-      // Use the provided provider or the current settings provider
-      const selectedProvider = provider || settings.provider || 'all';
-      const response = await axios.get(`/api/tooly/models?provider=${selectedProvider}`);
-      if (response.data.models) {
-        setDiscoveredModels(response.data.models);
-      }
-    } catch (error) {
-      console.error('Failed to fetch models:', error);
-    } finally {
-      setModelsLoading(false);
-    }
-  };
-
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveStatus('saving');
@@ -204,26 +169,6 @@ const Settings: React.FC = () => {
     } finally {
       setLoadingModel(false);
       setTimeout(() => setLoadModelStatus(''), 5000);
-    }
-  };
-
-  const handleFetchOpenAIModels = async () => {
-    setOpenaiModelsLoading(true);
-    setOpenaiModelsError('');
-    
-    try {
-      const response = await axios.get('http://localhost:3001/api/openai/models');
-      if (response.data.models) {
-        setOpenaiModels(response.data.models);
-        // Auto-select first model if none selected
-        if (!settings.openaiModel && response.data.models.length > 0) {
-          setSettings(prev => ({ ...prev, openaiModel: response.data.models[0] }));
-        }
-      }
-    } catch (error: any) {
-      setOpenaiModelsError(error.response?.data?.error || error.message);
-    } finally {
-      setOpenaiModelsLoading(false);
     }
   };
 
@@ -353,63 +298,24 @@ const Settings: React.FC = () => {
               )}
             </div>
 
-            {/* Discovered Models */}
-            <div className="border border-[#2d2d2d] rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-medium text-white flex items-center gap-2">
-                  <span className="text-2xl">🎯</span> Discovered Models
-                </h4>
-                <button
-                  type="button"
-                  onClick={() => fetchDiscoveredModels(settings.provider)}
-                  disabled={modelsLoading}
-                  className="px-3 py-1 text-xs bg-[#2d2d2d] text-gray-300 rounded hover:bg-[#3d3d3d] disabled:opacity-50 transition-colors"
-                >
-                  {modelsLoading ? '⏳ Scanning...' : `🔄 Scan ${settings.provider === 'lmstudio' ? 'LM Studio' : settings.provider === 'openai' ? 'OpenAI' : settings.provider === 'azure' ? 'Azure' : 'All'}`}
-                </button>
-              </div>
-              
-              {discoveredModels.length > 0 ? (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {discoveredModels.map((model) => (
-                    <div
-                      key={model.id}
-                      className="flex items-center justify-between p-3 bg-[#0d0d0d] rounded-lg border border-[#2d2d2d]"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`text-lg ${
-                          model.status === 'tested' || model.status === 'known_good' ? 'text-green-400' :
-                          model.status === 'untested' ? 'text-yellow-400' :
-                          'text-red-400'
-                        }`}>
-                          {model.status === 'tested' || model.status === 'known_good' ? '✅' :
-                           model.status === 'untested' ? '⚠️' : '❌'}
-                        </span>
-                        <div>
-                          <p className="text-white text-sm font-medium">{model.displayName}</p>
-                          <p className="text-xs text-gray-500">{model.provider}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {model.score !== undefined && (
-                          <span className="text-xs text-gray-400">
-                            {model.score}/100
-                          </span>
-                        )}
-                        {model.toolCount !== undefined && (
-                          <span className="text-xs px-2 py-0.5 bg-[#2d2d2d] rounded text-gray-400">
-                            🔧 {model.toolCount}/{model.totalTools}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+            {/* Model Hub Link */}
+            <div className="border border-[#2d2d2d] rounded-lg p-4 bg-purple-500/5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-lg font-medium text-white flex items-center gap-2">
+                    <span className="text-2xl">🎯</span> Model Management
+                  </h4>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Discover, test, and configure models in the Tooly - Model Hub
+                  </p>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-500 text-center py-4">
-                  Click "Scan" to discover available models from your LLM providers
-                </p>
-              )}
+                <a
+                  href="/tooly"
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  Open Model Hub →
+                </a>
+              </div>
             </div>
 
             {/* Azure OpenAI Configuration - only show when Azure is selected */}
@@ -740,72 +646,29 @@ const Settings: React.FC = () => {
               </div>
             </div>
 
-            {/* OpenAI Model Selection */}
+            {/* OpenAI Model - Simplified */}
             <div>
               <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                <span className="text-2xl">🤖</span> OpenAI Model
+                <span className="text-2xl">🤖</span> Default OpenAI Model
               </h4>
               <p className="text-sm text-gray-400 mb-4">
-                Select which OpenAI model to use when proxying requests. Click "Fetch Models" to load available models from your API key.
+                Fallback model for OpenAI requests. For full model management, use the Model Hub.
               </p>
               
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleFetchOpenAIModels}
-                    disabled={openaiModelsLoading}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
-                  >
-                    {openaiModelsLoading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Fetching...
-                      </>
-                    ) : (
-                      <>🔄 Fetch Models</>
-                    )}
-                  </button>
-                  {openaiModels.length > 0 && (
-                    <span className="text-xs text-gray-400 self-center">
-                      {openaiModels.length} models available
-                    </span>
-                  )}
-                </div>
-                
-                {openaiModelsError && (
-                  <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
-                    ❌ {openaiModelsError}
-                  </div>
-                )}
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Selected Model
-                  </label>
-                  {openaiModels.length > 0 ? (
-                    <select
-                      value={settings.openaiModel}
-                      onChange={(e) => handleChange('openaiModel', e.target.value)}
-                      className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    >
-                      {openaiModels.map(model => (
-                        <option key={model} value={model}>{model}</option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      value={settings.openaiModel}
-                      onChange={(e) => handleChange('openaiModel', e.target.value)}
-                      className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      placeholder="gpt-4o-mini"
-                    />
-                  )}
-                  <p className="mt-2 text-xs text-gray-500">
-                    💡 This model is used when the IDE sends an unknown model name (not gpt-*, o1-*)
-                  </p>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Model Name
+                </label>
+                <input
+                  type="text"
+                  value={settings.openaiModel}
+                  onChange={(e) => handleChange('openaiModel', e.target.value)}
+                  className="w-full bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="gpt-4o-mini"
+                />
+                <p className="mt-2 text-xs text-gray-500">
+                  💡 Used as fallback when the IDE sends an unknown model name
+                </p>
               </div>
             </div>
 

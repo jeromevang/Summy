@@ -4,6 +4,22 @@ import React, { useState, useEffect } from 'react';
 // TYPES
 // ============================================================
 
+interface ProbeResults {
+  testedAt: string;
+  emitTest: { passed: boolean; score: number; details: string };
+  schemaTest: { passed: boolean; score: number; details: string };
+  selectionTest: { passed: boolean; score: number; details: string };
+  suppressionTest: { passed: boolean; score: number; details: string };
+  overallScore: number;
+}
+
+interface ContextLatencyData {
+  testedContextSizes: number[];
+  latencies: Record<number, number>;
+  maxUsableContext: number;
+  recommendedContext: number;
+}
+
 interface ModelProfile {
   modelId: string;
   displayName: string;
@@ -12,7 +28,10 @@ interface ModelProfile {
   score: number;
   enabledTools: string[];
   capabilities: Record<string, { supported: boolean; score: number }>;
-  contextLength?: number;  // Custom context length override
+  contextLength?: number;
+  role?: 'main' | 'executor' | 'both' | 'none';
+  probeResults?: ProbeResults;
+  contextLatency?: ContextLatencyData;
 }
 
 interface DiscoveredModel {
@@ -23,6 +42,7 @@ interface DiscoveredModel {
   score?: number;
   toolCount?: number;
   totalTools?: number;
+  role?: 'main' | 'executor' | 'both' | 'none';
 }
 
 interface TestDefinition {
@@ -64,8 +84,10 @@ const Tooly: React.FC = () => {
   const [testMode, setTestMode] = useState<'quick' | 'keep_on_success' | 'manual'>('keep_on_success');
   const [defaultContextLength, setDefaultContextLength] = useState<number>(8192);
   const [editingContextLength, setEditingContextLength] = useState<number | null>(null);
+  const [probingModel, setProbingModel] = useState<string | null>(null);
+  const [proxyMode, setProxyMode] = useState<'passthrough' | 'summy' | 'tooly' | 'both'>('both');
 
-  // Fetch settings for default context length
+  // Fetch settings for default context length and proxy mode
   const fetchSettings = async () => {
     try {
       const res = await fetch('/api/settings');
@@ -73,6 +95,9 @@ const Tooly: React.FC = () => {
         const data = await res.json();
         if (data.defaultContextLength) {
           setDefaultContextLength(data.defaultContextLength);
+        }
+        if (data.proxyMode) {
+          setProxyMode(data.proxyMode);
         }
       }
     } catch (error) {
@@ -206,6 +231,56 @@ const Tooly: React.FC = () => {
     }
   };
 
+  const runProbeTests = async (modelId: string, modelProvider?: string, runLatencyProfile: boolean = false) => {
+    setProbingModel(modelId);
+    try {
+      const res = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/probe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          provider: modelProvider || 'lmstudio',
+          runLatencyProfile
+        })
+      });
+      if (res.ok) {
+        await fetchModels();
+        await fetchModelProfile(modelId);
+      }
+    } catch (error) {
+      console.error('Failed to run probe tests:', error);
+    } finally {
+      setProbingModel(null);
+    }
+  };
+
+  const saveProxyMode = async (mode: typeof proxyMode) => {
+    try {
+      await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proxyMode: mode })
+      });
+      setProxyMode(mode);
+    } catch (error) {
+      console.error('Failed to save proxy mode:', error);
+    }
+  };
+
+  const getRoleBadge = (role?: string) => {
+    switch (role) {
+      case 'main':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400">🧠 Main</span>;
+      case 'executor':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">⚡ Executor</span>;
+      case 'both':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-purple-500/20 text-purple-400">✨ Both</span>;
+      case 'none':
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-red-500/20 text-red-400">⚠️ Limited</span>;
+      default:
+        return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-500/20 text-gray-400">? Unprobed</span>;
+    }
+  };
+
   const handleRollback = async (backupId: string) => {
     try {
       const res = await fetch(`/api/tooly/backups/${backupId}/restore`, {
@@ -244,19 +319,35 @@ const Tooly: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-white">Tooly</h1>
-          <p className="text-gray-400 text-sm">Tool Management & Model Capabilities</p>
+          <h1 className="text-2xl font-bold text-white">Tooly - Model Hub</h1>
+          <p className="text-gray-400 text-sm">Model Capabilities, Probing & Tool Management</p>
         </div>
-        <button
-          onClick={() => {
-            fetchModels();
-            fetchTests();
-            fetchLogs();
-          }}
-          className="px-3 py-1.5 text-sm bg-[#2d2d2d] text-gray-300 rounded-lg hover:bg-[#3d3d3d] transition-colors"
-        >
-          ↻ Refresh
-        </button>
+        <div className="flex items-center gap-4">
+          {/* Proxy Mode Selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Mode:</span>
+            <select
+              value={proxyMode}
+              onChange={(e) => saveProxyMode(e.target.value as typeof proxyMode)}
+              className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-sm text-gray-300 focus:border-purple-500 focus:outline-none"
+            >
+              <option value="passthrough">Passthrough Only</option>
+              <option value="summy">Summy Only (Compression)</option>
+              <option value="tooly">Tooly Only (Tools)</option>
+              <option value="both">Summy + Tooly</option>
+            </select>
+          </div>
+          <button
+            onClick={() => {
+              fetchModels();
+              fetchTests();
+              fetchLogs();
+            }}
+            className="px-3 py-1.5 text-sm bg-[#2d2d2d] text-gray-300 rounded-lg hover:bg-[#3d3d3d] transition-colors"
+          >
+            ↻ Refresh
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -350,19 +441,36 @@ const Tooly: React.FC = () => {
                             {getStatusIcon(model.status)}
                           </span>
                           <div>
-                            <p className="text-white font-medium">{model.displayName}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-white font-medium">{model.displayName}</p>
+                              {getRoleBadge(model.role)}
+                            </div>
                             <p className="text-gray-500 text-xs">{model.provider}</p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex items-center gap-2">
                           {model.score !== undefined ? (
-                            <>
+                            <div className="text-right">
                               <p className="text-white">{model.score}/100</p>
                               <p className="text-gray-500 text-xs">
                                 🔧 {model.toolCount}/{model.totalTools}
                               </p>
-                            </>
-                          ) : (
+                            </div>
+                          ) : null}
+                          {!model.role && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                runProbeTests(model.id, model.provider);
+                              }}
+                              disabled={probingModel === model.id}
+                              className="px-3 py-1 text-xs bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 disabled:opacity-50"
+                              title="Run probe tests to determine model role"
+                            >
+                              {probingModel === model.id ? 'Probing...' : 'Probe'}
+                            </button>
+                          )}
+                          {model.score === undefined && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -371,7 +479,7 @@ const Tooly: React.FC = () => {
                               disabled={testingModel === model.id}
                               className="px-3 py-1 text-xs bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 disabled:opacity-50"
                             >
-                              {testingModel === model.id ? 'Testing...' : 'Run Tests'}
+                              {testingModel === model.id ? 'Testing...' : 'Test Tools'}
                             </button>
                           )}
                         </div>
@@ -384,16 +492,87 @@ const Tooly: React.FC = () => {
 
             {/* Model Details */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">
-                {selectedModel ? selectedModel.displayName : 'Select a Model'}
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">
+                  {selectedModel ? selectedModel.displayName : 'Select a Model'}
+                </h3>
+                {selectedModel && getRoleBadge(selectedModel.role)}
+              </div>
               {selectedModel ? (
                 <div className="space-y-4">
-                  {/* Score */}
-                  <div className="flex items-center justify-between p-3 bg-[#2d2d2d] rounded-lg">
-                    <span className="text-gray-400">Overall Score</span>
-                    <span className="text-2xl font-bold text-white">{selectedModel.score}/100</span>
+                  {/* Role & Score */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-[#2d2d2d] rounded-lg">
+                      <span className="text-gray-400 text-sm">Tool Score</span>
+                      <p className="text-2xl font-bold text-white">{selectedModel.score}/100</p>
+                    </div>
+                    <div className="p-3 bg-[#2d2d2d] rounded-lg">
+                      <span className="text-gray-400 text-sm">Probe Score</span>
+                      <p className="text-2xl font-bold text-white">
+                        {selectedModel.probeResults?.overallScore ?? '-'}/100
+                      </p>
+                    </div>
                   </div>
+
+                  {/* Probe Results */}
+                  {selectedModel.probeResults && (
+                    <div className="p-3 bg-[#2d2d2d] rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-400 mb-3">Probe Test Results</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { name: 'Emit', key: 'emitTest', icon: '📤' },
+                          { name: 'Schema', key: 'schemaTest', icon: '📋' },
+                          { name: 'Selection', key: 'selectionTest', icon: '🎯' },
+                          { name: 'Suppression', key: 'suppressionTest', icon: '🛑' }
+                        ].map(({ name, key, icon }) => {
+                          const result = selectedModel.probeResults?.[key as keyof ProbeResults] as { passed: boolean; score: number; details: string } | undefined;
+                          return (
+                            <div 
+                              key={key} 
+                              className={`p-2 rounded border ${result?.passed ? 'border-green-500/30 bg-green-500/10' : 'border-red-500/30 bg-red-500/10'}`}
+                              title={result?.details}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm text-white">{icon} {name}</span>
+                                <span className={`text-sm font-medium ${result?.passed ? 'text-green-400' : 'text-red-400'}`}>
+                                  {result?.score ?? 0}%
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Context Latency */}
+                  {selectedModel.contextLatency && (
+                    <div className="p-3 bg-[#2d2d2d] rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-400 mb-2">Context Latency Profile</h4>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">Max Usable Context</span>
+                        <span className="text-white font-medium">
+                          {(selectedModel.contextLatency.maxUsableContext / 1024).toFixed(0)}K
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm mt-1">
+                        <span className="text-gray-400">Recommended</span>
+                        <span className="text-green-400 font-medium">
+                          {(selectedModel.contextLatency.recommendedContext / 1024).toFixed(0)}K
+                        </span>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {Object.entries(selectedModel.contextLatency.latencies).map(([size, latency]) => (
+                          <span 
+                            key={size} 
+                            className={`px-2 py-0.5 text-xs rounded ${latency < 30000 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}
+                          >
+                            {(parseInt(size) / 1024).toFixed(0)}K: {(latency / 1000).toFixed(1)}s
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Context Length */}
                   <div className="p-3 bg-[#2d2d2d] rounded-lg">
@@ -438,7 +617,7 @@ const Tooly: React.FC = () => {
                   {/* Tool Categories */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-400 mb-2">Tool Capabilities</h4>
-                    <div className="space-y-1 max-h-64 overflow-y-auto">
+                    <div className="space-y-1 max-h-48 overflow-y-auto">
                       {Object.entries(selectedModel.capabilities).map(([tool, cap]) => (
                         <div key={tool} className="flex items-center justify-between py-1">
                           <span className={`text-sm ${cap.supported ? 'text-white' : 'text-gray-500'}`}>
@@ -453,11 +632,18 @@ const Tooly: React.FC = () => {
                   {/* Actions */}
                   <div className="flex gap-2">
                     <button
+                      onClick={() => runProbeTests(selectedModel.modelId, selectedModel.provider, true)}
+                      disabled={probingModel === selectedModel.modelId}
+                      className="flex-1 py-2 px-4 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 disabled:opacity-50"
+                    >
+                      {probingModel === selectedModel.modelId ? 'Probing...' : '🧪 Run Probes'}
+                    </button>
+                    <button
                       onClick={() => runModelTests(selectedModel.modelId, selectedModel.provider)}
                       disabled={testingModel === selectedModel.modelId}
                       className="flex-1 py-2 px-4 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 disabled:opacity-50"
                     >
-                      {testingModel === selectedModel.modelId ? 'Testing...' : 'Re-test All'}
+                      {testingModel === selectedModel.modelId ? 'Testing...' : '🔧 Test Tools'}
                     </button>
                   </div>
                 </div>
