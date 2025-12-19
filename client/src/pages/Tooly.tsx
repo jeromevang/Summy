@@ -38,6 +38,9 @@ interface ContextLatencyData {
   latencies: Record<number, number>;
   maxUsableContext: number;
   recommendedContext: number;
+  minLatency?: number;
+  isInteractiveSpeed?: boolean;
+  speedRating?: 'excellent' | 'good' | 'acceptable' | 'slow' | 'very_slow';
 }
 
 interface ModelProfile {
@@ -1034,8 +1037,52 @@ const Tooly: React.FC = () => {
                   {/* Context Latency */}
                   {selectedModel.contextLatency && (
                     <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-400 mb-2">Context Latency Profile</h4>
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-medium text-gray-400">Context Latency Profile</h4>
+                        {/* Speed Rating Badge */}
+                        {selectedModel.contextLatency.speedRating && (
+                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                            selectedModel.contextLatency.speedRating === 'excellent' ? 'bg-green-500/20 text-green-400' :
+                            selectedModel.contextLatency.speedRating === 'good' ? 'bg-blue-500/20 text-blue-400' :
+                            selectedModel.contextLatency.speedRating === 'acceptable' ? 'bg-yellow-500/20 text-yellow-400' :
+                            selectedModel.contextLatency.speedRating === 'slow' ? 'bg-orange-500/20 text-orange-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {selectedModel.contextLatency.speedRating === 'excellent' ? '🚀 Excellent' :
+                             selectedModel.contextLatency.speedRating === 'good' ? '✅ Good' :
+                             selectedModel.contextLatency.speedRating === 'acceptable' ? '⚡ Acceptable' :
+                             selectedModel.contextLatency.speedRating === 'slow' ? '🐢 Slow' :
+                             '⚠️ Very Slow'}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Speed Warning */}
+                      {selectedModel.contextLatency.isInteractiveSpeed === false && (
+                        <div className="mb-2 p-2 bg-orange-500/10 border border-orange-500/30 rounded text-xs text-orange-400">
+                          ⚠️ This model may be too slow for interactive IDE use. Consider using a smaller/faster model.
+                        </div>
+                      )}
+                      
+                      {/* Min Latency */}
+                      {selectedModel.contextLatency.minLatency !== undefined && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-400">Fastest Response</span>
+                          <span className={`font-medium ${
+                            selectedModel.contextLatency.minLatency < 500 ? 'text-green-400' :
+                            selectedModel.contextLatency.minLatency < 2000 ? 'text-blue-400' :
+                            selectedModel.contextLatency.minLatency < 5000 ? 'text-yellow-400' :
+                            'text-orange-400'
+                          }`}>
+                            {selectedModel.contextLatency.minLatency < 1000 
+                              ? `${selectedModel.contextLatency.minLatency}ms`
+                              : `${(selectedModel.contextLatency.minLatency / 1000).toFixed(1)}s`
+                            }
+                          </span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between text-sm mt-1">
                         <span className="text-gray-400">Max Usable Context</span>
                         <span className="text-white font-medium">
                           {(selectedModel.contextLatency.maxUsableContext / 1024).toFixed(0)}K
@@ -1047,15 +1094,26 @@ const Tooly: React.FC = () => {
                           {(selectedModel.contextLatency.recommendedContext / 1024).toFixed(0)}K
                         </span>
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {Object.entries(selectedModel.contextLatency.latencies).map(([size, latency]) => (
-                          <span 
-                            key={size} 
-                            className={`px-2 py-0.5 text-xs rounded ${latency < 30000 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}
-                          >
-                            {(parseInt(size) / 1024).toFixed(0)}K: {(latency / 1000).toFixed(1)}s
-                          </span>
-                        ))}
+                      
+                      {/* Latency by Context Size */}
+                      <div className="mt-2">
+                        <span className="text-xs text-gray-500">Latency by context size:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {Object.entries(selectedModel.contextLatency.latencies).map(([size, latency]) => (
+                            <span 
+                              key={size} 
+                              className={`px-2 py-0.5 text-xs rounded ${
+                                latency < 500 ? 'bg-green-500/20 text-green-400' :
+                                latency < 2000 ? 'bg-blue-500/20 text-blue-400' :
+                                latency < 5000 ? 'bg-yellow-500/20 text-yellow-400' :
+                                latency < 10000 ? 'bg-orange-500/20 text-orange-400' :
+                                'bg-red-500/20 text-red-400'
+                              }`}
+                            >
+                              {(parseInt(size) / 1024).toFixed(0)}K: {latency < 1000 ? `${latency}ms` : `${(latency / 1000).toFixed(1)}s`}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
