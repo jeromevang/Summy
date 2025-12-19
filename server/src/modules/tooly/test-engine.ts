@@ -405,29 +405,24 @@ class TestEngine {
       const loadedModels = await client.llm.listLoaded();
       const loadedIds = loadedModels.map(m => m.identifier);
       
-      // Check if model is already loaded
-      const isAlreadyLoaded = loadedIds.includes(modelId);
-      
-      if (isAlreadyLoaded) {
-        console.log(`[TestEngine] Model ${modelId} is already loaded`);
-        
-        // Still unload others if requested
-        if (unloadOthers) {
-          for (const model of loadedModels) {
-            if (model.identifier !== modelId) {
-              await client.llm.unload(model.identifier);
-              console.log(`[TestEngine] Unloaded ${model.identifier}`);
-            }
-          }
-        }
-        return; // Model already loaded, no need to load again
+      // Always unload the model first to ensure correct context size
+      if (loadedIds.includes(modelId)) {
+        wsBroadcast.broadcastModelLoading(modelId, 'unloading', 'Unloading to set correct context...');
+        console.log(`[TestEngine] Model ${modelId} is already loaded, unloading to set correct context...`);
+        await client.llm.unload(modelId);
       }
 
       // Unload other models if requested
       if (unloadOthers) {
         for (const model of loadedModels) {
-          await client.llm.unload(model.identifier);
-          console.log(`[TestEngine] Unloaded ${model.identifier}`);
+          if (model.identifier !== modelId) {
+            try {
+              await client.llm.unload(model.identifier);
+              console.log(`[TestEngine] Unloaded ${model.identifier}`);
+            } catch {
+              // Ignore
+            }
+          }
         }
       }
     } catch (error: any) {
@@ -436,13 +431,15 @@ class TestEngine {
 
     // Load the test model
     try {
+      wsBroadcast.broadcastModelLoading(modelId, 'loading', `Loading model with ${contextLength} context...`);
       console.log(`[TestEngine] Loading model ${modelId} with context length ${contextLength}...`);
       await client.llm.load(modelId, {
         config: { contextLength }
       });
+      wsBroadcast.broadcastModelLoading(modelId, 'loaded', `Model loaded with ${contextLength} context`);
       console.log(`[TestEngine] Model ${modelId} loaded successfully`);
     } catch (error: any) {
-      // Model might already be loaded
+      wsBroadcast.broadcastModelLoading(modelId, 'failed', error.message);
       if (!error.message.includes('already loaded')) {
         throw error;
       }

@@ -50,6 +50,18 @@ class WSBroadcastService {
       ...progress
     });
   }
+
+  /**
+   * Broadcast model loading status
+   */
+  broadcastModelLoading(modelId: string, status: 'loading' | 'unloading' | 'loaded' | 'unloaded' | 'failed', message?: string) {
+    console.log(`[WSBroadcast] Model ${status}: ${modelId} - ${message || ''} (clients: ${this.clients.size})`);
+    this.broadcast('model_loading', {
+      modelId,
+      status,
+      message: message || `Model ${status}`
+    });
+  }
 }
 
 export const wsBroadcast = new WSBroadcastService();

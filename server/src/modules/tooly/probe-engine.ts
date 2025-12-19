@@ -438,18 +438,27 @@ class ProbeEngine {
     if (provider === 'lmstudio' && settings.lmstudioUrl) {
       try {
         const client = new LMStudioClient();
+        
+        // Unload first to ensure correct context size
+        wsBroadcast.broadcastModelLoading(modelId, 'unloading', 'Unloading model to set correct context...');
+        try {
+          await client.llm.unload(modelId);
+          console.log(`[ProbeEngine] Unloaded model ${modelId}`);
+        } catch {
+          // Model might not be loaded
+        }
+        
+        // Load with correct context
+        wsBroadcast.broadcastModelLoading(modelId, 'loading', `Loading model with ${contextLength} context...`);
         console.log(`[ProbeEngine] Loading model ${modelId} with context ${contextLength}...`);
         await client.llm.load(modelId, {
           config: { contextLength }
         });
+        wsBroadcast.broadcastModelLoading(modelId, 'loaded', `Model loaded with ${contextLength} context`);
         console.log(`[ProbeEngine] Model ${modelId} loaded with context ${contextLength}`);
       } catch (error: any) {
-        // Model might already be loaded or other error
-        if (!error.message?.includes('already loaded')) {
-          console.log(`[ProbeEngine] Could not load model: ${error.message}`);
-        } else {
-          console.log(`[ProbeEngine] Model ${modelId} was already loaded`);
-        }
+        wsBroadcast.broadcastModelLoading(modelId, 'failed', error.message);
+        console.log(`[ProbeEngine] Could not load model: ${error.message}`);
       }
     }
 

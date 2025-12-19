@@ -2,9 +2,9 @@
   "modelId": "deepseek/deepseek-r1-0528-qwen3-8b",
   "displayName": "deepseek/deepseek-r1-0528-qwen3-8b",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T13:42:08.488Z",
-  "testVersion": 2,
-  "score": 81,
+  "testedAt": "2025-12-19T15:46:51.169Z",
+  "testVersion": 3,
+  "score": 85,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -12,168 +12,168 @@
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 5340.5,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 3510.5,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "file_write": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 6245,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 3862,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "file_patch": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 5761,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 6659,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "file_list": {
       "supported": true,
-      "score": 75,
+      "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 6746,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 4462,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "file_search": {
-      "supported": false,
-      "score": 20,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 8923,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3738,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "create_new_file": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4182,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 4368,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "folder_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 5797,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 3588,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "folder_delete": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 7621,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "supported": false,
+      "score": 20,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 4336,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "git_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 7025,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 4385,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "git_diff": {
-      "supported": false,
-      "score": 20,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 5246,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2722,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "git_log": {
       "supported": true,
       "score": 75,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 6292,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 3739,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4149,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 4350,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "git_add": {
       "supported": true,
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 4655.5,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 3868.5,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 5905,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 3824,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 4439,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 3296,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4208,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 2682,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4813,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 3508,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4715,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 4511,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 5937,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 4562,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 6114,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "avgLatency": 4793,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "run_python": {
-      "supported": false,
-      "score": 20,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 5761,
-      "lastTested": "2025-12-19T13:42:08.488Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 6334,
+      "lastTested": "2025-12-19T15:46:51.169Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -185,11 +185,11 @@
   "enabledTools": [
     "file_read",
     "file_write",
-    "file_patch",
     "file_list",
+    "file_search",
     "create_new_file",
     "folder_create",
-    "folder_delete",
+    "git_diff",
     "git_log",
     "git_commit",
     "git_add",
@@ -198,183 +198,204 @@
     "npm_install",
     "npm_uninstall",
     "http_request",
-    "browser_navigate"
+    "browser_navigate",
+    "run_python"
   ],
   "testResults": [
     {
       "testId": "file_read_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-k9kl1gwlzlfu42iih4fkr\",\"object\":\"chat.completion\",\"created\":1766151598,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want me to read the contents of a file called \\\"config.json\\\" from the current directory.\\n\\nLooking at my available tools, I can use the file_read function which matches this request perfectly. The tool requires just one parameter: path wit"
+      "response": "{\"id\":\"chatcmpl-54xokgr1zf9jfbckpw32ef\",\"object\":\"chat.completion\",\"created\":1766159116,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants me to read the contents of config.json from the current directory. \\n\\nHmm, this seems like a straightforward file reading request. The tool is available and the parameters are clear - just need the path argument set to \\\"config.json\\\". \\n\\nI wonder if they're expecting JSON pa"
     },
     {
       "testId": "file_read_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-yvkkx5uwwfprcakdbx1typ\",\"object\":\"chat.completion\",\"created\":1766151604,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants to check the contents of a TypeScript file from their project directory. They're probably working on some code and need quick context about this helper file.\\n\\nHmm, they specifically mentioned \\\"helpers.ts\\\" which suggests it might contain utility functions or shared logic. Si"
+      "response": "{\"id\":\"chatcmpl-mhnl7tgauc925rq3q2cck8\",\"object\":\"chat.completion\",\"created\":1766159119,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants to check the contents of a specific TypeScript file: src/utils/helpers.ts. \\n\\nHmm, they're probably working on some code and need to reference helper functions from this file. Maybe debugging or refactoring? The path looks like it's from a standard React/Node project structure"
     },
     {
       "testId": "file_write_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-g6hwrldlv48okryi1r4dmq\",\"object\":\"chat.completion\",\"created\":1766151609,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's break this down. The user wants me to create a JavaScript file named \\\"hello.js\\\" with a simple \\\"Hello World\\\" message.\\n\\nFirst, I need to check if any tools are needed here. Looking at the available tools, there's a `file_write` function that can handle writing content to files. "
+      "response": "{\"id\":\"chatcmpl-0xhxf93idext6kay56b5l\",\"object\":\"chat.completion\",\"created\":1766159123,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user wants here. They're asking me to create a new JavaScript file named \\\"hello.js\\\" and put a simple \\\"console.log('Hello World')\\\" inside it.\\n\\nThis seems like a straightforward request - they want me to write some basic code in a file. The content is very standard f"
     },
     {
       "testId": "file_patch_basic",
-      "passed": true,
-      "score": 99,
-      "response": "{\"id\":\"chatcmpl-wqn7jsf2i5qu4q918zv\",\"object\":\"chat.completion\",\"created\":1766151615,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let me process this request carefully. The user wants to modify the port number in app.js from 3000 to 8080.\\n\\nLooking at the available tools, I see file_patch is perfect for this task - it allows modifying specific content in a file by finding and replacing text. \\n\\nThe parameters needed "
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-uhcfaqiakak6gtk7zwkb2\",\"object\":\"chat.completion\",\"created\":1766159127,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nWe are only allowed to use the available tool: file_patch.\\n The user wants to change the port number in app.js from 3000 to 8080.\\n\\n We must provide a TOOL_REQUEST block with:\\n   - name: \\\"file_patch\\\"\\n   - arguments: containing path, find, and replace.\\n\\n Since we are only modifying one fi"
     },
     {
       "testId": "file_list_basic",
       "passed": true,
-      "score": 75,
-      "response": "{\"id\":\"chatcmpl-17dths1fp5y5p8gh4wwn6g\",\"object\":\"chat.completion\",\"created\":1766151621,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want to see all the files in the \\\"src\\\" directory. \\n\\nLooking at my available tools, I have a function called \\\"file_list\\\". The description says it lists files in a directory, and there's an optional parameter for the folder path with a "
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-wfzjp1jt61aq6gei3jwn7\",\"object\":\"chat.completion\",\"created\":1766159134,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want me to show them all the files in the \\\"src\\\" directory. \\n\\nI remember that I have this tool called \\\"file_list\\\" available. It can list files in a directory and there's no need to specify anything if they just want the current one, but"
     },
     {
       "testId": "file_search_basic",
-      "passed": false,
-      "score": 20,
-      "response": "{\"id\":\"chatcmpl-eh7el11n1aaeusif3uynjk\",\"object\":\"chat.completion\",\"created\":1766151628,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking here. They want me to search for all occurrences of \\\"TODO\\\" in their project files. Hmm, this seems like a common task developers do to find pending tasks or comments they need to address later.\\n\\nFirst, I should check if there are any tools available t"
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-qh4k0uckg5t9nvpt2g1hf6\",\"object\":\"chat.completion\",\"created\":1766159138,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants me to search for all TODO comments across their entire project files. That's a pretty common request among developers - they're probably looking for quick wins or areas needing attention.\\n\\nHmm, I notice they didn't specify any particular directory path. Since they said \\\"proj"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-m8hq2n1jfcgteseih1vg\",\"object\":\"chat.completion\",\"created\":1766151636,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want me to check the current git status of their repository. The tool available is called \\\"git_status\\\" which seems straightforward.\\n\\nFirst, I need to make sure that using this tool is appropriate. Since they specifically mentioned checkin"
+      "response": "{\"id\":\"chatcmpl-j090pnlosaoe74phefwb9\",\"object\":\"chat.completion\",\"created\":1766159142,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants me to check the current git status of their repository. This is a straightforward request that matches exactly one of my available tools - git_status. \\n\\nHmm, looking at the tool description, it just says \\\"Check git repository status\\\" without any parameters needed. That means"
     },
     {
       "testId": "git_diff_basic",
-      "passed": false,
-      "score": 20,
-      "response": "{\"id\":\"chatcmpl-b4yxe6q7ceomqu4e7ejz\",\"object\":\"chat.completion\",\"created\":1766151643,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking here. They want to see the git diff for the file \\\"index.js\\\". The available tool is called \\\"git_diff\\\", which takes an optional parameter \\\"file\\\". Since they specified a specific file, I should include that in the arguments.\\n\\nThe example shows how to s"
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-e7fmzmoqbkocznttxles4m\",\"object\":\"chat.completion\",\"created\":1766159146,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nWe are given an example of how to call the tool and format it.\\n The user wants to see the git diff for the file \\\"index.js\\\".\\n We have a function called \\\"git_diff\\\" that takes an optional parameter \\\"file\\\".\\n\\n Since we want to specify the file, we will set \\\"file\\\": \\\"index.js\\\"\\n\\n Format"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 75,
-      "response": "{\"id\":\"chatcmpl-8jb3dloteryfufvabu1kf\",\"object\":\"chat.completion\",\"created\":1766151649,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want to see the last five commits. I remember there's a tool called git_log that can handle this. The parameters for git_log include an optional count parameter which specifies how many commits to show.\\n\\nThe user hasn't provided any specif"
+      "response": "{\"id\":\"chatcmpl-y6jf7gkozpdpgtuvuqj1qr\",\"object\":\"chat.completion\",\"created\":1766159149,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants to see the last 5 commits from Git history. They're probably working on some code and need context for recent changes - maybe debugging or planning next steps. \\n\\nHmm, they didn't specify any particular repository path though. Should I assume we're in their current directory? "
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-x0adchx96xzba33lfrqlk\",\"object\":\"chat.completion\",\"created\":1766151655,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking here. They want me to commit all changes with the message \\\"Fix login bug\\\". The available tool is `git_commit` which requires a message parameter.\\n\\nThe user seems to be working on some code and has fixed a login issue. They're probably in a development "
+      "response": "{\"id\":\"chatcmpl-s7brnf7awyh97szq9blc\",\"object\":\"chat.completion\",\"created\":1766159153,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let me think through this carefully. The user wants me to commit all changes with a specific message about fixing a login bug. \\n\\nFirst, I need to check if any tool calls are necessary here. Looking at my available tools list, there's only one function called git_commit that requires a \\\"m"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-7ge4hbenn9p6xd7xc0z3d\",\"object\":\"chat.completion\",\"created\":1766151659,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to create a new Git branch named \\\"feature/user-auth\\\". This is a straightforward request that matches one of my available tools perfectly.\\n\\nLooking at the tool specification for git_branch_create, I see it requires exactly one parameter: the branch name. The user has p"
+      "response": "{\"id\":\"chatcmpl-xndjuyi85gbh7zs0p61idg\",\"object\":\"chat.completion\",\"created\":1766159157,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to create a new Git branch named \\\"feature/user-auth\\\". This looks like a straightforward request for version control management.\\n\\nHmm, judging by the branch naming convention (\\\"feature/...\\\"), this is likely part of some software development workflow. The prefix sugg"
     },
     {
       "testId": "npm_run_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-a7xfvjan33hg1oynfret\",\"object\":\"chat.completion\",\"created\":1766151665,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking here. They want me to run an npm script called \\\"build\\\". I remember that there's a tool available for this purpose called \\\"npm_run\\\", which requires specifying the script name as a parameter.\\n\\nThe user seems comfortable with technical commands since the"
+      "response": "{\"id\":\"chatcmpl-dk4vl7w26r8jlmdyihph8j\",\"object\":\"chat.completion\",\"created\":1766159161,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nWe are given an instruction: \\\"Run the 'build' npm script\\\"\\n The available tool is \\\"npm_run\\\", which takes one required parameter: \\\"script\\\"\\n\\n We should call the tool with the argument:\\n   {\\\"script\\\": \\\"build\\\"}\\n\\n Since we are only using one tool, we output it in a single  \\n\\n We do n"
     },
     {
       "testId": "npm_install_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-l26kk8iuurfvxl2eg8mvw\",\"object\":\"chat.completion\",\"created\":1766151669,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want me to install the lodash package using npm. I remember that there's an available tool called \\\"npm_install\\\" which can handle this.\\n\\nLooking at the parameters required by the function, it needs a \\\"package\\\" argument with the name of "
+      "response": "{\"id\":\"chatcmpl-xyswongllgnuw2ezcib14o\",\"object\":\"chat.completion\",\"created\":1766159164,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants me to install the lodash package. This is straightforward since I have the npm_install tool available. \\n\\nLooking at the examples provided earlier, they showed how to structure tool requests - just need to use the exact format and specify the required \\\"package\\\" parameter wit"
     },
     {
       "testId": "http_request_get",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-9q1vch0u83jfznqt4f9z4f\",\"object\":\"chat.completion\",\"created\":1766151674,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want me to fetch data from api.example.com/users. The available tool I have is http_request which requires at least the URL and method.\\n\\nHmm, looking at this request - it doesn't specify any authentication or special parameters beyond jus"
+      "response": "{\"id\":\"chatcmpl-auo090v3yxv18yio0f5fg\",\"object\":\"chat.completion\",\"created\":1766159167,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants me to fetch data from an API endpoint - specifically \\\"https://api.example.com/users\\\". \\n\\nHmm, this seems like a straightforward request but I should consider what they actually need beyond just getting raw JSON. Are they expecting formatted output? Error handling? Maybe pagin"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-tn5r48pq05mpglk6w2e5pk\",\"object\":\"chat.completion\",\"created\":1766151680,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's break this down. The user wants me to open GitHub and retrieve its page title. \\n\\nFirst, I need to check if there's any tool available that can directly fetch a webpage's title. Looking at the tools provided, \\\"browser_navigate\\\" seems relevant because it allows navigation to a URL"
+      "response": "{\"id\":\"chatcmpl-21kvpkp4mdlazsa79qpk7v\",\"object\":\"chat.completion\",\"created\":1766159172,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's break this down. The user wants me to open GitHub and retrieve its page title. \\n\\nFirst, I need to check if any tool is required here. The available tools include browser_navigate which can handle both navigation and content retrieval. Since they specifically asked for the page tit"
     },
     {
       "testId": "create_new_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-52fwhcrvywtwv1x6d83uhf\",\"object\":\"chat.completion\",\"created\":1766151686,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to create a new empty file named \\\"README.md\\\". This is straightforward since I have the `create_new_file` tool available.\\n\\nLooking at the tool's parameters, it requires a \\\"path\\\" argument and optionally accepts content. Since the user specified an empty file, I don't"
+      "response": "{\"id\":\"chatcmpl-h109zfmi7nqv4z8lgaszao\",\"object\":\"chat.completion\",\"created\":1766159176,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to create a new empty file named \\\"README.md\\\". This is straightforward since I have the `create_new_file` tool available.\\n\\nFirst, let's consider what this request might mean in context. A README.md file is typically created at the beginning of a project or directory t"
     },
     {
       "testId": "folder_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-0ikv0avx75mqqm3p5kbx9\",\"object\":\"chat.completion\",\"created\":1766151690,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to create a new folder named \\\"components\\\". This seems like a straightforward file system operation based on their request.\\n\\nLooking at my available tools, I see there's a \\\"folder_create\\\" function that matches this need perfectly. The description clearly states it cr"
+      "response": "{\"id\":\"chatcmpl-ovxonlhcdvpg8wv4z64xxo\",\"object\":\"chat.completion\",\"created\":1766159181,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to create a new folder named \\\"components\\\". This seems like a straightforward file system operation based on their request and the available tools.\\n\\nLooking at the tool list, there's only one function provided: folder_create with a required path parameter. The user ha"
     },
     {
       "testId": "folder_delete_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-txofb7b6ilpiwtug9nqr\",\"object\":\"chat.completion\",\"created\":1766151696,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want me to delete a folder called \\\"temp\\\". I remember there's a tool available called `folder_delete` that can handle this.\\n\\nLooking at the parameters needed for `folder_delete`, it requires a path argument. The user mentioned just the fol"
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-n67baphsokloar1wkcb0kb\",\"object\":\"chat.completion\",\"created\":1766159184,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want me to delete a folder called \\\"temp\\\". I have this tool available called folder_delete that can handle directory deletion. The parameters require a path argument.\\n\\nThe user didn't specify any additional details about where exactly th"
     },
     {
       "testId": "git_add_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-bz4b7pwpt2psqhvwo16mo\",\"object\":\"chat.completion\",\"created\":1766151704,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking here. They want me to stage the file \\\"index.js\\\" for a commit. I have access to the git_add tool which allows staging files.\\n\\nThe parameters require specifying the file path. The user provided \\\"index.js\\\", so that should be straightforward. \\n\\nI need "
+      "response": "{\"id\":\"chatcmpl-n4lashr81pc09rjtmarl7q4\",\"object\":\"chat.completion\",\"created\":1766159189,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's break this down. The user wants me to stage a specific file called \\\"index.js\\\" for commit in Git. \\n\\nLooking at the available tools, there's one named \\\"git_add\\\" that seems perfect for this task. It requires just one parameter: \\\"file\\\", which is exactly what I need here - the p"
     },
     {
       "testId": "git_add_all",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-wj6ij7h9s1p4t1bj8vyubx\",\"object\":\"chat.completion\",\"created\":1766151708,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to stage all changes for a commit in Git. This is a straightforward request that matches one of my available tools perfectly - git_add with file set to \\\".\\\" which means \\\"all\\\" files.\\n\\nLooking at the tool description, I see this exactly fits what they're asking for. T"
+      "response": "{\"id\":\"chatcmpl-r8bt9nxdise1avuz0p3k2h\",\"object\":\"chat.completion\",\"created\":1766159193,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to stage all changes for a commit in Git. This is a straightforward request that matches one of my available functions perfectly - git_add with file set to \\\".\\\" which means staging all tracked changes.\\n\\nI need to respond by calling this tool directly since it's exactl"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-wrihbf8jertel4d7uemjg\",\"object\":\"chat.completion\",\"created\":1766151713,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want to see all the branches in their current repository. I remember there's a tool called `git_branch_list` that can list all branches.\\n\\nThe description of the tool says it lists all branches without needing any parameters since the prope"
+      "response": "{\"id\":\"chatcmpl-98hn8v54ab9pp2ois3gpql\",\"object\":\"chat.completion\",\"created\":1766159197,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, user wants to see all the branches in their current repository. This is a straightforward request that matches exactly one of our available tools - git_branch_list. \\n\\nHmm, looking at the history shows I'm set up as an assistant with tool access capabilities. The user's query doesn't spe"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-akwdogq3hkvbxy8vu2trn6\",\"object\":\"chat.completion\",\"created\":1766151718,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let's see what the user is asking for here. They want me to remove the axios package from their project. I remember that there's an npm_uninstall tool available specifically for this purpose.\\n\\nLooking at how it works, I need to call this tool with the exact format specified. The require"
+      "response": "{\"id\":\"chatcmpl-vs6vr4xz9kc6eer5lwmwq\",\"object\":\"chat.completion\",\"created\":1766159200,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, let me think about how to handle this request step by step.\\n\\nThe user wants to remove the axios package from their project. Looking at the available tools, there's an npm_uninstall function that seems perfect for this task. It requires just one parameter: the package name to uninstall.\\n"
     },
     {
       "testId": "run_python_basic",
-      "passed": false,
-      "score": 20,
-      "response": "{\"id\":\"chatcmpl-ytyc7prjkbgnggj3sa3hwd\",\"object\":\"chat.completion\",\"created\":1766151722,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, the user wants me to run a Python script that prints \\\"Hello World\\\". This seems straightforward since I have the `run_python` tool available. \\n\\nFirst, I need to make sure I'm using the correct format for the tool call. The example shows that each tool should be wrapped in `` tags. \\n\\n"
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-49nho66cxrmnuym0at4zt\",\"object\":\"chat.completion\",\"created\":1766159204,\"model\":\"deepseek/deepseek-r1-0528-qwen3-8b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nWe are only allowed to use the listed tools, and one tool per block.\\n The user wants to run a Python script that prints \\\"Hello World\\\".\\n We have a function called `run_python` which can execute Python code.\\n\\n Since we cannot output any text after the tool call (if using a tool), we must for"
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T13:39:57.924Z",
+    "testedAt": "2025-12-19T15:45:12.324Z",
     "emitTest": {
       "passed": true,
-      "score": 100,
-      "details": "Valid tool call with correct parameters"
+      "score": 95,
+      "details": "XML format succeeded (OpenAI format failed: Wrong tool called: tool_name)"
     },
     "schemaTest": {
-      "passed": false,
-      "score": 40,
-      "details": "Missing \"message\" field"
-    },
-    "selectionTest": {
       "passed": true,
       "score": 100,
-      "details": "Correct tool selected with correct file path"
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 30,
+      "details": "Model called multiple tools instead of selecting one"
     },
     "suppressionTest": {
       "passed": true,
       "score": 70,
       "details": "No tool called but mentioned tools in response"
     },
-    "toolScore": 76,
-    "reasoningScore": 19,
-    "overallScore": 48,
+    "nearIdenticalSelectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct: chose search_web for real-time data with appropriate query"
+    },
+    "multiToolEmitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: emitted 2 read_file calls with correct paths"
+    },
+    "argumentValidationTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: all types and nested structures correct"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
+    "toolScore": 84,
+    "reasoningScore": 39,
+    "overallScore": 62,
     "reasoningProbes": {
       "intentExtraction": {
         "passed": false,
-        "score": 0,
-        "details": "Test failed"
+        "score": 30,
+        "details": "Response contains invalid JSON"
       },
       "multiStepPlanning": {
         "passed": false,
-        "score": 0,
-        "details": "Test failed"
+        "score": 25,
+        "details": "Invalid JSON array"
       },
       "conditionalReasoning": {
         "passed": false,
@@ -393,15 +414,42 @@
       },
       "explanation": {
         "passed": false,
-        "score": 0,
-        "details": "Test failed"
+        "score": 20,
+        "details": "No JSON found"
       },
       "edgeCaseHandling": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
       }
     }
   },
-  "role": "none"
+  "role": "executor",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "latencies": {
+      "2048": 4090,
+      "4096": 4044,
+      "8192": 4074,
+      "16384": 4022,
+      "32768": 4048,
+      "65536": 10566,
+      "131072": 12423
+    },
+    "maxUsableContext": 131072,
+    "recommendedContext": 131072,
+    "modelMaxContext": 131072,
+    "minLatency": 4022,
+    "isInteractiveSpeed": true,
+    "speedRating": "acceptable"
+  },
+  "contextLength": 131072
 }
