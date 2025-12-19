@@ -680,13 +680,21 @@ class TestEngine {
       messages,
       tools,
       tool_choice: 'auto',
-      temperature: 0
+      temperature: 0,
+      max_tokens: 500  // Limit output to prevent runaway generation
     };
 
     switch (provider) {
       case 'lmstudio':
         url = `${settings.lmstudioUrl}/v1/chat/completions`;
         body.model = modelId;
+        // Add stop strings to prevent loops and leaked control tokens
+        body.stop = [
+          '<|im_end|>', '<|im_start|>', '<|stop|>', '<|end|>',
+          '<|recipient|>', '<|from|>', '<|eot_id|>', '<|end_header_id|>',
+          '</s>', '[/INST]', '<|endoftext|>',
+          '\n\nUser:', '\n\nHuman:', '\nuser:', '\nhuman:'
+        ];
         break;
 
       case 'openai':
