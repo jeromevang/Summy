@@ -35,6 +35,7 @@ export interface ProbeResult {
   details: string;
   response?: any;
   error?: string;
+  toolFormat?: ToolFormat;  // Which format worked (if applicable)
 }
 
 export interface ReasoningProbeResults {
@@ -85,6 +86,129 @@ export interface ProbeOptions {
   timeout?: number;              // Default 30000ms
   runLatencyProfile?: boolean;   // Run context latency profiling
   runReasoningProbes?: boolean;  // Run reasoning probes (default: true)
+}
+
+export type ToolFormat = 'openai' | 'xml' | 'none';
+
+// ============================================================
+// BAD OUTPUT DETECTION
+// ============================================================
+
+interface BadOutputResult {
+  isLooping: boolean;
+  hasLeakedTokens: boolean;
+  leakedTokens: string[];
+  isMalformed: boolean;
+}
+
+/**
+ * Detect problematic model outputs like repetition loops and leaked control tokens
+ */
+function detectBadOutput(content: string): BadOutputResult {
+  if (!content) return { isLooping: false, hasLeakedTokens: false, leakedTokens: [], isMalformed: false };
+  
+  // Detect repetition loop - same 30+ char pattern repeated 3+ times
+  const loopPattern = /(.{30,})\1{2,}/s;
+  const isLooping = loopPattern.test(content);
+  
+  // Detect leaked control tokens
+  const controlTokens = [
+    '<|stop|>', '<|end|>', '<|im_end|>', '<|im_start|>',
+    '<|recipient|>', '<|from|>', '<|content|>',
+    '<|eot_id|>', '<|start_header_id|>', '<|end_header_id|>',
+    '<|endoftext|>', '<|pad|>', '<|assistant|>', '<|user|>',
+    '<|system|>', '</s>', '<s>', '[/INST]', '[INST]'
+  ];
+  
+  const leakedTokens = controlTokens.filter(t => content.includes(t));
+  
+  // Check for malformed output (excessive special chars, binary-like)
+  const specialCharRatio = (content.match(/[<>|{}\[\]]/g) || []).length / content.length;
+  const isMalformed = specialCharRatio > 0.3;
+  
+  return {
+    isLooping,
+    hasLeakedTokens: leakedTokens.length > 0,
+    leakedTokens,
+    isMalformed
+  };
+}
+
+// ============================================================
+// XML TOOL FORMAT
+// ============================================================
+
+/**
+ * Generate XML-style tool description for models that don't support OpenAI format
+ */
+function generateXmlToolPrompt(tools: any[]): string {
+  let xml = '<available_tools>\n';
+  
+  for (const tool of tools) {
+    const fn = tool.function;
+    xml += `  <tool name="${fn.name}">\n`;
+    xml += `    <description>${fn.description}</description>\n`;
+    xml += `    <parameters>\n`;
+    
+    for (const [paramName, paramDef] of Object.entries(fn.parameters.properties || {})) {
+      const def = paramDef as any;
+      const isRequired = fn.parameters.required?.includes(paramName);
+      xml += `      <param name="${paramName}" type="${def.type}" required="${isRequired}">${def.description || ''}</param>\n`;
+    }
+    
+    xml += `    </parameters>\n`;
+    xml += `  </tool>\n`;
+  }
+  
+  xml += '</available_tools>';
+  return xml;
+}
+
+/**
+ * Parse XML-style tool call from model response
+ */
+function parseXmlToolCall(content: string): { name: string; arguments: any } | null {
+  // Try multiple XML patterns
+  const patterns = [
+    // <tool_call><name>...</name><arguments>...</arguments></tool_call>
+    /<tool_call>\s*<name>([^<]+)<\/name>\s*<arguments>([\s\S]*?)<\/arguments>\s*<\/tool_call>/i,
+    // <function_call name="...">...</function_call>
+    /<function_call\s+name="([^"]+)">([\s\S]*?)<\/function_call>/i,
+    // <call tool="..." args="..."/>
+    /<call\s+tool="([^"]+)"\s+(?:args|arguments)="([^"]+)"/i,
+    // ```json with tool info
+    /```(?:json)?\s*\{\s*"(?:tool|name|function)"\s*:\s*"([^"]+)"[\s\S]*?"(?:arguments|args|parameters)"\s*:\s*(\{[^}]+\})/i,
+  ];
+  
+  for (const pattern of patterns) {
+    const match = content.match(pattern);
+    if (match) {
+      const name = match[1].trim();
+      let args = {};
+      try {
+        // Try parsing as JSON
+        args = JSON.parse(match[2].trim());
+      } catch {
+        // Try extracting key-value pairs
+        const kvPattern = /"?(\w+)"?\s*[:=]\s*"?([^",}\n]+)"?/g;
+        let kvMatch;
+        while ((kvMatch = kvPattern.exec(match[2])) !== null) {
+          (args as any)[kvMatch[1]] = kvMatch[2].trim();
+        }
+      }
+      return { name, arguments: args };
+    }
+  }
+  
+  // Also try plain JSON in the content
+  const jsonMatch = content.match(/\{\s*"(?:tool|name|function)"\s*:\s*"([^"]+)"[\s\S]*?"(?:arguments|args|parameters)"\s*:\s*(\{[^}]+\})\s*\}/i);
+  if (jsonMatch) {
+    try {
+      return { name: jsonMatch[1], arguments: JSON.parse(jsonMatch[2]) };
+    } catch {}
+  }
+  
+  return null;
 }
 
 // ============================================================
@@ -324,8 +448,74 @@ class ProbeEngine {
   /**
    * PROBE 1: Emit Test
    * Can the model emit valid tool_calls when forced?
+   * Tries OpenAI format first, then falls back to XML format
    */
   private async runEmitTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    // ============ PHASE 1: Try OpenAI format ============
+    const openAIResult = await this.tryEmitOpenAIFormat(modelId, provider, settings, timeout);
+    
+    // If OpenAI format succeeded with score >= 80, we're done
+    if (openAIResult.score >= 80) {
+      return {
+        ...openAIResult,
+        latency: Date.now() - startTime,
+        toolFormat: 'openai'
+      };
+    }
+
+    // Check for bad output (loops, leaked tokens)
+    const content = openAIResult.response?.choices?.[0]?.message?.content || '';
+    const badOutput = detectBadOutput(content);
+    
+    if (badOutput.isLooping) {
+      console.log(`[ProbeEngine] Model stuck in repetition loop, trying XML format...`);
+    } else if (badOutput.hasLeakedTokens) {
+      console.log(`[ProbeEngine] Model leaked control tokens (${badOutput.leakedTokens.join(', ')}), trying XML format...`);
+    } else if (badOutput.isMalformed) {
+      console.log(`[ProbeEngine] Model output malformed, trying XML format...`);
+    }
+
+    // ============ PHASE 2: Try XML format as fallback ============
+    console.log(`[ProbeEngine] OpenAI format failed (score: ${openAIResult.score}), trying XML format...`);
+    const xmlResult = await this.tryEmitXMLFormat(modelId, provider, settings, timeout);
+
+    // Return the better result
+    if (xmlResult.score > openAIResult.score) {
+      return {
+        ...xmlResult,
+        latency: Date.now() - startTime,
+        toolFormat: 'xml',
+        details: `XML format succeeded (OpenAI format failed: ${openAIResult.details})`
+      };
+    }
+
+    // Both failed - return OpenAI result with bad output info
+    let details = openAIResult.details;
+    if (badOutput.isLooping) {
+      details = 'Model stuck in repetition loop';
+    } else if (badOutput.hasLeakedTokens) {
+      details = `Leaked control tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`;
+    }
+
+    return {
+      ...openAIResult,
+      latency: Date.now() - startTime,
+      toolFormat: 'none',
+      details
+    };
+  }
+
+  /**
+   * Try OpenAI-style tool calling
+   */
+  private async tryEmitOpenAIFormat(
     modelId: string,
     provider: 'lmstudio' | 'openai' | 'azure',
     settings: any,
@@ -353,7 +543,6 @@ class ProbeEngine {
       const hasToolCalls = Array.isArray(toolCalls) && toolCalls.length > 0;
 
       if (!hasToolCalls) {
-        // Check if it tried to describe the tool instead
         const content = response?.choices?.[0]?.message?.content || '';
         const describesToolInstead = content.toLowerCase().includes('ping') || 
                                       content.toLowerCase().includes('tool');
@@ -387,7 +576,6 @@ class ProbeEngine {
         };
       }
 
-      // Check correct tool name
       if (functionName !== 'ping') {
         return {
           testName: 'emit',
@@ -399,7 +587,6 @@ class ProbeEngine {
         };
       }
 
-      // Check correct parameter
       if (args.value !== 'test') {
         return {
           testName: 'emit',
@@ -416,7 +603,7 @@ class ProbeEngine {
         passed: true,
         score: 100,
         latency,
-        details: 'Valid tool call with correct parameters',
+        details: 'Valid tool call with correct parameters (OpenAI format)',
         response
       };
 
@@ -426,7 +613,121 @@ class ProbeEngine {
         passed: false,
         score: 0,
         latency: Date.now() - startTime,
-        details: 'Test failed',
+        details: 'OpenAI format test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Try XML-style tool calling for models that don't support OpenAI format
+   */
+  private async tryEmitXMLFormat(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const xmlToolDesc = generateXmlToolPrompt([PING_TOOL]);
+    
+    const messages = [
+      {
+        role: 'system',
+        content: `You are a tool-calling assistant. You have access to the following tools:
+
+${xmlToolDesc}
+
+When you need to call a tool, output it in this EXACT format:
+<tool_call>
+<name>tool_name</name>
+<arguments>{"param": "value"}</arguments>
+</tool_call>
+
+Do not output any other text. Only output the tool_call XML.`
+      },
+      {
+        role: 'user',
+        content: 'Call the "ping" tool with value "test". Output ONLY the tool_call XML, nothing else.'
+      }
+    ];
+
+    try {
+      // Call WITHOUT tools param - let model generate XML
+      const response = await this.callLLM(modelId, provider, messages, undefined, settings, timeout);
+      const latency = Date.now() - startTime;
+      const content = response?.choices?.[0]?.message?.content || '';
+
+      // Check for bad output first
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'emit',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping 
+            ? 'XML format: Model stuck in repetition loop' 
+            : `XML format: Leaked tokens (${badOutput.leakedTokens.slice(0, 2).join(', ')})`,
+          response
+        };
+      }
+
+      // Try to parse XML tool call
+      const parsedCall = parseXmlToolCall(content);
+      
+      if (!parsedCall) {
+        return {
+          testName: 'emit',
+          passed: false,
+          score: content.includes('ping') ? 15 : 0,
+          latency,
+          details: 'XML format: Could not parse tool call from response',
+          response
+        };
+      }
+
+      // Validate the parsed call
+      if (parsedCall.name !== 'ping') {
+        return {
+          testName: 'emit',
+          passed: false,
+          score: 40,
+          latency,
+          details: `XML format: Wrong tool called: ${parsedCall.name}`,
+          response
+        };
+      }
+
+      const value = parsedCall.arguments?.value;
+      if (value !== 'test') {
+        return {
+          testName: 'emit',
+          passed: true,
+          score: 75,
+          latency,
+          details: `XML format: Correct tool but wrong value: "${value}" instead of "test"`,
+          response
+        };
+      }
+
+      return {
+        testName: 'emit',
+        passed: true,
+        score: 95, // Slightly lower than OpenAI format (95 vs 100)
+        latency,
+        details: 'Valid tool call with correct parameters (XML format)',
+        response
+      };
+
+    } catch (error: any) {
+      return {
+        testName: 'emit',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'XML format test failed',
         error: error.message
       };
     }
@@ -1774,13 +2075,13 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
   }
 
   /**
-   * Call LLM with tools
+   * Call LLM with optional tools
    */
   private async callLLM(
     modelId: string,
     provider: 'lmstudio' | 'openai' | 'azure',
     messages: any[],
-    tools: any[],
+    tools: any[] | undefined,
     settings: any,
     timeout: number
   ): Promise<any> {
@@ -1788,10 +2089,14 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     let headers: Record<string, string> = { 'Content-Type': 'application/json' };
     let body: any = {
       messages,
-      tools,
-      tool_choice: 'auto',
       temperature: 0  // Always use temp 0 for deterministic testing
     };
+
+    // Only add tools if provided (for XML format, we don't send tools)
+    if (tools && tools.length > 0) {
+      body.tools = tools;
+      body.tool_choice = 'auto';
+    }
 
     switch (provider) {
       case 'lmstudio':
