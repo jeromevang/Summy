@@ -72,6 +72,8 @@ interface DiscoveredModel {
   provider: 'lmstudio' | 'openai' | 'azure';
   status: 'tested' | 'untested' | 'failed' | 'known_good';
   score?: number;
+  toolScore?: number;
+  reasoningScore?: number;
   toolCount?: number;
   totalTools?: number;
   role?: 'main' | 'executor' | 'both' | 'none';
@@ -809,9 +811,11 @@ const Tooly: React.FC = () => {
                         <div className="text-right">
                           {model.score !== undefined ? (
                             <div className="text-right">
-                              <p className="text-white font-medium">{model.score}/100</p>
+                              <p className="text-white font-medium" title="🔧Tools / 🔬Probe / 🧠Reasoning">
+                                🔧{model.score}/🔬{model.toolScore ?? '-'}/🧠{model.reasoningScore ?? '-'}
+                              </p>
                               <p className="text-gray-500 text-xs">
-                                🔧 {model.toolCount}/{model.totalTools}
+                                {model.toolCount}/{model.totalTools} tools
                               </p>
                             </div>
                           ) : (
