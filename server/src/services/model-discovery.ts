@@ -282,21 +282,23 @@ class ModelDiscoveryService {
   /**
    * Extract quantization level from model ID
    * Common patterns: q4_k_m, iq2_m, q8_0, fp16, etc.
+   * Separators can be: - _ or @
    */
   private extractQuantization(modelId: string): string | undefined {
     // Common quantization patterns in model names
+    // Separators: - _ or @
     const quantPatterns = [
-      // IQ patterns (importance matrix quants)
-      /[_-](iq[1-4]_[a-z]+)/i,
-      // Standard Q patterns
-      /[_-](q[2-8]_[kms0-9_]+)/i,
-      /[_-](q[2-8]_[0-9]+)/i,
+      // IQ patterns (importance matrix quants) - e.g., @iq2_m, -iq3_xs
+      /[@_-](iq[1-4]_[a-z]+)/i,
+      // Standard Q patterns - e.g., -q4_k_m, @q5_k_s
+      /[@_-](q[2-8]_[kms0-9_]+)/i,
+      /[@_-](q[2-8]_[0-9]+)/i,
       // FP patterns
-      /[_-](fp16|fp32|bf16)/i,
+      /[@_-](fp16|fp32|bf16)/i,
       // Simple Q patterns
-      /[_-](q[2-8])/i,
+      /[@_-](q[2-8])/i,
       // GGUF specific
-      /[_-](f16|f32)/i,
+      /[@_-](f16|f32)/i,
     ];
 
     const lowerModelId = modelId.toLowerCase();
