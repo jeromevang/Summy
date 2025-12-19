@@ -433,19 +433,26 @@ class ProbeEngine {
     console.log(`[ProbeEngine] Starting probe tests for ${modelId} (provider: ${provider})`);
     notifications.info(`Starting probe tests for ${modelId}`);
 
-    // For LM Studio: load model with minimal context
+    // For LM Studio: unload all models then load with minimal context
     const contextLength = options.contextLength || 2048;
     if (provider === 'lmstudio' && settings.lmstudioUrl) {
       try {
         const client = new LMStudioClient();
         
-        // Unload first to ensure correct context size
-        wsBroadcast.broadcastModelLoading(modelId, 'unloading', 'Unloading model to set correct context...');
+        // Unload ALL loaded models first
+        wsBroadcast.broadcastModelLoading(modelId, 'unloading', 'Unloading all models...');
         try {
-          await client.llm.unload(modelId);
-          console.log(`[ProbeEngine] Unloaded model ${modelId}`);
+          const loadedModels = await client.llm.listLoaded();
+          for (const model of loadedModels) {
+            try {
+              await client.llm.unload(model.identifier);
+              console.log(`[ProbeEngine] Unloaded ${model.identifier}`);
+            } catch {
+              // Ignore individual unload errors
+            }
+          }
         } catch {
-          // Model might not be loaded
+          // Ignore list errors
         }
         
         // Load with correct context
@@ -2822,21 +2829,30 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     const contextSize = 2048;
     
     console.log(`[ProbeEngine] Quick latency check for ${modelId} at ${contextSize} context`);
-    wsBroadcast.broadcastModelLoading(modelId, 'loading', `Loading for quick latency check...`);
 
-    // For LM Studio, load model with 2K context
+    // For LM Studio, unload all models then load the test model
     if (provider === 'lmstudio' && settings.lmstudioUrl) {
       try {
         const client = new LMStudioClient();
         
-        // Unload first
+        // Unload ALL loaded models first
+        wsBroadcast.broadcastModelLoading(modelId, 'unloading', `Unloading all models...`);
         try {
-          await client.llm.unload(modelId);
+          const loadedModels = await client.llm.listLoaded();
+          for (const model of loadedModels) {
+            try {
+              await client.llm.unload(model.identifier);
+              console.log(`[ProbeEngine] Unloaded ${model.identifier}`);
+            } catch {
+              // Ignore individual unload errors
+            }
+          }
         } catch {
-          // Model might not be loaded
+          // Ignore list errors
         }
         
-        // Load with 2K context
+        // Load test model with 2K context
+        wsBroadcast.broadcastModelLoading(modelId, 'loading', `Loading for quick latency check...`);
         await client.llm.load(modelId, {
           config: { contextLength: contextSize }
         });
