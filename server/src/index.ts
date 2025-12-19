@@ -14,6 +14,7 @@ import { LMStudioClient } from '@lmstudio/sdk';
 import { toolyRoutes, notificationsRoutes, analyticsRoutes } from './routes/index.js';
 import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
+import { mcpClient } from './modules/tooly/mcp-client.js';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -86,15 +87,62 @@ const broadcastToClients = (type: string, data: any) => {
   });
 };
 
+// Get full status including MCP and LM Studio
+const getFullStatus = async () => {
+  let lmstudioConnected = false;
+  let lmstudioModels: string[] = [];
+  
+  try {
+    const client = new LMStudioClient();
+    const loadedModels = await client.llm.listLoaded();
+    lmstudioConnected = true;
+    lmstudioModels = loadedModels.map(m => m.identifier);
+  } catch {
+    lmstudioConnected = false;
+  }
+
+  const mcpStatus = mcpClient.getStatus();
+
+  return {
+    server: 'online',
+    websocket: 'connected',
+    mcp: mcpStatus.connected ? 'connected' : 'disconnected',
+    lmstudio: lmstudioConnected ? 'connected' : 'disconnected',
+    lmstudioModels
+  };
+};
+
+// Broadcast status to all WebSocket clients
+const broadcastStatus = async () => {
+  if (wsClients.size === 0) return;
+  
+  const status = await getFullStatus();
+  const message = JSON.stringify({
+    type: 'status',
+    data: status,
+    timestamp: new Date().toISOString()
+  });
+
+  wsClients.forEach(client => {
+    if (client.readyState === 1) { // OPEN
+      client.send(message);
+    }
+  });
+};
+
+// Broadcast status every 5 seconds
+setInterval(broadcastStatus, 5000);
+
 // WebSocket connection handling
-wss.on('connection', (ws) => {
+wss.on('connection', async (ws) => {
   console.log('[WS] Client connected');
   wsClients.add(ws);
 
-  // Send initial connection status
+  // Send initial full status
+  const status = await getFullStatus();
   ws.send(JSON.stringify({
     type: 'status',
-    data: { websocket: 'connected', server: 'online' },
+    data: status,
     timestamp: new Date().toISOString()
   }));
 
