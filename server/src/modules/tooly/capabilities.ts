@@ -69,7 +69,7 @@ export const ALL_TOOLS = [
   'folder_create',
   'folder_delete',
   
-  // Git Operations
+  // Git Operations (safe subset - checkout/merge/rm removed for safety)
   'git_status',
   'git_diff',
   'git_log',
@@ -77,9 +77,9 @@ export const ALL_TOOLS = [
   'git_add',
   'git_branch_create',
   'git_branch_list',
-  'git_checkout',
-  'git_merge',
-  'git_rm',
+  // 'git_checkout',  // Removed: can lose uncommitted changes
+  // 'git_merge',     // Removed: complex, can cause conflicts
+  // 'git_rm',        // Removed: deletes files from disk
   
   // NPM Operations
   'npm_run',
@@ -97,7 +97,7 @@ export const ALL_TOOLS = [
 
 export const TOOL_CATEGORIES: Record<string, string[]> = {
   'File Operations': ['file_read', 'file_write', 'file_patch', 'file_list', 'file_search', 'create_new_file', 'folder_create', 'folder_delete'],
-  'Git Operations': ['git_status', 'git_diff', 'git_log', 'git_commit', 'git_add', 'git_branch_create', 'git_branch_list', 'git_checkout', 'git_merge', 'git_rm'],
+  'Git Operations': ['git_status', 'git_diff', 'git_log', 'git_commit', 'git_add', 'git_branch_create', 'git_branch_list'],
   'NPM Operations': ['npm_run', 'npm_install', 'npm_uninstall'],
   'Browser/HTTP': ['http_request', 'browser_navigate'],
   'Other': ['run_python', 'mcp_rules']
@@ -124,9 +124,6 @@ export const TOOL_RISK_LEVELS: Record<string, 'low' | 'medium' | 'high'> = {
   git_commit: 'medium',
   git_add: 'medium',
   git_branch_create: 'medium',
-  git_checkout: 'medium',
-  git_merge: 'medium',
-  git_rm: 'medium',
   
   // High risk - system/package changes
   npm_run: 'high',

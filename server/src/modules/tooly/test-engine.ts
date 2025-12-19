@@ -270,6 +270,116 @@ export const TEST_DEFINITIONS: TestDefinition[] = [
         url: { contains: 'github.com' }
       }
     }
+  },
+
+  // ========== ADDITIONAL FILE OPERATIONS ==========
+  {
+    id: 'create_new_file_basic',
+    tool: 'create_new_file',
+    category: 'file_operations',
+    difficulty: 'easy',
+    prompt: 'Create a new empty file called "README.md"',
+    expected: {
+      tool: 'create_new_file',
+      params: {
+        path: { contains: 'README.md' }
+      }
+    }
+  },
+  {
+    id: 'folder_create_basic',
+    tool: 'folder_create',
+    category: 'file_operations',
+    difficulty: 'easy',
+    prompt: 'Create a new folder called "components"',
+    expected: {
+      tool: 'folder_create',
+      params: {
+        path: { oneOf: ['components', 'components/', './components'] }
+      }
+    }
+  },
+  {
+    id: 'folder_delete_basic',
+    tool: 'folder_delete',
+    category: 'file_operations',
+    difficulty: 'medium',
+    prompt: 'Delete the folder named "temp"',
+    expected: {
+      tool: 'folder_delete',
+      params: {
+        path: { contains: 'temp' }
+      }
+    }
+  },
+
+  // ========== ADDITIONAL GIT OPERATIONS ==========
+  {
+    id: 'git_add_basic',
+    tool: 'git_add',
+    category: 'git_operations',
+    difficulty: 'easy',
+    prompt: 'Stage the file "index.js" for commit',
+    expected: {
+      tool: 'git_add',
+      params: {
+        file: { contains: 'index.js' }
+      }
+    }
+  },
+  {
+    id: 'git_add_all',
+    tool: 'git_add',
+    category: 'git_operations',
+    difficulty: 'easy',
+    prompt: 'Stage all changes for commit',
+    expected: {
+      tool: 'git_add',
+      params: {
+        file: { oneOf: ['.', '*', '-A', '--all', undefined] }
+      }
+    }
+  },
+  {
+    id: 'git_branch_list_basic',
+    tool: 'git_branch_list',
+    category: 'git_operations',
+    difficulty: 'easy',
+    prompt: 'Show me all the branches in this repository',
+    expected: {
+      tool: 'git_branch_list',
+      params: {}
+    }
+  },
+
+  // ========== ADDITIONAL NPM OPERATIONS ==========
+  {
+    id: 'npm_uninstall_basic',
+    tool: 'npm_uninstall',
+    category: 'npm_operations',
+    difficulty: 'medium',
+    prompt: 'Remove the axios package from the project',
+    expected: {
+      tool: 'npm_uninstall',
+      params: {
+        package: { contains: 'axios' }
+      }
+    }
+  },
+
+  // ========== PYTHON ==========
+  {
+    id: 'run_python_basic',
+    tool: 'run_python',
+    category: 'other_operations',
+    difficulty: 'medium',
+    prompt: 'Run a Python script that prints "Hello World"',
+    expected: {
+      tool: 'run_python',
+      params: {
+        code: { contains: 'print' }
+      }
+    }
   }
 ];
 

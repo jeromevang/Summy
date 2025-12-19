@@ -514,6 +514,115 @@ export const TOOL_SCHEMAS: Record<string, OpenAIToolSchema> = {
         required: ['url']
       }
     }
+  },
+  create_new_file: {
+    type: 'function',
+    function: {
+      name: 'create_new_file',
+      description: 'Create a new file',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'The file path to create' },
+          content: { type: 'string', description: 'Initial content (optional)' }
+        },
+        required: ['path']
+      }
+    }
+  },
+  folder_create: {
+    type: 'function',
+    function: {
+      name: 'folder_create',
+      description: 'Create a new directory',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'The directory path to create' }
+        },
+        required: ['path']
+      }
+    }
+  },
+  folder_delete: {
+    type: 'function',
+    function: {
+      name: 'folder_delete',
+      description: 'Delete a directory and its contents',
+      parameters: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'The directory path to delete' }
+        },
+        required: ['path']
+      }
+    }
+  },
+  git_add: {
+    type: 'function',
+    function: {
+      name: 'git_add',
+      description: 'Stage files for commit',
+      parameters: {
+        type: 'object',
+        properties: {
+          file: { type: 'string', description: 'The file path to stage (or "." for all)' }
+        },
+        required: ['file']
+      }
+    }
+  },
+  git_branch_list: {
+    type: 'function',
+    function: {
+      name: 'git_branch_list',
+      description: 'List all branches',
+      parameters: {
+        type: 'object',
+        properties: {},
+        required: []
+      }
+    }
+  },
+  npm_uninstall: {
+    type: 'function',
+    function: {
+      name: 'npm_uninstall',
+      description: 'Remove an npm package',
+      parameters: {
+        type: 'object',
+        properties: {
+          package: { type: 'string', description: 'The package name to remove' }
+        },
+        required: ['package']
+      }
+    }
+  },
+  run_python: {
+    type: 'function',
+    function: {
+      name: 'run_python',
+      description: 'Execute Python code',
+      parameters: {
+        type: 'object',
+        properties: {
+          code: { type: 'string', description: 'The Python code to execute' }
+        },
+        required: ['code']
+      }
+    }
+  },
+  mcp_rules: {
+    type: 'function',
+    function: {
+      name: 'mcp_rules',
+      description: 'Get MCP tool policies and rules',
+      parameters: {
+        type: 'object',
+        properties: {},
+        required: []
+      }
+    }
   }
 };
 
