@@ -930,7 +930,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
       const modifiedBody = {
         ...req.body,
         model: lmstudioModel,
-        messages: messagesToSend
+        messages: messagesToSend,
+        temperature: 0  // Always use temp 0 for deterministic output
       };
       
       try {
@@ -1008,7 +1009,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
       
       const modifiedBody = {
         ...req.body,
-        messages: messagesToSend
+        messages: messagesToSend,
+        temperature: 0  // Always use temp 0 for deterministic output
       };
       // Remove 'model' from body as Azure uses deployment name in URL
       delete modifiedBody.model;
@@ -1083,7 +1085,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
     const modifiedBody = {
       ...req.body,
       model: actualModel,
-      messages: messagesToSend
+      messages: messagesToSend,
+      temperature: 0  // Always use temp 0 for deterministic output
     };
 
     const openaiUrl = req.url.startsWith('/v1/') ? req.url : req.url.replace('/chat/completions', '/v1/chat/completions');

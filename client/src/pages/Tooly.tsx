@@ -66,6 +66,7 @@ interface DiscoveredModel {
   role?: 'main' | 'executor' | 'both' | 'none';
   maxContextLength?: number;
   sizeBytes?: number;
+  quantization?: string;
 }
 
 interface TestDefinition {
@@ -764,6 +765,12 @@ const Tooly: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
                               <span>{model.provider}</span>
+                              {model.quantization && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-purple-400">{model.quantization}</span>
+                                </>
+                              )}
                               {model.sizeBytes && (
                                 <>
                                   <span>•</span>

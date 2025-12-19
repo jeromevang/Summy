@@ -1,0 +1,410 @@
+{
+  "modelId": "vistral-7b-chat-function-calling",
+  "displayName": "vistral-7b-chat-function-calling",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T14:26:13.769Z",
+  "testVersion": 2,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 2960.5,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1162,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1341,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 710,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 813,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 961,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 737,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 727,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 605,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 755,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 824,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 797,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 886.5,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 666,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 584,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1189,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 643,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 816,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 356,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1052,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1324,
+      "lastTested": "2025-12-19T14:26:13.769Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-cuerrhwllvpay7wy6ub519\",\"object\":\"chat.completion\",\"created\":1766154350,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"file_read\\\", \\\"description\\\": \\\"Read the contents of a file\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"path\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The file path to read\\\"}}, \\\"required\\\": [\\\"path\\\"]}}]\\n\\nUse tool: [{\\\"type\\\": "
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-wsm0nx4rypa1bgbvsbqepi\",\"object\":\"chat.completion\",\"created\":1766154353,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"file_read\\\", \\\"description\\\": \\\"Read the contents of a file\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"path\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The file path to read\\\"}}, \\\"required\\\": [\\\"path\\\"]}}]\\n\\nUse tool: [{\\\"type\\\": "
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-k6frxx1o4m6ry9xmf61js\",\"object\":\"chat.completion\",\"created\":1766154355,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\":\\\"function\\\",\\\"function\\\":{\\\"name\\\":\\\"file_write\\\", \\\"description\\\":\\\"Write content to a file (creates or overwrites)\\\", \\\"parameters\\\":{\\\"type\\\":\\\"object\\\", \\\"properties\\\":{\\\"path\\\":{\\\"type\\\":\\\"string\\\", \\\"description\\\":\\\"The file path to write\\\"}, \\\"content\\\":{\\\"type\\\":\\\"string\\\", \\\"descript"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-c74tvlf9ib5g47fiprzym5\",\"object\":\"chat.completion\",\"created\":1766154357,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"file_patch\\\", \\\"description\\\": \\\"Modify specific content in a file\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"path\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The file path to modify\\\"}, \\\"find\\\": {\\\"type\\\": \\\"string\\\", \\\"descriptio"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-alo0kwfgxjm5xlhn6mjfo\",\"object\":\"chat.completion\",\"created\":1766154358,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"file_list\\\", \\\"description\\\": \\\"List files in a directory\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"folder\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The directory to list (default: current)\\\"}}, \\\"required\\\": []}}]\\n\\nUse the tool"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-s10sqaa1lo67rp6lahxx9\",\"object\":\"chat.completion\",\"created\":1766154359,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"file_search\\\", \\\"description\\\": \\\"Search for text in files\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"query\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The text to search for\\\"}, \\\"path\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"Th"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-1dbg2eflvpp8muslswhxue\",\"object\":\"chat.completion\",\"created\":1766154359,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"git_status\\\", \\\"description\\\": \\\"Check git repository status\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {}, \\\"required\\\": []}}}][/AVAILABLE_TOOLS]\\n\\nUse the tool provided to check the current git status of this repository. \",\"tool_call"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ekruqpfafaipfuqbcnu81k\",\"object\":\"chat.completion\",\"created\":1766154360,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"git_diff\\\", \\\"description\\\": \\\"View git differences\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"file\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"Specific file to diff (optional)\\\"}}, \\\"required\\\": []}}]\\n\\nUse the tool provided, I ne"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-e6o1suonmnjzjawfep2zzm\",\"object\":\"chat.completion\",\"created\":1766154361,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"git_log\\\", \\\"description\\\": \\\"View commit history\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"count\\\": {\\\"type\\\": \\\"number\\\", \\\"description\\\": \\\"Number of commits to show\\\"}}, \\\"required\\\": []}}][/AVAILABLE_TOOLS]\\n\\nUse the tool prov"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-tif611k3h58hxvtduujxv\",\"object\":\"chat.completion\",\"created\":1766154362,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"git_commit\\\", \\\"description\\\": \\\"Commit changes with a message\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"message\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The commit message\\\"}, \\\"changes\\\": {\\\"type\\\": \\\"array\\\", \\\"items\\\": {\\\"typ"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-8oxzsvusckgtccculyczof\",\"object\":\"chat.completion\",\"created\":1766154362,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"git_branch_create\\\", \\\"description\\\": \\\"Create and switch to a new branch\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"name\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The branch name\\\"}}, \\\"required\\\": [\\\"name\\\"]}}]\\n\\nUse the tool p"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-j7gt0l6gpijb2tdz8xol2\",\"object\":\"chat.completion\",\"created\":1766154363,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"npm_run\\\", \\\"description\\\": \\\"Run an npm script\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"script\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The script name to run\\\"}}, \\\"required\\\": [\\\"script\\\"]}}]\\n\\nUse the tool provided by the u"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-yrs0sqocoheux49qcqiv9\",\"object\":\"chat.completion\",\"created\":1766154364,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"npm_install\\\", \\\"description\\\": \\\"Install an npm package\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"package\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The package name\\\"}}, \\\"required\\\": [\\\"package\\\"]}}]\\n\\nUse the tool to install l"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-9ftni45v2rjsinza5rcc1g\",\"object\":\"chat.completion\",\"created\":1766154365,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"name\\\":\\\"John Doe\\\", \\\"age\\\":30, \\\"location\\\":\\\"New York\\\"}, {\\\"name\\\":\\\"Jane Smith\\\", \\\"age\\\":25, \\\"location\\\":\\\"Los Angeles\\\"}] \",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":158,\"completion_tokens\":42,\"total_tokens\":200},\"stats\":{},\"system_fingerprint\":\"vistr"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-frvrontxiamvto9qeyaudd\",\"object\":\"chat.completion\",\"created\":1766154365,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\":\\\"function\\\", \\\"function\\\":{\\\"name\\\":\\\"browser_navigate\\\", \\\"description\\\":\\\"Navigate to a webpage\\\", \\\"parameters\\\":{\\\"type\\\":\\\"object\\\", \\\"properties\\\":{\\\"url\\\":{\\\"type\\\":\\\"string\\\", \\\"description\\\":\\\"The URL to navigate to\\\"}, \\\"clickSelector\\\":{\\\"type\\\":\\\"string\\\", \\\"description\\\":\\\"CSS s"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-x6zpnhordof6rk5gt6l523\",\"object\":\"chat.completion\",\"created\":1766154366,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"create_new_file\\\", \\\"description\\\": \\\"Create a new file\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"path\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The file path to create\\\"}, \\\"content\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"I"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-88gs4sl2ji35cp8ieo0uqs\",\"object\":\"chat.completion\",\"created\":1766154367,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"folder_create\\\", \\\"description\\\": \\\"Create a new directory\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"path\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The directory path to create\\\"}}, \\\"required\\\": [\\\"path\\\"]}}]\\n\\nUse the tool fol"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-jbui21norunap99ip191iq\",\"object\":\"chat.completion\",\"created\":1766154368,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"folder_delete\\\", \\\"description\\\": \\\"Delete a directory and its contents\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"path\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The directory path to delete\\\"}}, \\\"required\\\": [\\\"path\\\"]}}]\\n\\nUse"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-2jaq7ymnl0zy595kjuyx5\",\"object\":\"chat.completion\",\"created\":1766154369,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"git_add\\\", \\\"description\\\": \\\"Stage files for commit\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"file\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The file path to stage (or \\\\\\\".\\\\\\\" for all)\\\"}}, \\\"required\\\": [\\\"file\\\"]}}]\\n\\nTo use"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-bx6ha9rrnjyu8ds6booe\",\"object\":\"chat.completion\",\"created\":1766154370,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"git_add\\\", \\\"description\\\": \\\"Stage files for commit\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"file\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The file path to stage (or \\\\\\\".\\\\\\\" for all)\\\"}}, \\\"required\\\": [\\\"file\\\"]}}]\\n\\nUse the"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-uue9wefzw6oasrm3bt78v\",\"object\":\"chat.completion\",\"created\":1766154371,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"git_branch_list\\\", \\\"description\\\": \\\"List all branches\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {}, \\\"required\\\": []}}}][/AVAILABLE_TOOLS]\\n\\nUse the tool provided to list all the branches in this repository. \",\"tool_calls\":[]},\"logpr"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-pvcbe7bl5fo4i6wqt3qof5\",\"object\":\"chat.completion\",\"created\":1766154371,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  [{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"npm_uninstall\\\", \\\"description\\\": \\\"Remove an npm package\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"package\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The package name to remove\\\"}}, \\\"required\\\": [\\\"package\\\"]}}]\\n\\nUse the tool "
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-fch8ab67xxv1fti8nn2c\",\"object\":\"chat.completion\",\"created\":1766154372,\"model\":\"vistral-7b-chat-function-calling\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"  { \\n    \\\"type\\\": \\\"function\\\", \\n    \\\"function\\\": {\\\"name\\\": \\\"run_python\\\", \\\"description\\\": \\\"Execute Python code\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"code\\\": {\\\"type\\\": \\\"string\\\", \\\"description\\\": \\\"The Python code to execute\\\"}}, \\\"required\\\": [\\\"code\\\"]}}\\n}\\n\\n{ \\n    \\\"co"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T14:25:47.383Z",
+    "emitTest": {
+      "passed": true,
+      "score": 75,
+      "details": "XML format succeeded (OpenAI format failed: Model described the tool instead of calling it)"
+    },
+    "schemaTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "toolScore": 43,
+    "reasoningScore": 50,
+    "overallScore": 47,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 30,
+        "details": "Response contains invalid JSON"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 30,
+        "details": "Failed to identify logical conflict"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 0,
+        "details": "Model stuck in repetition loop"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768
+    ],
+    "latencies": {
+      "2048": 3787,
+      "4096": 3778,
+      "8192": 3772,
+      "16384": 3961,
+      "32768": 3954
+    },
+    "maxUsableContext": 32768,
+    "recommendedContext": 32768,
+    "modelMaxContext": 32768
+  },
+  "contextLength": 32768
+}
