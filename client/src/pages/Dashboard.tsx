@@ -348,6 +348,52 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
+          {/* Daily Activity Chart */}
+          {analytics.dailyActivity && analytics.dailyActivity.length > 0 && (
+            <div className="mb-6">
+              <h4 className="text-sm font-medium text-gray-400 mb-3">Daily Activity</h4>
+              <div className="h-32 flex items-end gap-1">
+                {(() => {
+                  const maxRequests = Math.max(...analytics.dailyActivity.map(d => d.requests), 1);
+                  const maxToolCalls = Math.max(...analytics.dailyActivity.map(d => d.toolCalls), 1);
+                  const maxValue = Math.max(maxRequests, maxToolCalls);
+                  
+                  return analytics.dailyActivity.map((day, i) => (
+                    <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
+                      <div className="w-full flex gap-0.5 items-end h-24">
+                        {/* Requests bar */}
+                        <div 
+                          className="flex-1 bg-purple-500/60 rounded-t"
+                          style={{ height: `${(day.requests / maxValue) * 100}%`, minHeight: day.requests > 0 ? '4px' : '0' }}
+                          title={`Requests: ${day.requests}`}
+                        />
+                        {/* Tool calls bar */}
+                        <div 
+                          className="flex-1 bg-blue-500/60 rounded-t"
+                          style={{ height: `${(day.toolCalls / maxValue) * 100}%`, minHeight: day.toolCalls > 0 ? '4px' : '0' }}
+                          title={`Tool Calls: ${day.toolCalls}`}
+                        />
+                      </div>
+                      <span className="text-[10px] text-gray-500">
+                        {new Date(day.date).toLocaleDateString('en', { weekday: 'short' })}
+                      </span>
+                    </div>
+                  ));
+                })()}
+              </div>
+              <div className="flex justify-center gap-4 mt-2">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-purple-500/60 rounded"></div>
+                  <span className="text-xs text-gray-500">Requests</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-blue-500/60 rounded"></div>
+                  <span className="text-xs text-gray-500">Tool Calls</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Top Tools */}
           {analytics.toolUsage.length > 0 && (
             <div>

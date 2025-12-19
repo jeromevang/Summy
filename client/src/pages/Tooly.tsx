@@ -4,12 +4,31 @@ import React, { useState, useEffect } from 'react';
 // TYPES
 // ============================================================
 
+interface ProbeTestResult {
+  passed: boolean;
+  score: number;
+  details: string;
+}
+
+interface ReasoningProbeResults {
+  intentExtraction: ProbeTestResult;
+  multiStepPlanning: ProbeTestResult;
+  conditionalReasoning: ProbeTestResult;
+  contextContinuity: ProbeTestResult;
+  logicalConsistency: ProbeTestResult;
+  explanation: ProbeTestResult;
+  edgeCaseHandling: ProbeTestResult;
+}
+
 interface ProbeResults {
   testedAt: string;
-  emitTest: { passed: boolean; score: number; details: string };
-  schemaTest: { passed: boolean; score: number; details: string };
-  selectionTest: { passed: boolean; score: number; details: string };
-  suppressionTest: { passed: boolean; score: number; details: string };
+  emitTest: ProbeTestResult;
+  schemaTest: ProbeTestResult;
+  selectionTest: ProbeTestResult;
+  suppressionTest: ProbeTestResult;
+  reasoningProbes?: ReasoningProbeResults;
+  toolScore?: number;
+  reasoningScore?: number;
   overallScore: number;
 }
 
@@ -32,6 +51,7 @@ interface ModelProfile {
   role?: 'main' | 'executor' | 'both' | 'none';
   probeResults?: ProbeResults;
   contextLatency?: ContextLatencyData;
+  systemPrompt?: string;
 }
 
 interface DiscoveredModel {
@@ -86,8 +106,20 @@ const Tooly: React.FC = () => {
   const [editingContextLength, setEditingContextLength] = useState<number | null>(null);
   const [probingModel, setProbingModel] = useState<string | null>(null);
   const [proxyMode, setProxyMode] = useState<'passthrough' | 'summy' | 'tooly' | 'both'>('both');
+  const [enableDualModel, setEnableDualModel] = useState(false);
+  const [mainModelId, setMainModelId] = useState<string>('');
+  const [executorModelId, setExecutorModelId] = useState<string>('');
+  const [savingDualModel, setSavingDualModel] = useState(false);
+  const [editingSystemPrompt, setEditingSystemPrompt] = useState<string>('');
+  const [savingSystemPrompt, setSavingSystemPrompt] = useState(false);
+  const [showSystemPromptEditor, setShowSystemPromptEditor] = useState(false);
+  const [mcpStatus, setMcpStatus] = useState<{ connected: boolean; mode: string }>({ connected: false, mode: 'none' });
+  const [mcpTools, setMcpTools] = useState<string[]>([]);
+  const [mcpConnecting, setMcpConnecting] = useState(false);
+  const [logStatusFilter, setLogStatusFilter] = useState<'all' | 'success' | 'failed' | 'timeout'>('all');
+  const [logToolFilter, setLogToolFilter] = useState<string>('');
 
-  // Fetch settings for default context length and proxy mode
+  // Fetch settings for default context length, proxy mode, and dual-model config
   const fetchSettings = async () => {
     try {
       const res = await fetch('/api/settings');
@@ -99,9 +131,97 @@ const Tooly: React.FC = () => {
         if (data.proxyMode) {
           setProxyMode(data.proxyMode);
         }
+        if (data.enableDualModel !== undefined) {
+          setEnableDualModel(data.enableDualModel);
+        }
+        if (data.mainModelId) {
+          setMainModelId(data.mainModelId);
+        }
+        if (data.executorModelId) {
+          setExecutorModelId(data.executorModelId);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch settings:', error);
+    }
+  };
+
+  // Save dual-model configuration
+  const saveDualModelConfig = async () => {
+    setSavingDualModel(true);
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enableDualModel,
+          mainModelId,
+          executorModelId
+        })
+      });
+    } catch (error) {
+      console.error('Failed to save dual-model config:', error);
+    } finally {
+      setSavingDualModel(false);
+    }
+  };
+
+  // Get models suitable for main role
+  const getMainModels = () => models.filter(m => m.role === 'main' || m.role === 'both');
+  
+  // Get models suitable for executor role
+  const getExecutorModels = () => models.filter(m => m.role === 'executor' || m.role === 'both');
+
+  // Save system prompt for model
+  const saveSystemPrompt = async (modelId: string, prompt: string) => {
+    setSavingSystemPrompt(true);
+    try {
+      await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/prompt`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemPrompt: prompt })
+      });
+      await fetchModelProfile(modelId);
+    } catch (error) {
+      console.error('Failed to save system prompt:', error);
+    } finally {
+      setSavingSystemPrompt(false);
+    }
+  };
+
+  // Fetch MCP status and tools
+  const fetchMcpStatus = async () => {
+    try {
+      const [statusRes, toolsRes] = await Promise.all([
+        fetch('/api/tooly/mcp/status'),
+        fetch('/api/tooly/mcp/tools')
+      ]);
+      
+      if (statusRes.ok) {
+        const status = await statusRes.json();
+        setMcpStatus(status);
+      }
+      
+      if (toolsRes.ok) {
+        const tools = await toolsRes.json();
+        setMcpTools(tools.tools || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch MCP status:', error);
+    }
+  };
+
+  // Connect/disconnect MCP
+  const toggleMcpConnection = async () => {
+    setMcpConnecting(true);
+    try {
+      const endpoint = mcpStatus.connected ? '/api/tooly/mcp/disconnect' : '/api/tooly/mcp/connect';
+      await fetch(endpoint, { method: 'POST' });
+      await fetchMcpStatus();
+    } catch (error) {
+      console.error('Failed to toggle MCP connection:', error);
+    } finally {
+      setMcpConnecting(false);
     }
   };
 
@@ -144,6 +264,7 @@ const Tooly: React.FC = () => {
     fetchTests();
     fetchLogs();
     fetchSettings();
+    fetchMcpStatus();
   }, []);
 
   // Refetch when provider filter changes
@@ -203,6 +324,8 @@ const Tooly: React.FC = () => {
       if (res.ok) {
         const profile = await res.json();
         setSelectedModel(profile);
+        setEditingSystemPrompt(profile.systemPrompt || '');
+        setShowSystemPromptEditor(false);
       }
     } catch (error) {
       console.error('Failed to fetch model profile:', error);
@@ -348,6 +471,135 @@ const Tooly: React.FC = () => {
             ↻ Refresh
           </button>
         </div>
+      </div>
+
+      {/* Dual-Model Configuration */}
+      <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={enableDualModel}
+                onChange={(e) => setEnableDualModel(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
+              />
+              <span className="text-white font-medium">Enable Dual-Model Routing</span>
+            </label>
+          </div>
+          <button
+            onClick={saveDualModelConfig}
+            disabled={savingDualModel}
+            className="px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded disabled:opacity-50"
+          >
+            {savingDualModel ? 'Saving...' : 'Save Config'}
+          </button>
+        </div>
+        
+        {enableDualModel && (
+          <div className="grid grid-cols-2 gap-4">
+            {/* Main Model */}
+            <div className="p-3 bg-[#0d0d0d] rounded-lg border border-[#2d2d2d]">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🧠</span>
+                <span className="text-white font-medium">Main Model (Reasoning)</span>
+              </div>
+              <select
+                value={mainModelId}
+                onChange={(e) => setMainModelId(e.target.value)}
+                className="w-full bg-[#1a1a1a] border border-[#3d3d3d] rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
+              >
+                <option value="">Select model...</option>
+                {getMainModels().map((m) => (
+                  <option key={m.id} value={m.id}>{m.displayName}</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-2">
+                Handles reasoning, planning. No direct tool access.
+              </p>
+              {getMainModels().length === 0 && (
+                <p className="text-xs text-yellow-400 mt-1">
+                  No models with Main role. Run probe tests first.
+                </p>
+              )}
+            </div>
+            
+            {/* Executor Model */}
+            <div className="p-3 bg-[#0d0d0d] rounded-lg border border-[#2d2d2d]">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">⚡</span>
+                <span className="text-white font-medium">Executor Model (Tools)</span>
+              </div>
+              <select
+                value={executorModelId}
+                onChange={(e) => setExecutorModelId(e.target.value)}
+                className="w-full bg-[#1a1a1a] border border-[#3d3d3d] rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
+              >
+                <option value="">Select model...</option>
+                {getExecutorModels().map((m) => (
+                  <option key={m.id} value={m.id}>{m.displayName}</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-2">
+                Executes tool calls. Schema-aware, deterministic.
+              </p>
+              {getExecutorModels().length === 0 && (
+                <p className="text-xs text-yellow-400 mt-1">
+                  No models with Executor role. Run probe tests first.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {!enableDualModel && (
+          <p className="text-sm text-gray-500">
+            Single-model mode: The selected provider's model handles both reasoning and tool execution.
+          </p>
+        )}
+      </div>
+
+      {/* MCP Server Status */}
+      <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <span className="text-lg">🔌</span>
+            <span className="text-white font-medium">MCP Server</span>
+            <span className={`px-2 py-0.5 text-xs rounded ${mcpStatus.connected ? 'bg-green-500/20 text-green-400' : 'bg-gray-600/50 text-gray-400'}`}>
+              {mcpStatus.connected ? 'Connected' : 'Disconnected'}
+            </span>
+            {mcpStatus.mode && mcpStatus.mode !== 'none' && (
+              <span className="text-xs text-gray-500">({mcpStatus.mode})</span>
+            )}
+          </div>
+          <button
+            onClick={toggleMcpConnection}
+            disabled={mcpConnecting}
+            className={`px-3 py-1 text-sm rounded ${
+              mcpStatus.connected 
+                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' 
+                : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+            } disabled:opacity-50`}
+          >
+            {mcpConnecting ? '...' : mcpStatus.connected ? 'Disconnect' : 'Connect'}
+          </button>
+        </div>
+        
+        {mcpStatus.connected && mcpTools.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-[#2d2d2d]">
+            <p className="text-xs text-gray-500 mb-2">Available Tools ({mcpTools.length})</p>
+            <div className="flex flex-wrap gap-1">
+              {mcpTools.slice(0, 15).map(tool => (
+                <span key={tool} className="px-2 py-0.5 text-xs bg-[#2d2d2d] text-gray-300 rounded">
+                  {tool}
+                </span>
+              ))}
+              {mcpTools.length > 15 && (
+                <span className="px-2 py-0.5 text-xs text-gray-500">+{mcpTools.length - 15} more</span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -517,31 +769,77 @@ const Tooly: React.FC = () => {
                   {/* Probe Results */}
                   {selectedModel.probeResults && (
                     <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-400 mb-3">Probe Test Results</h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { name: 'Emit', key: 'emitTest', icon: '📤' },
-                          { name: 'Schema', key: 'schemaTest', icon: '📋' },
-                          { name: 'Selection', key: 'selectionTest', icon: '🎯' },
-                          { name: 'Suppression', key: 'suppressionTest', icon: '🛑' }
-                        ].map(({ name, key, icon }) => {
-                          const result = selectedModel.probeResults?.[key as keyof ProbeResults] as { passed: boolean; score: number; details: string } | undefined;
-                          return (
-                            <div 
-                              key={key} 
-                              className={`p-2 rounded border ${result?.passed ? 'border-green-500/30 bg-green-500/10' : 'border-red-500/30 bg-red-500/10'}`}
-                              title={result?.details}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm text-white">{icon} {name}</span>
-                                <span className={`text-sm font-medium ${result?.passed ? 'text-green-400' : 'text-red-400'}`}>
-                                  {result?.score ?? 0}%
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })}
+                      {/* Score Summary */}
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-medium text-gray-400">Probe Test Results</h4>
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="text-gray-400">Tool: <span className="text-white font-medium">{selectedModel.probeResults?.toolScore ?? '-'}%</span></span>
+                          <span className="text-gray-400">Reasoning: <span className="text-white font-medium">{selectedModel.probeResults?.reasoningScore ?? '-'}%</span></span>
+                        </div>
                       </div>
+                      
+                      {/* Tool Behavior Probes */}
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 mb-2">Tool Behavior (1.x)</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { name: 'Emit', key: 'emitTest', icon: '📤' },
+                            { name: 'Schema', key: 'schemaTest', icon: '📋' },
+                            { name: 'Selection', key: 'selectionTest', icon: '🎯' },
+                            { name: 'Suppression', key: 'suppressionTest', icon: '🛑' }
+                          ].map(({ name, key, icon }) => {
+                            const result = selectedModel.probeResults?.[key as keyof ProbeResults] as ProbeTestResult | undefined;
+                            return (
+                              <div 
+                                key={key} 
+                                className={`p-2 rounded border ${result?.passed ? 'border-green-500/30 bg-green-500/10' : 'border-red-500/30 bg-red-500/10'}`}
+                                title={result?.details}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-white">{icon} {name}</span>
+                                  <span className={`text-xs font-medium ${result?.passed ? 'text-green-400' : 'text-red-400'}`}>
+                                    {result?.score ?? 0}%
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      
+                      {/* Reasoning Probes */}
+                      {selectedModel.probeResults.reasoningProbes && (
+                        <div>
+                          <p className="text-xs text-gray-500 mb-2">Reasoning (2.x)</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {[
+                              { name: 'Intent', key: 'intentExtraction', icon: '🎯' },
+                              { name: 'Planning', key: 'multiStepPlanning', icon: '📋' },
+                              { name: 'Conditional', key: 'conditionalReasoning', icon: '🔀' },
+                              { name: 'Context', key: 'contextContinuity', icon: '🔗' },
+                              { name: 'Logic', key: 'logicalConsistency', icon: '🧩' },
+                              { name: 'Explain', key: 'explanation', icon: '💬' },
+                              { name: 'Edge Cases', key: 'edgeCaseHandling', icon: '⚠️' }
+                            ].map(({ name, key, icon }) => {
+                              const result = selectedModel.probeResults?.reasoningProbes?.[key as keyof ReasoningProbeResults];
+                              return (
+                                <div 
+                                  key={key} 
+                                  className={`p-2 rounded border ${result?.passed ? 'border-green-500/30 bg-green-500/10' : 'border-red-500/30 bg-red-500/10'}`}
+                                  title={result?.details}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-white">{icon} {name}</span>
+                                    <span className={`text-xs font-medium ${result?.passed ? 'text-green-400' : 'text-red-400'}`}>
+                                      {result?.score ?? 0}%
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -614,37 +912,116 @@ const Tooly: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Tool Categories */}
+                  {/* Tool Categories with Toggles */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-400 mb-2">Tool Capabilities</h4>
                     <div className="space-y-1 max-h-48 overflow-y-auto">
                       {Object.entries(selectedModel.capabilities).map(([tool, cap]) => (
                         <div key={tool} className="flex items-center justify-between py-1">
-                          <span className={`text-sm ${cap.supported ? 'text-white' : 'text-gray-500'}`}>
-                            {cap.supported ? '✅' : '❌'} {tool}
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={selectedModel.enabledTools?.includes(tool) || false}
+                              onChange={async (e) => {
+                                try {
+                                  await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/tools/${tool}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ enabled: e.target.checked })
+                                  });
+                                  await fetchModelProfile(selectedModel.modelId);
+                                } catch (error) {
+                                  console.error('Failed to toggle tool:', error);
+                                }
+                              }}
+                              className="w-3 h-3 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
+                            />
+                            <span className={`text-xs ${cap.supported ? 'text-white' : 'text-gray-500'}`}>
+                              {tool}
+                            </span>
+                          </div>
+                          <span className={`text-xs ${cap.score >= 70 ? 'text-green-400' : cap.score >= 40 ? 'text-yellow-400' : 'text-red-400'}`}>
+                            {cap.score}%
                           </span>
-                          <span className="text-sm text-gray-500">{cap.score}%</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => runProbeTests(selectedModel.modelId, selectedModel.provider, true)}
                       disabled={probingModel === selectedModel.modelId}
-                      className="flex-1 py-2 px-4 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 disabled:opacity-50"
+                      className="flex-1 py-2 px-3 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 disabled:opacity-50 text-sm"
                     >
-                      {probingModel === selectedModel.modelId ? 'Probing...' : '🧪 Run Probes'}
+                      {probingModel === selectedModel.modelId ? 'Probing...' : '🧪 Probes'}
                     </button>
                     <button
                       onClick={() => runModelTests(selectedModel.modelId, selectedModel.provider)}
                       disabled={testingModel === selectedModel.modelId}
-                      className="flex-1 py-2 px-4 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 disabled:opacity-50"
+                      className="flex-1 py-2 px-3 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 disabled:opacity-50 text-sm"
                     >
-                      {testingModel === selectedModel.modelId ? 'Testing...' : '🔧 Test Tools'}
+                      {testingModel === selectedModel.modelId ? 'Testing...' : '🔧 Tools'}
                     </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/latency-profile`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ provider: selectedModel.provider })
+                          });
+                          await fetchModelProfile(selectedModel.modelId);
+                        } catch (error) {
+                          console.error('Failed to run latency profile:', error);
+                        }
+                      }}
+                      className="flex-1 py-2 px-3 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30 text-sm"
+                    >
+                      ⏱️ Latency
+                    </button>
+                  </div>
+
+                  {/* System Prompt Editor */}
+                  <div className="pt-3 border-t border-[#3d3d3d]">
+                    <button
+                      onClick={() => setShowSystemPromptEditor(!showSystemPromptEditor)}
+                      className="text-sm text-gray-400 hover:text-white flex items-center gap-2"
+                    >
+                      <span>{showSystemPromptEditor ? '▼' : '▶'}</span>
+                      <span>Custom System Prompt</span>
+                      {selectedModel.systemPrompt && <span className="text-xs text-purple-400">(customized)</span>}
+                    </button>
+                    
+                    {showSystemPromptEditor && (
+                      <div className="mt-3 space-y-2">
+                        <textarea
+                          value={editingSystemPrompt}
+                          onChange={(e) => setEditingSystemPrompt(e.target.value)}
+                          placeholder="Enter custom system prompt for this model..."
+                          className="w-full h-32 bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none resize-none"
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => {
+                              setEditingSystemPrompt('');
+                              saveSystemPrompt(selectedModel.modelId, '');
+                            }}
+                            className="px-3 py-1 text-xs text-gray-400 hover:text-white"
+                          >
+                            Clear
+                          </button>
+                          <button
+                            onClick={() => saveSystemPrompt(selectedModel.modelId, editingSystemPrompt)}
+                            disabled={savingSystemPrompt}
+                            className="px-3 py-1 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded disabled:opacity-50"
+                          >
+                            {savingSystemPrompt ? 'Saving...' : 'Save Prompt'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -693,12 +1070,40 @@ const Tooly: React.FC = () => {
         {/* Logs Tab */}
         {activeTab === 'logs' && (
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Execution Logs</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Execution Logs</h3>
+              
+              {/* Log Filters */}
+              <div className="flex items-center gap-3">
+                <select
+                  value={logStatusFilter}
+                  onChange={(e) => setLogStatusFilter(e.target.value as typeof logStatusFilter)}
+                  className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
+                >
+                  <option value="all">All Status</option>
+                  <option value="success">Success</option>
+                  <option value="failed">Failed</option>
+                  <option value="timeout">Timeout</option>
+                </select>
+                
+                <input
+                  type="text"
+                  value={logToolFilter}
+                  onChange={(e) => setLogToolFilter(e.target.value)}
+                  placeholder="Filter by tool..."
+                  className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 w-32 focus:border-purple-500 focus:outline-none"
+                />
+              </div>
+            </div>
+            
             {logs.length === 0 ? (
               <p className="text-gray-500 text-center py-8">No execution logs yet.</p>
             ) : (
               <div className="space-y-2">
-                {logs.map((log) => (
+                {logs
+                  .filter(log => logStatusFilter === 'all' || log.status === logStatusFilter)
+                  .filter(log => !logToolFilter || log.tool.toLowerCase().includes(logToolFilter.toLowerCase()))
+                  .map((log) => (
                   <div
                     key={log.id}
                     className="p-4 rounded-lg border border-[#2d2d2d] hover:border-[#3d3d3d]"

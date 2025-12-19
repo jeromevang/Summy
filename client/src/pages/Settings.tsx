@@ -44,11 +44,7 @@ const Settings: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [lmstudioStatus, setLmstudioStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
-  const [lmstudioModels, setLmstudioModels] = useState<string[]>([]);
   const [lmstudioError, setLmstudioError] = useState<string>('');
-  const [unloadOthers, setUnloadOthers] = useState(true);
-  const [loadingModel, setLoadingModel] = useState(false);
-  const [loadModelStatus, setLoadModelStatus] = useState<string>('');
   
   // Azure connection test
   const [azureStatus, setAzureStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
@@ -125,13 +121,6 @@ const Settings: React.FC = () => {
 
       if (response.data.success) {
         setLmstudioStatus('connected');
-        const models = response.data.models?.map((m: any) => m.id) || [];
-        setLmstudioModels(models);
-        
-        // Auto-select first model if none selected
-        if (!settings.lmstudioModel && models.length > 0) {
-          setSettings(prev => ({ ...prev, lmstudioModel: models[0] }));
-        }
       } else {
         setLmstudioStatus('failed');
         setLmstudioError(response.data.error || 'Connection failed');
@@ -139,36 +128,6 @@ const Settings: React.FC = () => {
     } catch (error: any) {
       setLmstudioStatus('failed');
       setLmstudioError(error.response?.data?.error || error.message);
-    }
-  };
-
-  const handleLoadModel = async () => {
-    if (!settings.lmstudioModel) {
-      setLoadModelStatus('No model selected');
-      return;
-    }
-
-    setLoadingModel(true);
-    setLoadModelStatus('Loading model...');
-
-    try {
-      const response = await axios.post('http://localhost:3001/api/lmstudio/load-model', {
-        model: settings.lmstudioModel,
-        unloadOthers: unloadOthers
-      });
-
-      if (response.data.success) {
-        setLoadModelStatus(`✓ ${settings.lmstudioModel} loaded!`);
-        // Refresh model list
-        handleTestLMStudio();
-      } else {
-        setLoadModelStatus(`✗ ${response.data.error}`);
-      }
-    } catch (error: any) {
-      setLoadModelStatus(`✗ ${error.response?.data?.error || error.message}`);
-    } finally {
-      setLoadingModel(false);
-      setTimeout(() => setLoadModelStatus(''), 5000);
     }
   };
 
@@ -412,13 +371,13 @@ const Settings: React.FC = () => {
               </div>
             )}
 
-            {/* LMStudio Configuration */}
+            {/* LMStudio Configuration - Connection Only */}
             <div>
               <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                <span className="text-2xl">🤖</span> LMStudio Configuration
+                <span className="text-2xl">🤖</span> LMStudio Connection
               </h4>
               <p className="text-sm text-gray-400 mb-4">
-                LMStudio is used for compressing conversation context{settings.provider === 'lmstudio' ? ' and as the main LLM provider' : ''}. Make sure LMStudio is running.
+                Configure the LM Studio server URL. Model selection and management is done in the Model Hub.
               </p>
               
               <div className="space-y-4">
@@ -459,63 +418,9 @@ const Settings: React.FC = () => {
                       ❌ {lmstudioError}
                     </p>
                   )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Model
-                  </label>
-                  <div className="flex gap-2">
-                    {lmstudioModels.length > 0 ? (
-                      <select
-                        value={settings.lmstudioModel}
-                        onChange={(e) => handleChange('lmstudioModel', e.target.value)}
-                        className="flex-1 bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      >
-                        {lmstudioModels.map(model => (
-                          <option key={model} value={model}>{model}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        value={settings.lmstudioModel}
-                        onChange={(e) => handleChange('lmstudioModel', e.target.value)}
-                        className="flex-1 bg-[#0d0d0d] border border-[#3d3d3d] rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        placeholder="Test connection to see available models"
-                      />
-                    )}
-                    <button
-                      type="button"
-                      onClick={handleLoadModel}
-                      disabled={loadingModel || !settings.lmstudioModel}
-                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
-                        loadingModel
-                          ? 'bg-yellow-600 text-white cursor-wait'
-                          : 'bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed'
-                      }`}
-                    >
-                      {loadingModel ? '⏳ Loading...' : '📥 Load Model'}
-                    </button>
-                  </div>
-                  
-                  {/* Unload others checkbox */}
-                  <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={unloadOthers}
-                      onChange={(e) => setUnloadOthers(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
-                    />
-                    <span className="text-sm text-gray-400">
-                      Unload other models when loading (recommended)
-                    </span>
-                  </label>
-                  
-                  {/* Load status message */}
-                  {loadModelStatus && (
-                    <p className={`mt-2 text-sm ${loadModelStatus.startsWith('✓') ? 'text-green-400' : loadModelStatus.startsWith('✗') ? 'text-red-400' : 'text-yellow-400'}`}>
-                      {loadModelStatus}
+                  {lmstudioStatus === 'connected' && (
+                    <p className="mt-2 text-sm text-green-400">
+                      ✓ Connected to LM Studio. Go to <a href="/tooly" className="underline text-purple-400 hover:text-purple-300">Model Hub</a> to manage models.
                     </p>
                   )}
                 </div>

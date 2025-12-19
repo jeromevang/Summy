@@ -28,6 +28,7 @@ export interface DiscoveredModel {
   avgLatency?: number;
   testedAt?: string;
   error?: string;
+  role?: 'main' | 'executor' | 'both' | 'none';
 }
 
 export interface ModelDiscoveryResult {
@@ -135,7 +136,8 @@ class ModelDiscoveryService {
           toolCount: profile?.enabledTools?.length,
           totalTools: 22,
           avgLatency: profile?.avgLatency,
-          testedAt: profile?.testedAt
+          testedAt: profile?.testedAt,
+          role: profile?.role
         });
       }
 

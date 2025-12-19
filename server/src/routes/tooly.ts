@@ -80,13 +80,18 @@ router.get('/models', async (req, res) => {
 
     console.log(`[Tooly] Discovered models (filter: ${providerFilter}): LMStudio=${lmstudioModels.length}, OpenAI=${openaiModels.length}, Azure=${azureModels.length}`);
 
+    // Check which providers are actually available (not just based on filter results)
+    const lmstudioAvailable = settings.lmstudioUrl ? true : false;
+    const openaiAvailable = !!process.env.OPENAI_API_KEY;
+    const azureAvailable = !!(settings.azureResourceName && settings.azureApiKey);
+
     res.json({
       models,
       lastUpdated: new Date().toISOString(),
       providers: {
-        lmstudio: lmstudioModels.length > 0,
-        openai: openaiModels.length > 0,
-        azure: azureModels.length > 0
+        lmstudio: lmstudioAvailable,
+        openai: openaiAvailable,
+        azure: azureAvailable
       },
       filter: providerFilter
     });
@@ -214,17 +219,35 @@ router.post('/models/:modelId/probe', async (req, res) => {
       runLatencyProfile
     });
 
+    // Build probe results for saving
+    const probeResultsToSave: any = {
+      testedAt: result.completedAt,
+      emitTest: { passed: result.emitTest.passed, score: result.emitTest.score, details: result.emitTest.details },
+      schemaTest: { passed: result.schemaTest.passed, score: result.schemaTest.score, details: result.schemaTest.details },
+      selectionTest: { passed: result.selectionTest.passed, score: result.selectionTest.score, details: result.selectionTest.details },
+      suppressionTest: { passed: result.suppressionTest.passed, score: result.suppressionTest.score, details: result.suppressionTest.details },
+      toolScore: result.toolScore,
+      reasoningScore: result.reasoningScore,
+      overallScore: result.overallScore
+    };
+
+    // Include reasoning probes if available
+    if (result.reasoningProbes) {
+      probeResultsToSave.reasoningProbes = {
+        intentExtraction: { passed: result.reasoningProbes.intentExtraction.passed, score: result.reasoningProbes.intentExtraction.score, details: result.reasoningProbes.intentExtraction.details },
+        multiStepPlanning: { passed: result.reasoningProbes.multiStepPlanning.passed, score: result.reasoningProbes.multiStepPlanning.score, details: result.reasoningProbes.multiStepPlanning.details },
+        conditionalReasoning: { passed: result.reasoningProbes.conditionalReasoning.passed, score: result.reasoningProbes.conditionalReasoning.score, details: result.reasoningProbes.conditionalReasoning.details },
+        contextContinuity: { passed: result.reasoningProbes.contextContinuity.passed, score: result.reasoningProbes.contextContinuity.score, details: result.reasoningProbes.contextContinuity.details },
+        logicalConsistency: { passed: result.reasoningProbes.logicalConsistency.passed, score: result.reasoningProbes.logicalConsistency.score, details: result.reasoningProbes.logicalConsistency.details },
+        explanation: { passed: result.reasoningProbes.explanation.passed, score: result.reasoningProbes.explanation.score, details: result.reasoningProbes.explanation.details },
+        edgeCaseHandling: { passed: result.reasoningProbes.edgeCaseHandling.passed, score: result.reasoningProbes.edgeCaseHandling.score, details: result.reasoningProbes.edgeCaseHandling.details }
+      };
+    }
+
     // Save probe results to model profile
     await capabilities.updateProbeResults(
       modelId,
-      {
-        testedAt: result.completedAt,
-        emitTest: { passed: result.emitTest.passed, score: result.emitTest.score, details: result.emitTest.details },
-        schemaTest: { passed: result.schemaTest.passed, score: result.schemaTest.score, details: result.schemaTest.details },
-        selectionTest: { passed: result.selectionTest.passed, score: result.selectionTest.score, details: result.selectionTest.details },
-        suppressionTest: { passed: result.suppressionTest.passed, score: result.suppressionTest.score, details: result.suppressionTest.details },
-        overallScore: result.overallScore
-      },
+      probeResultsToSave,
       result.role,
       result.contextLatency
     );
