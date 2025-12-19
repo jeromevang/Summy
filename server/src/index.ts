@@ -98,19 +98,24 @@ const getSharedLMStudioClient = () => {
   return sharedLMStudioClient;
 };
 
-// Get full status including MCP and LM Studio
-const getFullStatus = async () => {
-  let lmstudioConnected = false;
-  let lmstudioModels: string[] = [];
-  
-  try {
-    const client = getSharedLMStudioClient();
-    const loadedModels = await client.llm.listLoaded();
-    lmstudioConnected = true;
-    lmstudioModels = loadedModels.map(m => m.identifier);
-  } catch {
-    lmstudioConnected = false;
-    sharedLMStudioClient = null; // Reset on error to reconnect next time
+// Cached LM Studio status (to avoid checking every broadcast)
+let cachedLMStudioStatus = { connected: false, models: [] as string[] };
+
+// Get full status including MCP and optionally LM Studio
+const getFullStatus = async (checkLMStudio = false) => {
+  // Only check LM Studio if requested (on new connections)
+  if (checkLMStudio) {
+    try {
+      const client = getSharedLMStudioClient();
+      const loadedModels = await client.llm.listLoaded();
+      cachedLMStudioStatus = {
+        connected: true,
+        models: loadedModels.map(m => m.identifier)
+      };
+    } catch {
+      cachedLMStudioStatus = { connected: false, models: [] };
+      sharedLMStudioClient = null; // Reset on error to reconnect next time
+    }
   }
 
   const mcpStatus = mcpClient.getStatus();
@@ -119,16 +124,16 @@ const getFullStatus = async () => {
     server: 'online',
     websocket: 'connected',
     mcp: mcpStatus.connected ? 'connected' : 'disconnected',
-    lmstudio: lmstudioConnected ? 'connected' : 'disconnected',
-    lmstudioModels
+    lmstudio: cachedLMStudioStatus.connected ? 'connected' : 'disconnected',
+    lmstudioModels: cachedLMStudioStatus.models
   };
 };
 
-// Broadcast status to all WebSocket clients
+// Broadcast status to all WebSocket clients (without LM Studio check)
 const broadcastStatus = async () => {
   if (wsClients.size === 0) return;
   
-  const status = await getFullStatus();
+  const status = await getFullStatus(false); // Don't check LM Studio on interval
   const message = JSON.stringify({
     type: 'status',
     data: status,
@@ -142,8 +147,8 @@ const broadcastStatus = async () => {
   });
 };
 
-// Broadcast status every 5 seconds
-setInterval(broadcastStatus, 5000);
+// Broadcast status every 30 seconds (MCP only, LM Studio uses cached value)
+setInterval(broadcastStatus, 30000);
 
 // WebSocket connection handling
 wss.on('connection', async (ws) => {
@@ -151,8 +156,8 @@ wss.on('connection', async (ws) => {
   wsClients.add(ws);
   wsBroadcast.registerClient(ws);
 
-  // Send initial full status
-  const status = await getFullStatus();
+  // Send initial full status (check LM Studio on new connection)
+  const status = await getFullStatus(true);
   ws.send(JSON.stringify({
     type: 'status',
     data: status,
