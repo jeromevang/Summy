@@ -1,0 +1,425 @@
+{
+  "modelId": "gemma-3-27b-tools-i1@iq1_m",
+  "displayName": "gemma-3-27b-tools-i1@iq1_m",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T14:17:36.257Z",
+  "testVersion": 2,
+  "score": 89,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 2269,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "file_write": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2765,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "file_patch": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3072,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "file_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1644,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "file_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1823,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 866,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "folder_create": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2087,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "folder_delete": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2098,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1377,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "git_diff": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1699,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "git_log": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1908,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "git_commit": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2244,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "git_add": {
+      "supported": true,
+      "score": 73,
+      "testsPassed": 1,
+      "testsFailed": 1,
+      "avgLatency": 1915,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "git_branch_create": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2179,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1656,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "npm_run": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1747,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "npm_install": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1722,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "npm_uninstall": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1984,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "http_request": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2927,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "browser_navigate": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2602,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "run_python": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2272,
+      "lastTested": "2025-12-19T14:17:36.257Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [
+    "file_read",
+    "file_write",
+    "file_patch",
+    "file_list",
+    "file_search",
+    "folder_create",
+    "folder_delete",
+    "git_diff",
+    "git_log",
+    "git_commit",
+    "git_add",
+    "git_branch_create",
+    "npm_run",
+    "npm_install",
+    "npm_uninstall",
+    "http_request",
+    "browser_navigate",
+    "run_python"
+  ],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-qeddxafo36o3pspy7371rq\",\"object\":\"chat.completion\",\"created\":1766153809,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of config.json.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"545409546\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":436,\"completion_tokens\":48,\"total_tokens\":484},\"stats\":{},\"s"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-qrnlz2354cned68czsb6j4\",\"object\":\"chat.completion\",\"created\":1766153811,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of the file located at src/utils/helpers.ts.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"932269049\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":438,\"completion_tokens\":"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-fieh0e3vkejvkz2828j4lm\",\"object\":\"chat.completion\",\"created\":1766153813,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we can create a new file named \\\"hello.js\\\" and write content into it.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"125412164\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\""
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-y5qtrq15hy308hsc32n8r\",\"object\":\"chat.completion\",\"created\":1766153816,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we can modify the file:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"615394021\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":510,\"completion_tokens\":66,\"tota"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-gve2mlyo3xlnlwwlfozp5q\",\"object\":\"chat.completion\",\"created\":1766153819,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"646528335\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":33,\"total_tokens\":454},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-3sq02xzf4ackw03u99pcbm\",\"object\":\"chat.completion\",\"created\":1766153821,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's search for all occurrences of \\\"TODO\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"570822636\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":459,\"completion_tokens\":46,\"total_tokens\":505},\"stats\":{},\""
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-7n9edyc8wna3t5den22527\",\"object\":\"chat.completion\",\"created\":1766153823,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"791848018\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":385,\"completion_tokens\":28,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-rrd30od349bjn681rr6ga\",\"object\":\"chat.completion\",\"created\":1766153824,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"809538416\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":422,\"completion_tokens\":33,\"total_tokens\":455},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-uecyb5jsotfp9va3vy92h\",\"object\":\"chat.completion\",\"created\":1766153826,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"495432078\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":415,\"completion_tokens\":32,\"total_tokens\":447},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-hyey13nax47bcblqbakeuh\",\"object\":\"chat.completion\",\"created\":1766153828,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's where we commit our changes! Let's get this fixed. \\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"805467738\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":427,\"completion_tokens\":54,\"total_toke"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-tvaygnjpmyo2qs403kjj8e\",\"object\":\"chat.completion\",\"created\":1766153830,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"334379311\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":37,\"total_tokens\":469},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ksw8179phi823eostsfrxa\",\"object\":\"chat.completion\",\"created\":1766153832,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"156516885\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":31,\"total_tokens\":455},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-95moaybxwtmwt2rcuzzurr\",\"object\":\"chat.completion\",\"created\":1766153834,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"455838563\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":420,\"completion_tokens\":32,\"total_tokens\":452},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-s4n8nzita6q9lwfvykka\",\"object\":\"chat.completion\",\"created\":1766153835,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can fetch data from https://api.example.com/users using the `http_request` tool. Let's get started!\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"409518462\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-xkpvttfmhw1ii6m9o9gx3\",\"object\":\"chat.completion\",\"created\":1766153838,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will navigate to GitHub and return the page content.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"590718661\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":486,\"completio"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-zjxrf3oxuddv3ftulfz599\",\"object\":\"chat.completion\",\"created\":1766153841,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will create a new file named \\\"README.md\\\".\\n\\n[TOOL_RESULT]\\n<result>\\n[END_TOOL_RESULT]\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":458,\"completion_tokens\":34,\"total_tokens\":492},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ojnudwkj8leu2y3ayjfpi\",\"object\":\"chat.completion\",\"created\":1766153842,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will create a new directory named \\\"components\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"942491569\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":46,\"total_tokens\":471},"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-f1m65p72t6gb36x2i4h9h\",\"object\":\"chat.completion\",\"created\":1766153844,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will delete the directory named \\\"temp\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"240308393\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":426,\"completion_tokens\":45,\"total_tokens\":471},\"stats\":{},\"sy"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-08ehypoi0syqyzxo21wnq3\",\"object\":\"chat.completion\",\"created\":1766153846,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"495326338\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":434,\"completion_tokens\":33,\"total_tokens\":467},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-h9txxs5n77rusjvd4n916k\",\"object\":\"chat.completion\",\"created\":1766153848,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's stage all files for commit. Here is the tool call:\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"802473695\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"all\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":429,\"completion_tokens\":49,\"total_tokens\":478},\"stats\":{"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-r6sfhw4k5slitvlrxqogme\",\"object\":\"chat.completion\",\"created\":1766153850,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"764923045\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":386,\"completion_tokens\":30,\"total_tokens\":416},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-3od9ppls2dljpqdo4pn55i\",\"object\":\"chat.completion\",\"created\":1766153852,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will remove the axios package using npm uninstall.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"269532523\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":45,\"total_tokens\":469},"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-v856gwlzt2anjzzeuwa3c\",\"object\":\"chat.completion\",\"created\":1766153853,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's the tool call:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"909546733\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":426,\"completion_tokens\":47,\"total_tokens\":473},\"stats\":{},\"system_fing"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T14:16:44.874Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct tool selected with correct file path"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "toolScore": 100,
+    "reasoningScore": 86,
+    "overallScore": 93,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": true,
+        "score": 80,
+        "details": "Valid intent JSON with reasoning"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 50,
+        "details": "Unclear action: package.json"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": true,
+        "score": 100,
+        "details": "Provided reasoning before action"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    }
+  },
+  "role": "executor",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192
+    ],
+    "latencies": {
+      "2048": 1889,
+      "4096": 1837,
+      "8192": 1846
+    },
+    "maxUsableContext": 8192,
+    "recommendedContext": 8192,
+    "modelMaxContext": 131072
+  },
+  "contextLength": 8192
+}
