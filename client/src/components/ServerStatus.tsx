@@ -5,6 +5,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 const ServerStatus: React.FC = () => {
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [websocketStatus, setWebsocketStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  const [mcpStatus, setMcpStatus] = useState<'connected' | 'disconnected'>('disconnected');
   const [isStarting, setIsStarting] = useState(false);
 
   // WebSocket connection
@@ -103,9 +104,22 @@ The server will run on: http://localhost:3001
 
   useEffect(() => {
     checkServerStatus();
-    const interval = setInterval(checkServerStatus, 5000); // Check every 5 seconds
+    checkMcpStatus();
+    const interval = setInterval(() => {
+      checkServerStatus();
+      checkMcpStatus();
+    }, 5000); // Check every 5 seconds
     return () => clearInterval(interval);
   }, []);
+
+  const checkMcpStatus = async () => {
+    try {
+      const res = await axios.get('http://localhost:3001/api/tooly/mcp/status', { timeout: 2000 });
+      setMcpStatus(res.data?.connected ? 'connected' : 'disconnected');
+    } catch {
+      setMcpStatus('disconnected');
+    }
+  };
 
   return (
     <div className="flex items-center space-x-3">
@@ -134,6 +148,18 @@ The server will run on: http://localhost:3001
           websocketStatus === 'disconnected' ? 'text-red-400' : 'text-yellow-400'
         }`}>
           {websocketStatus === 'connected' ? 'WS' : websocketStatus === 'disconnected' ? 'WS ✗' : 'WS...'}
+        </span>
+      </div>
+
+      {/* MCP status */}
+      <div className="flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-[#2d2d2d]">
+        <div className={`w-1.5 h-1.5 rounded-full ${
+          mcpStatus === 'connected' ? 'bg-green-400' : 'bg-gray-500'
+        }`}></div>
+        <span className={`text-xs font-medium ${
+          mcpStatus === 'connected' ? 'text-green-400' : 'text-gray-500'
+        }`}>
+          MCP
         </span>
       </div>
 

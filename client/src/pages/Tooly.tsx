@@ -448,24 +448,6 @@ const Tooly: React.FC = () => {
           <p className="text-gray-400 text-sm">Model Capabilities, Probing & Tool Management</p>
         </div>
         <div className="flex items-center gap-4">
-          {/* MCP Status Indicator */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">MCP:</span>
-            <button
-              onClick={toggleMcpConnection}
-              disabled={mcpConnecting}
-              className={`flex items-center gap-1.5 px-2 py-1 text-xs rounded transition-colors ${
-                mcpStatus.connected 
-                  ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
-                  : 'bg-gray-600/30 text-gray-400 hover:bg-gray-600/40'
-              } disabled:opacity-50`}
-              title={mcpStatus.connected ? `Connected (${mcpTools.length} tools)` : 'Click to connect'}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${mcpStatus.connected ? 'bg-green-400' : 'bg-gray-500'}`}></span>
-              {mcpConnecting ? '...' : mcpStatus.connected ? 'On' : 'Off'}
-            </button>
-          </div>
-          
           {/* Proxy Mode Selector */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">Mode:</span>
