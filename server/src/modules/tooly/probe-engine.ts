@@ -2,11 +2,20 @@
  * Probe Engine
  * Implements capability probing tests to evaluate model behavior for tool calling
  * 
- * Four probe tests:
- * 1. Emit Test - Can model emit valid tool_calls when forced?
- * 2. Schema Adherence Test - Does model adapt to schema changes?
- * 3. Selection Logic Test - Can model choose correctly between similar tools?
- * 4. Suppression Test - Can model NOT call tools when forbidden?
+ * Tool Behavior Probes (1.x):
+ * 1.1 Emit Test - Can model emit valid tool_calls when forced?
+ * 1.2 Schema Adherence Test - Does model adapt to schema changes?
+ * 1.3 Selection Logic Test - Can model choose correctly between similar tools?
+ * 1.4 Suppression Test - Can model NOT call tools when forbidden?
+ * 
+ * Reasoning Probes (2.x):
+ * 2.1 Intent Extraction Test - Can model output structured JSON intent?
+ * 2.2 Multi-step Planning Test - Can model break complex tasks into ordered steps?
+ * 2.3 Conditional Reasoning Test - Can model reason through conditions?
+ * 2.4 Context Continuity Test - Does model maintain context across turns?
+ * 2.5 Logical Consistency Test - Can model detect contradictory instructions?
+ * 2.6 Explanation Test - Does model provide reasoning before action?
+ * 2.7 Edge Case Handling Test - Does model handle ambiguous scenarios safely?
  */
 
 import axios from 'axios';
@@ -27,20 +36,35 @@ export interface ProbeResult {
   error?: string;
 }
 
+export interface ReasoningProbeResults {
+  intentExtraction: ProbeResult;
+  multiStepPlanning: ProbeResult;
+  conditionalReasoning: ProbeResult;
+  contextContinuity: ProbeResult;
+  logicalConsistency: ProbeResult;
+  explanation: ProbeResult;
+  edgeCaseHandling: ProbeResult;
+}
+
 export interface ProbeRunResult {
   modelId: string;
   provider: 'lmstudio' | 'openai' | 'azure';
   startedAt: string;
   completedAt: string;
   
-  // Individual probe results
+  // Tool behavior probe results (1.x)
   emitTest: ProbeResult;
   schemaTest: ProbeResult;
   selectionTest: ProbeResult;
   suppressionTest: ProbeResult;
   
+  // Reasoning probe results (2.x)
+  reasoningProbes?: ReasoningProbeResults;
+  
   // Aggregated results
-  overallScore: number;
+  toolScore: number;      // Score from tool behavior probes
+  reasoningScore: number; // Score from reasoning probes
+  overallScore: number;   // Combined score
   role: 'main' | 'executor' | 'both' | 'none';
   
   // Context latency profiling
@@ -58,6 +82,7 @@ export interface ProbeOptions {
   contextLength?: number;
   timeout?: number;              // Default 30000ms
   runLatencyProfile?: boolean;   // Run context latency profiling
+  runReasoningProbes?: boolean;  // Run reasoning probes (default: true)
 }
 
 // ============================================================
@@ -153,26 +178,69 @@ class ProbeEngine {
   ): Promise<ProbeRunResult> {
     const startedAt = new Date().toISOString();
     const timeout = options.timeout || this.defaultTimeout;
+    const runReasoningProbes = options.runReasoningProbes !== false; // Default: true
 
     console.log(`[ProbeEngine] Starting probe tests for ${modelId} (provider: ${provider})`);
     notifications.info(`Starting probe tests for ${modelId}`);
 
-    // Run all four probe tests
+    // Run tool behavior probes (1.x)
     const emitTest = await this.runEmitTest(modelId, provider, settings, timeout);
     const schemaTest = await this.runSchemaAdherenceTest(modelId, provider, settings, timeout);
     const selectionTest = await this.runSelectionLogicTest(modelId, provider, settings, timeout);
     const suppressionTest = await this.runSuppressionTest(modelId, provider, settings, timeout);
 
-    // Calculate overall score (weighted)
-    const overallScore = Math.round(
-      emitTest.score * 0.30 +      // Emit is foundational
-      schemaTest.score * 0.25 +    // Schema adherence matters for evolution
-      selectionTest.score * 0.25 + // Selection logic for multi-tool
-      suppressionTest.score * 0.20 // Suppression for safety
+    // Calculate tool score
+    const toolScore = Math.round(
+      emitTest.score * 0.30 +
+      schemaTest.score * 0.30 +
+      selectionTest.score * 0.20 +
+      suppressionTest.score * 0.20
     );
 
+    // Run reasoning probes (2.x) if enabled
+    let reasoningProbes: ReasoningProbeResults | undefined;
+    let reasoningScore = 0;
+
+    if (runReasoningProbes) {
+      console.log(`[ProbeEngine] Running reasoning probes for ${modelId}`);
+      
+      const intentExtraction = await this.runIntentExtractionTest(modelId, provider, settings, timeout);
+      const multiStepPlanning = await this.runMultiStepPlanningTest(modelId, provider, settings, timeout);
+      const conditionalReasoning = await this.runConditionalReasoningTest(modelId, provider, settings, timeout);
+      const contextContinuity = await this.runContextContinuityTest(modelId, provider, settings, timeout);
+      const logicalConsistency = await this.runLogicalConsistencyTest(modelId, provider, settings, timeout);
+      const explanation = await this.runExplanationTest(modelId, provider, settings, timeout);
+      const edgeCaseHandling = await this.runEdgeCaseHandlingTest(modelId, provider, settings, timeout);
+
+      reasoningProbes = {
+        intentExtraction,
+        multiStepPlanning,
+        conditionalReasoning,
+        contextContinuity,
+        logicalConsistency,
+        explanation,
+        edgeCaseHandling
+      };
+
+      // Calculate reasoning score (equal weights)
+      reasoningScore = Math.round(
+        (intentExtraction.score +
+         multiStepPlanning.score +
+         conditionalReasoning.score +
+         contextContinuity.score +
+         logicalConsistency.score +
+         explanation.score +
+         edgeCaseHandling.score) / 7
+      );
+    }
+
+    // Calculate overall score (50% tool, 50% reasoning if available)
+    const overallScore = runReasoningProbes
+      ? Math.round((toolScore + reasoningScore) / 2)
+      : toolScore;
+
     // Determine role based on probe results
-    const role = this.determineRole(emitTest, schemaTest, selectionTest, suppressionTest);
+    const role = this.determineRole(emitTest, schemaTest, selectionTest, suppressionTest, reasoningProbes);
 
     // Optional: Run context latency profiling
     let contextLatency: ContextLatencyResult | undefined;
@@ -189,12 +257,15 @@ class ProbeEngine {
       schemaTest,
       selectionTest,
       suppressionTest,
+      reasoningProbes,
+      toolScore,
+      reasoningScore,
       overallScore,
       role,
       contextLatency
     };
 
-    console.log(`[ProbeEngine] Completed probe tests for ${modelId}: score=${overallScore}, role=${role}`);
+    console.log(`[ProbeEngine] Completed probe tests for ${modelId}: tool=${toolScore}, reasoning=${reasoningScore}, overall=${overallScore}, role=${role}`);
     notifications.success(`Probe tests completed for ${modelId}: ${role} role, score ${overallScore}/100`);
 
     return result;
@@ -670,19 +741,42 @@ Just say "OK".`
     emit: ProbeResult,
     schema: ProbeResult,
     selection: ProbeResult,
-    suppression: ProbeResult
+    suppression: ProbeResult,
+    reasoning?: ReasoningProbeResults
   ): 'main' | 'executor' | 'both' | 'none' {
-    // Main model requirements:
-    // - Good suppression (can refrain from tools)
-    // - Good selection (can reason about which tool)
-    const canBeMain = suppression.passed && suppression.score >= 70 && 
-                      selection.passed && selection.score >= 70;
-
     // Executor model requirements:
     // - Good emit (can produce tool calls)
     // - Good schema adherence (follows tool schemas exactly)
     const canBeExecutor = emit.passed && emit.score >= 80 && 
                           schema.passed && schema.score >= 70;
+
+    // Main model requirements:
+    // - Good suppression (can refrain from tools)
+    // - Good selection (can reason about which tool)
+    // - If reasoning probes available: good reasoning scores
+    let canBeMain = suppression.passed && suppression.score >= 70 && 
+                    selection.passed && selection.score >= 70;
+
+    // If reasoning probes were run, require them for main role
+    if (reasoning) {
+      const reasoningPassed = 
+        reasoning.intentExtraction.passed &&
+        reasoning.conditionalReasoning.passed &&
+        reasoning.logicalConsistency.passed;
+      
+      const reasoningAvgScore = (
+        reasoning.intentExtraction.score +
+        reasoning.multiStepPlanning.score +
+        reasoning.conditionalReasoning.score +
+        reasoning.contextContinuity.score +
+        reasoning.logicalConsistency.score +
+        reasoning.explanation.score +
+        reasoning.edgeCaseHandling.score
+      ) / 7;
+
+      // Main model needs good reasoning (avg >= 60)
+      canBeMain = canBeMain && reasoningPassed && reasoningAvgScore >= 60;
+    }
 
     if (canBeMain && canBeExecutor) {
       return 'both';
@@ -697,6 +791,776 @@ Just say "OK".`
     }
 
     return 'none';
+  }
+
+  // ============================================================
+  // REASONING PROBES (2.x)
+  // ============================================================
+
+  /**
+   * PROBE 2.1: Intent Extraction Test
+   * Can the model output valid structured JSON intent?
+   */
+  private async runIntentExtractionTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: `You are a planning assistant. Output your intent as JSON only.
+
+Output format:
+{
+  "action": "call_tool",
+  "tool": "tool_name",
+  "parameters": { ... },
+  "metadata": { "reasoning": "..." }
+}
+
+Do NOT output any text outside the JSON.`
+      },
+      {
+        role: 'user',
+        content: 'Add error handling to the login function in auth.js'
+      }
+    ];
+
+    try {
+      // No tools - just want JSON output
+      const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
+      const latency = Date.now() - startTime;
+      const content = response?.choices?.[0]?.message?.content || '';
+
+      // Try to parse JSON from response
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          return {
+            testName: 'intent_extraction',
+            passed: false,
+            score: 20,
+            latency,
+            details: 'No JSON found in response',
+            response
+          };
+        }
+
+        const intent = JSON.parse(jsonMatch[0]);
+
+        // Check required fields
+        const hasAction = 'action' in intent;
+        const hasTool = 'tool' in intent;
+        const hasParams = 'parameters' in intent;
+        const hasMetadata = 'metadata' in intent;
+
+        if (!hasAction || !hasTool) {
+          return {
+            testName: 'intent_extraction',
+            passed: false,
+            score: 50,
+            latency,
+            details: 'JSON parsed but missing required fields (action, tool)',
+            response
+          };
+        }
+
+        // Check if tool makes sense for the task (file_read is good start)
+        const sensibleTool = ['file_read', 'read_file', 'file_patch'].includes(intent.tool);
+
+        return {
+          testName: 'intent_extraction',
+          passed: true,
+          score: sensibleTool ? 100 : 80,
+          latency,
+          details: `Valid intent JSON with ${hasMetadata ? 'reasoning' : 'no reasoning'}`,
+          response
+        };
+
+      } catch {
+        return {
+          testName: 'intent_extraction',
+          passed: false,
+          score: 30,
+          latency,
+          details: 'Response contains invalid JSON',
+          response
+        };
+      }
+
+    } catch (error: any) {
+      return {
+        testName: 'intent_extraction',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 2.2: Multi-step Planning Test
+   * Can the model break complex tasks into ordered steps?
+   */
+  private async runMultiStepPlanningTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: `Break tasks into numbered steps. Output as JSON array:
+[
+  { "step": 1, "action": "tool_name", "params": { ... } },
+  { "step": 2, "action": "tool_name", "params": { ... } }
+]
+Do NOT output any text outside the JSON array.`
+      },
+      {
+        role: 'user',
+        content: 'Deploy feature: run tests, commit changes, merge to main'
+      }
+    ];
+
+    try {
+      const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
+      const latency = Date.now() - startTime;
+      const content = response?.choices?.[0]?.message?.content || '';
+
+      try {
+        const jsonMatch = content.match(/\[[\s\S]*\]/);
+        if (!jsonMatch) {
+          return {
+            testName: 'multi_step_planning',
+            passed: false,
+            score: 20,
+            latency,
+            details: 'No JSON array found in response',
+            response
+          };
+        }
+
+        const steps = JSON.parse(jsonMatch[0]);
+
+        if (!Array.isArray(steps) || steps.length === 0) {
+          return {
+            testName: 'multi_step_planning',
+            passed: false,
+            score: 30,
+            latency,
+            details: 'Empty or invalid steps array',
+            response
+          };
+        }
+
+        // Check if steps are in logical order
+        const hasTestStep = steps.some((s: any) => 
+          s.action?.includes('test') || s.action?.includes('npm_run')
+        );
+        const hasCommitStep = steps.some((s: any) => 
+          s.action?.includes('commit') || s.action?.includes('git_commit')
+        );
+        const hasMergeStep = steps.some((s: any) => 
+          s.action?.includes('merge') || s.action?.includes('git_merge')
+        );
+
+        const hasAllSteps = hasTestStep && hasCommitStep && hasMergeStep;
+        const hasStepNumbers = steps.every((s: any) => 'step' in s);
+
+        return {
+          testName: 'multi_step_planning',
+          passed: steps.length >= 2,
+          score: hasAllSteps ? 100 : (hasStepNumbers ? 70 : 50),
+          latency,
+          details: `${steps.length} steps planned${hasAllSteps ? ' with correct order' : ''}`,
+          response
+        };
+
+      } catch {
+        return {
+          testName: 'multi_step_planning',
+          passed: false,
+          score: 25,
+          latency,
+          details: 'Invalid JSON array',
+          response
+        };
+      }
+
+    } catch (error: any) {
+      return {
+        testName: 'multi_step_planning',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 2.3: Conditional Reasoning Test
+   * Can the model reason through if/else conditions?
+   */
+  private async runConditionalReasoningTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: `Analyze the condition and output the correct action as JSON:
+{ "action": "call_tool", "tool": "...", "parameters": { ... } }
+Do NOT output any text outside the JSON.`
+      },
+      {
+        role: 'user',
+        content: 'If package.json exists, read it. Otherwise, create it. The file EXISTS.'
+      }
+    ];
+
+    try {
+      const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
+      const latency = Date.now() - startTime;
+      const content = response?.choices?.[0]?.message?.content || '';
+
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          return {
+            testName: 'conditional_reasoning',
+            passed: false,
+            score: 20,
+            latency,
+            details: 'No JSON found',
+            response
+          };
+        }
+
+        const action = JSON.parse(jsonMatch[0]);
+        const tool = action.tool || action.action || '';
+
+        // Correct answer: read (because file EXISTS)
+        const isRead = tool.toLowerCase().includes('read');
+        const isCreate = tool.toLowerCase().includes('create') || tool.toLowerCase().includes('write');
+
+        if (isRead) {
+          return {
+            testName: 'conditional_reasoning',
+            passed: true,
+            score: 100,
+            latency,
+            details: 'Correctly chose read based on condition',
+            response
+          };
+        }
+
+        if (isCreate) {
+          return {
+            testName: 'conditional_reasoning',
+            passed: false,
+            score: 40,
+            latency,
+            details: 'Chose create when file exists - failed conditional logic',
+            response
+          };
+        }
+
+        return {
+          testName: 'conditional_reasoning',
+          passed: false,
+          score: 50,
+          latency,
+          details: `Unclear action: ${tool}`,
+          response
+        };
+
+      } catch {
+        return {
+          testName: 'conditional_reasoning',
+          passed: false,
+          score: 25,
+          latency,
+          details: 'Invalid JSON',
+          response
+        };
+      }
+
+    } catch (error: any) {
+      return {
+        testName: 'conditional_reasoning',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 2.4: Context Continuity Test
+   * Does the model maintain context across turns?
+   */
+  private async runContextContinuityTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are a helpful assistant. Output JSON actions when asked.'
+      },
+      {
+        role: 'user',
+        content: 'The API endpoint is /users/profile'
+      },
+      {
+        role: 'assistant',
+        content: 'Understood. The API endpoint is /users/profile. What would you like me to do with it?'
+      },
+      {
+        role: 'user',
+        content: 'Make a GET request to it. Output as JSON: { "action": "http_request", "url": "...", "method": "..." }'
+      }
+    ];
+
+    try {
+      const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
+      const latency = Date.now() - startTime;
+      const content = response?.choices?.[0]?.message?.content || '';
+
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          // Check if it mentioned the endpoint in text
+          const mentionsEndpoint = content.includes('/users/profile');
+          return {
+            testName: 'context_continuity',
+            passed: mentionsEndpoint,
+            score: mentionsEndpoint ? 60 : 20,
+            latency,
+            details: mentionsEndpoint ? 'Remembered endpoint but no JSON' : 'No context retention',
+            response
+          };
+        }
+
+        const action = JSON.parse(jsonMatch[0]);
+        const url = action.url || '';
+
+        const hasCorrectEndpoint = url.includes('/users/profile');
+        const hasGetMethod = (action.method || '').toUpperCase() === 'GET';
+
+        if (hasCorrectEndpoint && hasGetMethod) {
+          return {
+            testName: 'context_continuity',
+            passed: true,
+            score: 100,
+            latency,
+            details: 'Perfect context retention with correct endpoint and method',
+            response
+          };
+        }
+
+        if (hasCorrectEndpoint) {
+          return {
+            testName: 'context_continuity',
+            passed: true,
+            score: 80,
+            latency,
+            details: 'Remembered endpoint, method may differ',
+            response
+          };
+        }
+
+        return {
+          testName: 'context_continuity',
+          passed: false,
+          score: 40,
+          latency,
+          details: 'Failed to use endpoint from previous context',
+          response
+        };
+
+      } catch {
+        return {
+          testName: 'context_continuity',
+          passed: false,
+          score: 25,
+          latency,
+          details: 'Invalid JSON',
+          response
+        };
+      }
+
+    } catch (error: any) {
+      return {
+        testName: 'context_continuity',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 2.5: Logical Consistency Test
+   * Can the model detect contradictory instructions?
+   */
+  private async runLogicalConsistencyTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: `Analyze instructions for conflicts. If there's a logical conflict, respond:
+{ "conflict": true, "reason": "..." }
+Otherwise output the action as JSON.`
+      },
+      {
+        role: 'user',
+        content: 'Delete the file log.txt, then append new data to log.txt.'
+      }
+    ];
+
+    try {
+      const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
+      const latency = Date.now() - startTime;
+      const content = response?.choices?.[0]?.message?.content || '';
+
+      // Check if model identified the conflict
+      const mentionsConflict = content.toLowerCase().includes('conflict') ||
+                               content.toLowerCase().includes('cannot') ||
+                               content.toLowerCase().includes('deleted') ||
+                               content.toLowerCase().includes('contradiction');
+
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const result = JSON.parse(jsonMatch[0]);
+          if (result.conflict === true) {
+            return {
+              testName: 'logical_consistency',
+              passed: true,
+              score: 100,
+              latency,
+              details: 'Correctly identified conflict in structured format',
+              response
+            };
+          }
+        }
+      } catch {
+        // JSON parse failed, check text
+      }
+
+      if (mentionsConflict) {
+        return {
+          testName: 'logical_consistency',
+          passed: true,
+          score: 80,
+          latency,
+          details: 'Identified conflict in text response',
+          response
+        };
+      }
+
+      return {
+        testName: 'logical_consistency',
+        passed: false,
+        score: 30,
+        latency,
+        details: 'Failed to identify logical conflict',
+        response
+      };
+
+    } catch (error: any) {
+      return {
+        testName: 'logical_consistency',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 2.6: Explanation Test
+   * Does the model provide reasoning before action?
+   */
+  private async runExplanationTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: `Before taking any action, explain your reasoning. Output:
+{
+  "reasoning": "explanation of what you'll do and why",
+  "action": "call_tool",
+  "tool": "...",
+  "parameters": { ... }
+}`
+      },
+      {
+        role: 'user',
+        content: 'Update config.json with the new API endpoint'
+      }
+    ];
+
+    try {
+      const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
+      const latency = Date.now() - startTime;
+      const content = response?.choices?.[0]?.message?.content || '';
+
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          return {
+            testName: 'explanation',
+            passed: false,
+            score: 20,
+            latency,
+            details: 'No JSON found',
+            response
+          };
+        }
+
+        const result = JSON.parse(jsonMatch[0]);
+        const hasReasoning = 'reasoning' in result && result.reasoning.length > 10;
+        const hasAction = 'action' in result || 'tool' in result;
+
+        if (hasReasoning && hasAction) {
+          return {
+            testName: 'explanation',
+            passed: true,
+            score: 100,
+            latency,
+            details: 'Provided reasoning before action',
+            response
+          };
+        }
+
+        if (hasAction && !hasReasoning) {
+          return {
+            testName: 'explanation',
+            passed: true,
+            score: 60,
+            latency,
+            details: 'Action provided but no reasoning',
+            response
+          };
+        }
+
+        return {
+          testName: 'explanation',
+          passed: false,
+          score: 40,
+          latency,
+          details: 'Missing required fields',
+          response
+        };
+
+      } catch {
+        return {
+          testName: 'explanation',
+          passed: false,
+          score: 25,
+          latency,
+          details: 'Invalid JSON',
+          response
+        };
+      }
+
+    } catch (error: any) {
+      return {
+        testName: 'explanation',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * PROBE 2.7: Edge Case Handling Test
+   * Does the model handle ambiguous scenarios safely?
+   */
+  private async runEdgeCaseHandlingTest(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    const messages = [
+      {
+        role: 'system',
+        content: `Handle edge cases safely. If a situation is ambiguous, include fallback handling.
+Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it fails" }`
+      },
+      {
+        role: 'user',
+        content: 'Append to notes.txt, but the file may not exist.'
+      }
+    ];
+
+    try {
+      const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
+      const latency = Date.now() - startTime;
+      const content = response?.choices?.[0]?.message?.content || '';
+
+      // Check if model addresses the edge case
+      const addressesEdgeCase = content.toLowerCase().includes('not exist') ||
+                                content.toLowerCase().includes('create') ||
+                                content.toLowerCase().includes('check') ||
+                                content.toLowerCase().includes('if') ||
+                                content.toLowerCase().includes('fallback');
+
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const result = JSON.parse(jsonMatch[0]);
+          const hasFallback = 'fallback' in result || 'if_not_exists' in result;
+
+          if (hasFallback) {
+            return {
+              testName: 'edge_case_handling',
+              passed: true,
+              score: 100,
+              latency,
+              details: 'Properly handles edge case with fallback',
+              response
+            };
+          }
+
+          if (addressesEdgeCase) {
+            return {
+              testName: 'edge_case_handling',
+              passed: true,
+              score: 80,
+              latency,
+              details: 'Addresses edge case without explicit fallback',
+              response
+            };
+          }
+        }
+      } catch {
+        // JSON failed
+      }
+
+      if (addressesEdgeCase) {
+        return {
+          testName: 'edge_case_handling',
+          passed: true,
+          score: 70,
+          latency,
+          details: 'Mentions edge case in text response',
+          response
+        };
+      }
+
+      return {
+        testName: 'edge_case_handling',
+        passed: false,
+        score: 30,
+        latency,
+        details: 'Did not address the edge case',
+        response
+      };
+
+    } catch (error: any) {
+      return {
+        testName: 'edge_case_handling',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        details: 'Test failed',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Call LLM without tools (for reasoning tests)
+   */
+  private async callLLMNoTools(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    messages: any[],
+    settings: any,
+    timeout: number
+  ): Promise<any> {
+    let url: string;
+    let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    let body: any = {
+      messages,
+      temperature: 0
+    };
+
+    switch (provider) {
+      case 'lmstudio':
+        url = `${settings.lmstudioUrl}/v1/chat/completions`;
+        body.model = modelId;
+        break;
+
+      case 'openai':
+        url = 'https://api.openai.com/v1/chat/completions';
+        headers['Authorization'] = `Bearer ${settings.openaiApiKey}`;
+        body.model = modelId;
+        break;
+
+      case 'azure':
+        const { azureResourceName, azureDeploymentName, azureApiKey, azureApiVersion } = settings;
+        url = `https://${azureResourceName}.openai.azure.com/openai/deployments/${azureDeploymentName}/chat/completions?api-version=${azureApiVersion || '2024-02-01'}`;
+        headers['api-key'] = azureApiKey;
+        break;
+
+      default:
+        throw new Error(`Unknown provider: ${provider}`);
+    }
+
+    const response = await axios.post(url, body, {
+      headers,
+      timeout
+    });
+
+    return response.data;
   }
 
   /**

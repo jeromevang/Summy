@@ -24,12 +24,31 @@ export interface ToolCapability {
   notes?: string;
 }
 
+export interface ProbeTestResult {
+  passed: boolean;
+  score: number;
+  details: string;
+}
+
+export interface ReasoningProbeResults {
+  intentExtraction: ProbeTestResult;
+  multiStepPlanning: ProbeTestResult;
+  conditionalReasoning: ProbeTestResult;
+  contextContinuity: ProbeTestResult;
+  logicalConsistency: ProbeTestResult;
+  explanation: ProbeTestResult;
+  edgeCaseHandling: ProbeTestResult;
+}
+
 export interface ProbeResults {
   testedAt: string;
-  emitTest: { passed: boolean; score: number; details: string };
-  schemaTest: { passed: boolean; score: number; details: string };
-  selectionTest: { passed: boolean; score: number; details: string };
-  suppressionTest: { passed: boolean; score: number; details: string };
+  emitTest: ProbeTestResult;
+  schemaTest: ProbeTestResult;
+  selectionTest: ProbeTestResult;
+  suppressionTest: ProbeTestResult;
+  reasoningProbes?: ReasoningProbeResults;
+  toolScore: number;
+  reasoningScore: number;
   overallScore: number;
 }
 
