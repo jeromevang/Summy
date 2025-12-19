@@ -134,8 +134,10 @@ class ModelDiscoveryService {
         const modelId = model.modelKey;
         const profile = await this.loadModelProfile(modelId);
         
-        // Get quantization from LM Studio API
-        const quantization = await this.getModelQuantization(lmstudioUrl, modelId);
+        // Try to get quantization from SDK first, fallback to API if not available
+        // Cast to any to check for quantization property (may not be in SDK types yet)
+        const sdkQuantization = (model as any).quantization;
+        const quantization = sdkQuantization || await this.getModelQuantization(lmstudioUrl, modelId);
 
         models.push({
           id: modelId,
