@@ -2810,6 +2810,68 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
   }
 
   /**
+   * Quick latency check at 2K context
+   * Used to detect slow models before running full test suite
+   */
+  async runQuickLatencyCheck(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    timeout: number
+  ): Promise<number> {
+    const contextSize = 2048;
+    
+    console.log(`[ProbeEngine] Quick latency check for ${modelId} at ${contextSize} context`);
+    wsBroadcast.broadcastModelLoading(modelId, 'loading', `Loading for quick latency check...`);
+
+    // For LM Studio, load model with 2K context
+    if (provider === 'lmstudio' && settings.lmstudioUrl) {
+      try {
+        const client = new LMStudioClient();
+        
+        // Unload first
+        try {
+          await client.llm.unload(modelId);
+        } catch {
+          // Model might not be loaded
+        }
+        
+        // Load with 2K context
+        await client.llm.load(modelId, {
+          config: { contextLength: contextSize }
+        });
+        
+        wsBroadcast.broadcastModelLoading(modelId, 'loaded', `Model ready for latency check`);
+      } catch (error: any) {
+        console.log(`[ProbeEngine] Cannot load model: ${error.message}`);
+        wsBroadcast.broadcastModelLoading(modelId, 'failed', error.message);
+        throw error;
+      }
+    }
+
+    // Run a simple test to measure latency
+    const startTime = Date.now();
+    
+    try {
+      const messages = [
+        { role: 'system', content: 'Call the ping tool with value "latency_test".' },
+        { role: 'user', content: 'Call ping now.' }
+      ];
+
+      await this.callLLM(modelId, provider, messages, [PING_TOOL], settings, timeout);
+      
+      const latency = Date.now() - startTime;
+      console.log(`[ProbeEngine] Quick latency check: ${latency}ms`);
+      
+      return latency;
+    } catch (error: any) {
+      console.error(`[ProbeEngine] Quick latency check failed: ${error.message}`);
+      // Return a high latency to indicate slow model
+      return Date.now() - startTime;
+    }
+  }
+
+  /**
    * Run context latency profiling
    * Tests model at increasing context sizes, early exit if >30s
    */

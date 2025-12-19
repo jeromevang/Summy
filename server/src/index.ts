@@ -16,6 +16,7 @@ import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
 import { mcpClient } from './modules/tooly/mcp-client.js';
 import { wsBroadcast } from './services/ws-broadcast.js';
+import { systemMetrics } from './services/system-metrics.js';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -1875,5 +1876,9 @@ server.listen(PORT, () => {
   console.log('  🔧 Tooly routes: /api/tooly/*');
   console.log('  🔔 Notifications: /api/notifications/*');
   console.log('  📈 Analytics: /api/analytics/*');
+  
+  // Start system metrics collection
+  systemMetrics.start(1000); // Collect every 1 second
+  console.log('  📊 System metrics: ACTIVE (CPU/GPU monitoring)');
   console.log('  🔌 WebSocket: Ready for real-time updates');
 });
