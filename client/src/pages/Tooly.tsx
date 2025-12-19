@@ -12,6 +12,7 @@ interface ModelProfile {
   score: number;
   enabledTools: string[];
   capabilities: Record<string, { supported: boolean; score: number }>;
+  contextLength?: number;  // Custom context length override
 }
 
 interface DiscoveredModel {
@@ -61,12 +62,63 @@ const Tooly: React.FC = () => {
     lmstudio: false, openai: false, azure: false
   });
   const [testMode, setTestMode] = useState<'quick' | 'keep_on_success' | 'manual'>('keep_on_success');
+  const [defaultContextLength, setDefaultContextLength] = useState<number>(8192);
+  const [editingContextLength, setEditingContextLength] = useState<number | null>(null);
+
+  // Fetch settings for default context length
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.defaultContextLength) {
+          setDefaultContextLength(data.defaultContextLength);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+    }
+  };
+
+  // Update context length for a model
+  const updateContextLength = async (modelId: string, contextLength: number) => {
+    try {
+      const res = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/context-length`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contextLength })
+      });
+      if (res.ok) {
+        // Refresh the profile
+        await fetchModelProfile(modelId);
+      }
+    } catch (error) {
+      console.error('Failed to update context length:', error);
+    } finally {
+      setEditingContextLength(null);
+    }
+  };
+
+  // Remove custom context length (revert to global default)
+  const removeContextLength = async (modelId: string) => {
+    try {
+      const res = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/context-length`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        await fetchModelProfile(modelId);
+      }
+    } catch (error) {
+      console.error('Failed to remove context length:', error);
+    }
+  };
 
   // Fetch data on mount
   useEffect(() => {
     fetchModels();
     fetchTests();
     fetchLogs();
+    fetchSettings();
   }, []);
 
   // Refetch when provider filter changes
@@ -80,7 +132,11 @@ const Tooly: React.FC = () => {
       const res = await fetch(`/api/tooly/models?provider=${providerFilter}`);
       if (res.ok) {
         const data = await res.json();
-        setModels(data.models || []);
+        // Sort models alphabetically by display name
+        const sortedModels = (data.models || []).sort((a: DiscoveredModel, b: DiscoveredModel) => 
+          a.displayName.localeCompare(b.displayName)
+        );
+        setModels(sortedModels);
         if (data.providers) {
           setAvailableProviders(data.providers);
         }
@@ -337,6 +393,46 @@ const Tooly: React.FC = () => {
                   <div className="flex items-center justify-between p-3 bg-[#2d2d2d] rounded-lg">
                     <span className="text-gray-400">Overall Score</span>
                     <span className="text-2xl font-bold text-white">{selectedModel.score}/100</span>
+                  </div>
+
+                  {/* Context Length */}
+                  <div className="p-3 bg-[#2d2d2d] rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-gray-400">Context Length</span>
+                      {selectedModel.contextLength && (
+                        <button
+                          onClick={() => removeContextLength(selectedModel.modelId)}
+                          className="text-xs text-red-400 hover:text-red-300"
+                        >
+                          Remove custom
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={editingContextLength ?? selectedModel.contextLength ?? defaultContextLength}
+                        onChange={(e) => {
+                          const newValue = parseInt(e.target.value);
+                          setEditingContextLength(newValue);
+                          updateContextLength(selectedModel.modelId, newValue);
+                        }}
+                        className="flex-1 bg-[#0d0d0d] border border-[#3d3d3d] rounded px-2 py-1 text-white text-sm focus:border-purple-500 focus:outline-none"
+                      >
+                        <option value={2048}>2,048 (2K)</option>
+                        <option value={4096}>4,096 (4K)</option>
+                        <option value={8192}>8,192 (8K)</option>
+                        <option value={16384}>16,384 (16K)</option>
+                        <option value={32768}>32,768 (32K)</option>
+                        <option value={65536}>65,536 (64K)</option>
+                        <option value={131072}>131,072 (128K)</option>
+                        <option value={1048576}>1,048,576 (1M)</option>
+                      </select>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {selectedModel.contextLength 
+                        ? '📌 Custom value set for this model' 
+                        : `Using global default (${defaultContextLength.toLocaleString()})`}
+                    </p>
                   </div>
 
                   {/* Tool Categories */}

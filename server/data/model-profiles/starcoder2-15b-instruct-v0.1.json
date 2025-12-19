@@ -1,0 +1,268 @@
+{
+  "modelId": "starcoder2-15b-instruct-v0.1",
+  "displayName": "starcoder2-15b-instruct-v0.1",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-18T23:10:59.550Z",
+  "testVersion": 3,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_checkout": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_merge": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "git_rm": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-18T23:10:59.550Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    }
+  ]
+}

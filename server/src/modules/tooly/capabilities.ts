@@ -34,6 +34,7 @@ export interface ModelProfile {
   toolFormat: 'openai_tools' | 'function_calling' | 'xml' | 'none';
   systemPrompt?: string;   // Custom system prompt for this model
   avgLatency?: number;
+  contextLength?: number;  // Custom context length override for this model
   
   capabilities: Record<string, ToolCapability>;
   enabledTools: string[];
@@ -363,6 +364,34 @@ class CapabilitiesService {
 
     profile.systemPrompt = systemPrompt;
     await this.saveProfile(profile);
+  }
+
+  /**
+   * Update custom context length for a model
+   */
+  async updateContextLength(modelId: string, contextLength: number): Promise<void> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) {
+      throw new Error(`Profile not found for model: ${modelId}`);
+    }
+
+    profile.contextLength = contextLength;
+    await this.saveProfile(profile);
+    console.log(`[Capabilities] Updated context length for ${modelId} to ${contextLength}`);
+  }
+
+  /**
+   * Remove custom context length (revert to global default)
+   */
+  async removeContextLength(modelId: string): Promise<void> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) {
+      throw new Error(`Profile not found for model: ${modelId}`);
+    }
+
+    delete profile.contextLength;
+    await this.saveProfile(profile);
+    console.log(`[Capabilities] Removed custom context length for ${modelId}`);
   }
 
   /**
