@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // ============================================================
 // TYPES
@@ -96,6 +96,7 @@ const Tooly: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('models');
   const [models, setModels] = useState<DiscoveredModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<ModelProfile | null>(null);
+  const selectedModelRef = useRef<string | null>(null);
   const [tests, setTests] = useState<TestDefinition[]>([]);
   const [logs, setLogs] = useState<ExecutionLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,26 +137,37 @@ const Tooly: React.FC = () => {
     modelId?: string;
   }>({});
 
+  // Keep ref in sync with selectedModel
+  useEffect(() => {
+    selectedModelRef.current = selectedModel?.modelId || null;
+  }, [selectedModel?.modelId]);
+
   // Listen for WebSocket progress updates
   useEffect(() => {
     const ws = new WebSocket('ws://localhost:3001');
+    
+    ws.onopen = () => {
+      console.log('[Tooly] WebSocket connected for progress updates');
+    };
     
     ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
         if (message.type === 'test_progress') {
           const { testType, modelId, current, total, currentTest, score, status } = message.data;
+          console.log('[Tooly] Progress:', testType, `${current}/${total}`, currentTest, status);
           setTestProgress(prev => ({
             ...prev,
             modelId,
-            [`${testType}Progress`]: { current, total, currentTest, score, status }
+            [`${testType}Progress`]: { current, total, currentTest, score: score ?? 0, status }
           }));
           
-          // Refresh model list when test completes
+          // Refresh model list and selected model profile when test completes
           if (status === 'completed') {
             setTimeout(() => {
               fetchModels();
-              if (modelId === selectedModel?.modelId) {
+              // Use ref to get current selected model ID
+              if (modelId === selectedModelRef.current) {
                 fetchModelProfile(modelId);
               }
             }, 500);
@@ -165,9 +177,13 @@ const Tooly: React.FC = () => {
         // Ignore parse errors
       }
     };
+    
+    ws.onerror = (e) => {
+      console.error('[Tooly] WebSocket error:', e);
+    };
 
     return () => ws.close();
-  }, [selectedModel?.modelId]);
+  }, []); // Empty dependency - stable connection
 
   // Persist filter selections to localStorage
   useEffect(() => {
