@@ -178,7 +178,7 @@ router.post('/models/:modelId/test', async (req, res) => {
       unloadOthersBefore: testMode !== 'manual',
       unloadAfterTest: testMode === 'quick',
       unloadOnlyOnFail: testMode === 'keep_on_success',
-      contextLength: settings.defaultContextLength || 8192
+      contextLength: 4096 // Minimal context for tool capability testing
     };
 
     console.log(`[Tooly] Running tests for ${modelId} with mode: ${testMode}`);
@@ -232,7 +232,7 @@ router.post('/models/:modelId/probe', async (req, res) => {
     console.log(`[Tooly] Running probe tests for ${modelId}`);
 
     const result = await probeEngine.runAllProbes(modelId, provider, testSettings, {
-      contextLength: settings.defaultContextLength || 8192,
+      contextLength: 2048, // Minimal context for behavioral probe testing
       timeout: 30000,
       runLatencyProfile
     });

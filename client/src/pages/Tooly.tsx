@@ -65,6 +65,7 @@ interface DiscoveredModel {
   totalTools?: number;
   role?: 'main' | 'executor' | 'both' | 'none';
   maxContextLength?: number;
+  sizeBytes?: number;
 }
 
 interface TestDefinition {
@@ -747,6 +748,12 @@ const Tooly: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
                               <span>{model.provider}</span>
+                              {model.sizeBytes && (
+                                <>
+                                  <span>•</span>
+                                  <span>{(model.sizeBytes / (1024 * 1024 * 1024)).toFixed(1)}GB</span>
+                                </>
+                              )}
                               {model.maxContextLength && (
                                 <>
                                   <span>•</span>
