@@ -6,6 +6,7 @@ const ServerStatus: React.FC = () => {
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [websocketStatus, setWebsocketStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [mcpStatus, setMcpStatus] = useState<'connected' | 'disconnected'>('disconnected');
+  const [lmstudioStatus, setLmstudioStatus] = useState<'connected' | 'disconnected'>('disconnected');
   const [isStarting, setIsStarting] = useState(false);
 
   // WebSocket connection
@@ -105,9 +106,11 @@ The server will run on: http://localhost:3001
   useEffect(() => {
     checkServerStatus();
     checkMcpStatus();
+    checkLmstudioStatus();
     const interval = setInterval(() => {
       checkServerStatus();
       checkMcpStatus();
+      checkLmstudioStatus();
     }, 5000); // Check every 5 seconds
     return () => clearInterval(interval);
   }, []);
@@ -118,6 +121,24 @@ The server will run on: http://localhost:3001
       setMcpStatus(res.data?.connected ? 'connected' : 'disconnected');
     } catch {
       setMcpStatus('disconnected');
+    }
+  };
+
+  const checkLmstudioStatus = async () => {
+    try {
+      // Check if LM Studio is reachable via the settings endpoint
+      const settingsRes = await axios.get('http://localhost:3001/api/settings', { timeout: 2000 });
+      const lmstudioUrl = settingsRes.data?.lmstudioUrl;
+      
+      if (lmstudioUrl) {
+        // Try to reach LM Studio directly
+        await axios.get(`${lmstudioUrl}/api/v0/models`, { timeout: 2000 });
+        setLmstudioStatus('connected');
+      } else {
+        setLmstudioStatus('disconnected');
+      }
+    } catch {
+      setLmstudioStatus('disconnected');
     }
   };
 
@@ -160,6 +181,18 @@ The server will run on: http://localhost:3001
           mcpStatus === 'connected' ? 'text-green-400' : 'text-gray-500'
         }`}>
           MCP
+        </span>
+      </div>
+
+      {/* LM Studio status */}
+      <div className="flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-[#2d2d2d]">
+        <div className={`w-1.5 h-1.5 rounded-full ${
+          lmstudioStatus === 'connected' ? 'bg-green-400' : 'bg-gray-500'
+        }`}></div>
+        <span className={`text-xs font-medium ${
+          lmstudioStatus === 'connected' ? 'text-green-400' : 'text-gray-500'
+        }`}>
+          LMS
         </span>
       </div>
 
