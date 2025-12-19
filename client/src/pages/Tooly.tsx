@@ -99,11 +99,17 @@ const Tooly: React.FC = () => {
   const [logs, setLogs] = useState<ExecutionLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [testingModel, setTestingModel] = useState<string | null>(null);
-  const [providerFilter, setProviderFilter] = useState<'all' | 'lmstudio' | 'openai' | 'azure'>('all');
+  const [providerFilter, setProviderFilter] = useState<'all' | 'lmstudio' | 'openai' | 'azure'>(() => {
+    const saved = localStorage.getItem('tooly_providerFilter');
+    return (saved as 'all' | 'lmstudio' | 'openai' | 'azure') || 'all';
+  });
   const [availableProviders, setAvailableProviders] = useState<{ lmstudio: boolean; openai: boolean; azure: boolean }>({
     lmstudio: false, openai: false, azure: false
   });
-  const [testMode, setTestMode] = useState<'quick' | 'keep_on_success' | 'manual'>('keep_on_success');
+  const [testMode, setTestMode] = useState<'quick' | 'keep_on_success' | 'manual'>(() => {
+    const saved = localStorage.getItem('tooly_testMode');
+    return (saved as 'quick' | 'keep_on_success' | 'manual') || 'keep_on_success';
+  });
   const [defaultContextLength, setDefaultContextLength] = useState<number>(8192);
   const [editingContextLength, setEditingContextLength] = useState<number | null>(null);
   const [probingModel, setProbingModel] = useState<string | null>(null);
@@ -120,6 +126,15 @@ const Tooly: React.FC = () => {
   const [mcpConnecting, setMcpConnecting] = useState(false);
   const [logStatusFilter, setLogStatusFilter] = useState<'all' | 'success' | 'failed' | 'timeout'>('all');
   const [logToolFilter, setLogToolFilter] = useState<string>('');
+
+  // Persist filter selections to localStorage
+  useEffect(() => {
+    localStorage.setItem('tooly_providerFilter', providerFilter);
+  }, [providerFilter]);
+
+  useEffect(() => {
+    localStorage.setItem('tooly_testMode', testMode);
+  }, [testMode]);
 
   // Fetch settings for default context length, proxy mode, and dual-model config
   const fetchSettings = async () => {
