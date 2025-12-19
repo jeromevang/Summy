@@ -861,30 +861,32 @@ const Tooly: React.FC = () => {
                     onClick={async () => {
                       if (!selectedModel) return;
                       
-                      // Initialize progress state so progress bars show immediately
+                      // Initialize progress state - server will send actual totals via WebSocket
                       setTestProgress({
                         modelId: selectedModel.modelId,
-                        probeProgress: { current: 0, total: 11, currentTest: 'Starting probe tests...', score: 0, status: 'running' }
+                        probeProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
                       });
                       
                       // Order: probe → reasoning → tools → latency
                       // 1. Run probe tests (includes reasoning) WITHOUT latency
                       await runProbeTests(selectedModel.modelId, selectedModel.provider, false);
                       
-                      // Update for tool tests
-                      setTestProgress({
-                        modelId: selectedModel.modelId,
-                        toolsProgress: { current: 0, total: 22, currentTest: 'Starting tool tests...', score: 0, status: 'running' }
-                      });
+                      // Update for tool tests - server will send actual totals
+                      setTestProgress(prev => ({
+                        ...prev,
+                        probeProgress: undefined,
+                        toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                      }));
                       
                       // 2. Run tool capability tests
                       await runModelTests(selectedModel.modelId, selectedModel.provider);
                       
-                      // Update for latency tests
-                      setTestProgress({
-                        modelId: selectedModel.modelId,
-                        latencyProgress: { current: 0, total: 7, currentTest: 'Starting latency tests...', status: 'running' }
-                      });
+                      // Update for latency tests - server will send actual totals
+                      setTestProgress(prev => ({
+                        ...prev,
+                        toolsProgress: undefined,
+                        latencyProgress: { current: 0, total: 1, currentTest: 'Initializing...', status: 'running' }
+                      }));
                       
                       // 3. Run latency profile last
                       try {
@@ -1251,9 +1253,10 @@ const Tooly: React.FC = () => {
                   <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => {
+                        // Initialize - server will send actual totals via WebSocket
                         setTestProgress({
                           modelId: selectedModel.modelId,
-                          probeProgress: { current: 0, total: 11, currentTest: 'Starting...', score: 0, status: 'running' }
+                          probeProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
                         });
                         runProbeTests(selectedModel.modelId, selectedModel.provider, true);
                       }}
@@ -1264,9 +1267,10 @@ const Tooly: React.FC = () => {
                     </button>
                     <button
                       onClick={() => {
+                        // Initialize - server will send actual totals via WebSocket
                         setTestProgress({
                           modelId: selectedModel.modelId,
-                          toolsProgress: { current: 0, total: 22, currentTest: 'Starting...', score: 0, status: 'running' }
+                          toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
                         });
                         runModelTests(selectedModel.modelId, selectedModel.provider);
                       }}
@@ -1277,9 +1281,10 @@ const Tooly: React.FC = () => {
                     </button>
                     <button
                       onClick={async () => {
+                        // Initialize - server will send actual totals via WebSocket
                         setTestProgress({
                           modelId: selectedModel.modelId,
-                          latencyProgress: { current: 0, total: 7, currentTest: 'Starting...', status: 'running' }
+                          latencyProgress: { current: 0, total: 1, currentTest: 'Initializing...', status: 'running' }
                         });
                         try {
                           await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/latency-profile`, {
