@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 // ============================================================
 // TYPES
@@ -143,9 +144,9 @@ const Tooly: React.FC = () => {
     selectedModelRef.current = selectedModel?.modelId || null;
   }, [selectedModel?.modelId]);
 
-  // Listen for WebSocket progress updates
+  // Listen for WebSocket progress updates with auto-reconnect
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3001');
+    const ws = new ReconnectingWebSocket('ws://localhost:3001');
     
     ws.onopen = () => {
       console.log('[Tooly] WebSocket connected for progress updates');
@@ -182,9 +183,13 @@ const Tooly: React.FC = () => {
     ws.onerror = (e) => {
       console.error('[Tooly] WebSocket error:', e);
     };
+    
+    ws.onclose = () => {
+      console.log('[Tooly] WebSocket closed, will auto-reconnect...');
+    };
 
     return () => ws.close();
-  }, []); // Empty dependency - stable connection
+  }, []); // Empty dependency - stable connection with auto-reconnect
 
   // Persist filter selections to localStorage
   useEffect(() => {
