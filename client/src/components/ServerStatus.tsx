@@ -126,17 +126,9 @@ The server will run on: http://localhost:3001
 
   const checkLmstudioStatus = async () => {
     try {
-      // Check if LM Studio is reachable via the settings endpoint
-      const settingsRes = await axios.get('http://localhost:3001/api/settings', { timeout: 2000 });
-      const lmstudioUrl = settingsRes.data?.lmstudioUrl;
-      
-      if (lmstudioUrl) {
-        // Try to reach LM Studio directly
-        await axios.get(`${lmstudioUrl}/api/v0/models`, { timeout: 2000 });
-        setLmstudioStatus('connected');
-      } else {
-        setLmstudioStatus('disconnected');
-      }
+      // Check LM Studio via backend SDK endpoint (no CORS issues)
+      const res = await axios.get('http://localhost:3001/api/lmstudio/status', { timeout: 3000 });
+      setLmstudioStatus(res.data?.connected ? 'connected' : 'disconnected');
     } catch {
       setLmstudioStatus('disconnected');
     }

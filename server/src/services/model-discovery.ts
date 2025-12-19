@@ -7,6 +7,7 @@ import axios from 'axios';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { LMStudioClient } from '@lmstudio/sdk';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,8 @@ export interface DiscoveredModel {
   error?: string;
   role?: 'main' | 'executor' | 'both' | 'none';
   maxContextLength?: number;
+  trainedForToolUse?: boolean;
+  vision?: boolean;
 }
 
 export interface ModelDiscoveryResult {
@@ -92,31 +95,30 @@ class ModelDiscoveryService {
   }
 
   /**
-   * Discover LM Studio models
-   * Uses /api/v0/models which provides max_context_length
+   * Discover LM Studio models using the SDK
+   * Returns maxContextLength, trainedForToolUse, and vision from model info
    */
   async discoverLMStudio(lmstudioUrl?: string): Promise<DiscoveredModel[]> {
+    // We still need lmstudioUrl to know if user has configured LM Studio
     if (!lmstudioUrl) return [];
 
     try {
-      // Use v0 API which returns max_context_length
-      const response = await axios.get(`${lmstudioUrl}/api/v0/models`, {
-        timeout: 5000
-      });
-
-      const rawModels = response.data?.data || [];
+      const client = new LMStudioClient();
+      
+      // Use SDK to list all downloaded LLM models
+      const rawModels = await client.system.listDownloadedModels("llm");
       
       // Deduplicate models - remove :2, :3, etc. suffixes if base model exists
-      const modelIds = new Set(rawModels.map((m: any) => m.id || m.name));
-      const filteredModels = rawModels.filter((model: any) => {
-        const modelId = model.id || model.name;
+      const modelKeys = new Set(rawModels.map(m => m.modelKey));
+      const filteredModels = rawModels.filter(model => {
+        const modelId = model.modelKey;
         
         // Check if this is a duplicate (ends with :N)
         const match = modelId.match(/^(.+):(\d+)$/);
         if (match) {
           const baseId = match[1];
           // If base model exists, skip this duplicate
-          if (modelIds.has(baseId)) {
+          if (modelKeys.has(baseId)) {
             console.log(`[ModelDiscovery] Skipping duplicate: ${modelId} (base: ${baseId})`);
             return false;
           }
@@ -127,12 +129,12 @@ class ModelDiscoveryService {
       const models: DiscoveredModel[] = [];
 
       for (const model of filteredModels) {
-        const modelId = model.id || model.name;
+        const modelId = model.modelKey;
         const profile = await this.loadModelProfile(modelId);
 
         models.push({
           id: modelId,
-          displayName: this.formatModelName(modelId),
+          displayName: model.displayName || this.formatModelName(modelId),
           provider: 'lmstudio',
           status: profile ? (profile.score >= 50 ? 'tested' : 'failed') : 'untested',
           score: profile?.score,
@@ -141,7 +143,9 @@ class ModelDiscoveryService {
           avgLatency: profile?.avgLatency,
           testedAt: profile?.testedAt,
           role: profile?.role,
-          maxContextLength: model.max_context_length
+          maxContextLength: model.maxContextLength,
+          trainedForToolUse: model.trainedForToolUse,
+          vision: model.vision
         });
       }
 
