@@ -1,0 +1,414 @@
+{
+  "modelId": "functionary-small-v3.2",
+  "displayName": "functionary-small-v3.2",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T14:08:49.024Z",
+  "testVersion": 2,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 406,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 805,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 2095,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 499,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 695,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 642,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 516,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 514,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 824,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 523,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 440,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 367,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 622,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 376,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 660,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 365,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 333,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 530,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1213,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 864,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 554,
+      "lastTested": "2025-12-19T14:08:49.024Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-mloy42ow5lgrmxr370qrg\",\"object\":\"chat.completion\",\"created\":1766153314,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"file_read{\\\"path\\\": \\\"config.json\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":113,\"completion_tokens\":9,\"total_tokens\":122},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-wvgxtn55s7jf8lsyojhf8u\",\"object\":\"chat.completion\",\"created\":1766153314,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"file_read{\\\"path\\\": \\\"src/utils/helpers.ts\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":112,\"completion_tokens\":11,\"total_tokens\":123},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-3kodm3cd6tkmu36u6oluqs\",\"object\":\"chat.completion\",\"created\":1766153314,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"file_write{\\\"path\\\": \\\"hello.js\\\", \\\"content\\\": \\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":141,\"completion_tokens\":20,\"total_tokens\":161},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ixhl76bcsh9oq67w6i3r\",\"object\":\"chat.completion\",\"created\":1766153315,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I can use the `file_patch` tool to modify specific content in a file, but I need to know the exact path of the file you're referring to. Could you please provide me with the complete path to the file? For example, if it's located on your desktop, you would say \\\"Desktop/app.js\\\". If it's somewhere else, please specif"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-y8azxmuau7nvvxy17olm\",\"object\":\"chat.completion\",\"created\":1766153317,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"file_list{\\\"folder\\\": \\\"src\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":106,\"completion_tokens\":8,\"total_tokens\":114},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-4lqtrpo39tno4n256fh74\",\"object\":\"chat.completion\",\"created\":1766153318,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"file_search{\\\"query\\\": \\\"TODO\\\", \\\"path\\\": \\\"/home/user/project\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":127,\"completion_tokens\":16,\"total_tokens\":143},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-cwekzw6pz0f8hc0vi73r1h\",\"object\":\"chat.completion\",\"created\":1766153319,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm sorry, but I can't retrieve information about the current state of a specific repository without knowing which one you're referring to. Could you please provide me with the name or URL of the repository?\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":82,\"completion_tokens\":4"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-2lqxbq6zu9u8tjkdi8j6kd\",\"object\":\"chat.completion\",\"created\":1766153319,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"git_diff{\\\"file\\\": \\\"index.js\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":106,\"completion_tokens\":9,\"total_tokens\":115},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-k5yb2nj4jomgkzbksjhq3r\",\"object\":\"chat.completion\",\"created\":1766153320,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"git_log --count=5\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":99,\"completion_tokens\":6,\"total_tokens\":105},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-cxlqpnkmuddo92u3t9ehx\",\"object\":\"chat.completion\",\"created\":1766153320,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":105,\"completion_tokens\":0,\"total_tokens\":105},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-e3t16uzugnd3j8kkxt3fg\",\"object\":\"chat.completion\",\"created\":1766153321,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":107,\"completion_tokens\":0,\"total_tokens\":107},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-928o64j1rcmbuwthhqbsa5\",\"object\":\"chat.completion\",\"created\":1766153321,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":102,\"completion_tokens\":0,\"total_tokens\":102},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-eulgbynagw74sc2onia5ev\",\"object\":\"chat.completion\",\"created\":1766153321,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":97,\"completion_tokens\":0,\"total_tokens\":97},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ncuzcsk39tb7l3oxh70m\",\"object\":\"chat.completion\",\"created\":1766153322,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm sorry, but I don't have the ability to fetch data from external sources like websites or APIs. My capabilities are limited to providing information and assistance based on my current knowledge and context. If you need help with something else, please let me know!\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-g6al2r7i1v5g1jcv4o5gpc\",\"object\":\"chat.completion\",\"created\":1766153323,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"browser_navigate, {\\\"url\\\": \\\"https://github.com\\\", \\\"clickSelector\\\": \\\"\\\", \\\"getContent\\\": true}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":144,\"completion_tokens\":23,\"total_tokens\":167},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-shcmccnzwzam1vf1yuliif\",\"object\":\"chat.completion\",\"created\":1766153324,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"create_new_file{\\\"path\\\": \\\"README.md\\\"}[/CREATE_FILE]\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":125,\"completion_tokens\":14,\"total_tokens\":139},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-umdgolvame6p8pwwicfts\",\"object\":\"chat.completion\",\"created\":1766153325,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"folder_create{\\\"path\\\": \\\"/components\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":103,\"completion_tokens\":8,\"total_tokens\":111},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-g5v0fdavoo56q4h7jol0gp\",\"object\":\"chat.completion\",\"created\":1766153325,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"folder_delete{\\\"path\\\": \\\"/home/user/temp\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":104,\"completion_tokens\":10,\"total_tokens\":114},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ew8qoknm70e4s9fvn37lj3\",\"object\":\"chat.completion\",\"created\":1766153326,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"git_add{\\\"file\\\": \\\"index.js\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":112,\"completion_tokens\":9,\"total_tokens\":121},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ap96y0lqr6l1t7plp7of1j\",\"object\":\"chat.completion\",\"created\":1766153326,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm sorry, but I can't perform actions like staging files or committing changes directly. My role is to provide information and assist you in using the tools available to you. If you need help with that, please let me know!\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":108,\"com"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-gkjg7yz6q47kfqw0w6crf\",\"object\":\"chat.completion\",\"created\":1766153327,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm sorry, but I can't retrieve information about branches for you at the moment. Please try again later.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":82,\"completion_tokens\":23,\"total_tokens\":105},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-x4p0qadsf2dthe4r8epya\",\"object\":\"chat.completion\",\"created\":1766153327,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"npm_uninstall{\\\"package\\\": \\\"axios\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":103,\"completion_tokens\":9,\"total_tokens\":112},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-1hl31381muzqs968v9xdzq\",\"object\":\"chat.completion\",\"created\":1766153328,\"model\":\"functionary-small-v3.2\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"run_python{\\\"code\\\": \\\"print('Hello World')\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":104,\"completion_tokens\":12,\"total_tokens\":116},\"stats\":{},\"system_fingerprint\":\"functionary-small-v3.2\"}"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T14:08:33.429Z",
+    "emitTest": {
+      "passed": true,
+      "score": 75,
+      "details": "XML format succeeded (OpenAI format failed: Model described the tool instead of calling it)"
+    },
+    "schemaTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 85,
+      "details": "No tool called, but response was: \"I am ready to assist you. Please provide me with t\""
+    },
+    "toolScore": 40,
+    "reasoningScore": 21,
+    "overallScore": 31,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 30,
+        "details": "Response contains invalid JSON"
+      },
+      "multiStepPlanning": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 20,
+        "details": "No JSON found"
+      },
+      "edgeCaseHandling": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "latencies": {
+      "2048": 77,
+      "4096": 72,
+      "8192": 73,
+      "16384": 72,
+      "32768": 74,
+      "65536": 73,
+      "131072": 434
+    },
+    "maxUsableContext": 131072,
+    "recommendedContext": 131072,
+    "modelMaxContext": 131072
+  },
+  "contextLength": 131072
+}

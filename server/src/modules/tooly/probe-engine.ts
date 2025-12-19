@@ -357,18 +357,18 @@ class ProbeEngine {
     };
 
     // Run tool behavior probes (1.x)
-    wsBroadcast.broadcastProgress('probe', modelId, { current: 0, total: totalTests, currentTest: 'Emit Test', status: 'running' });
+    wsBroadcast.broadcastProgress('probe', modelId, { current: 0, total: totalTests, currentTest: '🔬 Probe: Emit Test', status: 'running' });
     const emitTest = await this.runEmitTest(modelId, provider, settings, timeout);
-    broadcastProgress('Emit Test', emitTest.score);
+    broadcastProgress('🔬 Probe: Emit Test', emitTest.score);
     
     const schemaTest = await this.runSchemaAdherenceTest(modelId, provider, settings, timeout);
-    broadcastProgress('Schema Adherence', schemaTest.score);
+    broadcastProgress('🔬 Probe: Schema Adherence', schemaTest.score);
     
     const selectionTest = await this.runSelectionLogicTest(modelId, provider, settings, timeout);
-    broadcastProgress('Selection Logic', selectionTest.score);
+    broadcastProgress('🔬 Probe: Selection Logic', selectionTest.score);
     
     const suppressionTest = await this.runSuppressionTest(modelId, provider, settings, timeout);
-    broadcastProgress('Suppression', suppressionTest.score);
+    broadcastProgress('🔬 Probe: Suppression', suppressionTest.score);
 
     // Calculate tool score
     const toolScore = Math.round(
@@ -386,25 +386,25 @@ class ProbeEngine {
       console.log(`[ProbeEngine] Running reasoning probes for ${modelId}`);
       
       const intentExtraction = await this.runIntentExtractionTest(modelId, provider, settings, timeout);
-      broadcastProgress('Intent Extraction', intentExtraction.score);
+      broadcastProgress('🧠 Reasoning: Intent Extraction', intentExtraction.score);
       
       const multiStepPlanning = await this.runMultiStepPlanningTest(modelId, provider, settings, timeout);
-      broadcastProgress('Multi-step Planning', multiStepPlanning.score);
+      broadcastProgress('🧠 Reasoning: Multi-step Planning', multiStepPlanning.score);
       
       const conditionalReasoning = await this.runConditionalReasoningTest(modelId, provider, settings, timeout);
-      broadcastProgress('Conditional Reasoning', conditionalReasoning.score);
+      broadcastProgress('🧠 Reasoning: Conditional', conditionalReasoning.score);
       
       const contextContinuity = await this.runContextContinuityTest(modelId, provider, settings, timeout);
-      broadcastProgress('Context Continuity', contextContinuity.score);
+      broadcastProgress('🧠 Reasoning: Context Continuity', contextContinuity.score);
       
       const logicalConsistency = await this.runLogicalConsistencyTest(modelId, provider, settings, timeout);
-      broadcastProgress('Logical Consistency', logicalConsistency.score);
+      broadcastProgress('🧠 Reasoning: Logical Consistency', logicalConsistency.score);
       
       const explanation = await this.runExplanationTest(modelId, provider, settings, timeout);
-      broadcastProgress('Explanation', explanation.score);
+      broadcastProgress('🧠 Reasoning: Explanation', explanation.score);
       
       const edgeCaseHandling = await this.runEdgeCaseHandlingTest(modelId, provider, settings, timeout);
-      broadcastProgress('Edge Case Handling', edgeCaseHandling.score);
+      broadcastProgress('🧠 Reasoning: Edge Case', edgeCaseHandling.score);
 
       reasoningProbes = {
         intentExtraction,
@@ -1216,6 +1216,21 @@ Do NOT output any text outside the JSON.`
       const latency = Date.now() - startTime;
       const content = response?.choices?.[0]?.message?.content || '';
 
+      // Check for bad output (loops, leaked tokens)
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'intent_extraction',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping 
+            ? 'Model stuck in repetition loop' 
+            : `Leaked control tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
+
       // Try to parse JSON from response
       try {
         const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -1316,6 +1331,21 @@ Do NOT output any text outside the JSON array.`
       const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
       const latency = Date.now() - startTime;
       const content = response?.choices?.[0]?.message?.content || '';
+
+      // Check for bad output (loops, leaked tokens)
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'multi_step_planning',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping 
+            ? 'Model stuck in repetition loop' 
+            : `Leaked control tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
 
       try {
         const jsonMatch = content.match(/\[[\s\S]*\]/);
@@ -1418,6 +1448,21 @@ Do NOT output any text outside the JSON.`
       const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
       const latency = Date.now() - startTime;
       const content = response?.choices?.[0]?.message?.content || '';
+
+      // Check for bad output (loops, leaked tokens)
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'conditional_reasoning',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping 
+            ? 'Model stuck in repetition loop' 
+            : `Leaked control tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
 
       try {
         const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -1529,6 +1574,21 @@ Do NOT output any text outside the JSON.`
       const latency = Date.now() - startTime;
       const content = response?.choices?.[0]?.message?.content || '';
 
+      // Check for bad output (loops, leaked tokens)
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'context_continuity',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping 
+            ? 'Model stuck in repetition loop' 
+            : `Leaked control tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
+
       try {
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
@@ -1634,6 +1694,21 @@ Otherwise output the action as JSON.`
       const latency = Date.now() - startTime;
       const content = response?.choices?.[0]?.message?.content || '';
 
+      // Check for bad output (loops, leaked tokens)
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'logical_consistency',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping 
+            ? 'Model stuck in repetition loop' 
+            : `Leaked control tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
+
       // Check if model identified the conflict
       const mentionsConflict = content.toLowerCase().includes('conflict') ||
                                content.toLowerCase().includes('cannot') ||
@@ -1724,6 +1799,21 @@ Otherwise output the action as JSON.`
       const response = await this.callLLMNoTools(modelId, provider, messages, settings, timeout);
       const latency = Date.now() - startTime;
       const content = response?.choices?.[0]?.message?.content || '';
+
+      // Check for bad output (loops, leaked tokens)
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'explanation',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping 
+            ? 'Model stuck in repetition loop' 
+            : `Leaked control tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
 
       try {
         const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -1825,6 +1915,21 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
       const latency = Date.now() - startTime;
       const content = response?.choices?.[0]?.message?.content || '';
 
+      // Check for bad output (loops, leaked tokens)
+      const badOutput = detectBadOutput(content);
+      if (badOutput.isLooping || badOutput.hasLeakedTokens) {
+        return {
+          testName: 'edge_case_handling',
+          passed: false,
+          score: 0,
+          latency,
+          details: badOutput.isLooping 
+            ? 'Model stuck in repetition loop' 
+            : `Leaked control tokens: ${badOutput.leakedTokens.slice(0, 3).join(', ')}`,
+          response
+        };
+      }
+
       // Check if model addresses the edge case
       const addressesEdgeCase = content.toLowerCase().includes('not exist') ||
                                 content.toLowerCase().includes('create') ||
@@ -1910,13 +2015,16 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     let headers: Record<string, string> = { 'Content-Type': 'application/json' };
     let body: any = {
       messages,
-      temperature: 0
+      temperature: 0,
+      max_tokens: 800  // Slightly higher for reasoning tests (need more output)
     };
 
     switch (provider) {
       case 'lmstudio':
         url = `${settings.lmstudioUrl}/v1/chat/completions`;
         body.model = modelId;
+        // Add stop strings to prevent loops and leaked control tokens
+        body.stop = COMMON_STOP_STRINGS;
         break;
 
       case 'openai':
