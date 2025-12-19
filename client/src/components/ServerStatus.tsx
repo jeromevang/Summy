@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const ServerStatus: React.FC = () => {
@@ -9,29 +8,37 @@ const ServerStatus: React.FC = () => {
   const [lmstudioStatus, setLmstudioStatus] = useState<'connected' | 'disconnected'>('disconnected');
   const [isStarting, setIsStarting] = useState(false);
 
-  // WebSocket connection
+  // All status updates come via WebSocket - no polling!
   useEffect(() => {
     const ws = new ReconnectingWebSocket('ws://localhost:3001');
 
     ws.onopen = () => {
       setWebsocketStatus('connected');
+      setServerStatus('online');
     };
 
     ws.onclose = () => {
       setWebsocketStatus('disconnected');
+      setServerStatus('offline');
+      setMcpStatus('disconnected');
+      setLmstudioStatus('disconnected');
     };
 
     ws.onerror = () => {
       setWebsocketStatus('disconnected');
+      setServerStatus('offline');
     };
 
     ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
         if (message.type === 'status') {
-          // Server sends connection status
-          setWebsocketStatus(message.data.websocket === 'connected' ? 'connected' : 'disconnected');
-          setServerStatus(message.data.server === 'online' ? 'online' : 'offline');
+          const data = message.data;
+          // Update all status from WebSocket message
+          setServerStatus(data.server === 'online' ? 'online' : 'offline');
+          setWebsocketStatus(data.websocket === 'connected' ? 'connected' : 'disconnected');
+          setMcpStatus(data.mcp === 'connected' ? 'connected' : 'disconnected');
+          setLmstudioStatus(data.lmstudio === 'connected' ? 'connected' : 'disconnected');
         }
       } catch (error) {
         console.error('Failed to parse WebSocket message:', error);
@@ -43,19 +50,9 @@ const ServerStatus: React.FC = () => {
     };
   }, []);
 
-  const checkServerStatus = async () => {
-    try {
-      await axios.get('http://localhost:3001/health', { timeout: 2000 });
-      setServerStatus('online');
-    } catch {
-      setServerStatus('offline');
-    }
-  };
-
   const startServer = async () => {
     setIsStarting(true);
     try {
-      // Show clear instructions since browser can't start system processes
       const instructions = `
 To start the server, open a new terminal and run one of these commands:
 
@@ -75,62 +72,11 @@ Then refresh this page to see the server status change to Online.
 The server will run on: http://localhost:3001
       `.trim();
 
-      // Create a simple dialog with copyable commands
-      if (window.confirm) {
-        alert(instructions);
-      } else {
-        // Fallback for browsers without confirm
-        alert('Open a terminal in your Summy project folder and run:\n\ncd server && npm run dev\n\nThen refresh this page.');
-      }
+      alert(instructions);
     } catch (error) {
       console.error('Failed to show start instructions:', error);
     } finally {
       setIsStarting(false);
-    }
-  };
-
-  const stopServer = async () => {
-    try {
-      const confirmed = confirm(
-        'This will kill all Node.js processes. Make sure to save your work first.\n\nContinue?'
-      );
-
-      if (confirmed) {
-        alert('Run this command in a terminal to stop all Node processes:\n\nnpm run kill\n\nOr manually: taskkill /F /IM node.exe /T');
-      }
-    } catch (error) {
-      console.error('Failed to stop server:', error);
-    }
-  };
-
-  useEffect(() => {
-    checkServerStatus();
-    checkMcpStatus();
-    checkLmstudioStatus();
-    const interval = setInterval(() => {
-      checkServerStatus();
-      checkMcpStatus();
-      checkLmstudioStatus();
-    }, 5000); // Check every 5 seconds
-    return () => clearInterval(interval);
-  }, []);
-
-  const checkMcpStatus = async () => {
-    try {
-      const res = await axios.get('http://localhost:3001/api/tooly/mcp/status', { timeout: 2000 });
-      setMcpStatus(res.data?.connected ? 'connected' : 'disconnected');
-    } catch {
-      setMcpStatus('disconnected');
-    }
-  };
-
-  const checkLmstudioStatus = async () => {
-    try {
-      // Check LM Studio via backend SDK endpoint (no CORS issues)
-      const res = await axios.get('http://localhost:3001/api/lmstudio/status', { timeout: 3000 });
-      setLmstudioStatus(res.data?.connected ? 'connected' : 'disconnected');
-    } catch {
-      setLmstudioStatus('disconnected');
     }
   };
 
