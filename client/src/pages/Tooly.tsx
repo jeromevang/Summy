@@ -165,14 +165,19 @@ const Tooly: React.FC = () => {
     ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
+        console.log('[Tooly] WS message received:', message.type, message.data?.testType, message.data?.current, message.data?.total);
         if (message.type === 'test_progress') {
           const { testType, modelId, current, total, currentTest, score, status } = message.data;
-          console.log('[Tooly] Progress:', testType, `${current}/${total}`, currentTest, status);
-          setTestProgress(prev => ({
-            ...prev,
-            modelId,
-            [`${testType}Progress`]: { current, total, currentTest, score: score ?? 0, status }
-          }));
+          console.log('[Tooly] Progress update:', testType, `${current}/${total}`, currentTest, status, 'score:', score);
+          setTestProgress(prev => {
+            const newState = {
+              ...prev,
+              modelId,
+              [`${testType}Progress`]: { current, total, currentTest, score: score ?? 0, status }
+            };
+            console.log('[Tooly] New testProgress state:', newState);
+            return newState;
+          });
           
           // Refresh model list and selected model profile when test completes
           if (status === 'completed') {

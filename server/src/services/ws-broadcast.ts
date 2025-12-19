@@ -43,6 +43,7 @@ class WSBroadcastService {
     score?: number;
     status?: 'running' | 'completed' | 'failed';
   }) {
+    console.log(`[WSBroadcast] Progress: ${testType} ${progress.current}/${progress.total} - ${progress.currentTest} (clients: ${this.clients.size})`);
     this.broadcast('test_progress', {
       testType,
       modelId,
