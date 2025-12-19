@@ -815,8 +815,8 @@ const Tooly: React.FC = () => {
                   <button
                     onClick={async () => {
                       if (!selectedModel) return;
-                      // Run probe tests (includes reasoning)
-                      await runProbeTests(selectedModel.modelId, selectedModel.provider);
+                      // Run probe tests (includes reasoning) with latency profile
+                      await runProbeTests(selectedModel.modelId, selectedModel.provider, true);
                       // Run tool tests
                       await runModelTests(selectedModel.modelId, selectedModel.provider);
                     }}
