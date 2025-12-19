@@ -1,0 +1,377 @@
+{
+  "modelId": "llama-2-7b-chat-hf-function-calling-v2",
+  "displayName": "llama-2-7b-chat-hf-function-calling-v2",
+  "provider": "lmstudio",
+  "testedAt": "2025-12-19T14:58:06.413Z",
+  "testVersion": 2,
+  "score": 0,
+  "toolFormat": "openai_tools",
+  "capabilities": {
+    "file_read": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "file_write": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "file_patch": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "file_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "file_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "create_new_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "folder_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "folder_delete": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "git_diff": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "git_log": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "git_commit": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "git_add": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "git_branch_create": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "npm_run": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "npm_install": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "npm_uninstall": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "http_request": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "browser_navigate": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "run_python": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "lastTested": "2025-12-19T14:58:06.413Z"
+    },
+    "mcp_rules": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 0
+    }
+  },
+  "enabledTools": [],
+  "testResults": [
+    {
+      "testId": "file_read_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_read_nested",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_write_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_patch_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_list_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "file_search_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "error": "Request failed with status code 400"
+    }
+  ],
+  "probeResults": {
+    "testedAt": "2025-12-19T14:58:03.871Z",
+    "emitTest": {
+      "passed": false,
+      "score": 0,
+      "details": "OpenAI format test failed"
+    },
+    "schemaTest": {
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
+    },
+    "selectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
+    },
+    "suppressionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
+    },
+    "toolScore": 0,
+    "reasoningScore": 0,
+    "overallScore": 0,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "multiStepPlanning": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "contextContinuity": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      },
+      "edgeCaseHandling": {
+        "passed": false,
+        "score": 0,
+        "details": "Test failed"
+      }
+    }
+  },
+  "role": "none",
+  "contextLatency": {
+    "testedContextSizes": [],
+    "latencies": {},
+    "maxUsableContext": 2048,
+    "recommendedContext": 2048,
+    "modelMaxContext": 4096
+  },
+  "contextLength": 2048
+}

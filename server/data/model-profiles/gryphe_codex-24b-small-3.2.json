@@ -406,5 +406,23 @@
       }
     }
   },
-  "role": "executor"
+  "role": "executor",
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384
+    ],
+    "latencies": {
+      "2048": 2248,
+      "4096": 2338,
+      "8192": 2291,
+      "16384": 2296
+    },
+    "maxUsableContext": 16384,
+    "recommendedContext": 16384,
+    "modelMaxContext": 131072
+  },
+  "contextLength": 16384
 }

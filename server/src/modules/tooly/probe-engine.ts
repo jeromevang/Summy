@@ -79,6 +79,9 @@ export interface ContextLatencyResult {
   maxUsableContext: number;           // Largest context under 30s
   recommendedContext: number;         // Suggested context size
   modelMaxContext?: number;           // Model's reported max context (if available)
+  minLatency?: number;                // Fastest response time observed (ms)
+  isInteractiveSpeed: boolean;        // true if minLatency < 5s (good for IDE use)
+  speedRating: 'excellent' | 'good' | 'acceptable' | 'slow' | 'very_slow';
 }
 
 export interface ProbeOptions {
@@ -2220,11 +2223,31 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     // Recommended context is the largest usable one
     const recommendedContext = maxUsableContext;
 
+    // Calculate speed metrics
+    const latencyValues = Object.values(latencies);
+    const minLatency = latencyValues.length > 0 ? Math.min(...latencyValues) : undefined;
+    
+    // Speed thresholds for interactive IDE use
+    const EXCELLENT_THRESHOLD = 500;    // < 500ms - feels instant
+    const GOOD_THRESHOLD = 2000;        // < 2s - interactive
+    const ACCEPTABLE_THRESHOLD = 5000;  // < 5s - comfortable
+    const SLOW_THRESHOLD = 10000;       // < 10s - noticeable lag
+    
+    const isInteractiveSpeed = minLatency !== undefined && minLatency < ACCEPTABLE_THRESHOLD;
+    
+    let speedRating: 'excellent' | 'good' | 'acceptable' | 'slow' | 'very_slow' = 'very_slow';
+    if (minLatency !== undefined) {
+      if (minLatency < EXCELLENT_THRESHOLD) speedRating = 'excellent';
+      else if (minLatency < GOOD_THRESHOLD) speedRating = 'good';
+      else if (minLatency < ACCEPTABLE_THRESHOLD) speedRating = 'acceptable';
+      else if (minLatency < SLOW_THRESHOLD) speedRating = 'slow';
+    }
+
     // Broadcast completion
     wsBroadcast.broadcastProgress('latency', modelId, {
       current: completedTests,
       total: contextSizes.length,
-      currentTest: `Recommended: ${recommendedContext / 1024}K`,
+      currentTest: `Recommended: ${recommendedContext / 1024}K (${speedRating})`,
       status: 'completed'
     });
 
@@ -2233,7 +2256,10 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
       latencies,
       maxUsableContext,
       recommendedContext,
-      modelMaxContext
+      modelMaxContext,
+      minLatency,
+      isInteractiveSpeed,
+      speedRating
     };
   }
 
