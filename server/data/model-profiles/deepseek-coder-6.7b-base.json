@@ -2,164 +2,178 @@
   "modelId": "deepseek-coder-6.7b-base",
   "displayName": "deepseek-coder-6.7b-base",
   "provider": "lmstudio",
-  "testedAt": "2025-12-18T22:57:48.428Z",
-  "testVersion": 3,
-  "score": 73,
+  "testedAt": "2025-12-19T15:41:11.609Z",
+  "testVersion": 4,
+  "score": 71,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
-      "supported": false,
-      "score": 50,
-      "testsPassed": 1,
-      "testsFailed": 1,
-      "avgLatency": 207.5,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 2283.5,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "file_write": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 496,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 701,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "file_patch": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1725,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 1762,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "file_list": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 396,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 509,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "file_search": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 428,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 569,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "create_new_file": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 537,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "folder_create": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 75,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 456,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "folder_delete": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 576,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "git_status": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 412,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 442,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 381,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 493,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 384,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 476,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 379,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 495,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "git_add": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "supported": true,
+      "score": 88,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 447.5,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 416,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 543,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "git_branch_list": {
       "supported": false,
-      "score": 0,
+      "score": 45,
       "testsPassed": 0,
-      "testsFailed": 0
+      "testsFailed": 1,
+      "avgLatency": 458,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "npm_run": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 208,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 216,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "npm_install": {
       "supported": true,
       "score": 75,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 389,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 493,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "npm_uninstall": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
-      "testsFailed": 0
+      "testsFailed": 1,
+      "avgLatency": 305,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 915,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 1083,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 778,
-      "lastTested": "2025-12-18T22:57:48.428Z"
+      "avgLatency": 912,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "run_python": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
-      "testsFailed": 0
+      "testsFailed": 1,
+      "avgLatency": 194,
+      "lastTested": "2025-12-19T15:41:11.609Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -169,12 +183,17 @@
     }
   },
   "enabledTools": [
+    "file_read",
     "file_write",
     "file_list",
     "file_search",
+    "create_new_file",
+    "folder_create",
+    "folder_delete",
     "git_diff",
     "git_log",
     "git_commit",
+    "git_add",
     "git_branch_create",
     "npm_install",
     "http_request",
@@ -183,93 +202,141 @@
   "testResults": [
     {
       "testId": "file_read_basic",
-      "passed": false,
-      "score": 0,
-      "error": "timeout of 60000ms exceeded"
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-qdrzyvg2dqoyniztz9psm\",\"object\":\"chat.completion\",\"created\":1766158854,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n### Response:\\n[TOOL_RESULT]\\n{\\n  \\\"name\\\": \\\"config.json\\\",\\n  \\\"content\\\": {\\n    \\\"type\\\": \\\"object\\\",\\n    \\\"properties\\\": {\\n      \\\"apiKey\\\": {\\n        \\\"type\\\": \\\"string\\\"\\n      },\\n      \\\"apiSecret\\\": {\\n        \\\"type\\\": \\\"string\\\"\\n      }\\n    },\\n    \\\"required\\\": [\\n      \\\"apiKey\\\",\\n      \\\""
     },
     {
       "testId": "file_read_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-d0y0otoul3pm3rr8saqws\",\"object\":\"chat.completion\",\"created\":1766098660,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"938730426\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":496,\"completion_tokens\":47,\"total_tokens\":543},\"stats\":{},\"system_fingerprint\":\"deepseek-cod"
+      "response": "{\"id\":\"chatcmpl-j6u071wn0gcgf9q4zbmq6\",\"object\":\"chat.completion\",\"created\":1766158858,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"164737341\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":496,\"completion_tokens\":47,\"total_tokens\":543},\"stats\":{},\"system_fingerprint\":\"deepseek-cod"
     },
     {
       "testId": "file_write_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-ob4aczx88jl3fcpdmyp1vy\",\"object\":\"chat.completion\",\"created\":1766098661,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"717169868\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":540,\"completion_tokens\":50,\"total_tokens\":590},\"stats\":{},\"syst"
+      "response": "{\"id\":\"chatcmpl-qcxpoc7sagdu6ndb379un\",\"object\":\"chat.completion\",\"created\":1766158859,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"573971156\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":540,\"completion_tokens\":50,\"total_tokens\":590},\"stats\":{},\"syste"
     },
     {
       "testId": "file_patch_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-omntoeypxq80fuv5vfazp\",\"object\":\"chat.completion\",\"created\":1766098661,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n[TOOL_RESULT]\\n{\\n   \\\"type\\\":  \\\"function\\\",\\n   \\\"function\\\":  {\\n     \\\"name\\\":  \\\"file_patch\\\",\\n     \\\"description\\\":  \\\"Modify specific content in a file\\\",\\n     \\\"parameters\\\":  {\\n       \\\"type\\\":  \\\"object\\\",\\n       \\\"properties\\\":  {\\n         \\\"path\\\":  {\\n           \\\"type\\\":  \\\"string\\\",\\n     "
+      "response": "{\"id\":\"chatcmpl-5gvi4o6700pc86pg9ijlr\",\"object\":\"chat.completion\",\"created\":1766158860,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n[TOOL_RESULT]\\n{\\n   \\\"type\\\":  \\\"function\\\",\\n   \\\"function\\\":  {\\n     \\\"name\\\":  \\\"file_patch\\\",\\n     \\\"description\\\":  \\\"Modify specific content in a file\\\",\\n     \\\"parameters\\\":  {\\n       \\\"type\\\":  \\\"object\\\",\\n       \\\"properties\\\":  {\\n         \\\"path\\\":  {\\n           \\\"type\\\":  \\\"string\\\",\\n     "
     },
     {
       "testId": "file_list_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-lhnajyjeqeo738xnha74\",\"object\":\"chat.completion\",\"created\":1766098663,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"188707430\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":479,\"completion_tokens\":40,\"total_tokens\":519},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+      "response": "{\"id\":\"chatcmpl-wze3j7ndsbp4v22pa2x1\",\"object\":\"chat.completion\",\"created\":1766158861,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"678416763\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":479,\"completion_tokens\":40,\"total_tokens\":519},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
     },
     {
       "testId": "file_search_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-nu516tv5tcfu8gvncup4b\",\"object\":\"chat.completion\",\"created\":1766098663,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"962776107\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\"./\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":523,\"completion_tokens\":41,\"total_tokens\":564},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b"
+      "response": "{\"id\":\"chatcmpl-rlst13cbj3h4vlxebwfr\",\"object\":\"chat.completion\",\"created\":1766158862,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"379819411\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\"./\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":523,\"completion_tokens\":41,\"total_tokens\":564},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-evdgk02tr5nunp2yk8age\",\"object\":\"chat.completion\",\"created\":1766098664,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\nOn branch master\\nYour branch is up to date with 'origin/master'.\\nnothing to commit, working tree clean\\n```\\n\\n## 2023-01-18\\n\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":440,\"completion_tokens\":44,\"total_tokens\":484},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-"
+      "response": "{\"id\":\"chatcmpl-bbe5z84uf1utenwfv9a7a\",\"object\":\"chat.completion\",\"created\":1766158863,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\nOn branch master\\nYour branch is up to date with 'origin/master'.\\nnothing to commit, working tree clean\\n```\\n\\n## 2023-01-18\\n\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":440,\"completion_tokens\":44,\"total_tokens\":484},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-hfg8pwlsnlh0t24lrxokg3\",\"object\":\"chat.completion\",\"created\":1766098664,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"933419372\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":482,\"completion_tokens\":38,\"total_tokens\":520},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+      "response": "{\"id\":\"chatcmpl-io0pbbq5x7mpi8d3cc69\",\"object\":\"chat.completion\",\"created\":1766158863,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"424794856\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":482,\"completion_tokens\":38,\"total_tokens\":520},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-nvtany8rbdkejiwogpf0bg\",\"object\":\"chat.completion\",\"created\":1766098664,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"775774842\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":474,\"completion_tokens\":39,\"total_tokens\":513},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+      "response": "{\"id\":\"chatcmpl-ucxw0m1uczbd6ppo581qq\",\"object\":\"chat.completion\",\"created\":1766158863,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"179812091\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":474,\"completion_tokens\":39,\"total_tokens\":513},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ss35k9q04batsl0u702dd\",\"object\":\"chat.completion\",\"created\":1766098665,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"854327762\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":487,\"completion_tokens\":38,\"total_tokens\":525},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\""
+      "response": "{\"id\":\"chatcmpl-zhe3jjbrf0ckmu0wynz89\",\"object\":\"chat.completion\",\"created\":1766158864,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"950618774\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":487,\"completion_tokens\":38,\"total_tokens\":525},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\""
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2ki4bk6nfu72fe03t4h8ma\",\"object\":\"chat.completion\",\"created\":1766098665,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"139669231\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":490,\"completion_tokens\":42,\"total_tokens\":532},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6"
+      "response": "{\"id\":\"chatcmpl-bg5kwbmu9g8uk3yyh46bh\",\"object\":\"chat.completion\",\"created\":1766158864,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"287026758\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":490,\"completion_tokens\":42,\"total_tokens\":532},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6."
     },
     {
       "testId": "npm_run_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-h0e714tat545x8yky9vf9w\",\"object\":\"chat.completion\",\"created\":1766098666,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\nnpm run build\\n```\\n\\n## Example 2\\n\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":484,\"completion_tokens\":15,\"total_tokens\":499},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+      "response": "{\"id\":\"chatcmpl-jyb6unpbi8gs11qgcdx3sm\",\"object\":\"chat.completion\",\"created\":1766158865,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\nnpm run build\\n```\\n\\n## Example 2\\n\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":484,\"completion_tokens\":15,\"total_tokens\":499},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
     },
     {
       "testId": "npm_install_basic",
       "passed": true,
       "score": 75,
-      "response": "{\"id\":\"chatcmpl-yzdjlk8min9uuogbhgfvp\",\"object\":\"chat.completion\",\"created\":1766098666,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"757354240\",\"function\":{\"name\":\"_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":478,\"completion_tokens\":40,\"total_tokens\":518},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base"
+      "response": "{\"id\":\"chatcmpl-ezcl7hi4zm7kgv6z3f1ld\",\"object\":\"chat.completion\",\"created\":1766158865,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"594056766\",\"function\":{\"name\":\"_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":478,\"completion_tokens\":40,\"total_tokens\":518},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base"
     },
     {
       "testId": "http_request_get",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-8zj1l2l61unmbs2j23q8m\",\"object\":\"chat.completion\",\"created\":1766098666,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n[TOOL_RESULT]\\n{\\\"status\\\": 200, \\\"body\\\": {\\\"users\\\": [{\\\"id\\\": 1, \\\"name\\\": \\\"John\\\"}, {\\\"id\\\": 2, \\\"name\\\": \\\"Jane\\\"}]}}\\n[END_TOOL_RESULT]\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"607923075\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},"
+      "response": "{\"id\":\"chatcmpl-cxvm5zx0kwniil8mzgrma\",\"object\":\"chat.completion\",\"created\":1766158866,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n[TOOL_RESULT]\\n{\\\"status\\\": 200, \\\"body\\\": {\\\"users\\\": [{\\\"id\\\": 1, \\\"name\\\": \\\"John\\\"}, {\\\"id\\\": 2, \\\"name\\\": \\\"Jane\\\"}]}}\\n[END_TOOL_RESULT]\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"993613245\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-is3a64uzsur4zagx0nk4gx\",\"object\":\"chat.completion\",\"created\":1766098667,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n[TOOL_RESULT]\\n<h1 class=\\\"p-name\\\">GitHub · Build software better, together.</h1>\\n[END_TOOL_RESULT]\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"569427040\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}]"
+      "response": "{\"id\":\"chatcmpl-r9p5iv6zsgqh5bjnjgjk\",\"object\":\"chat.completion\",\"created\":1766158867,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n[TOOL_RESULT]\\n<h1 class=\\\"p-name\\\">GitHub · Build software better, together.</h1>\\n[END_TOOL_RESULT]\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"433391514\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\""
+    },
+    {
+      "testId": "create_new_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-u67veb0n1chu7yk6c61uz\",\"object\":\"chat.completion\",\"created\":1766158868,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"218272557\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":521,\"completion_tokens\":41,\"total_tokens\":562},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+    },
+    {
+      "testId": "folder_create_basic",
+      "passed": true,
+      "score": 75,
+      "response": "{\"id\":\"chatcmpl-7wevp3grfjujhncc19209p\",\"object\":\"chat.completion\",\"created\":1766158868,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"321192073\",\"function\":{\"name\":\"../folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":483,\"completion_tokens\":36,\"total_tokens\":519},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base"
+    },
+    {
+      "testId": "folder_delete_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-owd71r5ffn46c5o0q0z4x\",\"object\":\"chat.completion\",\"created\":1766158869,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help you delete that folder. Here's how:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"212532460\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":484,\"completion_tokens\":52,\"total_tokens\":536},\"stats\":{},\"s"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-w0cv7gblqgt9ajfykalp\",\"object\":\"chat.completion\",\"created\":1766158869,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"966143738\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":496,\"completion_tokens\":38,\"total_tokens\":534},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+    },
+    {
+      "testId": "git_add_all",
+      "passed": true,
+      "score": 75,
+      "response": "{\"id\":\"chatcmpl-jtot5icd2albt6ixjok5jj\",\"object\":\"chat.completion\",\"created\":1766158870,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"814866217\",\"function\":{\"name\":\"_git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":490,\"completion_tokens\":39,\"total_tokens\":529},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-1wfvcwm9x64p75swyc7fgs\",\"object\":\"chat.completion\",\"created\":1766158870,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\n\\n```\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"113922889\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":441,\"completion_tokens\":38,\"total_tokens\":479},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-rthxeqrme5er8zdxq4h40k\",\"object\":\"chat.completion\",\"created\":1766158871,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```\\nnpm uninstall --save axios\\n```\\n\\n## 2023-01-18\\n\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":485,\"completion_tokens\":27,\"total_tokens\":512},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-bwe3gdpmta8rwv43q9sf2\",\"object\":\"chat.completion\",\"created\":1766158871,\"model\":\"deepseek-coder-6.7b-base\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"```python\\nprint(\\\"Hello World\\\")\\n```\\n\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":484,\"completion_tokens\":12,\"total_tokens\":496},\"stats\":{},\"system_fingerprint\":\"deepseek-coder-6.7b-base\"}"
     }
   ],
   "probeResults": {
@@ -364,14 +431,17 @@
       16384
     ],
     "latencies": {
-      "2048": 994,
-      "4096": 970,
-      "8192": 970,
-      "16384": 973
+      "2048": 1071,
+      "4096": 1077,
+      "8192": 1080,
+      "16384": 1074
     },
     "maxUsableContext": 16384,
     "recommendedContext": 16384,
-    "modelMaxContext": 16384
+    "modelMaxContext": 16384,
+    "minLatency": 1071,
+    "isInteractiveSpeed": true,
+    "speedRating": "good"
   },
   "contextLength": 16384
 }

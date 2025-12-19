@@ -45,6 +45,7 @@ interface ContextLatencyData {
   latencies: Record<number, number>;
   maxUsableContext: number;
   recommendedContext: number;
+  modelMaxContext?: number;
   minLatency?: number;
   isInteractiveSpeed?: boolean;
   speedRating?: 'excellent' | 'good' | 'acceptable' | 'slow' | 'very_slow';
@@ -151,6 +152,13 @@ const Tooly: React.FC = () => {
     modelId?: string;
   }>({});
 
+  // Model loading state
+  const [modelLoading, setModelLoading] = useState<{
+    modelId?: string;
+    status?: 'loading' | 'unloading' | 'loaded' | 'unloaded' | 'failed';
+    message?: string;
+  }>({});
+
   // Keep ref in sync with selectedModel
   useEffect(() => {
     selectedModelRef.current = selectedModel?.modelId || null;
@@ -190,6 +198,15 @@ const Tooly: React.FC = () => {
                 fetchModelProfile(modelId);
               }
             }, 500);
+          }
+        } else if (message.type === 'model_loading') {
+          const { modelId, status, message: loadMessage } = message.data;
+          console.log('[Tooly] Model loading:', modelId, status, loadMessage);
+          setModelLoading({ modelId, status, message: loadMessage });
+          
+          // Clear loading state after model is loaded/failed
+          if (status === 'loaded' || status === 'failed' || status === 'unloaded') {
+            setTimeout(() => setModelLoading({}), 2000);
           }
         }
       } catch (e) {
@@ -920,6 +937,21 @@ const Tooly: React.FC = () => {
                       : '🚀 Run All Tests'}
                   </button>
 
+                  {/* Model Loading Indicator */}
+                  {modelLoading.modelId === selectedModel.modelId && (modelLoading.status === 'loading' || modelLoading.status === 'unloading') && (
+                    <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="animate-spin h-5 w-5 border-2 border-yellow-500 border-t-transparent rounded-full" />
+                        <div>
+                          <span className="text-sm text-yellow-400">
+                            {modelLoading.status === 'loading' ? '📥 Loading Model...' : '📤 Unloading Model...'}
+                          </span>
+                          <p className="text-xs text-gray-500">{modelLoading.message}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Test Progress Bars */}
                   {(testProgress.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running') && (
                     <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
@@ -1160,6 +1192,13 @@ const Tooly: React.FC = () => {
                               {(parseInt(size) / 1024).toFixed(0)}K: {latency < 1000 ? `${latency}ms` : `${(latency / 1000).toFixed(1)}s`}
                             </span>
                           ))}
+                          {/* Show if test was stopped early due to timeout */}
+                          {selectedModel.contextLatency.modelMaxContext && 
+                           selectedModel.contextLatency.maxUsableContext < selectedModel.contextLatency.modelMaxContext && (
+                            <span className="px-2 py-0.5 text-xs rounded bg-red-500/20 text-red-400" title="Test stopped - exceeded 30s timeout">
+                              ⚠️ {(selectedModel.contextLatency.maxUsableContext / 1024).toFixed(0)}K+ timeout
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

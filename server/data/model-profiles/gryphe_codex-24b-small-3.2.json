@@ -344,7 +344,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T14:50:40.455Z",
+    "testedAt": "2025-12-19T16:07:11.441Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -364,6 +364,26 @@
       "passed": true,
       "score": 100,
       "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct: chose search_web for real-time data with appropriate query"
+    },
+    "multiToolEmitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: emitted 2 read_file calls with correct paths"
+    },
+    "argumentValidationTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: all types and nested structures correct"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 100,
     "reasoningScore": 90,
