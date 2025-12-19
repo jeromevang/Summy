@@ -34,6 +34,7 @@ export interface DiscoveredModel {
   trainedForToolUse?: boolean;
   vision?: boolean;
   sizeBytes?: number;
+  quantization?: string;
 }
 
 export interface ModelDiscoveryResult {
@@ -147,7 +148,8 @@ class ModelDiscoveryService {
           maxContextLength: model.maxContextLength,
           trainedForToolUse: model.trainedForToolUse,
           vision: model.vision,
-          sizeBytes: model.sizeBytes
+          sizeBytes: model.sizeBytes,
+          quantization: this.extractQuantization(modelId)
         });
       }
 
@@ -275,6 +277,38 @@ class ModelDiscoveryService {
       .replace(/-chat$/i, ' (Chat)')
       .replace(/-/g, ' ')
       .replace(/\b\w/g, l => l.toUpperCase());
+  }
+
+  /**
+   * Extract quantization level from model ID
+   * Common patterns: q4_k_m, iq2_m, q8_0, fp16, etc.
+   */
+  private extractQuantization(modelId: string): string | undefined {
+    // Common quantization patterns in model names
+    const quantPatterns = [
+      // IQ patterns (importance matrix quants)
+      /[_-](iq[1-4]_[a-z]+)/i,
+      // Standard Q patterns
+      /[_-](q[2-8]_[kms0-9_]+)/i,
+      /[_-](q[2-8]_[0-9]+)/i,
+      // FP patterns
+      /[_-](fp16|fp32|bf16)/i,
+      // Simple Q patterns
+      /[_-](q[2-8])/i,
+      // GGUF specific
+      /[_-](f16|f32)/i,
+    ];
+
+    const lowerModelId = modelId.toLowerCase();
+    
+    for (const pattern of quantPatterns) {
+      const match = lowerModelId.match(pattern);
+      if (match) {
+        return match[1].toUpperCase();
+      }
+    }
+    
+    return undefined;
   }
 
   /**
