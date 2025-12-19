@@ -91,6 +91,35 @@ export interface ProbeOptions {
 export type ToolFormat = 'openai' | 'xml' | 'none';
 
 // ============================================================
+// COMMON STOP STRINGS
+// These help prevent loops and leaked control tokens
+// ============================================================
+
+const COMMON_STOP_STRINGS = [
+  // ChatML
+  '<|im_end|>',
+  '<|im_start|>',
+  // Phi-style
+  '<|stop|>',
+  '<|end|>',
+  '<|recipient|>',
+  '<|from|>',
+  // Llama 3
+  '<|eot_id|>',
+  '<|end_header_id|>',
+  // Llama 2 / Mistral
+  '</s>',
+  '[/INST]',
+  // General
+  '<|endoftext|>',
+  // Prevent assistant loop
+  '\n\nUser:',
+  '\n\nHuman:',
+  '\nuser:',
+  '\nhuman:',
+];
+
+// ============================================================
 // BAD OUTPUT DETECTION
 // ============================================================
 
@@ -2089,13 +2118,19 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
     let headers: Record<string, string> = { 'Content-Type': 'application/json' };
     let body: any = {
       messages,
-      temperature: 0  // Always use temp 0 for deterministic testing
+      temperature: 0,  // Always use temp 0 for deterministic testing
+      max_tokens: 500  // Limit output to prevent runaway generation
     };
 
     // Only add tools if provided (for XML format, we don't send tools)
     if (tools && tools.length > 0) {
       body.tools = tools;
       body.tool_choice = 'auto';
+    }
+
+    // Add stop strings for LM Studio to prevent loops and leaked control tokens
+    if (provider === 'lmstudio') {
+      body.stop = COMMON_STOP_STRINGS;
     }
 
     switch (provider) {
