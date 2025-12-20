@@ -102,6 +102,8 @@ app.put('/api/rag/config', async (req: Request, res: Response) => {
   try {
     const updates = req.body;
     
+    console.log('[RAG Server] Updating config:', JSON.stringify(updates));
+    
     // Update config
     config = { 
       ...config, 
@@ -115,9 +117,14 @@ app.put('/api/rag/config', async (req: Request, res: Response) => {
     
     // Update embedder model if changed
     if (updates.lmstudio?.model) {
+      console.log('[RAG Server] Setting embedding model:', updates.lmstudio.model);
       const embedder = getLMStudioEmbedder();
       await embedder.setModel(updates.lmstudio.model);
     }
+    
+    // Update the indexer with new config (important for the model!)
+    indexer = getIndexer(config);
+    indexer.onProgress(broadcastProgress);
     
     // Restart file watcher if project changed
     if (updates.project?.path) {
@@ -265,9 +272,15 @@ app.post('/api/rag/query', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'query is required' });
     }
     
+    console.log(`[Query] Searching for: "${query}" (limit: ${limit})`);
     const startTime = Date.now();
     
     const results = await indexer.query(query, limit);
+    
+    console.log(`[Query] Got ${results.length} results from indexer`);
+    results.forEach((r, i) => {
+      console.log(`[Query] Result ${i}: chunk=${r.chunk ? 'yes' : 'null'}, score=${r.score.toFixed(4)}, file=${r.chunk?.filePath || 'N/A'}`);
+    });
     
     // Transform to RAGResult format
     const formattedResults: RAGResult[] = results
@@ -282,6 +295,8 @@ app.post('/api/rag/query', async (req: Request, res: Response) => {
         language: r.chunk!.language,
         score: r.score
       }));
+    
+    console.log(`[Query] Formatted ${formattedResults.length} results after filtering null chunks`);
     
     // Apply filters if provided
     let filteredResults = formattedResults;
@@ -327,18 +342,34 @@ app.get('/api/rag/chunks', async (req: Request, res: Response) => {
   try {
     const { page = '1', limit = '50', fileType, symbolType, search } = req.query;
     
-    // TODO: Get from database when connected
-    // For now, return empty
-    const chunks: any[] = [];
-    const total = 0;
+    const result = indexer.getChunks({
+      page: Number(page),
+      limit: Number(limit),
+      fileType: fileType as string,
+      symbolType: symbolType as string,
+      search: search as string
+    });
+    
+    // Map to format expected by frontend (preview instead of full content)
+    const chunks = result.chunks.map(c => ({
+      id: c.id,
+      filePath: c.filePath,
+      startLine: c.startLine,
+      endLine: c.endLine,
+      symbolName: c.symbolName,
+      symbolType: c.symbolType,
+      language: c.language,
+      tokens: c.tokens,
+      preview: c.content.substring(0, 200)
+    }));
     
     res.json({
       chunks,
       pagination: {
         page: Number(page),
         limit: Number(limit),
-        total,
-        pages: Math.ceil(total / Number(limit))
+        total: result.total,
+        pages: Math.ceil(result.total / Number(limit))
       }
     });
   } catch (error: any) {
@@ -351,8 +382,12 @@ app.get('/api/rag/chunks/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
-    // TODO: Fetch chunk from database
-    res.status(404).json({ error: 'Chunk not found' });
+    const chunk = indexer.getChunk(id);
+    if (!chunk) {
+      return res.status(404).json({ error: 'Chunk not found' });
+    }
+    
+    res.json(chunk);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

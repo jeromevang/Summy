@@ -9,6 +9,16 @@ export interface VectorSearchResult {
   chunkId: string;  // Reference to chunk in database
   score: number;    // Similarity score (higher is better)
   distance: number; // Distance (lower is better)
+  metadata?: {      // Optional metadata stored with the vector
+    content?: string;
+    filePath?: string;
+    startLine?: number;
+    endLine?: number;
+    symbolName?: string;
+    symbolType?: string;
+    language?: string;
+    signature?: string;
+  };
 }
 
 export interface VectorStore {

@@ -22,6 +22,19 @@ interface VectorMapping {
   chunkId: string;
 }
 
+// Chunk metadata stored with vectors
+export interface ChunkMetadata {
+  vectorId: number;
+  content?: string;
+  filePath?: string;
+  startLine?: number;
+  endLine?: number;
+  symbolName?: string;
+  symbolType?: string;
+  language?: string;
+  signature?: string;
+}
+
 export class HNSWLibStore implements VectorStore {
   name = 'vectra';
   dimensions = 0;
@@ -70,7 +83,7 @@ export class HNSWLibStore implements VectorStore {
   /**
    * Add a vector to the store
    */
-  async add(vector: number[], chunkId: string): Promise<number> {
+  async add(vector: number[], chunkId: string, metadata?: Partial<ChunkMetadata>): Promise<number> {
     if (!this.isReady || !this.index) {
       throw new Error('Store not initialized');
     }
@@ -92,7 +105,7 @@ export class HNSWLibStore implements VectorStore {
       await this.index.insertItem({
         id: chunkId,
         vector,
-        metadata: { vectorId: existingId }
+        metadata: { vectorId: existingId, ...metadata }
       });
       return existingId;
     }
@@ -102,7 +115,7 @@ export class HNSWLibStore implements VectorStore {
     await this.index.insertItem({
       id: chunkId,
       vector,
-      metadata: { vectorId }
+      metadata: { vectorId, ...metadata }
     });
     
     this.mappings.set(vectorId, chunkId);
@@ -134,10 +147,14 @@ export class HNSWLibStore implements VectorStore {
    */
   async search(queryVector: number[], k: number): Promise<VectorSearchResult[]> {
     if (!this.isReady || !this.index) {
+      console.log('[VectraStore] Search failed: Store not initialized');
       throw new Error('Store not initialized');
     }
     
+    console.log(`[VectraStore] Searching with k=${k}, store size=${this.size}, isReady=${this.isReady}`);
+    
     if (this.size === 0) {
+      console.log('[VectraStore] Search: Store is empty');
       return [];
     }
     
@@ -145,15 +162,30 @@ export class HNSWLibStore implements VectorStore {
     const actualK = Math.min(k, this.size);
     
     // Search using Vectra
+    console.log(`[VectraStore] Calling queryItems with actualK=${actualK}`);
     const results = await this.index.queryItems(queryVector, actualK);
+    console.log(`[VectraStore] Got ${results.length} raw results from Vectra`);
     
-    // Map results
-    const searchResults: VectorSearchResult[] = results.map(result => ({
-      id: result.item.metadata?.vectorId as number || 0,
-      chunkId: result.item.id,
-      distance: 1 - result.score, // Vectra returns cosine similarity, convert to distance
-      score: result.score
-    }));
+    // Map results with metadata
+    const searchResults: VectorSearchResult[] = results.map(result => {
+      const meta = result.item.metadata || {};
+      return {
+        id: meta.vectorId as number || 0,
+        chunkId: result.item.id,
+        distance: 1 - result.score, // Vectra returns cosine similarity, convert to distance
+        score: result.score,
+        metadata: {
+          content: meta.content as string | undefined,
+          filePath: meta.filePath as string | undefined,
+          startLine: meta.startLine as number | undefined,
+          endLine: meta.endLine as number | undefined,
+          symbolName: meta.symbolName as string | undefined,
+          symbolType: meta.symbolType as string | undefined,
+          language: meta.language as string | undefined,
+          signature: meta.signature as string | undefined
+        }
+      };
+    });
     
     return searchResults;
   }
@@ -249,13 +281,26 @@ export class HNSWLibStore implements VectorStore {
   async load(loadPath?: string): Promise<void> {
     const targetPath = loadPath || this.dataPath;
     
+    // Ensure directory exists
+    await fs.mkdir(targetPath, { recursive: true });
+    
+    // Initialize Vectra index first
+    this.index = new LocalIndex(targetPath);
+    
+    // Check if index exists, create if not
+    if (!await this.index.isIndexCreated()) {
+      console.log(`[VectraStore] Creating new index at ${targetPath}`);
+      await this.index.createIndex();
+    }
+    
     const mappingsPath = path.join(targetPath, 'mappings.json');
     
-    // Check if files exist
+    // Check if mappings file exists
     try {
       await fs.access(mappingsPath);
     } catch {
-      console.log(`[VectraStore] No existing index found at ${targetPath}`);
+      console.log(`[VectraStore] No existing mappings found at ${targetPath}, starting fresh`);
+      this.isReady = true;
       return;
     }
     
@@ -274,9 +319,6 @@ export class HNSWLibStore implements VectorStore {
       this.mappings.set(vectorId, chunkId);
       this.reverseMappings.set(chunkId, vectorId);
     }
-    
-    // Initialize Vectra index
-    this.index = new LocalIndex(targetPath);
     
     this.isReady = true;
     console.log(`[VectraStore] Loaded index from ${targetPath} (${this.size} vectors)`);
