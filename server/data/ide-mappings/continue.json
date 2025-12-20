@@ -1,0 +1,66 @@
+{
+  "ide": "Continue",
+  "version": "1.0.0",
+  "description": "VS Code Continue extension tool mappings",
+  "modelSuffix": "continue",
+  
+  "mappings": {
+    "read_file": {
+      "mcp": "read_file",
+      "params": {
+        "filepath": "path"
+      },
+      "description": "Read file contents"
+    },
+    "create_new_file": {
+      "mcp": "write_file",
+      "params": {
+        "filepath": "path",
+        "contents": "content"
+      },
+      "description": "Create a new file"
+    },
+    "edit_existing_file": {
+      "mcp": "edit_file",
+      "transform": "continueEditToMcpEdit",
+      "description": "Edit an existing file with find/replace"
+    },
+    "run_terminal_command": {
+      "mcp": "shell_exec",
+      "params": {
+        "command": "command"
+      },
+      "description": "Run a terminal command"
+    },
+    "ls": {
+      "mcp": "list_directory",
+      "params": {
+        "dirPath": "path"
+      },
+      "description": "List directory contents"
+    },
+    "grep": {
+      "mcp": "search_files",
+      "params": {
+        "pattern": "path",
+        "path": "regex"
+      },
+      "description": "Search for patterns in files"
+    }
+  },
+  
+  "ideOnly": {
+    "read_currently_open_file": {
+      "description": "Read the currently open file in editor (IDE handles)",
+      "action": "passthrough"
+    },
+    "create_rule_block": {
+      "description": "Create a Continue rule block (IDE handles)",
+      "action": "passthrough"
+    },
+    "view_diff": {
+      "description": "View diff in IDE (IDE handles)",
+      "action": "passthrough"
+    }
+  }
+}

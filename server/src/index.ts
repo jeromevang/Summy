@@ -18,6 +18,9 @@ import { mcpClient } from './modules/tooly/mcp-client.js';
 import { wsBroadcast } from './services/ws-broadcast.js';
 import { systemMetrics } from './services/system-metrics.js';
 import { modelManager } from './services/lmstudio-model-manager.js';
+import { ideMapping, type IDEMapping } from './services/ide-mapping.js';
+import { TOOL_SCHEMAS } from './modules/tooly/tool-prompts.js';
+import { ALL_TOOLS, capabilities } from './modules/tooly/capabilities.js';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -244,6 +247,7 @@ interface ContextSession {
   id: string;
   name: string;
   ide: string;
+  ideMapping?: string;  // IDE mapping identifier (e.g., 'continue', 'cursor')
   created: string;
   conversations: ConversationTurn[];
   originalSize?: number;
@@ -973,6 +977,72 @@ const proxyToOpenAI = async (req: any, res: any) => {
     const settings = await loadServerSettings();
     const requestedModel = req.body?.model || 'gpt-4o-mini';
     
+    // ========== IDE DETECTION AND TOOL MERGING ==========
+    // Parse model name to detect IDE (e.g., "gpt-4o-continue" -> ide: "continue")
+    const parsedModel = ideMapping.parseModelIDE(requestedModel);
+    const ideMappingConfig = await ideMapping.loadIDEMapping(parsedModel.ide);
+    
+    // Store IDE info in session for UI display
+    if (session && parsedModel.ide) {
+      session.ide = ideMappingConfig.ide;
+      session.ideMapping = parsedModel.ide;
+      await saveSession(session);
+    }
+    
+    // Get the actual model ID based on provider
+    const actualModelId = settings.provider === 'lmstudio' 
+      ? settings.lmstudioModel 
+      : settings.provider === 'azure'
+        ? settings.azureDeploymentName
+        : settings.openaiModel || parsedModel.baseModel;
+    
+    // Load model profile and get enabled tools
+    const modelProfile = actualModelId ? await capabilities.getProfile(actualModelId) : null;
+    const modelEnabledTools = modelProfile?.enabledTools?.length ? modelProfile.enabledTools : ALL_TOOLS;
+    
+    // Get the list of MCP tools to add (tools not covered by IDE)
+    const mcpToolsToAdd = ideMapping.getMCPToolsToAdd(modelEnabledTools, ideMappingConfig);
+    
+    // Build the existing tools array from request
+    let toolsToSend = req.body?.tools || [];
+    
+    // Add MCP extension tools that aren't covered by IDE
+    if (mcpToolsToAdd.length > 0) {
+      const existingToolNames = new Set(toolsToSend.map((t: any) => t.function?.name).filter(Boolean));
+      
+      for (const mcpTool of mcpToolsToAdd) {
+        // Only add if not already present and schema exists
+        if (!existingToolNames.has(mcpTool) && TOOL_SCHEMAS[mcpTool]) {
+          toolsToSend.push(TOOL_SCHEMAS[mcpTool]);
+        }
+      }
+      
+      addDebugEntry('request', `Added ${mcpToolsToAdd.length} MCP tools for ${ideMappingConfig.ide}`, {
+        ide: ideMappingConfig.ide,
+        mcpToolsAdded: mcpToolsToAdd.length,
+        totalTools: toolsToSend.length
+      });
+    }
+    
+    // Inject MCP tool descriptions into system prompt if needed
+    const mcpToolPrompt = ideMapping.buildUnifiedToolPrompt(modelEnabledTools, ideMappingConfig);
+    if (mcpToolPrompt && messagesToSend.length > 0) {
+      // Find system message and append MCP tool info
+      const systemMsgIndex = messagesToSend.findIndex((m: any) => m.role === 'system');
+      if (systemMsgIndex >= 0) {
+        messagesToSend[systemMsgIndex] = {
+          ...messagesToSend[systemMsgIndex],
+          content: messagesToSend[systemMsgIndex].content + '\n\n' + mcpToolPrompt
+        };
+      } else {
+        // No system message - add one
+        messagesToSend.unshift({
+          role: 'system',
+          content: mcpToolPrompt.trim()
+        });
+      }
+    }
+    
     // Use the configured provider from settings
     const effectiveProvider = settings.provider;
     
@@ -997,6 +1067,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
         ...req.body,
         model: lmstudioModel,
         messages: messagesToSend,
+        tools: toolsToSend.length > 0 ? toolsToSend : undefined,
         temperature: 0  // Always use temp 0 for deterministic output
       };
       
@@ -1076,6 +1147,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
       const modifiedBody = {
         ...req.body,
         messages: messagesToSend,
+        tools: toolsToSend.length > 0 ? toolsToSend : undefined,
         temperature: 0  // Always use temp 0 for deterministic output
       };
       // Remove 'model' from body as Azure uses deployment name in URL
@@ -1140,18 +1212,21 @@ const proxyToOpenAI = async (req: any, res: any) => {
     ];
     
     // Use settings.openaiModel if available, otherwise map or default
+    // Also use the base model (without IDE suffix) for OpenAI
     let actualModel: string;
-    if (knownOpenAIModels.some(m => requestedModel.startsWith(m))) {
-      actualModel = requestedModel;
+    const baseModel = parsedModel.baseModel;  // Model without IDE suffix
+    if (knownOpenAIModels.some(m => baseModel.startsWith(m))) {
+      actualModel = baseModel;
     } else {
       actualModel = settings.openaiModel || 'gpt-4o-mini';
     }
     
-    // Create modified request body with correct model and potentially compressed messages
+    // Create modified request body with correct model, compressed messages, and merged tools
     const modifiedBody = {
       ...req.body,
       model: actualModel,
       messages: messagesToSend,
+      tools: toolsToSend.length > 0 ? toolsToSend : undefined,
       temperature: 0  // Always use temp 0 for deterministic output
     };
 
@@ -1319,6 +1394,25 @@ app.delete('/api/sessions/:id', async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete session' });
+  }
+});
+
+// Delete ALL sessions
+app.delete('/api/sessions', async (req, res) => {
+  try {
+    const files = await fs.readdir(SESSIONS_DIR);
+    const jsonFiles = files.filter(f => f.endsWith('.json'));
+    
+    let deleted = 0;
+    for (const file of jsonFiles) {
+      await fs.remove(path.join(SESSIONS_DIR, file));
+      deleted++;
+    }
+    
+    addDebugEntry('session', `🗑️ Cleared all sessions: ${deleted} files deleted`, {});
+    res.json({ success: true, deleted });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to clear sessions' });
   }
 });
 
