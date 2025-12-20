@@ -19,6 +19,7 @@ import { defaultConfig, RAGConfig, IndexProgress, RAGResult, RAGMetrics } from '
 import { getIndexer, Indexer } from './services/indexer.js';
 import { getLMStudioEmbedder } from './embeddings/lmstudio.js';
 import { getHNSWLibStore } from './storage/hnswlib.js';
+import { initializeTokenizer } from './services/tokenizer.js';
 
 const app = express();
 
@@ -26,11 +27,47 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
+// Config file path
+const CONFIG_FILE = './data/rag-config.json';
+
 // Current configuration (loaded from file or defaults)
 let config: RAGConfig = { ...defaultConfig };
 
 // Services
 let indexer: Indexer;
+
+// Save config to disk
+async function saveConfig(): Promise<void> {
+  try {
+    await fs.mkdir('./data', { recursive: true });
+    await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2));
+    console.log('[RAG Server] Config saved to', CONFIG_FILE);
+  } catch (err) {
+    console.error('[RAG Server] Failed to save config:', err);
+  }
+}
+
+// Load config from disk
+async function loadConfig(): Promise<void> {
+  try {
+    const data = await fs.readFile(CONFIG_FILE, 'utf-8');
+    const savedConfig = JSON.parse(data);
+    config = {
+      ...defaultConfig,
+      ...savedConfig,
+      lmstudio: { ...defaultConfig.lmstudio, ...savedConfig.lmstudio },
+      storage: { ...defaultConfig.storage, ...savedConfig.storage },
+      indexing: { ...defaultConfig.indexing, ...savedConfig.indexing },
+      watcher: { ...defaultConfig.watcher, ...savedConfig.watcher },
+      project: { ...defaultConfig.project, ...savedConfig.project }
+    };
+    console.log('[RAG Server] Loaded config from', CONFIG_FILE);
+    console.log('[RAG Server] Embedding model:', config.lmstudio.model || 'not set');
+    console.log('[RAG Server] Project path:', config.project.path || 'not set');
+  } catch {
+    console.log('[RAG Server] No saved config found, using defaults');
+  }
+}
 
 // WebSocket clients for progress updates
 const wsClients: Set<WebSocket> = new Set();
@@ -57,6 +94,24 @@ function broadcast(type: string, data: any): void {
 
 // Initialize services
 async function initializeServices(): Promise<void> {
+  // Load saved config first
+  await loadConfig();
+  
+  // Initialize tokenizer for accurate token counting
+  console.log('[RAG Server] Initializing tokenizer...');
+  try {
+    await initializeTokenizer();
+    console.log('[RAG Server] Tokenizer ready');
+  } catch (error) {
+    console.warn('[RAG Server] Tokenizer initialization failed, using estimates:', error);
+  }
+  
+  // Set embedding model if configured
+  if (config.lmstudio.model) {
+    const embedder = getLMStudioEmbedder();
+    await embedder.setModel(config.lmstudio.model);
+  }
+  
   indexer = getIndexer(config);
   indexer.onProgress(broadcastProgress);
   
@@ -134,7 +189,8 @@ app.put('/api/rag/config', async (req: Request, res: Response) => {
       }
     }
     
-    // TODO: Save config to file
+    // Save config to file
+    await saveConfig();
     
     res.json({ success: true, config });
   } catch (error: any) {
@@ -201,12 +257,13 @@ app.post('/api/rag/index', async (req: Request, res: Response) => {
     
     // Update config with new project path
     config.project.path = projectPath;
+    await saveConfig();
     
     // Start indexing in background
     res.json({ success: true, message: 'Indexing started' });
     
     // Run indexing asynchronously
-    indexer.indexProject(projectPath).then(result => {
+    indexer.indexProject(projectPath).then(async result => {
       console.log('[RAG Server] Indexing completed:', result);
       
       // Start file watcher
