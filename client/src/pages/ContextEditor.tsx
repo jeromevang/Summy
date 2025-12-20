@@ -1215,9 +1215,12 @@ Rules:
   );
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   
-  // View mode: 'messages' = flat message view, 'timeline' = turn-based timeline view
-  const [viewMode, setViewMode] = useState<'messages' | 'timeline'>('timeline');
+  // View mode: 'timeline' = turn-based, 'messages' = source view, 'data' = raw JSON
+  const [viewMode, setViewMode] = useState<'messages' | 'timeline' | 'data'>('timeline');
   const [expandedTurns, setExpandedTurns] = useState<Set<string>>(new Set());
+  
+  // Selected turn for Source View (1-indexed, 0 = latest)
+  const [selectedTurn, setSelectedTurn] = useState<number>(0);
   
   // Toggle turn expansion
   const toggleTurn = (turnId: string) => {
@@ -1348,6 +1351,7 @@ Rules:
       setSystemPrompt(session.compression.systemPrompt);
     }
   }, [session?.compression?.systemPrompt]);
+  
 
   // Extract keywords when session loads
   useEffect(() => {
@@ -1429,56 +1433,69 @@ Rules:
     return turn.response?.choices?.[0]?.message?.content || '';
   };
 
-  // Get RAW source messages - exactly what's in the API context, no filtering
+  // Get the effective turn index (0 means latest)
+  const getEffectiveTurnIndex = (): number => {
+    if (!session?.conversations.length) return 0;
+    return selectedTurn === 0 ? session.conversations.length : selectedTurn;
+  };
+  
+  // Get RAW source messages for a specific turn
   const getRawSourceMessages = (): any[] => {
-    if (!session) return [];
+    if (!session?.conversations.length) return [];
+    
+    const turnIdx = getEffectiveTurnIndex();
+    const turn = session.conversations[turnIdx - 1]; // Convert to 0-indexed
+    if (!turn) return [];
+    
     const messages: any[] = [];
     
-    for (const turn of session.conversations) {
-      // Add ALL request messages exactly as they are
-      if (turn.request?.messages) {
-        for (const msg of turn.request.messages) {
-          // Determine descriptive source based on role
-          let source = '→ to LLM';
-          if (msg.role === 'tool') {
-            source = '→ tool result to LLM';
-          } else if (msg.role === 'system') {
-            source = '→ system to LLM';
-          } else if (msg.role === 'user') {
-            source = '→ user to LLM';
-          } else if (msg.role === 'assistant' && msg.tool_calls) {
-            source = '→ context to LLM';
-          }
-          
-          messages.push({
-            ...msg,
-            _source: source,
-            _turnId: turn.id,
-            _timestamp: turn.timestamp
-          });
+    // Add ALL request messages exactly as they are
+    if (turn.request?.messages) {
+      for (const msg of turn.request.messages) {
+        // Determine descriptive source based on role
+        let source = '→ to LLM';
+        
+        if (msg.role === 'tool') {
+          source = '→ tool result to LLM';
+        } else if (msg.role === 'system') {
+          source = '→ system to LLM';
+        } else if (msg.role === 'user') {
+          source = '→ user to LLM';
+        } else if (msg.role === 'assistant' && msg.tool_calls) {
+          source = '→ context to LLM';
         }
+        
+        messages.push({
+          ...msg,
+          _source: source,
+          _turnId: turn.id,
+          _turnNumber: turnIdx,
+          _timestamp: turn.timestamp
+        });
       }
-      
-      // Add response message if it has content
-      if (turn.response) {
-        const responseMsg = turn.response.choices?.[0]?.message;
-        if (responseMsg) {
-          messages.push({
-            ...responseMsg,
-            _source: '← from LLM',
-            _turnId: turn.id,
-            _timestamp: turn.timestamp
-          });
-        } else if (turn.response.content) {
-          // Streaming response
-          messages.push({
-            role: 'assistant',
-            content: turn.response.content,
-            _source: '← from LLM',
-            _turnId: turn.id,
-            _timestamp: turn.timestamp
-          });
-        }
+    }
+    
+    // Add response message if it has content
+    if (turn.response) {
+      const responseMsg = turn.response.choices?.[0]?.message;
+      if (responseMsg) {
+        messages.push({
+          ...responseMsg,
+          _source: '← from LLM',
+          _turnId: turn.id,
+          _turnNumber: turnIdx,
+          _timestamp: turn.timestamp
+        });
+      } else if (turn.response.content) {
+        // Streaming response
+        messages.push({
+          role: 'assistant',
+          content: turn.response.content,
+          _source: '← from LLM',
+          _turnId: turn.id,
+          _turnNumber: turnIdx,
+          _timestamp: turn.timestamp
+        });
       }
     }
     
@@ -1783,6 +1800,16 @@ Rules:
             >
               📄 Source View
             </button>
+            <button
+              onClick={() => setViewMode('data')}
+              className={`px-3 py-1 text-xs rounded ${
+                viewMode === 'data' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+              }`}
+            >
+              🔍 Source Data
+            </button>
           </div>
           
           <div className="w-px h-5 bg-[#2d2d2d]" />
@@ -1804,68 +1831,158 @@ Rules:
         {/* Left Panel - Original (always) */}
         <div className="flex-1 flex flex-col border-r border-[#2d2d2d]">
           <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d]">
-            <span className="text-sm font-medium text-gray-300">
-              {viewMode === 'timeline' ? '📝 Original' : '📄 Raw Context'}
-            </span>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium text-gray-300">
+                  {viewMode === 'timeline' ? '📝 Original' : viewMode === 'messages' ? '📄 Raw Context' : '🔍 Source Data (JSON)'}
+                </span>
             <span className="text-xs text-gray-500 ml-2">
               {viewMode === 'timeline' 
-                ? `${session?.conversations.length || 0} turns`
-                : `${getRawSourceMessages().filter(m => showSystemMessages || m.role !== 'system').length} messages`}
+                ? `Turn ${getEffectiveTurnIndex()} of ${session?.conversations.length || 0}`
+                : viewMode === 'messages'
+                  ? `Turn ${getEffectiveTurnIndex()} of ${session?.conversations.length || 0} • ${getRawSourceMessages().filter(m => showSystemMessages || m.role !== 'system').length} messages`
+                  : `Turn ${getEffectiveTurnIndex()} of ${session?.conversations.length || 0}`}
               {' '}• ~{Math.round(JSON.stringify(allMessages).length / 4).toLocaleString()} tokens
             </span>
+              </div>
+              
+              {/* Turn slider for all views */}
+              {session?.conversations.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400">Turn:</span>
+                  <input
+                    type="range"
+                    min="1"
+                    max={session.conversations.length}
+                    value={getEffectiveTurnIndex()}
+                    onChange={(e) => setSelectedTurn(parseInt(e.target.value))}
+                    className="w-24 h-1 bg-[#2d2d2d] rounded-lg appearance-none cursor-pointer accent-purple-500"
+                  />
+                  <span className="text-xs text-purple-400 font-mono w-8">
+                    {getEffectiveTurnIndex()}/{session.conversations.length}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
           <div 
             ref={leftPanelRef}
             className="flex-1 overflow-y-auto p-4 scrollbar-thin"
             onScroll={() => handleScroll('left')}
           >
-            {/* Timeline View - Turn-based with expandable details */}
-            {viewMode === 'timeline' && session?.conversations.map((turn, idx) => (
-              <TurnCard
-                key={turn.id}
-                turn={turn}
-                turnIndex={idx}
-                isExpanded={expandedTurns.has(turn.id)}
-                onToggle={() => toggleTurn(turn.id)}
-                getUserMessage={getUserMessage}
-                getAssistantMessage={getAssistantMessage}
-              />
-            ))}
+            {/* Timeline View - Show only the selected turn */}
+            {viewMode === 'timeline' && session?.conversations.length > 0 && (() => {
+              const turnIdx = getEffectiveTurnIndex();
+              const turn = session.conversations[turnIdx - 1];
+              if (!turn) return null;
+              return (
+                <TurnCard
+                  key={turn.id}
+                  turn={turn}
+                  turnIndex={turnIdx - 1}
+                  isExpanded={expandedTurns.has(turn.id)}
+                  onToggle={() => toggleTurn(turn.id)}
+                  getUserMessage={getUserMessage}
+                  getAssistantMessage={getAssistantMessage}
+                />
+              );
+            })()}
             
-            {/* Source View - Raw context messages exactly as in API */}
+            {/* Source View - Raw context messages for selected turn */}
             {viewMode === 'messages' && getRawSourceMessages()
               .filter(m => showSystemMessages || (m.role !== 'system'))
               .map((msg, idx) => (
                 <SourceMessage key={`source-${idx}`} msg={msg} />
               ))}
+            
+            {/* Source Data View - Raw JSON for selected turn */}
+            {viewMode === 'data' && session?.conversations.length > 0 && (() => {
+              const turnIdx = getEffectiveTurnIndex();
+              const turn = session.conversations[turnIdx - 1];
+              if (!turn) return null;
+              return (
+                <div className="mb-4">
+                  {/* Turn header */}
+                  <div className="flex items-center gap-2 mb-2 px-2">
+                    <div className="flex-1 h-px bg-orange-500/30"></div>
+                    <span className="text-xs text-orange-400 font-medium px-2">
+                      Turn {turnIdx} of {session.conversations.length} • {new Date(turn.timestamp).toLocaleTimeString()}
+                    </span>
+                    <div className="flex-1 h-px bg-orange-500/30"></div>
+                  </div>
+                  
+                  {/* Request section */}
+                  <div className="mb-2 p-2 bg-[#0d0d0d] rounded border border-blue-500/30">
+                    <div className="text-xs text-blue-400 font-medium mb-1">📤 Request ({turn.request?.messages?.length || 0} messages)</div>
+                    <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap overflow-x-auto max-h-[60vh] overflow-y-auto scrollbar-thin">
+                      {JSON.stringify(turn.request, null, 2)}
+                    </pre>
+                  </div>
+                  
+                  {/* Response section */}
+                  <div className="p-2 bg-[#0d0d0d] rounded border border-green-500/30">
+                    <div className="text-xs text-green-400 font-medium mb-1">📥 Response</div>
+                    <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap overflow-x-auto max-h-[40vh] overflow-y-auto scrollbar-thin">
+                      {JSON.stringify(turn.response, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
         {/* Right Panel - Selected Compression Mode */}
         <div className="flex-1 flex flex-col">
           <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d] flex items-center justify-between">
-            <div>
-              <span className="text-sm font-medium text-gray-300">
-                {compressionMode === 0 ? '📝 None (Original)' : `🗜️ ${COMPRESSION_MODES[compressionMode].label}`}
-              </span>
-              <span className="text-xs text-gray-500 ml-2">
-                {selectedMessages.length} messages
-                {compressionMode > 0 && compressionVersions && (
-                  <> • <span className="text-green-400">
-                    -{Math.round((compressionVersions[['none', 'light', 'medium', 'aggressive'][compressionMode] as keyof CompressionVersions]?.stats?.ratio || 0) * 100)}%
-                  </span></>
-                )}
-              </span>
+            <div className="flex items-center gap-4">
+              <div>
+                <span className="text-sm font-medium text-gray-300">
+                  {compressionMode === 0 ? '📝 None (Original)' : `🗜️ ${COMPRESSION_MODES[compressionMode].label}`}
+                </span>
+                <span className="text-xs text-gray-500 ml-2">
+                  {selectedMessages.length} messages
+                  {compressionMode > 0 && compressionVersions && (
+                    <> • <span className="text-green-400">
+                      -{Math.round((compressionVersions[['none', 'light', 'medium', 'aggressive'][compressionMode] as keyof CompressionVersions]?.stats?.ratio || 0) * 100)}%
+                    </span></>
+                  )}
+                </span>
+              </div>
+              {/* Turn slider for right pane */}
+              {session?.conversations.length > 0 && (
+                <div className="flex items-center gap-2 ml-4 pl-4 border-l border-[#2d2d2d]">
+                  <span className="text-xs text-gray-400">Turn:</span>
+                  <input
+                    type="range"
+                    min="1"
+                    max={session.conversations.length}
+                    value={getEffectiveTurnIndex()}
+                    onChange={(e) => setSelectedTurn(parseInt(e.target.value))}
+                    className="w-20 h-1 bg-[#2d2d2d] rounded-lg appearance-none cursor-pointer accent-purple-500"
+                  />
+                  <span className="text-xs text-purple-400 font-mono">
+                    {getEffectiveTurnIndex()}/{session.conversations.length}
+                  </span>
+                </div>
+              )}
             </div>
-            <label className="flex items-center gap-2 text-xs">
-              <input
-                type="checkbox"
-                checked={syncScroll}
-                onChange={(e) => setSyncScroll(e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-gray-400">Sync scroll</span>
-            </label>
+            <div className="flex items-center gap-4">
+              {compressionMode > 0 && lmstudioConnected && (
+                <span className="text-xs text-gray-500">
+                  via LMStudio
+                </span>
+              )}
+              <label className="flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={syncScroll}
+                  onChange={(e) => setSyncScroll(e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-gray-400">Sync scroll</span>
+              </label>
+            </div>
           </div>
           <div 
             ref={rightPanelRef}
