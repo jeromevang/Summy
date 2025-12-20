@@ -11,7 +11,7 @@ import { createServer } from 'http';
 import { LMStudioClient } from '@lmstudio/sdk';
 
 // Import new route modules
-import { toolyRoutes, notificationsRoutes, analyticsRoutes } from './routes/index.js';
+import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes } from './routes/index.js';
 import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
 import { mcpClient } from './modules/tooly/mcp-client.js';
@@ -905,8 +905,10 @@ interface AgenticLoopResult {
     args: any;
     result: any;
     toolCallId: string;
+    isError?: boolean;
   }>;
   iterations: number;
+  initialIntent?: string; // The first assistant message text (before tool execution)
   // All messages generated during the agentic loop (with sources)
   agenticMessages: Array<{
     role: string;
@@ -915,8 +917,54 @@ interface AgenticLoopResult {
     tool_call_id?: string;
     name?: string;
     _source: 'llm' | 'mcp' | 'middleware';
+    isError?: boolean;
   }>;
 }
+
+// ============================================================
+// AGENTIC LOOP CONFIGURATION
+// ============================================================
+
+const AGENTIC_CONFIG = {
+  MAX_RESULT_SIZE: 15000,        // Max chars per tool result before summarization
+  MAX_ACCUMULATED_SIZE: 50000,   // Max total accumulated context size
+  SUMMARIZE_TARGET_SIZE: 2000,   // Target size for summaries
+  MAX_DUPLICATE_CALLS: 2,        // Max times same tool+args can be called
+};
+
+/**
+ * Summarize a large tool result using the LLM
+ */
+const summarizeToolResult = async (
+  content: string,
+  toolName: string,
+  args: any,
+  llmCallFn: (messages: any[]) => Promise<any>
+): Promise<string> => {
+  const summarizePrompt = `Summarize the following ${toolName} result concisely. 
+Focus on: key information, structure, important names/identifiers.
+Keep under ${AGENTIC_CONFIG.SUMMARIZE_TARGET_SIZE} characters.
+Original size: ${content.length} chars.
+
+CONTENT:
+${content.substring(0, 30000)}${content.length > 30000 ? '\n[...truncated for summarization...]' : ''}
+
+SUMMARY:`;
+
+  try {
+    const response = await llmCallFn([
+      { role: 'system', content: 'You are a concise summarizer. Output only the summary, no preamble.' },
+      { role: 'user', content: summarizePrompt }
+    ]);
+    
+    const summary = response.choices?.[0]?.message?.content || response.content || '';
+    return `[SUMMARIZED from ${content.length} chars]\n${summary}\n[End summary. For full content, request specific sections.]`;
+  } catch (error: any) {
+    console.error('[Agentic] Summarization failed:', error.message);
+    // Fallback to truncation if summarization fails
+    return `${content.substring(0, AGENTIC_CONFIG.MAX_RESULT_SIZE)}\n[TRUNCATED: ${content.length} chars total. Summarization failed.]`;
+  }
+};
 
 /**
  * Execute tools from LLM response and continue conversation until final answer
@@ -936,12 +984,23 @@ const executeAgenticLoop = async (
   let currentResponse = initialResponse;
   let currentMessages = [...messages];
   let iterations = 0;
+  let initialIntent: string | undefined;
+  
+  // Tracking for smart context management
+  const toolCallCounts = new Map<string, number>(); // Track duplicate calls
+  let accumulatedContextSize = 0; // Track total result size
+
+  // Capture initial intent from first response (the "thinking" text before tool execution)
+  const firstContent = initialResponse.choices?.[0]?.message?.content || initialResponse.content || '';
+  if (firstContent.trim()) {
+    initialIntent = firstContent;
+  }
 
   // Broadcast: Starting agentic loop
   broadcastToClients('turn_status', { 
     sessionId, 
     status: 'thinking', 
-    message: 'Processing tool calls...',
+    message: initialIntent || 'Processing tool calls...',
     iteration: 0
   });
 
@@ -972,7 +1031,7 @@ const executeAgenticLoop = async (
       });
       
       console.log(`[Agentic] Loop complete after ${iterations} iterations`);
-      return { finalResponse: currentResponse, toolExecutions, iterations, agenticMessages };
+      return { finalResponse: currentResponse, toolExecutions, iterations, agenticMessages, initialIntent };
     }
 
     console.log(`[Agentic] Iteration ${iterations}: Processing ${toolCalls.length} tool calls`);
@@ -1007,6 +1066,44 @@ const executeAgenticLoop = async (
         console.warn(`[Agentic] Failed to parse tool arguments:`, tc.function?.arguments);
       }
 
+      // === DUPLICATE CALL DETECTION ===
+      const callKey = `${toolName}:${JSON.stringify(args)}`;
+      const callCount = (toolCallCounts.get(callKey) || 0) + 1;
+      toolCallCounts.set(callKey, callCount);
+      
+      if (callCount > AGENTIC_CONFIG.MAX_DUPLICATE_CALLS) {
+        console.warn(`[Agentic] Duplicate call detected: ${toolName} called ${callCount} times with same args`);
+        
+        // Skip execution and inject warning
+        const skipMessage = `[SKIPPED] You have already called ${toolName} with these exact arguments ${callCount - 1} time(s). The result was provided above. Please use that information to provide your final answer, or try a different approach.`;
+        
+        toolExecutions.push({
+          toolName,
+          mcpTool: toolName,
+          args,
+          result: skipMessage,
+          toolCallId,
+          isError: false
+        });
+        
+        currentMessages.push({
+          role: 'tool',
+          content: skipMessage,
+          tool_call_id: toolCallId
+        });
+        
+        agenticMessages.push({
+          role: 'tool',
+          content: skipMessage,
+          tool_call_id: toolCallId,
+          name: toolName,
+          _source: 'middleware',
+          isError: false
+        });
+        
+        continue; // Skip actual execution
+      }
+
       console.log(`[Agentic] Executing tool: ${toolName} with args:`, args);
       
       // Broadcast: Running tool
@@ -1022,6 +1119,7 @@ const executeAgenticLoop = async (
       const mapped = ideMapping.mappings[toolName];
       let result: any;
       let mcpToolName = toolName;
+      let isError = false;
 
       if (mapped) {
         // Map parameters
@@ -1045,6 +1143,7 @@ const executeAgenticLoop = async (
         } catch (error: any) {
           console.error(`[Agentic] MCP tool execution failed:`, error.message);
           result = `Error executing ${mcpToolName}: ${error.message}`;
+          isError = true;
         }
       } else {
         // Tool not mapped, check if it's a direct MCP tool
@@ -1054,18 +1153,39 @@ const executeAgenticLoop = async (
         } catch (error: any) {
           console.error(`[Agentic] Direct tool execution failed:`, error.message);
           result = `Error: Tool ${toolName} not available. ${error.message}`;
+          isError = true;
         }
       }
+
+      // === SMART SUMMARIZATION FOR LARGE RESULTS ===
+      let processedResult = result;
+      if (!isError && result && result.length > AGENTIC_CONFIG.MAX_RESULT_SIZE) {
+        console.log(`[Agentic] Result too large (${result.length} chars), summarizing...`);
+        broadcastToClients('turn_status', { 
+          sessionId, 
+          status: 'thinking', 
+          message: `Summarizing large result from ${toolName}...`,
+          iteration: iterations
+        });
+        processedResult = await summarizeToolResult(result, mcpToolName, args, llmCallFn);
+        console.log(`[Agentic] Summarized to ${processedResult.length} chars`);
+      }
+      
+      // Track accumulated context size
+      accumulatedContextSize += processedResult.length;
+      console.log(`[Agentic] Accumulated context: ${accumulatedContextSize} chars`);
 
       toolExecutions.push({
         toolName,
         mcpTool: mcpToolName,
         args,
-        result,
-        toolCallId
+        result: processedResult,
+        toolCallId,
+        isError
       });
 
-      const toolResultContent = typeof result === 'string' ? result : JSON.stringify(result);
+      // Use processedResult (potentially summarized) for LLM context
+      const toolResultContent = typeof processedResult === 'string' ? processedResult : JSON.stringify(processedResult);
 
       // Add tool result to messages
       currentMessages.push({
@@ -1074,16 +1194,34 @@ const executeAgenticLoop = async (
         tool_call_id: toolCallId
       });
 
-      // Track tool result in agenticMessages
+      // Track tool result in agenticMessages with error flag
       agenticMessages.push({
         role: 'tool',
         content: toolResultContent,
         tool_call_id: toolCallId,
         name: mcpToolName,
-        _source: 'mcp'
+        _source: 'mcp',
+        isError
       });
 
-      console.log(`[Agentic] Tool ${toolName} result length: ${result?.length || 0} chars`);
+      console.log(`[Agentic] Tool ${toolName} result length: ${processedResult?.length || 0} chars (original: ${result?.length || 0})`);
+    }
+    
+    // === ACCUMULATED CONTEXT OVERFLOW PROTECTION ===
+    if (accumulatedContextSize > AGENTIC_CONFIG.MAX_ACCUMULATED_SIZE) {
+      console.warn(`[Agentic] Accumulated context too large (${accumulatedContextSize}), forcing completion`);
+      broadcastToClients('turn_status', { 
+        sessionId, 
+        status: 'complete', 
+        message: 'Context limit reached, generating response...',
+        iterations
+      });
+      
+      // Inject a message to force the model to respond
+      currentMessages.push({
+        role: 'system',
+        content: `IMPORTANT: You have gathered a lot of information (${accumulatedContextSize} chars). Please synthesize what you have learned and provide your final answer now. Do not make any more tool calls.`
+      });
     }
 
     // Broadcast: Thinking again after tool execution
@@ -1100,15 +1238,41 @@ const executeAgenticLoop = async (
   }
 
   // Broadcast: Max iterations reached
-  broadcastToClients('turn_status', { 
-    sessionId, 
-    status: 'complete', 
+  broadcastToClients('turn_status', {
+    sessionId,
+    status: 'complete',
     message: 'Max iterations reached',
     iterations: maxIterations
   });
 
   console.warn(`[Agentic] Max iterations (${maxIterations}) reached`);
-  return { finalResponse: currentResponse, toolExecutions, iterations, agenticMessages };
+  
+  // When max iterations reached, synthesize a response if the model is still returning tool_calls
+  const lastToolCalls = currentResponse.tool_calls || currentResponse.choices?.[0]?.message?.tool_calls;
+  if (lastToolCalls && lastToolCalls.length > 0) {
+    // The model is still trying to call tools - create a fallback response
+    const toolSummary = toolExecutions.map(t => `- ${t.toolName}: ${t.isError ? 'error' : 'success'}`).join('\n');
+    const fallbackContent = `I gathered the following information from ${toolExecutions.length} tool calls:\n${toolSummary}\n\nBased on this information, I can provide a summary of what was found. However, I reached the maximum processing limit before completing my analysis.`;
+    
+    return { 
+      finalResponse: {
+        ...currentResponse,
+        choices: [{
+          message: {
+            role: 'assistant',
+            content: fallbackContent
+          },
+          finish_reason: 'length'
+        }]
+      }, 
+      toolExecutions, 
+      iterations, 
+      agenticMessages, 
+      initialIntent 
+    };
+  }
+  
+  return { finalResponse: currentResponse, toolExecutions, iterations, agenticMessages, initialIntent };
 };
 
 /**
@@ -1132,6 +1296,50 @@ const shouldExecuteAgentically = (response: any, ideMapping: IDEMapping): boolea
   }
 
   return false;
+};
+
+// Detect if this is a title generation request from Continue
+const isTitleGenerationRequest = (req: any): boolean => {
+  const body = req.requestBody || req.body;
+  
+  // Check for low max_tokens (title requests use ~16 tokens)
+  if (body?.max_tokens && body.max_tokens <= 50) {
+    // Also check if no tools are provided (title requests don't need tools)
+    if (!body.tools || body.tools.length === 0) {
+      // Check if user message contains title generation pattern
+      const userMessage = body?.messages?.find((m: any) => m.role === 'user');
+      if (userMessage?.content?.toLowerCase().includes('please reply with a title')) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+};
+
+// Handle title generation request - update existing session instead of creating new one
+const handleTitleGenerationRequest = async (req: any, res: any, next: any): Promise<boolean> => {
+  if (!isTitleGenerationRequest(req)) {
+    return false;
+  }
+  
+  console.log('[Title] Detected title generation request');
+  
+  // Find the most recent session (within 60 seconds)
+  const recentSession = db.getMostRecentSession(60);
+  
+  if (!recentSession) {
+    console.log('[Title] No recent session found to update');
+    return false;
+  }
+  
+  console.log('[Title] Will update session:', recentSession.id, 'with generated title');
+  
+  // Mark this request to update the session title on response
+  req.isTitleRequest = true;
+  req.titleTargetSession = recentSession.id;
+  
+  return true;
 };
 
 // Create session immediately on request
@@ -1184,8 +1392,25 @@ const updateSessionWithResponse = async (
   sessionId: string, 
   requestBody: any, 
   responseData: any,
-  agenticMessages?: AgenticLoopResult['agenticMessages']
+  agenticMessages?: AgenticLoopResult['agenticMessages'],
+  options?: { isTitleRequest?: boolean; titleTargetSession?: string }
 ): Promise<void> => {
+  // Handle title generation requests - update the original session's name
+  if (options?.isTitleRequest && options?.titleTargetSession) {
+    const generatedTitle = responseData.choices?.[0]?.message?.content || 
+                          responseData.content || '';
+    if (generatedTitle.trim()) {
+      const cleanTitle = generatedTitle.trim().substring(0, 100); // Limit title length
+      console.log(`[Title] Updating session ${options.titleTargetSession} with title: "${cleanTitle}"`);
+      db.updateContextSessionName(options.titleTargetSession, cleanTitle);
+      addDebugEntry('session', `📝 Updated session title: "${cleanTitle}"`, { 
+        targetSession: options.titleTargetSession 
+      });
+    }
+    // Don't create a turn for title requests
+    return;
+  }
+  
   try {
     const turnNumber = db.getLatestTurnNumber(sessionId) + 1;
     const previousToolSetId = db.getPreviousToolSetId(sessionId);
@@ -1276,8 +1501,13 @@ const proxyToOpenAI = async (req: any, res: any) => {
     req.sessionId = extractConversationId(req);
     req.isStreaming = req.body?.stream === true;
 
-    // CREATE SESSION IMMEDIATELY (this was the key missing piece!)
-    await createSessionFromRequest(req);
+    // Check if this is a title generation request from Continue
+    const isTitleReq = await handleTitleGenerationRequest(req, res, null);
+    
+    if (!isTitleReq) {
+      // CREATE SESSION IMMEDIATELY (only if not a title request)
+      await createSessionFromRequest(req);
+    }
 
     // Broadcast: Turn started (thinking)
     broadcastToClients('turn_status', { 
@@ -1475,7 +1705,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
               };
               
               try {
-                const { finalResponse, toolExecutions, iterations, agenticMessages } = await executeAgenticLoop(
+                const { finalResponse, toolExecutions, iterations, agenticMessages, initialIntent } = await executeAgenticLoop(
                   parsedResponse,
                   messagesToSend,
                   llmCallFn,
@@ -1509,10 +1739,12 @@ const proxyToOpenAI = async (req: any, res: any) => {
                   toolyMeta: {
                     agenticLoop: true,
                     toolExecutions,
-                    iterations
+                    iterations,
+                    initialIntent
                   }
                 };
-                await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse, agenticMessages);
+                await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse, agenticMessages, 
+                  { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
                 res.end();
               } catch (agentError: any) {
                 console.error('[Agentic] Loop failed:', agentError.message);
@@ -1520,13 +1752,15 @@ const proxyToOpenAI = async (req: any, res: any) => {
                 
                 // Fall back to original response
                 res.write(fullContent);
-                await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+                await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse, undefined,
+                  { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
                 res.end();
               }
             } else {
               // No mapped tool calls, stream normally
               res.write(fullContent);
-              await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+              await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse, undefined,
+                { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
               
               // Broadcast: Complete
               broadcastToClients('turn_status', { 
@@ -1561,7 +1795,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
               return loopResponse.data;
             };
             
-            const { finalResponse, toolExecutions, iterations, agenticMessages } = await executeAgenticLoop(
+            const { finalResponse, toolExecutions, iterations, agenticMessages, initialIntent } = await executeAgenticLoop(
               response.data,
               messagesToSend,
               llmCallFn,
@@ -1571,12 +1805,14 @@ const proxyToOpenAI = async (req: any, res: any) => {
             
             const enrichedResponse = {
               ...finalResponse,
-              toolyMeta: { agenticLoop: true, toolExecutions, iterations }
+              toolyMeta: { agenticLoop: true, toolExecutions, iterations, initialIntent }
             };
-            await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse, agenticMessages);
+            await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse, agenticMessages,
+              { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
             res.json(finalResponse);
           } else {
-            await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
+            await updateSessionWithResponse(req.sessionId, req.requestBody, response.data, undefined,
+              { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
             res.json(response.data);
           }
         }
@@ -1651,7 +1887,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
           });
           response.data.on('end', async () => {
             const parsedResponse = parseStreamingResponse(fullContent);
-            await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+            await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse, undefined,
+              { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
             res.end();
           });
           response.data.on('error', (err: Error) => {
@@ -1660,7 +1897,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
             res.end();
           });
         } else {
-          await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
+          await updateSessionWithResponse(req.sessionId, req.requestBody, response.data, undefined,
+            { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
           res.json(response.data);
         }
         return;
@@ -1740,7 +1978,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
       });
       response.data.on('end', async () => {
         const parsedResponse = parseStreamingResponse(fullContent);
-        await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+        await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse, undefined,
+          { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
         res.end();
       });
       response.data.on('error', (err: Error) => {
@@ -1750,7 +1989,8 @@ const proxyToOpenAI = async (req: any, res: any) => {
       });
     } else {
       // Handle regular response
-      await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
+      await updateSessionWithResponse(req.sessionId, req.requestBody, response.data, undefined,
+        { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
       res.json(response.data);
     }
 
@@ -1770,7 +2010,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
         error: error.message,
         statusCode: error.response?.status,
         details: error.response?.data
-      });
+      }, undefined, { isTitleRequest: req.isTitleRequest, titleTargetSession: req.titleTargetSession });
     } catch (sessionError) {
       console.error('❌ SESSION UPDATE ERROR:', sessionError);
     }
@@ -2491,6 +2731,7 @@ notifications.initialize(wss);
 app.use('/api/tooly', toolyRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/rag', ragRoutes);
 
 // Schedule backup cleanup (every hour)
 scheduleBackupCleanup(60 * 60 * 1000);

@@ -2,7 +2,7 @@
  * MCP Server for Tooly
  * Provides tool execution capabilities via Model Context Protocol
  * 
- * Tools: ~70 total
+ * Tools: ~73 total
  * 
  * FILE OPERATIONS (13):
  *   read_file, read_multiple_files, write_file, edit_file, delete_file, copy_file,
@@ -43,6 +43,9 @@
  * 
  * UTILITY (6):
  *   mcp_rules, env_get, env_set, json_parse, base64_encode, base64_decode
+ * 
+ * RAG - SEMANTIC CODE SEARCH (3):
+ *   rag_query, rag_status, rag_index
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -52,6 +55,7 @@ import fs from "fs";
 import path from "path";
 import { chromium, Browser, Page, BrowserContext } from "playwright";
 import { execSync } from "child_process";
+import ignore, { Ignore } from "ignore";
 
 // ============================================================
 // CONFIGURATION
@@ -61,6 +65,74 @@ const projectRoot = process.cwd();
 
 // Session environment variables (not persisted)
 const sessionEnv: Record<string, string> = {};
+
+// ============================================================
+// GITIGNORE SUPPORT
+// ============================================================
+
+// Cache for gitignore instances per directory
+const gitignoreCache: Map<string, Ignore> = new Map();
+
+/**
+ * Load and cache gitignore patterns for a directory
+ * Walks up the directory tree to find all applicable .gitignore files
+ */
+function loadGitignore(dirPath: string): Ignore {
+  // Check cache first
+  const cached = gitignoreCache.get(dirPath);
+  if (cached) return cached;
+
+  const ig = ignore();
+  
+  // Always ignore these common patterns
+  ig.add([
+    '.git',
+    'node_modules',
+    '.DS_Store',
+    'Thumbs.db',
+    '*.pyc',
+    '__pycache__',
+    '.env.local',
+    '.env.*.local'
+  ]);
+
+  // Walk up from dirPath to projectRoot, collecting .gitignore files
+  let currentDir = dirPath;
+  const gitignoreFiles: string[] = [];
+  
+  while (currentDir.startsWith(projectRoot) || currentDir === projectRoot) {
+    const gitignorePath = path.join(currentDir, '.gitignore');
+    if (fs.existsSync(gitignorePath)) {
+      gitignoreFiles.unshift(gitignorePath); // Add to front (parent rules first)
+    }
+    
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) break; // Reached root
+    currentDir = parentDir;
+  }
+
+  // Load all .gitignore files (parent first, then child)
+  for (const gitignorePath of gitignoreFiles) {
+    try {
+      const content = fs.readFileSync(gitignorePath, 'utf-8');
+      ig.add(content);
+    } catch (err) {
+      // Ignore read errors
+    }
+  }
+
+  // Cache for reuse
+  gitignoreCache.set(dirPath, ig);
+  return ig;
+}
+
+/**
+ * Check if a path should be ignored based on gitignore rules
+ */
+function isIgnored(basePath: string, relativePath: string): boolean {
+  const ig = loadGitignore(basePath);
+  return ig.ignores(relativePath);
+}
 
 // ============================================================
 // BROWSER STATE (Persistent like @playwright/mcp)
@@ -491,20 +563,28 @@ server.registerTool("get_file_info", {
 
 // --- list_directory (official MCP name) ---
 server.registerTool("list_directory", {
-  description: "Get a detailed listing of files and directories in a specified path",
+  description: "Get a detailed listing of files and directories in a specified path (respects .gitignore)",
   inputSchema: { 
-    path: z.string().describe("Path to the directory to list")
+    path: z.string().describe("Path to the directory to list"),
+    showIgnored: z.boolean().optional().describe("Include gitignored files (default: false)")
   }
-}, async ({ path: dirPath }: { path: string }) => {
-  console.log(`[MCP] list_directory: ${dirPath}`);
+}, async ({ path: dirPath, showIgnored = false }: { path: string; showIgnored?: boolean }) => {
+  console.log(`[MCP] list_directory: ${dirPath} (showIgnored: ${showIgnored})`);
   const fullPath = resolvePath(dirPath);
   if (!isPathInProject(fullPath)) return errorResult("Access denied: Path outside allowed directories");
   try {
     const entries = fs.readdirSync(fullPath, { withFileTypes: true });
-    const result = entries.map(entry => ({
-      name: entry.name,
-      type: entry.isDirectory() ? 'directory' : entry.isFile() ? 'file' : 'other'
-    }));
+    const result = entries
+      .filter(entry => {
+        if (showIgnored) return true;
+        // Check if this entry should be ignored
+        const relativePath = entry.isDirectory() ? entry.name + '/' : entry.name;
+        return !isIgnored(fullPath, relativePath);
+      })
+      .map(entry => ({
+        name: entry.name,
+        type: entry.isDirectory() ? 'directory' : entry.isFile() ? 'file' : 'other'
+      }));
     return textResult(JSON.stringify(result, null, 2));
   } catch (err: any) {
     return errorResult(`Failed to list directory: ${err.message}`);
@@ -513,13 +593,14 @@ server.registerTool("list_directory", {
 
 // --- search_files (official MCP name) ---
 server.registerTool("search_files", {
-  description: "Recursively search for files and directories matching a pattern",
+  description: "Recursively search for files and directories matching a pattern (respects .gitignore)",
   inputSchema: {
     directory: z.string().describe("Starting directory for the search"),
-    pattern: z.string().describe("Search pattern (glob pattern like *.ts or regex)")
+    pattern: z.string().describe("Search pattern (glob pattern like *.ts or regex)"),
+    showIgnored: z.boolean().optional().describe("Include gitignored files (default: false)")
   }
-}, async ({ directory, pattern }: { directory: string; pattern: string }) => {
-  console.log(`[MCP] search_files: ${pattern} in ${directory}`);
+}, async ({ directory, pattern, showIgnored = false }: { directory: string; pattern: string; showIgnored?: boolean }) => {
+  console.log(`[MCP] search_files: ${pattern} in ${directory} (showIgnored: ${showIgnored})`);
   const fullPath = resolvePath(directory);
   if (!isPathInProject(fullPath)) return errorResult("Access denied: Path outside allowed directories");
   
@@ -532,12 +613,18 @@ server.registerTool("search_files", {
       for (const entry of entries) {
         const entryPath = path.join(dir, entry.name);
         const relativePath = path.relative(fullPath, entryPath);
+        const relativeForIgnore = entry.isDirectory() ? relativePath + '/' : relativePath;
+        
+        // Skip ignored files unless showIgnored is true
+        if (!showIgnored && isIgnored(fullPath, relativeForIgnore)) {
+          continue;
+        }
         
         if (regex.test(entry.name) || regex.test(relativePath)) {
           matches.push(relativePath);
         }
         
-        if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+        if (entry.isDirectory()) {
           searchDir(entryPath);
         }
       }
@@ -1982,6 +2069,128 @@ server.registerTool("zip_extract", {
     return textResult(`Extracted to: ${destination}`);
   } catch (err: any) {
     return errorResult(`Zip extract failed: ${err.message}`);
+  }
+});
+
+// ============================================================
+// RAG - SEMANTIC CODE SEARCH
+// ============================================================
+
+const RAG_SERVER_URL = process.env.RAG_SERVER_URL || 'http://localhost:3002';
+
+server.registerTool("rag_query", {
+  description: "Search the codebase semantically using RAG. Returns relevant code snippets based on natural language queries.",
+  inputSchema: z.object({
+    query: z.string().describe("Natural language query describing what you're looking for"),
+    limit: z.number().optional().describe("Maximum number of results to return (default: 5)"),
+    fileTypes: z.array(z.string()).optional().describe("Filter by file types (e.g., ['ts', 'js', 'py'])"),
+    paths: z.array(z.string()).optional().describe("Filter by path patterns (e.g., ['src/', 'lib/'])")
+  })
+}, async (args) => {
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: args.query,
+        limit: args.limit || 5,
+        filter: {
+          fileTypes: args.fileTypes,
+          paths: args.paths
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      return errorResult(`RAG query failed: ${error}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.results || data.results.length === 0) {
+      return textResult("No relevant code found for your query.");
+    }
+    
+    // Format results
+    let output = `Found ${data.results.length} relevant code snippets (latency: ${data.latency}ms):\n\n`;
+    
+    for (let i = 0; i < data.results.length; i++) {
+      const r = data.results[i];
+      output += `--- Result ${i + 1} (score: ${(r.score * 100).toFixed(1)}%) ---\n`;
+      output += `File: ${r.filePath}:${r.startLine}-${r.endLine}\n`;
+      if (r.symbolName) {
+        output += `Symbol: ${r.symbolName} (${r.symbolType})\n`;
+      }
+      output += `\`\`\`${r.language}\n${r.snippet}\n\`\`\`\n\n`;
+    }
+    
+    return textResult(output);
+  } catch (err: any) {
+    // RAG server might not be running
+    if (err.message.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running. Start it with 'npm run dev:rag'");
+    }
+    return errorResult(`RAG query error: ${err.message}`);
+  }
+});
+
+server.registerTool("rag_status", {
+  description: "Get the status of the RAG indexing system",
+  inputSchema: z.object({})
+}, async () => {
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/stats`);
+    
+    if (!response.ok) {
+      return errorResult("Failed to get RAG status");
+    }
+    
+    const stats = await response.json();
+    
+    let output = "RAG System Status:\n";
+    output += `  Project: ${stats.projectPath || 'Not configured'}\n`;
+    output += `  Status: ${stats.status}\n`;
+    output += `  Files indexed: ${stats.totalFiles}\n`;
+    output += `  Chunks: ${stats.totalChunks}\n`;
+    output += `  Vectors: ${stats.totalVectors}\n`;
+    output += `  Embedding model: ${stats.embeddingModel || 'Not configured'}\n`;
+    output += `  Model loaded: ${stats.embeddingModelLoaded}\n`;
+    output += `  File watcher: ${stats.fileWatcherActive ? 'Active' : 'Inactive'}\n`;
+    
+    return textResult(output);
+  } catch (err: any) {
+    if (err.message.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running. Start it with 'npm run dev:rag'");
+    }
+    return errorResult(`RAG status error: ${err.message}`);
+  }
+});
+
+server.registerTool("rag_index", {
+  description: "Start indexing a project directory for semantic search",
+  inputSchema: z.object({
+    projectPath: z.string().describe("Absolute path to the project directory to index")
+  })
+}, async (args) => {
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/index`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectPath: args.projectPath })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      return errorResult(`Failed to start indexing: ${error.error}`);
+    }
+    
+    return textResult(`Indexing started for: ${args.projectPath}\nUse rag_status to check progress.`);
+  } catch (err: any) {
+    if (err.message.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running. Start it with 'npm run dev:rag'");
+    }
+    return errorResult(`RAG index error: ${err.message}`);
   }
 });
 

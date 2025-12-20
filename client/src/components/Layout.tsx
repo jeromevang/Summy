@@ -64,6 +64,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   Tooly
                 </Link>
                 <Link
+                  to="/rag"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/rag'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                >
+                  RAG
+                </Link>
+                <Link
                   to="/debug"
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     location.pathname === '/debug'

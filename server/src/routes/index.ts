@@ -6,4 +6,5 @@
 export { default as toolyRoutes } from './tooly.js';
 export { default as notificationsRoutes } from './notifications.js';
 export { default as analyticsRoutes } from './analytics.js';
+export { default as ragRoutes } from './rag.js';
 
