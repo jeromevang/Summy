@@ -50,10 +50,20 @@ interface ToolyToolCallMeta {
 }
 
 interface ToolyMeta {
-  mode: 'single' | 'dual' | 'passthrough';
-  phases: ToolyPhase[];
+  mode?: 'single' | 'dual' | 'passthrough';
+  phases?: ToolyPhase[];
   toolCalls?: ToolyToolCallMeta[];
   totalLatencyMs?: number;
+  // Agentic loop fields
+  agenticLoop?: boolean;
+  toolExecutions?: Array<{
+    toolName: string;
+    mcpTool: string;
+    args: any;
+    result: string;
+    toolCallId: string;
+  }>;
+  iterations?: number;
 }
 
 interface ConversationTurn {
@@ -662,7 +672,11 @@ const ProcessingTimeline = ({
 }: { 
   turn: ConversationTurn;
 }) => {
-  const toolyMeta = turn.toolyMeta;
+  const toolyMeta = turn.toolyMeta || (turn.response as any)?.toolyMeta;
+  
+  // Check for agentic loop executions first
+  const agenticExecutions = toolyMeta?.toolExecutions || [];
+  const hasAgenticLoop = toolyMeta?.agenticLoop && agenticExecutions.length > 0;
   
   // Also extract tool calls from the request messages if toolyMeta not available
   const requestToolCalls = turn.request?.messages
@@ -672,7 +686,17 @@ const ProcessingTimeline = ({
   const toolResults = turn.request?.messages
     ?.filter(m => m.role === 'tool') || [];
   
-  // Merge tool calls with results
+  // Convert agentic executions to ToolyToolCallMeta format
+  const agenticToolCalls: ToolyToolCallMeta[] = agenticExecutions.map(exec => ({
+    id: exec.toolCallId || 'agentic',
+    name: `${exec.toolName} → ${exec.mcpTool}`,
+    arguments: exec.args,
+    result: exec.result,
+    status: 'success' as const,
+    latencyMs: undefined
+  }));
+  
+  // Merge tool calls with results (for non-agentic calls)
   const mergedToolCalls: ToolyToolCallMeta[] = toolyMeta?.toolCalls || requestToolCalls.map(tc => {
     const result = toolResults.find(tr => tr.tool_call_id === tc.id);
     
@@ -699,10 +723,13 @@ const ProcessingTimeline = ({
     } as ToolyToolCallMeta;
   });
   
-  const hasPhases = toolyMeta?.phases && toolyMeta.phases.length > 0;
-  const hasToolCalls = mergedToolCalls.length > 0;
+  // Combine all tool calls
+  const allToolCalls = [...agenticToolCalls, ...mergedToolCalls];
   
-  if (!hasPhases && !hasToolCalls) {
+  const hasPhases = toolyMeta?.phases && toolyMeta.phases.length > 0;
+  const hasToolCalls = allToolCalls.length > 0;
+  
+  if (!hasPhases && !hasToolCalls && !hasAgenticLoop) {
     // Extract system prompt from request if available
     const systemPrompt = turn.request?.messages?.find(m => m.role === 'system')?.content;
     if (!systemPrompt) {
@@ -736,9 +763,12 @@ const ProcessingTimeline = ({
       <div className="px-4 py-2 border-b border-[#2d2d2d] flex items-center gap-2">
         <span className="text-xs font-medium text-gray-400">📋 Processing Steps</span>
         <span className="text-xs text-gray-600">
-          {toolyMeta?.mode && `(${toolyMeta.mode} mode)`}
-          {hasPhases && ` • ${toolyMeta?.phases.length} phases`}
-          {hasToolCalls && ` • ${mergedToolCalls.length} tool calls`}
+          {hasAgenticLoop && (
+            <span className="text-green-400">🔄 Agentic Loop ({toolyMeta?.iterations} iterations)</span>
+          )}
+          {toolyMeta?.mode && ` (${toolyMeta.mode} mode)`}
+          {hasPhases && ` • ${toolyMeta?.phases?.length} phases`}
+          {hasToolCalls && ` • ${allToolCalls.length} tool calls`}
         </span>
       </div>
       
@@ -746,6 +776,20 @@ const ProcessingTimeline = ({
       <div className="relative px-4 py-3">
         {/* Vertical line */}
         <div className="absolute left-7 top-3 bottom-3 w-0.5 bg-[#2d2d2d]" />
+        
+        {/* Agentic loop indicator */}
+        {hasAgenticLoop && (
+          <div className="mb-3 ml-6 p-2 rounded bg-green-500/10 border border-green-500/30">
+            <div className="flex items-center gap-2 text-xs text-green-400">
+              <span>🔄</span>
+              <span className="font-medium">Agentic Tool Execution</span>
+              <span className="text-green-300/70">
+                • {agenticExecutions.length} tool{agenticExecutions.length !== 1 ? 's' : ''} executed via MCP
+                • {toolyMeta?.iterations} LLM iteration{toolyMeta?.iterations !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+        )}
         
         {/* Phases */}
         {toolyMeta?.phases?.map((phase, idx) => (
@@ -756,7 +800,7 @@ const ProcessingTimeline = ({
         ))}
         
         {/* Tool calls */}
-        {mergedToolCalls.map((tc, idx) => (
+        {allToolCalls.map((tc, idx) => (
           <TimelineToolCall 
             key={`tc-${tc.id}-${idx}`}
             toolCall={tc}
@@ -786,14 +830,21 @@ const TurnCard = ({
   const userMessage = getUserMsg(turn);
   const assistantMessage = getAssistantMsg(turn);
   
-  // Check if this turn has tool calls
+  // Get toolyMeta from turn or response
+  const toolyMeta = turn.toolyMeta || (turn.response as any)?.toolyMeta;
+  
+  // Check for agentic loop
+  const hasAgenticLoop = toolyMeta?.agenticLoop && toolyMeta?.toolExecutions?.length > 0;
+  const agenticToolCount = toolyMeta?.toolExecutions?.length || 0;
+  
+  // Check if this turn has tool calls (regular or agentic)
   const hasToolCalls = turn.request?.messages?.some(m => m.role === 'assistant' && m.tool_calls?.length > 0) ||
-                       turn.toolyMeta?.toolCalls?.length;
-  const toolCallCount = turn.toolyMeta?.toolCalls?.length || 
+                       toolyMeta?.toolCalls?.length || hasAgenticLoop;
+  const toolCallCount = agenticToolCount || toolyMeta?.toolCalls?.length || 
                         turn.request?.messages?.filter(m => m.role === 'assistant' && m.tool_calls)
                           .flatMap(m => m.tool_calls || []).length || 0;
   
-  const mode = turn.toolyMeta?.mode;
+  const mode = toolyMeta?.mode;
   
   return (
     <div className="mb-3 rounded-lg border border-[#2d2d2d] overflow-hidden bg-[#1a1a1a]">
@@ -804,6 +855,11 @@ const TurnCard = ({
       >
         <div className="flex items-center gap-3">
           <span className="text-xs font-medium text-gray-400">Turn {turnIndex + 1}</span>
+          {hasAgenticLoop && (
+            <span className="text-xs px-2 py-0.5 rounded bg-green-500/20 text-green-400">
+              🔄 Agentic ({toolyMeta?.iterations} iter)
+            </span>
+          )}
           {hasToolCalls && (
             <span className="text-xs px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">
               🔧 {toolCallCount} tool{toolCallCount !== 1 ? 's' : ''}
@@ -946,6 +1002,7 @@ const SourceMessage = ({ msg }: { msg: any }) => {
     user: { icon: '👤', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30' },
     assistant: { icon: '✨', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30' },
     tool: { icon: '🔧', color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/30' },
+    agentic: { icon: '🔄', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30' },
   };
   
   const config = roleConfig[msg.role] || { icon: '📄', color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/30' };
@@ -1041,6 +1098,18 @@ const SourceMessage = ({ msg }: { msg: any }) => {
       {isToolResult && msg.tool_call_id && (
         <div className="text-xs text-gray-500 font-mono mt-1">
           tool_call_id: {msg.tool_call_id}
+        </div>
+      )}
+      
+      {/* Agentic Execution Args */}
+      {msg._agenticExecution && (
+        <div className="mt-2 p-2 rounded bg-cyan-500/5 border border-cyan-500/20">
+          <div className="text-xs text-cyan-400 font-medium mb-1">
+            📥 MCP Tool Arguments
+          </div>
+          <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+            {JSON.stringify(msg._agenticExecution.args, null, 2)}
+          </pre>
         </div>
       )}
     </div>
@@ -1497,17 +1566,55 @@ Rules:
           _timestamp: turn.timestamp
         });
       }
+      
+      // Add agentic loop tool executions if present
+      const toolyMeta = (turn.response as any)?.toolyMeta || turn.toolyMeta;
+      if (toolyMeta?.agenticLoop && toolyMeta?.toolExecutions?.length > 0) {
+        // Add a marker for the agentic loop
+        messages.push({
+          role: 'agentic',
+          content: `🔄 Agentic Loop Executed (${toolyMeta.iterations} iterations)`,
+          _source: '⚡ middleware agentic execution',
+          _turnId: turn.id,
+          _turnNumber: turnIdx,
+          _timestamp: turn.timestamp,
+          _isAgenticHeader: true
+        });
+        
+        // Add each tool execution
+        for (const exec of toolyMeta.toolExecutions) {
+          messages.push({
+            role: 'tool',
+            content: exec.result,
+            tool_call_id: exec.toolCallId,
+            _source: `⚡ MCP: ${exec.toolName} → ${exec.mcpTool}`,
+            _turnId: turn.id,
+            _turnNumber: turnIdx,
+            _timestamp: turn.timestamp,
+            _agenticExecution: {
+              toolName: exec.toolName,
+              mcpTool: exec.mcpTool,
+              args: exec.args
+            }
+          });
+        }
+      }
     }
     
     return messages;
   };
 
-  const getAllMessages = (): any[] => {
+  const getAllMessages = (upToTurn?: number): any[] => {
     if (!session) return [];
     const messages: any[] = [];
     let seenSystemPrompts = new Set<string>();
     
-    for (const turn of session.conversations) {
+    // Limit to specific turn if provided (1-indexed)
+    const turnsToProcess = upToTurn 
+      ? session.conversations.slice(0, upToTurn)
+      : session.conversations;
+    
+    for (const turn of turnsToProcess) {
       // Extract system message (usually first in request messages)
       if (turn.request?.messages) {
         const systemMsg = turn.request.messages.find(m => m.role === 'system');
@@ -1672,7 +1779,7 @@ Rules:
   const groupedSelectedMessages = groupToolCallsWithResults(selectedMessages);
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] text-white">
+    <div className="h-screen overflow-hidden bg-[#0d0d0d] text-white flex flex-col">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[#0d0d0d] border-b border-[#2d2d2d] px-4 py-3">
         {/* Top row: navigation and controls */}
@@ -1827,10 +1934,10 @@ Rules:
       </div>
 
       {/* Main Content - Side by Side */}
-      <div className="flex h-[calc(100vh-180px)]">
+      <div className="flex flex-1 overflow-hidden">
         {/* Left Panel - Original (always) */}
         <div className="flex-1 flex flex-col border-r border-[#2d2d2d]">
-          <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d]">
+          <div className="sticky top-0 z-10 px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d]">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-sm font-medium text-gray-300">
@@ -1870,22 +1977,71 @@ Rules:
             className="flex-1 overflow-y-auto p-4 scrollbar-thin"
             onScroll={() => handleScroll('left')}
           >
-            {/* Timeline View - Show only the selected turn */}
+            {/* IDE View - Show chat history up to selected turn */}
             {viewMode === 'timeline' && session?.conversations.length > 0 && (() => {
               const turnIdx = getEffectiveTurnIndex();
-              const turn = session.conversations[turnIdx - 1];
-              if (!turn) return null;
-              return (
-                <TurnCard
-                  key={turn.id}
-                  turn={turn}
-                  turnIndex={turnIdx - 1}
-                  isExpanded={expandedTurns.has(turn.id)}
-                  onToggle={() => toggleTurn(turn.id)}
-                  getUserMessage={getUserMessage}
-                  getAssistantMessage={getAssistantMessage}
-                />
-              );
+              const messagesUpToTurn = getAllMessages(turnIdx);
+              const groupedUpToTurn = groupToolCallsWithResults(messagesUpToTurn);
+              
+              return groupedUpToTurn
+                .filter((m: any) => showSystemMessages || m.role !== 'system')
+                .map((msg: any, idx: number) => {
+                  // System Prompt
+                  if (msg.role === 'system') {
+                    return (
+                      <SystemPromptCard
+                        key={`system-${idx}`}
+                        content={msg.content}
+                        source="Conversation"
+                      />
+                    );
+                  }
+                  
+                  // Tool Group - show tool calls with results
+                  if (msg.role === 'tool_group') {
+                    return (
+                      <div key={`toolgroup-${idx}`} className="mb-2">
+                        {msg.toolCalls.map((tc: ToolCallInfo, tcIdx: number) => (
+                          <ToolCallCard
+                            key={`tc-${idx}-${tcIdx}`}
+                            toolCall={tc}
+                            result={msg.toolResults.get(tc.id)}
+                          />
+                        ))}
+                      </div>
+                    );
+                  }
+                  
+                  // Orphan tool result
+                  if (msg.role === 'tool_result_orphan') {
+                    return (
+                      <div key={`orphan-${idx}`} className="mb-2 p-3 rounded-lg border border-orange-500/30 bg-orange-500/5">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-sm">🔧</span>
+                          <span className="text-xs font-medium text-orange-400">
+                            Tool Result {msg.name ? `(${msg.name})` : ''}
+                          </span>
+                        </div>
+                        <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-2 rounded overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto scrollbar-thin">
+                          {msg.content}
+                        </pre>
+                      </div>
+                    );
+                  }
+                  
+                  // Regular message (user/assistant)
+                  return (
+                    <Message
+                      key={idx}
+                      role={msg.role || 'assistant'}
+                      content={msg.content || ''}
+                      isCompressed={false}
+                      isTool={false}
+                      keywords={[]}
+                      keywordMap={new Map()}
+                    />
+                  );
+                });
             })()}
             
             {/* Source View - Raw context messages for selected turn */}
@@ -1934,7 +2090,7 @@ Rules:
 
         {/* Right Panel - Selected Compression Mode */}
         <div className="flex-1 flex flex-col">
-          <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d] flex items-center justify-between">
+          <div className="sticky top-0 z-10 px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d] flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div>
                 <span className="text-sm font-medium text-gray-300">
