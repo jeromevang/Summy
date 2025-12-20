@@ -46,6 +46,39 @@
         "path": "regex"
       },
       "description": "Search for patterns in files"
+    },
+    "fetch_url_content": {
+      "mcp": "http_request",
+      "params": {
+        "url": "url"
+      },
+      "description": "Fetch URL content via HTTP request"
+    },
+    "search_web": {
+      "mcp": "web_search",
+      "params": {
+        "query": "query"
+      },
+      "description": "Search the web"
+    },
+    "single_find_and_replace": {
+      "mcp": "edit_file",
+      "transform": "continueEditToMcpEdit",
+      "description": "Find and replace in file"
+    },
+    "file_glob_search": {
+      "mcp": "search_files",
+      "params": {
+        "pattern": "pattern"
+      },
+      "description": "Search files with glob pattern"
+    },
+    "grep_search": {
+      "mcp": "search_files",
+      "params": {
+        "query": "regex"
+      },
+      "description": "Search with regex"
     }
   },
   

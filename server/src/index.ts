@@ -740,16 +740,17 @@ const extractConversationId = (req: any): string => {
     return body.conversation_id || body.session_id;
   }
 
-  // 3. Generate ID based on first user message (content hash + timestamp)
+  // 3. Generate ID based on first user message content (stable hash for same conversation)
   if (body.messages && body.messages.length > 0) {
     const firstUserMessage = body.messages.find((msg: any) => msg.role === 'user');
     if (firstUserMessage && firstUserMessage.content) {
-      // Create a hash of the first user message + timestamp for uniqueness
+      // Create a stable hash based only on the first user message content
+      // This ensures the same conversation always gets the same session ID
       const content = typeof firstUserMessage.content === 'string'
         ? firstUserMessage.content
         : JSON.stringify(firstUserMessage.content);
-      const timestamp = Date.now();
-      const hashInput = `${content.substring(0, 50)}-${timestamp}`;
+      // Use first 50 chars of content for the hash (no timestamp for stability)
+      const hashInput = content.substring(0, 50);
       return Buffer.from(hashInput).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
     }
   }
@@ -811,6 +812,7 @@ const parseStreamingResponse = (body: string): any => {
   let fullContent = '';
   let usage = null;
   let finishReason = null;
+  let toolCalls: any[] = [];
 
   for (const line of lines) {
     if (line.startsWith('data: ')) {
@@ -824,6 +826,20 @@ const parseStreamingResponse = (body: string): any => {
         // Extract content from delta
         if (parsed.choices?.[0]?.delta?.content) {
           fullContent += parsed.choices[0].delta.content;
+        }
+
+        // Extract tool_calls from delta (streaming tool calls)
+        if (parsed.choices?.[0]?.delta?.tool_calls) {
+          for (const tc of parsed.choices[0].delta.tool_calls) {
+            const idx = tc.index ?? toolCalls.length;
+            if (!toolCalls[idx]) {
+              toolCalls[idx] = { id: '', type: 'function', function: { name: '', arguments: '' } };
+            }
+            if (tc.id) toolCalls[idx].id = tc.id;
+            if (tc.type) toolCalls[idx].type = tc.type;
+            if (tc.function?.name) toolCalls[idx].function.name += tc.function.name;
+            if (tc.function?.arguments) toolCalls[idx].function.arguments += tc.function.arguments;
+          }
         }
 
         // Extract finish reason
@@ -841,14 +857,192 @@ const parseStreamingResponse = (body: string): any => {
     }
   }
 
-  return {
+  // Determine display content
+  let displayContent = fullContent;
+  if (!displayContent && toolCalls.length > 0) {
+    // LLM is making tool calls without text response
+    const toolNames = toolCalls.map(tc => tc.function?.name).filter(Boolean).join(', ');
+    displayContent = `Calling tools: ${toolNames}`;
+  } else if (!displayContent) {
+    displayContent = 'No assistant response';
+  }
+
+  const result: any = {
     type: 'streaming',
-    content: fullContent || 'No assistant response',
+    content: displayContent,
     chunks: chunks.length,
     usage: usage,
     finish_reason: finishReason || 'unknown',
     model: chunks[0]?.model || 'localproxy'
   };
+
+  // Include tool_calls if present
+  if (toolCalls.length > 0) {
+    result.tool_calls = toolCalls;
+  }
+
+  return result;
+};
+
+// ============================================================
+// AGENTIC TOOL EXECUTION LOOP
+// ============================================================
+
+interface AgenticLoopResult {
+  finalResponse: any;
+  toolExecutions: Array<{
+    toolName: string;
+    mcpTool: string;
+    args: any;
+    result: any;
+    toolCallId: string;
+  }>;
+  iterations: number;
+}
+
+/**
+ * Execute tools from LLM response and continue conversation until final answer
+ * This handles the case where LLM returns tool_calls - we execute them via MCP
+ * and continue the conversation until we get a text-only response.
+ */
+const executeAgenticLoop = async (
+  initialResponse: any,
+  messages: any[],
+  llmCallFn: (messages: any[]) => Promise<any>,
+  ideMapping: IDEMapping,
+  maxIterations: number = 10
+): Promise<AgenticLoopResult> => {
+  const toolExecutions: AgenticLoopResult['toolExecutions'] = [];
+  let currentResponse = initialResponse;
+  let currentMessages = [...messages];
+  let iterations = 0;
+
+  while (iterations < maxIterations) {
+    iterations++;
+
+    // Check if response has tool_calls
+    const toolCalls = currentResponse.tool_calls || 
+                      currentResponse.choices?.[0]?.message?.tool_calls;
+    
+    if (!toolCalls || toolCalls.length === 0) {
+      // No tool calls, we're done
+      console.log(`[Agentic] Loop complete after ${iterations} iterations`);
+      return { finalResponse: currentResponse, toolExecutions, iterations };
+    }
+
+    console.log(`[Agentic] Iteration ${iterations}: Processing ${toolCalls.length} tool calls`);
+
+    // Add assistant message with tool_calls to context
+    const assistantMessage = currentResponse.choices?.[0]?.message || {
+      role: 'assistant',
+      content: currentResponse.content || '',
+      tool_calls: toolCalls
+    };
+    currentMessages.push(assistantMessage);
+
+    // Execute each tool call
+    for (const tc of toolCalls) {
+      const toolName = tc.function?.name || tc.name;
+      const toolCallId = tc.id;
+      let args: any = {};
+      
+      try {
+        args = typeof tc.function?.arguments === 'string' 
+          ? JSON.parse(tc.function.arguments)
+          : tc.function?.arguments || {};
+      } catch (e) {
+        console.warn(`[Agentic] Failed to parse tool arguments:`, tc.function?.arguments);
+      }
+
+      console.log(`[Agentic] Executing tool: ${toolName} with args:`, args);
+
+      // Check if tool is mapped to MCP
+      const mapped = ideMapping.mappings[toolName];
+      let result: any;
+      let mcpToolName = toolName;
+
+      if (mapped) {
+        // Map parameters
+        mcpToolName = mapped.mcp;
+        let mcpArgs = { ...args };
+        
+        if (mapped.params) {
+          mcpArgs = {};
+          for (const [ideParam, mcpParam] of Object.entries(mapped.params)) {
+            if (args[ideParam] !== undefined) {
+              mcpArgs[mcpParam as string] = args[ideParam];
+            }
+          }
+        }
+
+        console.log(`[Agentic] Mapped ${toolName} -> ${mcpToolName} with args:`, mcpArgs);
+
+        try {
+          const mcpResult = await mcpClient.executeTool(mcpToolName, mcpArgs);
+          result = mcpResult.content?.[0]?.text || JSON.stringify(mcpResult);
+        } catch (error: any) {
+          console.error(`[Agentic] MCP tool execution failed:`, error.message);
+          result = `Error executing ${mcpToolName}: ${error.message}`;
+        }
+      } else {
+        // Tool not mapped, check if it's a direct MCP tool
+        try {
+          const mcpResult = await mcpClient.executeTool(toolName, args);
+          result = mcpResult.content?.[0]?.text || JSON.stringify(mcpResult);
+        } catch (error: any) {
+          console.error(`[Agentic] Direct tool execution failed:`, error.message);
+          result = `Error: Tool ${toolName} not available. ${error.message}`;
+        }
+      }
+
+      toolExecutions.push({
+        toolName,
+        mcpTool: mcpToolName,
+        args,
+        result,
+        toolCallId
+      });
+
+      // Add tool result to messages
+      currentMessages.push({
+        role: 'tool',
+        content: typeof result === 'string' ? result : JSON.stringify(result),
+        tool_call_id: toolCallId
+      });
+
+      console.log(`[Agentic] Tool ${toolName} result length: ${result?.length || 0} chars`);
+    }
+
+    // Call LLM again with updated context
+    console.log(`[Agentic] Calling LLM with ${currentMessages.length} messages`);
+    currentResponse = await llmCallFn(currentMessages);
+  }
+
+  console.warn(`[Agentic] Max iterations (${maxIterations}) reached`);
+  return { finalResponse: currentResponse, toolExecutions, iterations };
+};
+
+/**
+ * Check if a response requires agentic tool execution
+ */
+const shouldExecuteAgentically = (response: any, ideMapping: IDEMapping): boolean => {
+  const toolCalls = response.tool_calls || 
+                    response.choices?.[0]?.message?.tool_calls;
+  
+  if (!toolCalls || toolCalls.length === 0) {
+    return false;
+  }
+
+  // Check if any tool call is mapped to MCP
+  for (const tc of toolCalls) {
+    const toolName = tc.function?.name || tc.name;
+    if (ideMapping.mappings[toolName]) {
+      console.log(`[Agentic] Tool ${toolName} is mapped - will execute agentically`);
+      return true;
+    }
+  }
+
+  return false;
 };
 
 // Create session immediately on request
@@ -1087,25 +1281,132 @@ const proxyToOpenAI = async (req: any, res: any) => {
           res.setHeader('Content-Type', 'text/event-stream');
           res.setHeader('Cache-Control', 'no-cache');
           res.setHeader('Connection', 'keep-alive');
+          
+          // Buffer the response first to check for tool calls
           let fullContent = '';
           response.data.on('data', (chunk: Buffer) => {
-            const chunkStr = chunk.toString();
-            fullContent += chunkStr;
-            res.write(chunkStr);
+            fullContent += chunk.toString();
           });
+          
           response.data.on('end', async () => {
             const parsedResponse = parseStreamingResponse(fullContent);
-            await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
-            res.end();
+            
+            // Check if we need to execute tools agentically
+            if (shouldExecuteAgentically(parsedResponse, ideMappingConfig)) {
+              console.log('[Agentic] Tool calls detected, executing via MCP...');
+              
+              // Create LLM call function for the loop
+              const llmCallFn = async (msgs: any[]): Promise<any> => {
+                const loopBody = {
+                  ...modifiedBody,
+                  messages: msgs,
+                  stream: false  // Use non-streaming for loop iterations
+                };
+                const loopResponse = await axios({
+                  method: 'POST',
+                  url: lmstudioUrl,
+                  headers: { 'Content-Type': 'application/json' },
+                  data: loopBody,
+                  timeout: 300000,
+                });
+                return loopResponse.data;
+              };
+              
+              try {
+                const { finalResponse, toolExecutions, iterations } = await executeAgenticLoop(
+                  parsedResponse,
+                  messagesToSend,
+                  llmCallFn,
+                  ideMappingConfig
+                );
+                
+                console.log(`[Agentic] Completed with ${toolExecutions.length} tool executions in ${iterations} iterations`);
+                
+                // Stream the final response to client
+                const finalContent = finalResponse.choices?.[0]?.message?.content || finalResponse.content || '';
+                
+                // Create SSE format for the final response
+                const sseChunk = JSON.stringify({
+                  id: `chatcmpl-${Date.now()}`,
+                  object: 'chat.completion.chunk',
+                  created: Math.floor(Date.now() / 1000),
+                  model: lmstudioModel,
+                  choices: [{
+                    index: 0,
+                    delta: { content: finalContent },
+                    finish_reason: 'stop'
+                  }]
+                });
+                res.write(`data: ${sseChunk}\n\n`);
+                res.write('data: [DONE]\n\n');
+                
+                // Save with tool execution metadata
+                const enrichedResponse = {
+                  ...finalResponse,
+                  toolyMeta: {
+                    agenticLoop: true,
+                    toolExecutions,
+                    iterations
+                  }
+                };
+                await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse);
+                res.end();
+              } catch (agentError: any) {
+                console.error('[Agentic] Loop failed:', agentError.message);
+                addDebugEntry('error', `Agentic loop error: ${agentError.message}`, {});
+                
+                // Fall back to original response
+                res.write(fullContent);
+                await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+                res.end();
+              }
+            } else {
+              // No mapped tool calls, stream normally
+              res.write(fullContent);
+              await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+              res.end();
+            }
           });
+          
           response.data.on('error', (err: Error) => {
             console.error('❌ LM STUDIO STREAM ERROR:', err.message);
             addDebugEntry('error', `LM Studio stream error: ${err.message}`, {});
             res.end();
           });
         } else {
-          await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
-          res.json(response.data);
+          // Non-streaming: check for agentic execution
+          if (shouldExecuteAgentically(response.data, ideMappingConfig)) {
+            console.log('[Agentic] Tool calls detected (non-streaming), executing via MCP...');
+            
+            const llmCallFn = async (msgs: any[]): Promise<any> => {
+              const loopBody = { ...modifiedBody, messages: msgs, stream: false };
+              const loopResponse = await axios({
+                method: 'POST',
+                url: lmstudioUrl,
+                headers: { 'Content-Type': 'application/json' },
+                data: loopBody,
+                timeout: 300000,
+              });
+              return loopResponse.data;
+            };
+            
+            const { finalResponse, toolExecutions, iterations } = await executeAgenticLoop(
+              response.data,
+              messagesToSend,
+              llmCallFn,
+              ideMappingConfig
+            );
+            
+            const enrichedResponse = {
+              ...finalResponse,
+              toolyMeta: { agenticLoop: true, toolExecutions, iterations }
+            };
+            await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse);
+            res.json(finalResponse);
+          } else {
+            await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
+            res.json(response.data);
+          }
         }
         return;
       } catch (lmError: any) {
