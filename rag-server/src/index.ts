@@ -15,11 +15,14 @@ import { WebSocketServer, WebSocket } from 'ws';
 import path from 'path';
 import fs from 'fs/promises';
 
-import { defaultConfig, RAGConfig, IndexProgress, RAGResult, RAGMetrics } from './config.js';
+import { defaultConfig, RAGConfig, IndexProgress, RAGResult, RAGMetrics, FileSummary } from './config.js';
 import { getIndexer, Indexer } from './services/indexer.js';
 import { getLMStudioEmbedder } from './embeddings/lmstudio.js';
 import { getHNSWLibStore } from './storage/hnswlib.js';
 import { initializeTokenizer } from './services/tokenizer.js';
+import { initializeSummarizer, isSummarizerReady } from './services/summarizer.js';
+import { getDependencyGraph, getGraphStats, serializeGraph, loadGraph } from './services/graph-builder.js';
+import { createQueryPlan, buildQueryText, mergeAndRankResults, getContextExpansion, formatSearchResults } from './services/query-router.js';
 
 const app = express();
 
@@ -59,11 +62,19 @@ async function loadConfig(): Promise<void> {
       storage: { ...defaultConfig.storage, ...savedConfig.storage },
       indexing: { ...defaultConfig.indexing, ...savedConfig.indexing },
       watcher: { ...defaultConfig.watcher, ...savedConfig.watcher },
-      project: { ...defaultConfig.project, ...savedConfig.project }
+      project: { ...defaultConfig.project, ...savedConfig.project },
+      summarization: { ...defaultConfig.summarization, ...savedConfig.summarization },
+      dependencyGraph: { ...defaultConfig.dependencyGraph, ...savedConfig.dependencyGraph },
+      queryEnhancement: { ...defaultConfig.queryEnhancement, ...savedConfig.queryEnhancement },
+      queryRouting: { ...defaultConfig.queryRouting, ...savedConfig.queryRouting }
     };
     console.log('[RAG Server] Loaded config from', CONFIG_FILE);
     console.log('[RAG Server] Embedding model:', config.lmstudio.model || 'not set');
+    console.log('[RAG Server] Chat model:', config.lmstudio.chatModel || 'not set');
     console.log('[RAG Server] Project path:', config.project.path || 'not set');
+    console.log('[RAG Server] Summarization:', config.summarization.enabled ? 'enabled' : 'disabled');
+    console.log('[RAG Server] Query enhancement:', 
+      `HyDE=${config.queryEnhancement.enableHyde}, Expansion=${config.queryEnhancement.enableQueryExpansion}`);
   } catch {
     console.log('[RAG Server] No saved config found, using defaults');
   }
@@ -110,6 +121,28 @@ async function initializeServices(): Promise<void> {
   if (config.lmstudio.model) {
     const embedder = getLMStudioEmbedder();
     await embedder.setModel(config.lmstudio.model);
+  }
+  
+  // === HIERARCHICAL RAG: Initialize summarizer ===
+  if (config.summarization?.enabled && config.lmstudio.chatModel) {
+    console.log('[RAG Server] Initializing summarizer...');
+    const summarizerReady = await initializeSummarizer(config.lmstudio.chatModel);
+    if (summarizerReady) {
+      console.log('[RAG Server] Summarizer ready');
+    } else {
+      console.warn('[RAG Server] Summarizer not available (no chat model)');
+    }
+  }
+  
+  // === HIERARCHICAL RAG: Load dependency graph ===
+  if (config.dependencyGraph?.enabled) {
+    try {
+      const graphData = await fs.readFile('./data/dependency-graph.json', 'utf-8');
+      loadGraph(graphData);
+      console.log('[RAG Server] Loaded dependency graph');
+    } catch {
+      console.log('[RAG Server] No existing dependency graph');
+    }
   }
   
   indexer = getIndexer(config);
@@ -320,10 +353,10 @@ app.post('/api/rag/index/cancel', async (req: Request, res: Response) => {
   }
 });
 
-// Query the index
+// Query the index with hierarchical RAG support
 app.post('/api/rag/query', async (req: Request, res: Response) => {
   try {
-    const { query, limit = 5, filter } = req.body;
+    const { query, limit = 5, filter, strategy } = req.body;
     
     if (!query) {
       return res.status(400).json({ error: 'query is required' });
@@ -331,17 +364,43 @@ app.post('/api/rag/query', async (req: Request, res: Response) => {
     
     console.log(`[Query] Searching for: "${query}" (limit: ${limit})`);
     const startTime = Date.now();
+    const timings = { planning: 0, hyde: 0, expansion: 0, search: 0, total: 0 };
     
-    const results = await indexer.query(query, limit);
+    // === QUERY PLANNING ===
+    // Create query plan with optional HyDE and expansion
+    const planStart = Date.now();
+    const queryPlan = await createQueryPlan(query, config, limit);
+    timings.planning = Date.now() - planStart;
     
-    console.log(`[Query] Got ${results.length} results from indexer`);
-    results.forEach((r, i) => {
+    if (queryPlan.hydeCode) {
+      console.log(`[Query] HyDE generated ${queryPlan.hydeCode.length} chars of hypothetical code`);
+      timings.hyde = timings.planning; // Included in planning
+    }
+    if (queryPlan.processedQueries.length > 1) {
+      console.log(`[Query] Expanded to ${queryPlan.processedQueries.length} queries:`, queryPlan.processedQueries);
+      timings.expansion = timings.planning; // Included in planning
+    }
+    
+    // === SEARCH ===
+    const searchStart = Date.now();
+    
+    // Build the query text (may include HyDE code)
+    const queryText = buildQueryText(queryPlan);
+    
+    // Search with enhanced query
+    const results = await indexer.query(queryText, limit * 2); // Get more for re-ranking
+    
+    timings.search = Date.now() - searchStart;
+    
+    console.log(`[Query] Got ${results.length} results from indexer (strategy: ${queryPlan.strategy})`);
+    results.slice(0, 5).forEach((r, i) => {
       console.log(`[Query] Result ${i}: chunk=${r.chunk ? 'yes' : 'null'}, score=${r.score.toFixed(4)}, file=${r.chunk?.filePath || 'N/A'}`);
     });
     
-    // Transform to RAGResult format
-    const formattedResults: RAGResult[] = results
+    // Transform to RAGResult format with optional summaries
+    const formattedResults: (RAGResult & { summary?: string })[] = results
       .filter(r => r.chunk !== null)
+      .slice(0, limit)
       .map(r => ({
         filePath: r.chunk!.filePath,
         startLine: r.chunk!.startLine,
@@ -350,7 +409,8 @@ app.post('/api/rag/query', async (req: Request, res: Response) => {
         symbolName: r.chunk!.name || null,
         symbolType: r.chunk!.type || null,
         language: r.chunk!.language,
-        score: r.score
+        score: r.score,
+        summary: (r.chunk as any)?.summary || undefined
       }));
     
     console.log(`[Query] Formatted ${formattedResults.length} results after filtering null chunks`);
@@ -368,16 +428,42 @@ app.post('/api/rag/query', async (req: Request, res: Response) => {
       );
     }
     
-    const latency = Date.now() - startTime;
+    // === CONTEXT EXPANSION (for graph strategy) ===
+    let relatedFiles: string[] = [];
+    if (queryPlan.expandContext && config.dependencyGraph.enabled) {
+      const initialFiles = [...new Set(filteredResults.map(r => r.filePath))];
+      relatedFiles = getContextExpansion(initialFiles, queryPlan.strategy, 3);
+    }
+    
+    // === FILE SUMMARIES (for summary strategy) ===
+    let fileSummaries: FileSummary[] = [];
+    if (queryPlan.strategy === 'summary' || queryPlan.strategy === 'file') {
+      const matchedFiles = [...new Set(filteredResults.map(r => r.filePath))];
+      fileSummaries = matchedFiles
+        .map(f => indexer.getFileSummary(f))
+        .filter((s): s is FileSummary => s !== null);
+    }
+    
+    timings.total = Date.now() - startTime;
     
     res.json({ 
       results: filteredResults, 
-      query, 
-      latency,
+      query,
+      queryPlan: {
+        strategy: queryPlan.strategy,
+        hydeUsed: !!queryPlan.hydeCode,
+        expansionUsed: queryPlan.processedQueries.length > 1,
+        expandedQueries: queryPlan.processedQueries
+      },
+      fileSummaries: fileSummaries.length > 0 ? fileSummaries : undefined,
+      relatedFiles: relatedFiles.length > 0 ? relatedFiles : undefined,
+      latency: timings.total,
+      timings,
       totalResults: filteredResults.length
     });
     
   } catch (error: any) {
+    console.error('[Query] Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -481,6 +567,137 @@ app.get('/api/rag/metrics', async (req: Request, res: Response) => {
       }
     };
     res.json(metrics);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// =============================================================================
+// Hierarchical RAG Endpoints
+// =============================================================================
+
+// Get all file summaries
+app.get('/api/rag/file-summaries', async (req: Request, res: Response) => {
+  try {
+    const summaries = indexer.getFileSummaries();
+    res.json({
+      summaries,
+      total: summaries.length,
+      enabled: config.summarization?.fileSummaries || false
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get single file summary
+app.get('/api/rag/file-summaries/:filePath(*)', async (req: Request, res: Response) => {
+  try {
+    const { filePath } = req.params;
+    const summary = indexer.getFileSummary(filePath);
+    
+    if (!summary) {
+      return res.status(404).json({ error: 'File summary not found' });
+    }
+    
+    res.json(summary);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Search file summaries
+app.get('/api/rag/file-summaries/search', async (req: Request, res: Response) => {
+  try {
+    const { query, limit = '5' } = req.query;
+    
+    if (!query) {
+      return res.status(400).json({ error: 'query is required' });
+    }
+    
+    const results = indexer.searchFileSummaries(query as string, Number(limit));
+    res.json({ results, query, total: results.length });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get dependency graph stats
+app.get('/api/rag/graph/stats', async (req: Request, res: Response) => {
+  try {
+    if (!config.dependencyGraph?.enabled) {
+      return res.json({ enabled: false, message: 'Dependency graph is disabled' });
+    }
+    
+    const stats = getGraphStats();
+    res.json({ enabled: true, ...stats });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get dependency graph for a file
+app.get('/api/rag/graph/:filePath(*)', async (req: Request, res: Response) => {
+  try {
+    const { filePath } = req.params;
+    const { depth = '2' } = req.query;
+    
+    if (!config.dependencyGraph?.enabled) {
+      return res.json({ enabled: false, message: 'Dependency graph is disabled' });
+    }
+    
+    const graph = getDependencyGraph();
+    const node = graph.nodes.get(filePath);
+    
+    if (!node) {
+      return res.status(404).json({ error: 'File not found in graph' });
+    }
+    
+    // Get related files
+    const related = getContextExpansion([filePath], 'graph', Number(depth));
+    
+    res.json({
+      file: filePath,
+      node,
+      imports: node.imports,
+      related,
+      edges: graph.edges.filter(e => e.from === filePath || e.to === filePath)
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get hierarchical RAG status
+app.get('/api/rag/hierarchical/status', async (req: Request, res: Response) => {
+  try {
+    const graphStats = config.dependencyGraph?.enabled ? getGraphStats() : null;
+    
+    res.json({
+      summarization: {
+        enabled: config.summarization?.enabled || false,
+        chunkSummaries: config.summarization?.chunkSummaries || false,
+        fileSummaries: config.summarization?.fileSummaries || false,
+        asyncGeneration: config.summarization?.asyncGeneration || false,
+        summarizerReady: isSummarizerReady(),
+        fileSummaryCount: indexer.getFileSummaries().length
+      },
+      dependencyGraph: {
+        enabled: config.dependencyGraph?.enabled || false,
+        nodeCount: graphStats?.nodeCount || 0,
+        edgeCount: graphStats?.edgeCount || 0
+      },
+      queryEnhancement: {
+        hyde: config.queryEnhancement?.enableHyde || false,
+        queryExpansion: config.queryEnhancement?.enableQueryExpansion || false,
+        contextualChunks: config.queryEnhancement?.enableContextualChunks || false,
+        multiVector: config.queryEnhancement?.enableMultiVector || false
+      },
+      queryRouting: {
+        enabled: config.queryRouting?.enabled || false,
+        defaultStrategy: config.queryRouting?.defaultStrategy || 'code'
+      }
+    });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

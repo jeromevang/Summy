@@ -33,6 +33,11 @@ export interface ChunkMetadata {
   symbolType?: string;
   language?: string;
   signature?: string;
+  // Hierarchical RAG additions
+  summary?: string;
+  purpose?: string;
+  isSummaryVector?: boolean;
+  originalChunkId?: string;
 }
 
 export class HNSWLibStore implements VectorStore {

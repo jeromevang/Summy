@@ -3,6 +3,7 @@
   "wsPort": 3003,
   "lmstudio": {
     "model": "text-embedding-nomic-embed-text-v1.5@q8_0",
+    "chatModel": "qwen/qwen3-4b-2507",
     "loadOnDemand": false
   },
   "storage": {
@@ -50,10 +51,35 @@
   "watcher": {
     "enabled": true,
     "debounceMs": 2000,
-    "paths": ["server/src", "client/src", "rag-server/src", "mcp-server/src"]
+    "paths": [
+      "server/src",
+      "client/src",
+      "rag-server/src",
+      "mcp-server/src"
+    ]
   },
   "project": {
     "path": "C:\\Users\\Jerome\\Documents\\Projects\\Summy",
     "autoDetect": true
+  },
+  "summarization": {
+    "enabled": true,
+    "chunkSummaries": true,
+    "fileSummaries": true,
+    "asyncGeneration": true
+  },
+  "dependencyGraph": {
+    "enabled": true,
+    "includeCallGraph": false
+  },
+  "queryEnhancement": {
+    "enableHyde": true,
+    "enableQueryExpansion": true,
+    "enableContextualChunks": true,
+    "enableMultiVector": true
+  },
+  "queryRouting": {
+    "enabled": true,
+    "defaultStrategy": "auto"
   }
 }
