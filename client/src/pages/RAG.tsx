@@ -69,6 +69,28 @@ interface QueryResult {
   score: number;
 }
 
+interface ChunkInfo {
+  id: string;
+  filePath: string;
+  startLine: number;
+  endLine: number;
+  symbolName: string | null;
+  symbolType: string | null;
+  language: string;
+  tokens: number;
+  preview: string;
+  // Full content loaded on demand
+  content?: string;
+  signature?: string | null;
+}
+
+interface ChunkBrowserState {
+  chunks: ChunkInfo[];
+  totalCount: number;
+  page: number;
+  totalPages: number;
+}
+
 interface FolderEntry {
   name: string;
   path: string;
@@ -118,6 +140,21 @@ const RAG: React.FC = () => {
   const [browseParent, setBrowseParent] = useState<string | null>(null);
   const [browseIsProject, setBrowseIsProject] = useState(false);
   const [isLoadingFolder, setIsLoadingFolder] = useState(false);
+  
+  // Chunk browser state
+  const [chunkBrowser, setChunkBrowser] = useState<ChunkBrowserState>({
+    chunks: [],
+    totalCount: 0,
+    page: 1,
+    totalPages: 1
+  });
+  const [chunkFilter, setChunkFilter] = useState({
+    fileType: '',
+    symbolType: '',
+    search: ''
+  });
+  const [isLoadingChunks, setIsLoadingChunks] = useState(false);
+  const [selectedChunk, setSelectedChunk] = useState<ChunkInfo | null>(null);
 
   // Load data - each call is independent so one failure doesn't block others
   const loadData = useCallback(async () => {
@@ -311,6 +348,70 @@ const RAG: React.FC = () => {
       setIsQuerying(false);
     }
   };
+
+  // Load chunks for browser
+  const loadChunks = useCallback(async (page: number = 1) => {
+    setIsLoadingChunks(true);
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '20',
+        ...(chunkFilter.fileType && { fileType: chunkFilter.fileType }),
+        ...(chunkFilter.symbolType && { symbolType: chunkFilter.symbolType }),
+        ...(chunkFilter.search && { search: chunkFilter.search })
+      });
+      const res = await axios.get(`${API_BASE}/chunks?${params}`);
+      setChunkBrowser({
+        chunks: res.data.chunks || [],
+        totalCount: res.data.pagination?.total || 0,
+        page: res.data.pagination?.page || 1,
+        totalPages: res.data.pagination?.pages || 1
+      });
+      setSelectedChunk(null); // Clear selection when loading new page
+    } catch (error) {
+      console.error('Failed to load chunks:', error);
+    } finally {
+      setIsLoadingChunks(false);
+    }
+  }, [chunkFilter]);
+
+  // Load full chunk content
+  const loadFullChunk = async (chunkId: string) => {
+    try {
+      const res = await axios.get(`${API_BASE}/chunks/${chunkId}`);
+      const fullChunk = res.data;
+      // Update the chunk in the list with full content
+      setChunkBrowser(prev => ({
+        ...prev,
+        chunks: prev.chunks.map(c => 
+          c.id === chunkId ? { ...c, content: fullChunk.content, signature: fullChunk.signature } : c
+        )
+      }));
+      // Set as selected
+      const updatedChunk = { ...chunkBrowser.chunks.find(c => c.id === chunkId)!, content: fullChunk.content, signature: fullChunk.signature };
+      setSelectedChunk(updatedChunk);
+    } catch (error) {
+      console.error('Failed to load chunk details:', error);
+    }
+  };
+
+  // Handle chunk click
+  const handleChunkClick = (chunk: ChunkInfo) => {
+    if (selectedChunk?.id === chunk.id) {
+      setSelectedChunk(null);
+    } else if (chunk.content) {
+      setSelectedChunk(chunk);
+    } else {
+      loadFullChunk(chunk.id);
+    }
+  };
+
+  // Load chunks when browser tab is active
+  useEffect(() => {
+    if (activeTab === 'browser') {
+      loadChunks(1);
+    }
+  }, [activeTab, loadChunks]);
 
   // Format bytes
   const formatBytes = (bytes: number): string => {
@@ -668,11 +769,224 @@ const RAG: React.FC = () => {
 
         {/* Browser Tab */}
         {activeTab === 'browser' && (
-          <div className="bg-[#1a1a1a] rounded-lg p-6 border border-gray-800">
-            <h3 className="text-lg font-semibold mb-4">Chunk Browser</h3>
-            <p className="text-gray-400">
-              Browse and explore indexed code chunks. Coming soon...
-            </p>
+          <div className="space-y-4">
+            {/* Filters */}
+            <div className="bg-[#1a1a1a] rounded-lg p-4 border border-gray-800">
+              <div className="flex flex-wrap gap-4 items-end">
+                <div className="flex-1 min-w-[200px]">
+                  <label className="block text-sm text-gray-400 mb-1">Search</label>
+                  <input
+                    type="text"
+                    value={chunkFilter.search}
+                    onChange={(e) => setChunkFilter(f => ({ ...f, search: e.target.value }))}
+                    onKeyDown={(e) => e.key === 'Enter' && loadChunks(1)}
+                    placeholder="Search content or file path..."
+                    className="w-full px-3 py-2 bg-[#0a0a0a] border border-gray-700 rounded focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div className="w-40">
+                  <label className="block text-sm text-gray-400 mb-1">File Type</label>
+                  <select
+                    value={chunkFilter.fileType}
+                    onChange={(e) => {
+                      setChunkFilter(f => ({ ...f, fileType: e.target.value }));
+                    }}
+                    className="w-full px-3 py-2 bg-[#0a0a0a] border border-gray-700 rounded focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="">All Types</option>
+                    <option value="ts">TypeScript</option>
+                    <option value="tsx">TSX</option>
+                    <option value="js">JavaScript</option>
+                    <option value="jsx">JSX</option>
+                    <option value="py">Python</option>
+                    <option value="json">JSON</option>
+                    <option value="md">Markdown</option>
+                  </select>
+                </div>
+                <div className="w-40">
+                  <label className="block text-sm text-gray-400 mb-1">Symbol Type</label>
+                  <select
+                    value={chunkFilter.symbolType}
+                    onChange={(e) => {
+                      setChunkFilter(f => ({ ...f, symbolType: e.target.value }));
+                    }}
+                    className="w-full px-3 py-2 bg-[#0a0a0a] border border-gray-700 rounded focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="">All Symbols</option>
+                    <option value="function">Function</option>
+                    <option value="class">Class</option>
+                    <option value="interface">Interface</option>
+                    <option value="type">Type</option>
+                    <option value="variable">Variable</option>
+                    <option value="import">Import</option>
+                  </select>
+                </div>
+                <button
+                  onClick={() => loadChunks(1)}
+                  disabled={isLoadingChunks}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded font-medium"
+                >
+                  {isLoadingChunks ? 'Loading...' : 'Filter'}
+                </button>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="text-sm text-gray-400">
+              Showing {chunkBrowser.chunks.length} of {chunkBrowser.totalCount} chunks
+              {chunkBrowser.totalPages > 1 && ` (Page ${chunkBrowser.page} of ${chunkBrowser.totalPages})`}
+            </div>
+
+            {/* Chunk List */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {isLoadingChunks ? (
+                <div className="col-span-2 text-center py-8 text-gray-500">Loading chunks...</div>
+              ) : chunkBrowser.chunks.length === 0 ? (
+                <div className="col-span-2 bg-[#1a1a1a] rounded-lg p-6 border border-gray-800">
+                  {stats?.totalVectors === 0 ? (
+                    <div className="text-center text-gray-500">
+                      <p className="text-lg mb-2">📂 No chunks indexed yet</p>
+                      <p>Go to the Dashboard tab and click "Start Indexing" to index your project.</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <h4 className="text-lg font-semibold mb-4">📊 Index Statistics</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="bg-[#0a0a0a] p-4 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-400">{stats?.totalFiles || 0}</div>
+                          <div className="text-sm text-gray-500">Files Indexed</div>
+                        </div>
+                        <div className="bg-[#0a0a0a] p-4 rounded-lg">
+                          <div className="text-2xl font-bold text-green-400">{stats?.totalVectors || 0}</div>
+                          <div className="text-sm text-gray-500">Vectors</div>
+                        </div>
+                        <div className="bg-[#0a0a0a] p-4 rounded-lg">
+                          <div className="text-2xl font-bold text-purple-400">{stats?.dimensions || 0}</div>
+                          <div className="text-sm text-gray-500">Dimensions</div>
+                        </div>
+                        <div className="bg-[#0a0a0a] p-4 rounded-lg">
+                          <div className="text-2xl font-bold text-yellow-400">{formatBytes(stats?.storageSize || 0)}</div>
+                          <div className="text-sm text-gray-500">Storage</div>
+                        </div>
+                      </div>
+                      <p className="mt-4 text-gray-400">
+                        Use the <strong>Query</strong> tab to search your indexed codebase with semantic search.
+                      </p>
+                      <p className="mt-2 text-sm text-gray-500">
+                        The chunk browser requires re-indexing to populate (clear index and re-index).
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                chunkBrowser.chunks.map((chunk) => (
+                  <div
+                    key={chunk.id}
+                    onClick={() => handleChunkClick(chunk)}
+                    className={`bg-[#1a1a1a] rounded-lg p-4 border cursor-pointer transition-all hover:border-blue-500/50 ${
+                      selectedChunk?.id === chunk.id ? 'border-blue-500' : 'border-gray-800'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-mono text-sm text-blue-400 truncate" title={chunk.filePath}>
+                          {chunk.filePath}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          <span className="text-xs text-gray-500">
+                            Lines {chunk.startLine}-{chunk.endLine}
+                          </span>
+                          {chunk.symbolName && (
+                            <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded text-xs">
+                              {chunk.symbolType}: {chunk.symbolName}
+                            </span>
+                          )}
+                          <span className="px-2 py-0.5 bg-gray-700 text-gray-400 rounded text-xs">
+                            {chunk.language}
+                          </span>
+                          <span className="text-xs text-gray-600">
+                            {chunk.tokens} tokens
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Preview */}
+                    <div className="text-xs font-mono text-gray-400 mt-2 bg-[#0a0a0a] px-2 py-1 rounded line-clamp-2">
+                      {chunk.preview}...
+                    </div>
+                    
+                    {/* Expanded content */}
+                    {selectedChunk?.id === chunk.id && chunk.content && (
+                      <div className="mt-3 pt-3 border-t border-gray-700">
+                        {chunk.signature && (
+                          <div className="text-xs font-mono text-purple-400 mb-2 bg-purple-500/10 px-2 py-1 rounded">
+                            {chunk.signature}
+                          </div>
+                        )}
+                        <pre className="bg-[#0a0a0a] p-3 rounded overflow-x-auto text-xs max-h-96 overflow-y-auto">
+                          <code>{chunk.content}</code>
+                        </pre>
+                      </div>
+                    )}
+                    
+                    {/* Loading indicator */}
+                    {selectedChunk?.id === chunk.id && !chunk.content && (
+                      <div className="mt-3 pt-3 border-t border-gray-700 text-center text-gray-500 text-sm">
+                        Loading content...
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Pagination */}
+            {chunkBrowser.totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={() => loadChunks(chunkBrowser.page - 1)}
+                  disabled={chunkBrowser.page <= 1 || isLoadingChunks}
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-600 rounded"
+                >
+                  ← Previous
+                </button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, chunkBrowser.totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (chunkBrowser.totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (chunkBrowser.page <= 3) {
+                      pageNum = i + 1;
+                    } else if (chunkBrowser.page >= chunkBrowser.totalPages - 2) {
+                      pageNum = chunkBrowser.totalPages - 4 + i;
+                    } else {
+                      pageNum = chunkBrowser.page - 2 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => loadChunks(pageNum)}
+                        className={`w-10 h-10 rounded ${
+                          pageNum === chunkBrowser.page
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-700 hover:bg-gray-600'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  onClick={() => loadChunks(chunkBrowser.page + 1)}
+                  disabled={chunkBrowser.page >= chunkBrowser.totalPages || isLoadingChunks}
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-600 rounded"
+                >
+                  Next →
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

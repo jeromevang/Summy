@@ -30,22 +30,40 @@ import { getHNSWLibStore, HNSWLibStore } from '../storage/hnswlib.js';
 // Progress callback type
 export type ProgressCallback = (progress: IndexProgress) => void;
 
+// Stored chunk info for browser
+export interface StoredChunk {
+  id: string;
+  filePath: string;
+  startLine: number;
+  endLine: number;
+  symbolName: string | null;
+  symbolType: string | null;
+  language: string;
+  tokens: number;
+  content: string;
+  signature: string | null;
+  createdAt: string;
+}
+
 export class Indexer {
   private config: RAGConfig;
   private chunker: Chunker;
   private embedder: LMStudioEmbedder;
   private vectorStore: HNSWLibStore;
-  
+
   private progress: IndexProgress;
   private progressCallback: ProgressCallback | null = null;
   private isCancelled = false;
-  
+
   private fileWatcher: FSWatcher | null = null;
   private debounceTimer: NodeJS.Timeout | null = null;
   private pendingChanges: Set<string> = new Set();
-  
+
   // Database reference (will be injected or imported)
   private db: any = null;
+  
+  // In-memory chunk storage for browser
+  private storedChunks: Map<string, StoredChunk> = new Map();
   
   constructor(config: Partial<RAGConfig> = {}) {
     this.config = { ...defaultConfig, ...config };
@@ -73,7 +91,18 @@ export class Indexer {
   setDatabase(db: any): void {
     this.db = db;
   }
-  
+
+  /**
+   * Update config (for live updates)
+   */
+  updateConfig(config: Partial<RAGConfig>): void {
+    this.config = { ...this.config, ...config };
+    if (config.lmstudio) {
+      this.config.lmstudio = { ...this.config.lmstudio, ...config.lmstudio };
+    }
+    console.log('[Indexer] Config updated, model:', this.config.lmstudio.model);
+  }
+
   /**
    * Set progress callback
    */
@@ -105,7 +134,80 @@ export class Indexer {
   getProgress(): IndexProgress {
     return { ...this.progress };
   }
-  
+
+  /**
+   * Store a chunk for browser access
+   */
+  private storeChunk(chunk: StoredChunk): void {
+    this.storedChunks.set(chunk.id, chunk);
+  }
+
+  /**
+   * Get all stored chunks with pagination and filters
+   */
+  getChunks(options: {
+    page?: number;
+    limit?: number;
+    fileType?: string;
+    symbolType?: string;
+    search?: string;
+  } = {}): { chunks: StoredChunk[]; total: number } {
+    const page = options.page || 1;
+    const limit = options.limit || 50;
+    
+    let chunks = Array.from(this.storedChunks.values());
+    
+    // Apply filters
+    if (options.fileType) {
+      chunks = chunks.filter(c => c.language.toLowerCase() === options.fileType?.toLowerCase());
+    }
+    if (options.symbolType) {
+      chunks = chunks.filter(c => c.symbolType?.toLowerCase() === options.symbolType?.toLowerCase());
+    }
+    if (options.search) {
+      const search = options.search.toLowerCase();
+      chunks = chunks.filter(c => 
+        c.content.toLowerCase().includes(search) ||
+        c.filePath.toLowerCase().includes(search) ||
+        (c.symbolName?.toLowerCase().includes(search) ?? false)
+      );
+    }
+    
+    // Sort by file path and line number
+    chunks.sort((a, b) => {
+      const pathCompare = a.filePath.localeCompare(b.filePath);
+      if (pathCompare !== 0) return pathCompare;
+      return a.startLine - b.startLine;
+    });
+    
+    const total = chunks.length;
+    const offset = (page - 1) * limit;
+    const paginatedChunks = chunks.slice(offset, offset + limit);
+    
+    return { chunks: paginatedChunks, total };
+  }
+
+  /**
+   * Get a single chunk by ID
+   */
+  getChunk(id: string): StoredChunk | null {
+    return this.storedChunks.get(id) || null;
+  }
+
+  /**
+   * Clear all stored chunks
+   */
+  clearStoredChunks(): void {
+    this.storedChunks.clear();
+  }
+
+  /**
+   * Get total stored chunk count
+   */
+  getStoredChunkCount(): number {
+    return this.storedChunks.size;
+  }
+
   /**
    * Hash file content for change detection
    */
@@ -224,9 +326,35 @@ export class Indexer {
       if (embeddings[i].length === 0) continue;
       
       const chunk = chunks[i];
-      const vectorId = await this.vectorStore.add(embeddings[i], chunk.id);
       
-      // Save metadata to DB
+      // Store with chunk metadata in vector store (so we don't need DB for queries)
+      const vectorId = await this.vectorStore.add(embeddings[i], chunk.id, {
+        content: chunk.content,
+        filePath: relativePath,
+        startLine: chunk.startLine,
+        endLine: chunk.endLine,
+        symbolName: chunk.name,
+        symbolType: chunk.type,
+        language: chunk.language,
+        signature: chunk.signature
+      });
+      
+      // Store chunk for browser access
+      this.storeChunk({
+        id: chunk.id,
+        filePath: relativePath,
+        startLine: chunk.startLine,
+        endLine: chunk.endLine,
+        symbolName: chunk.name || null,
+        symbolType: chunk.type || null,
+        language: chunk.language,
+        tokens: chunk.tokens,
+        content: chunk.content,
+        signature: chunk.signature || null,
+        createdAt: new Date().toISOString()
+      });
+      
+      // Save metadata to DB (optional, for richer querying)
       if (this.db) {
         this.db.addRAGChunk({
           id: chunk.id,
@@ -521,10 +649,11 @@ export class Indexer {
     // Search
     const results = await this.vectorStore.search(queryVector, limit);
     
-    // Get chunk metadata from DB
+    // Get chunk metadata from DB or from vector store metadata
     const response = results.map(result => {
       let chunk: CodeChunk | null = null;
       
+      // Try database first (has more complete metadata)
       if (this.db) {
         const dbChunk = this.db.getRAGChunk(result.chunkId);
         if (dbChunk) {
@@ -542,6 +671,23 @@ export class Indexer {
             tokens: dbChunk.tokens
           };
         }
+      }
+      
+      // Fall back to vector store metadata if DB not available
+      if (!chunk && result.metadata) {
+        chunk = {
+          id: result.chunkId,
+          content: result.metadata.content || '',
+          type: (result.metadata.symbolType as CodeChunk['type']) || 'code',
+          name: result.metadata.symbolName || 'unknown',
+          filePath: result.metadata.filePath || '',
+          startLine: result.metadata.startLine || 0,
+          endLine: result.metadata.endLine || 0,
+          language: result.metadata.language || 'unknown',
+          imports: [],
+          signature: result.metadata.signature,
+          tokens: 0
+        };
       }
       
       return {
@@ -574,11 +720,12 @@ export class Indexer {
    */
   async clear(): Promise<void> {
     await this.vectorStore.clear();
-    
+    this.clearStoredChunks();
+
     if (this.db) {
       this.db.clearAllRAGData();
     }
-    
+
     this.progress = {
       status: 'idle',
       totalFiles: 0,
@@ -599,6 +746,9 @@ let indexerInstance: Indexer | null = null;
 export function getIndexer(config?: Partial<RAGConfig>): Indexer {
   if (!indexerInstance) {
     indexerInstance = new Indexer(config);
+  } else if (config) {
+    // Update existing instance config
+    indexerInstance.updateConfig(config);
   }
   return indexerInstance;
 }

@@ -310,6 +310,24 @@ router.post('/index', async (req: Request, res: Response) => {
       return res.status(503).json({ error: 'Could not start RAG server' });
     }
     
+    // Get saved config with embedding model
+    const savedConfig = db.getRAGConfig();
+    const embeddingModel = savedConfig?.lmstudio?.model;
+    
+    if (!embeddingModel) {
+      return res.status(400).json({ 
+        error: 'No embedding model selected. Please select an embedding model in RAG Settings first.' 
+      });
+    }
+    
+    console.log('[RAG] Starting indexing with model:', embeddingModel);
+    
+    // First update RAG server config with the model
+    await ragClient.updateConfig({
+      lmstudio: { model: embeddingModel }
+    });
+    
+    // Then start indexing
     const result = await ragClient.startIndexing(req.body.projectPath);
     res.json(result);
   } catch (error: any) {
@@ -432,42 +450,52 @@ router.get('/visualization', async (req: Request, res: Response) => {
   }
 });
 
-// Get chunks with pagination
+// Get chunks with pagination - proxy to RAG server
 router.get('/chunks', async (req: Request, res: Response) => {
   try {
-    // Use database directly for faster access
-    const { page, limit, fileType, symbolType, search } = req.query;
-    
-    const result = db.getRAGChunks({
-      page: page ? Number(page) : 1,
-      limit: limit ? Number(limit) : 50,
-      fileType: fileType as string,
-      symbolType: symbolType as string,
-      search: search as string
-    });
-    
-    res.json({
-      chunks: result.chunks,
-      pagination: {
+    // Forward to RAG server which has the chunks in memory
+    const chunks = await ragClient.getChunks(req.query as any);
+    res.json(chunks);
+  } catch (error: any) {
+    // Fall back to database if RAG server not available
+    try {
+      const { page, limit, fileType, symbolType, search } = req.query;
+      const result = db.getRAGChunks({
         page: page ? Number(page) : 1,
         limit: limit ? Number(limit) : 50,
-        total: result.total,
-        pages: Math.ceil(result.total / (limit ? Number(limit) : 50))
-      }
-    });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+        fileType: fileType as string,
+        symbolType: symbolType as string,
+        search: search as string
+      });
+      res.json({
+        chunks: result.chunks,
+        pagination: {
+          page: page ? Number(page) : 1,
+          limit: limit ? Number(limit) : 50,
+          total: result.total,
+          pages: Math.ceil(result.total / (limit ? Number(limit) : 50))
+        }
+      });
+    } catch (dbError: any) {
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 
-// Get single chunk
+// Get single chunk - proxy to RAG server
 router.get('/chunks/:id', async (req: Request, res: Response) => {
   try {
-    const chunk = db.getRAGChunk(req.params.id);
-    if (!chunk) {
+    // Try RAG server first
+    const chunk = await ragClient.getChunk(req.params.id);
+    if (chunk) {
+      return res.json(chunk);
+    }
+    // Fall back to database
+    const dbChunk = db.getRAGChunk(req.params.id);
+    if (!dbChunk) {
       return res.status(404).json({ error: 'Chunk not found' });
     }
-    res.json(chunk);
+    res.json(dbChunk);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
