@@ -48,11 +48,11 @@
       "description": "Search for patterns in files"
     },
     "fetch_url_content": {
-      "mcp": "http_request",
+      "mcp": "browser_fetch_content",
       "params": {
         "url": "url"
       },
-      "description": "Fetch URL content via HTTP request"
+      "description": "Fetch webpage content using browser (handles cookie popups)"
     },
     "search_web": {
       "mcp": "web_search",

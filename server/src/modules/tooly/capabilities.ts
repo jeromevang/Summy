@@ -161,6 +161,7 @@ export const ALL_TOOLS = [
   
   // HTTP/Search
   'http_request',
+  'url_fetch_content',
   'web_search',
   
   // Browser (Playwright MCP-compatible)
@@ -173,6 +174,7 @@ export const ALL_TOOLS = [
   'browser_select_option',
   'browser_press_key',
   'browser_snapshot',
+  'browser_fetch_content',
   'browser_take_screenshot',
   'browser_wait',
   'browser_resize',
@@ -239,8 +241,8 @@ export const TOOL_CATEGORIES: Record<string, string[]> = {
   'File Operations': ['read_file', 'read_multiple_files', 'write_file', 'edit_file', 'delete_file', 'copy_file', 'move_file', 'get_file_info', 'list_directory', 'search_files', 'create_directory', 'delete_directory', 'list_allowed_directories'],
   'Git Operations': ['git_status', 'git_diff', 'git_log', 'git_init', 'git_add', 'git_commit', 'git_push', 'git_pull', 'git_checkout', 'git_stash', 'git_stash_pop', 'git_reset', 'git_clone', 'git_branch_create', 'git_branch_list', 'git_blame', 'git_show'],
   'NPM Operations': ['npm_run', 'npm_install', 'npm_uninstall', 'npm_init', 'npm_test', 'npm_build', 'npm_list'],
-  'Browser': ['browser_navigate', 'browser_go_back', 'browser_go_forward', 'browser_click', 'browser_type', 'browser_hover', 'browser_select_option', 'browser_press_key', 'browser_snapshot', 'browser_take_screenshot', 'browser_wait', 'browser_resize', 'browser_handle_dialog', 'browser_drag', 'browser_tabs', 'browser_evaluate', 'browser_console_messages', 'browser_network_requests'],
-  'HTTP/Search': ['http_request', 'web_search'],
+  'Browser': ['browser_navigate', 'browser_go_back', 'browser_go_forward', 'browser_click', 'browser_type', 'browser_hover', 'browser_select_option', 'browser_press_key', 'browser_snapshot', 'browser_fetch_content', 'browser_take_screenshot', 'browser_wait', 'browser_resize', 'browser_handle_dialog', 'browser_drag', 'browser_tabs', 'browser_evaluate', 'browser_console_messages', 'browser_network_requests'],
+  'HTTP/Search': ['http_request', 'url_fetch_content', 'web_search'],
   'Code Execution': ['shell_exec', 'run_python', 'run_node', 'run_typescript'],
   'Memory': ['memory_store', 'memory_retrieve', 'memory_list', 'memory_delete'],
   'Text': ['text_summarize', 'diff_files'],

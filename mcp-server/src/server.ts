@@ -976,6 +976,73 @@ server.registerTool("http_request", {
   }
 });
 
+// --- url_fetch_content ---
+server.registerTool("url_fetch_content", {
+  description: "Fetch the content of a URL and return readable text. For simple pages, uses HTTP fetch. For JS-heavy pages, use browser tools instead.",
+  inputSchema: {
+    url: z.string().describe("URL to fetch content from"),
+    extractText: z.boolean().optional().describe("Extract readable text from HTML (default: true)")
+  }
+}, async ({ url, extractText = true }: { url: string; extractText?: boolean }) => {
+  console.log(`[MCP] url_fetch_content: ${url}`);
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!res.ok) {
+      return errorResult(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
+    const contentType = res.headers.get('content-type') || '';
+    const body = await res.text();
+    
+    // For HTML content, optionally extract readable text
+    if (extractText && contentType.includes('text/html')) {
+      // Simple HTML to text conversion (strip tags, decode entities)
+      let text = body
+        // Remove script and style blocks
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        // Remove HTML comments
+        .replace(/<!--[\s\S]*?-->/g, '')
+        // Remove tags
+        .replace(/<[^>]+>/g, ' ')
+        // Decode common HTML entities
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        // Collapse whitespace
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      // Limit output size
+      if (text.length > 15000) {
+        text = text.slice(0, 15000) + '\n\n[Content truncated...]';
+      }
+      
+      return textResult(text);
+    }
+    
+    // For non-HTML or if extractText is false, return raw body (limited)
+    const result = body.length > 15000 ? body.slice(0, 15000) + '\n\n[Content truncated...]' : body;
+    return textResult(result);
+  } catch (err: any) {
+    return errorResult(`Failed to fetch URL: ${err.message}`);
+  }
+});
+
 // ============================================================
 // BROWSER OPERATIONS (Playwright MCP-compatible)
 // ============================================================
@@ -1164,6 +1231,113 @@ server.registerTool("browser_snapshot", {
     }, null, 2));
   } catch (err: any) {
     return errorResult(`Snapshot failed: ${err.message}`);
+  }
+});
+
+// --- browser_fetch_content ---
+server.registerTool("browser_fetch_content", {
+  description: "Navigate to a URL, handle cookie/consent popups, and return the page text content. Best for dynamic pages that require JavaScript or have consent gates.",
+  inputSchema: {
+    url: z.string().describe("URL to fetch content from"),
+    waitTime: z.number().optional().describe("Time to wait for page load in ms (default: 2000)"),
+    dismissPopups: z.boolean().optional().describe("Try to dismiss cookie/consent popups (default: true)")
+  }
+}, async ({ url, waitTime = 2000, dismissPopups = true }: { url: string; waitTime?: number; dismissPopups?: boolean }) => {
+  console.log(`[MCP] browser_fetch_content: ${url}`);
+  try {
+    const { page } = await ensureBrowser();
+    
+    // Navigate to the URL
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+    
+    // Wait for initial content
+    await page.waitForTimeout(waitTime);
+    
+    // Try to dismiss common cookie/consent popups
+    if (dismissPopups) {
+      const consentSelectors = [
+        // Common cookie consent buttons (text-based)
+        'button:has-text("Accept")',
+        'button:has-text("Accept all")',
+        'button:has-text("Accept All")',
+        'button:has-text("Accepteren")',
+        'button:has-text("Akkoord")',
+        'button:has-text("Agree")',
+        'button:has-text("I agree")',
+        'button:has-text("OK")',
+        'button:has-text("Got it")',
+        'button:has-text("Allow")',
+        'button:has-text("Allow all")',
+        'button:has-text("Toestaan")',
+        // Common class/id patterns
+        '[class*="accept"]',
+        '[class*="consent"]',
+        '[id*="accept"]',
+        '[id*="consent"]',
+        '.cookie-accept',
+        '.accept-cookies',
+        '#accept-cookies',
+        '.privacy-accept',
+        // CMP specific
+        '.cmp-accept',
+        '[data-testid="accept-button"]',
+        '[data-action="accept"]',
+      ];
+      
+      for (const selector of consentSelectors) {
+        try {
+          const button = await page.$(selector);
+          if (button && await button.isVisible()) {
+            console.log(`[MCP] Clicking consent button: ${selector}`);
+            await button.click();
+            await page.waitForTimeout(500); // Wait for popup to close
+            break; // Only click one button
+          }
+        } catch {
+          // Selector not found or not clickable, continue
+        }
+      }
+      
+      // Also try pressing Escape to dismiss modals
+      try {
+        await page.keyboard.press('Escape');
+      } catch {
+        // Ignore errors
+      }
+    }
+    
+    // Wait a bit more for content to settle
+    await page.waitForTimeout(500);
+    
+    // Get page text content
+    const textContent = await page.evaluate(() => {
+      // Remove script and style elements
+      const scripts = document.querySelectorAll('script, style, noscript');
+      scripts.forEach(el => el.remove());
+      
+      // Get the main content or body text
+      const main = document.querySelector('main, article, [role="main"], .content, #content');
+      const contentElement = (main || document.body) as HTMLElement;
+      
+      // Get text and clean it up
+      let text = contentElement.innerText || '';
+      text = text.replace(/\s+/g, ' ').trim();
+      
+      return text;
+    });
+    
+    const title = await page.title();
+    const finalUrl = page.url();
+    
+    // Limit output size
+    const maxLength = 15000;
+    const truncatedContent = textContent.length > maxLength 
+      ? textContent.slice(0, maxLength) + '\n\n[Content truncated...]'
+      : textContent;
+    
+    return textResult(`URL: ${finalUrl}\nTitle: ${title}\n\n${truncatedContent}`);
+  } catch (err: any) {
+    return errorResult(`Failed to fetch content: ${err.message}`);
   }
 });
 
