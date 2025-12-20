@@ -5,18 +5,21 @@
   "workspaces": [
     "client",
     "server",
-    "mcp-server"
+    "mcp-server",
+    "rag-server"
   ],
   "scripts": {
     "dev": "npm run dev:client",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run dev",
     "dev:mcp": "cd mcp-server && npm run dev",
+    "dev:rag": "cd rag-server && npm run dev",
     "kill": "taskkill /F /IM node.exe /T 2>nul || echo No node processes found",
-    "build": "npm run build:server && npm run build:client && npm run build:mcp",
+    "build": "npm run build:server && npm run build:client && npm run build:mcp && npm run build:rag",
     "build:server": "cd server && npm run build",
     "build:client": "cd client && npm run build",
     "build:mcp": "cd mcp-server && npm run build",
+    "build:rag": "cd rag-server && npm run build",
     "install:all": "npm install",
     "postinstall": "cd mcp-server && npx playwright install chromium"
   },
