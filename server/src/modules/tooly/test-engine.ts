@@ -25,28 +25,90 @@ const __dirname = path.dirname(__filename);
  * Common synonyms for matching native tool names to MCP tools
  */
 const TOOL_SYNONYMS: Record<string, string[]> = {
-  'file_read': ['read_file', 'get_file', 'cat', 'load_file', 'read', 'file_get', 'get_file_content', 'read_content'],
-  'file_write': ['write_file', 'save_file', 'put_file', 'write', 'file_put', 'save', 'create_file'],
-  'file_patch': ['patch_file', 'edit_file', 'modify_file', 'update_file', 'patch', 'edit'],
-  'file_list': ['list_files', 'ls', 'dir', 'list_directory', 'list', 'directory_list'],
-  'file_search': ['search_files', 'grep', 'find', 'search', 'find_in_files'],
-  'create_new_file': ['new_file', 'create_file', 'touch', 'make_file'],
-  'folder_create': ['create_folder', 'mkdir', 'make_directory', 'create_directory'],
-  'folder_delete': ['delete_folder', 'rmdir', 'remove_directory', 'rm_folder'],
+  // File Operations (Official MCP names)
+  'read_file': ['file_read', 'get_file', 'cat', 'load_file', 'read', 'file_get', 'get_file_content', 'read_content'],
+  'read_multiple_files': ['read_files', 'get_files', 'batch_read', 'multi_read'],
+  'write_file': ['file_write', 'save_file', 'put_file', 'write', 'file_put', 'save', 'create_file', 'create_new_file', 'new_file'],
+  'edit_file': ['file_patch', 'patch_file', 'modify_file', 'update_file', 'patch', 'edit'],
+  'delete_file': ['file_delete', 'remove_file', 'rm', 'unlink'],
+  'copy_file': ['file_copy', 'cp', 'duplicate'],
+  'move_file': ['file_move', 'mv', 'rename', 'relocate'],
+  'get_file_info': ['file_info', 'stat', 'file_stats', 'file_metadata'],
+  'list_directory': ['file_list', 'list_files', 'ls', 'dir', 'directory_list'],
+  'search_files': ['file_search', 'grep', 'find', 'search', 'find_in_files'],
+  'create_directory': ['folder_create', 'mkdir', 'make_directory', 'create_folder'],
+  'delete_directory': ['folder_delete', 'rmdir', 'remove_directory', 'rm_folder'],
+  'list_allowed_directories': ['allowed_dirs', 'get_allowed', 'accessible_dirs'],
+  
+  // Git Operations
   'git_status': ['status', 'git_stat', 'repo_status'],
   'git_diff': ['diff', 'git_changes', 'show_diff'],
   'git_log': ['log', 'git_history', 'commit_history'],
   'git_commit': ['commit', 'git_save', 'save_changes'],
   'git_add': ['add', 'stage', 'git_stage'],
+  'git_push': ['push', 'upload', 'sync_remote'],
+  'git_pull': ['pull', 'fetch_merge', 'sync'],
+  'git_checkout': ['checkout', 'switch_branch', 'restore'],
+  'git_stash': ['stash', 'save_temp', 'stash_changes'],
+  'git_stash_pop': ['unstash', 'pop_stash', 'restore_stash'],
+  'git_reset': ['reset', 'undo', 'revert_head'],
+  'git_clone': ['clone', 'clone_repo', 'copy_repo'],
   'git_branch_create': ['create_branch', 'new_branch', 'branch'],
   'git_branch_list': ['list_branches', 'branches', 'show_branches'],
+  'git_blame': ['blame', 'annotate', 'who_changed'],
+  'git_show': ['show', 'show_commit', 'commit_details'],
+  
+  // NPM Operations
   'npm_run': ['run_npm', 'npm', 'run_script', 'execute_npm'],
   'npm_install': ['install', 'npm_add', 'add_package'],
   'npm_uninstall': ['uninstall', 'npm_remove', 'remove_package'],
+  'npm_init': ['init', 'initialize', 'create_package'],
+  'npm_test': ['test', 'run_tests', 'unit_test'],
+  'npm_build': ['build', 'compile', 'bundle'],
+  'npm_list': ['list_packages', 'show_deps', 'dependencies'],
+  
+  // HTTP/Search
   'http_request': ['fetch', 'get_url', 'fetch_url', 'fetch_url_content', 'web_request', 'curl', 'request', 'http', 'get', 'post', 'api_call', 'fetch_content'],
+  'web_search': ['search', 'google', 'lookup', 'find_online', 'internet_search'],
+  
+  // Browser
   'browser_navigate': ['browse', 'open_url', 'visit_page', 'web_browse', 'search_web', 'open_browser', 'navigate', 'browser', 'web'],
+  'browser_click': ['click', 'click_element', 'press'],
+  'browser_type': ['type', 'input', 'enter_text', 'fill'],
+  'browser_snapshot': ['snapshot', 'accessibility', 'page_tree'],
+  'browser_take_screenshot': ['screenshot', 'capture', 'screen_grab'],
+  
+  // Code Execution
+  'shell_exec': ['shell', 'bash', 'terminal', 'command', 'exec'],
   'run_python': ['execute_python', 'python', 'exec_code', 'execute_code', 'run_code', 'python_exec', 'code', 'execute'],
-  'mcp_rules': ['rules', 'get_rules', 'project_rules']
+  'run_node': ['node', 'javascript', 'js', 'run_js'],
+  'run_typescript': ['typescript', 'ts', 'run_ts'],
+  
+  // Memory
+  'memory_store': ['store', 'save_memory', 'remember', 'cache', 'set'],
+  'memory_retrieve': ['retrieve', 'get_memory', 'recall', 'load'],
+  'memory_list': ['list_memory', 'show_memory', 'keys'],
+  'memory_delete': ['forget', 'clear_memory', 'remove_memory'],
+  
+  // Text
+  'text_summarize': ['summarize', 'summary', 'tldr', 'condense'],
+  'diff_files': ['compare', 'file_diff', 'compare_files'],
+  
+  // Process
+  'process_list': ['ps', 'list_processes', 'running', 'tasks'],
+  'process_kill': ['kill', 'terminate', 'stop_process', 'end_task'],
+  
+  // Archive
+  'zip_create': ['zip', 'compress', 'archive', 'pack'],
+  'zip_extract': ['unzip', 'extract', 'decompress', 'unpack'],
+  
+  // Utility
+  'mcp_rules': ['rules', 'get_rules', 'project_rules'],
+  'env_get': ['getenv', 'get_environment', 'environment'],
+  'env_set': ['setenv', 'set_environment'],
+  'json_parse': ['parse_json', 'json', 'decode_json'],
+  'base64_encode': ['encode', 'to_base64', 'b64_encode'],
+  'base64_decode': ['decode', 'from_base64', 'b64_decode']
 };
 
 /**
@@ -296,39 +358,39 @@ export interface TestOptions {
 // ============================================================
 
 export const TEST_DEFINITIONS: TestDefinition[] = [
-  // ========== FILE OPERATIONS ==========
+  // ========== FILE OPERATIONS (Official MCP names) ==========
   {
-    id: 'file_read_basic',
-    tool: 'file_read',
+    id: 'read_file_basic',
+    tool: 'read_file',
     category: 'file_operations',
     difficulty: 'easy',
     prompt: 'Read the contents of the file named "config.json" in the current directory.',
     setupFiles: { 'config.json': '{"port": 3000, "debug": true}' },
     expected: {
-      tool: 'file_read',
+      tool: 'read_file',
       params: { path: { contains: 'config.json' } }
     }
   },
   {
-    id: 'file_read_nested',
-    tool: 'file_read',
+    id: 'read_file_nested',
+    tool: 'read_file',
     category: 'file_operations',
     difficulty: 'medium',
     prompt: 'I need to see what\'s in the file located at src/utils/helpers.ts',
     setupFiles: { 'src/utils/helpers.ts': 'export const helper = () => {}' },
     expected: {
-      tool: 'file_read',
+      tool: 'read_file',
       params: { path: { contains: 'helpers.ts' } }
     }
   },
   {
-    id: 'file_write_basic',
-    tool: 'file_write',
+    id: 'write_file_basic',
+    tool: 'write_file',
     category: 'file_operations',
     difficulty: 'easy',
     prompt: 'Create a new file called "hello.js" with the content: console.log("Hello World")',
     expected: {
-      tool: 'file_write',
+      tool: 'write_file',
       params: {
         path: { contains: 'hello.js' },
         content: { contains: 'console.log' }
@@ -336,41 +398,93 @@ export const TEST_DEFINITIONS: TestDefinition[] = [
     }
   },
   {
-    id: 'file_patch_basic',
-    tool: 'file_patch',
+    id: 'edit_file_basic',
+    tool: 'edit_file',
     category: 'file_operations',
     difficulty: 'medium',
     prompt: 'In the file "app.js", change the port number from 3000 to 8080',
     setupFiles: { 'app.js': 'const port = 3000;\napp.listen(port);' },
     expected: {
-      tool: 'file_patch',
+      tool: 'edit_file',
       params: {
         path: { contains: 'app.js' },
-        find: { contains: '3000' },
-        replace: { contains: '8080' }
+        edits: { exists: true }
       }
     }
   },
   {
-    id: 'file_list_basic',
-    tool: 'file_list',
+    id: 'list_directory_basic',
+    tool: 'list_directory',
     category: 'file_operations',
     difficulty: 'easy',
     prompt: 'Show me all files in the src directory',
     expected: {
-      tool: 'file_list',
-      params: { folder: { oneOf: ['src', 'src/', './src', undefined] } }
+      tool: 'list_directory',
+      params: { path: { oneOf: ['src', 'src/', './src', undefined] } }
     }
   },
   {
-    id: 'file_search_basic',
-    tool: 'file_search',
+    id: 'search_files_basic',
+    tool: 'search_files',
     category: 'file_operations',
     difficulty: 'medium',
-    prompt: 'Search for all occurrences of "TODO" in the project files',
+    prompt: 'Search for all TypeScript files in the project',
     expected: {
-      tool: 'file_search',
-      params: { query: { contains: 'TODO' } }
+      tool: 'search_files',
+      params: { 
+        directory: { exists: true },
+        pattern: { contains: 'ts' }
+      }
+    }
+  },
+  {
+    id: 'create_directory_basic',
+    tool: 'create_directory',
+    category: 'file_operations',
+    difficulty: 'easy',
+    prompt: 'Create a new folder called "components"',
+    expected: {
+      tool: 'create_directory',
+      params: {
+        path: { oneOf: ['components', 'components/', './components'] }
+      }
+    }
+  },
+  {
+    id: 'delete_file_basic',
+    tool: 'delete_file',
+    category: 'file_operations',
+    difficulty: 'medium',
+    prompt: 'Delete the file named "old_config.json"',
+    expected: {
+      tool: 'delete_file',
+      params: {
+        path: { contains: 'old_config.json' }
+      }
+    }
+  },
+  {
+    id: 'delete_directory_basic',
+    tool: 'delete_directory',
+    category: 'file_operations',
+    difficulty: 'medium',
+    prompt: 'Delete the folder named "temp"',
+    expected: {
+      tool: 'delete_directory',
+      params: {
+        path: { contains: 'temp' }
+      }
+    }
+  },
+  {
+    id: 'get_file_info_basic',
+    tool: 'get_file_info',
+    category: 'file_operations',
+    difficulty: 'easy',
+    prompt: 'Get the file size and modification date of package.json',
+    expected: {
+      tool: 'get_file_info',
+      params: { path: { contains: 'package.json' } }
     }
   },
 
@@ -430,6 +544,50 @@ export const TEST_DEFINITIONS: TestDefinition[] = [
       params: { name: { contains: 'user-auth' } }
     }
   },
+  {
+    id: 'git_add_basic',
+    tool: 'git_add',
+    category: 'git_operations',
+    difficulty: 'easy',
+    prompt: 'Stage the file "index.js" for commit',
+    expected: {
+      tool: 'git_add',
+      params: { file: { contains: 'index.js' } }
+    }
+  },
+  {
+    id: 'git_branch_list_basic',
+    tool: 'git_branch_list',
+    category: 'git_operations',
+    difficulty: 'easy',
+    prompt: 'Show me all the branches in this repository',
+    expected: {
+      tool: 'git_branch_list',
+      params: {}
+    }
+  },
+  {
+    id: 'git_blame_basic',
+    tool: 'git_blame',
+    category: 'git_operations',
+    difficulty: 'medium',
+    prompt: 'Show me who last modified each line in the file "server.ts"',
+    expected: {
+      tool: 'git_blame',
+      params: { file: { contains: 'server.ts' } }
+    }
+  },
+  {
+    id: 'git_show_basic',
+    tool: 'git_show',
+    category: 'git_operations',
+    difficulty: 'medium',
+    prompt: 'Show me the details of the latest commit',
+    expected: {
+      tool: 'git_show',
+      params: {}
+    }
+  },
 
   // ========== NPM OPERATIONS ==========
   {
@@ -454,8 +612,30 @@ export const TEST_DEFINITIONS: TestDefinition[] = [
       params: { package: { contains: 'lodash' } }
     }
   },
+  {
+    id: 'npm_uninstall_basic',
+    tool: 'npm_uninstall',
+    category: 'npm_operations',
+    difficulty: 'medium',
+    prompt: 'Remove the axios package from the project',
+    expected: {
+      tool: 'npm_uninstall',
+      params: { package: { contains: 'axios' } }
+    }
+  },
+  {
+    id: 'npm_test_basic',
+    tool: 'npm_test',
+    category: 'npm_operations',
+    difficulty: 'easy',
+    prompt: 'Run the test suite for this project',
+    expected: {
+      tool: 'npm_test',
+      params: {}
+    }
+  },
 
-  // ========== HTTP/BROWSER ==========
+  // ========== HTTP/SEARCH ==========
   {
     id: 'http_request_get',
     tool: 'http_request',
@@ -471,6 +651,19 @@ export const TEST_DEFINITIONS: TestDefinition[] = [
     }
   },
   {
+    id: 'web_search_basic',
+    tool: 'web_search',
+    category: 'http_operations',
+    difficulty: 'easy',
+    prompt: 'Search the web for information about TypeScript generics',
+    expected: {
+      tool: 'web_search',
+      params: { query: { contains: 'TypeScript' } }
+    }
+  },
+
+  // ========== BROWSER ==========
+  {
     id: 'browser_navigate_basic',
     tool: 'browser_navigate',
     category: 'browser_operations',
@@ -478,119 +671,147 @@ export const TEST_DEFINITIONS: TestDefinition[] = [
     prompt: 'Open the website https://github.com and get the page title',
     expected: {
       tool: 'browser_navigate',
-      params: {
-        url: { contains: 'github.com' }
-      }
-    }
-  },
-
-  // ========== ADDITIONAL FILE OPERATIONS ==========
-  {
-    id: 'create_new_file_basic',
-    tool: 'create_new_file',
-    category: 'file_operations',
-    difficulty: 'easy',
-    prompt: 'Create a new empty file called "README.md"',
-    expected: {
-      tool: 'create_new_file',
-      params: {
-        path: { contains: 'README.md' }
-      }
+      params: { url: { contains: 'github.com' } }
     }
   },
   {
-    id: 'folder_create_basic',
-    tool: 'folder_create',
-    category: 'file_operations',
-    difficulty: 'easy',
-    prompt: 'Create a new folder called "components"',
-    expected: {
-      tool: 'folder_create',
-      params: {
-        path: { oneOf: ['components', 'components/', './components'] }
-      }
-    }
-  },
-  {
-    id: 'folder_delete_basic',
-    tool: 'folder_delete',
-    category: 'file_operations',
+    id: 'browser_screenshot_basic',
+    tool: 'browser_take_screenshot',
+    category: 'browser_operations',
     difficulty: 'medium',
-    prompt: 'Delete the folder named "temp"',
+    prompt: 'Take a screenshot of the current page',
     expected: {
-      tool: 'folder_delete',
-      params: {
-        path: { contains: 'temp' }
-      }
-    }
-  },
-
-  // ========== ADDITIONAL GIT OPERATIONS ==========
-  {
-    id: 'git_add_basic',
-    tool: 'git_add',
-    category: 'git_operations',
-    difficulty: 'easy',
-    prompt: 'Stage the file "index.js" for commit',
-    expected: {
-      tool: 'git_add',
-      params: {
-        file: { contains: 'index.js' }
-      }
-    }
-  },
-  {
-    id: 'git_add_all',
-    tool: 'git_add',
-    category: 'git_operations',
-    difficulty: 'easy',
-    prompt: 'Stage all changes for commit',
-    expected: {
-      tool: 'git_add',
-      params: {
-        file: { oneOf: ['.', '*', '-A', '--all', undefined] }
-      }
-    }
-  },
-  {
-    id: 'git_branch_list_basic',
-    tool: 'git_branch_list',
-    category: 'git_operations',
-    difficulty: 'easy',
-    prompt: 'Show me all the branches in this repository',
-    expected: {
-      tool: 'git_branch_list',
+      tool: 'browser_take_screenshot',
       params: {}
     }
   },
 
-  // ========== ADDITIONAL NPM OPERATIONS ==========
-  {
-    id: 'npm_uninstall_basic',
-    tool: 'npm_uninstall',
-    category: 'npm_operations',
-    difficulty: 'medium',
-    prompt: 'Remove the axios package from the project',
-    expected: {
-      tool: 'npm_uninstall',
-      params: {
-        package: { contains: 'axios' }
-      }
-    }
-  },
-
-  // ========== PYTHON ==========
+  // ========== CODE EXECUTION ==========
   {
     id: 'run_python_basic',
     tool: 'run_python',
-    category: 'other_operations',
+    category: 'code_execution',
     difficulty: 'medium',
     prompt: 'Run a Python script that prints "Hello World"',
     expected: {
       tool: 'run_python',
-      params: {
-        code: { contains: 'print' }
+      params: { code: { contains: 'print' } }
+    }
+  },
+  {
+    id: 'shell_exec_basic',
+    tool: 'shell_exec',
+    category: 'code_execution',
+    difficulty: 'medium',
+    prompt: 'Run the command "echo Hello" in the terminal',
+    expected: {
+      tool: 'shell_exec',
+      params: { command: { contains: 'echo' } }
+    }
+  },
+
+  // ========== MEMORY ==========
+  {
+    id: 'memory_store_basic',
+    tool: 'memory_store',
+    category: 'memory_operations',
+    difficulty: 'easy',
+    prompt: 'Remember that the user\'s name is "Alice"',
+    expected: {
+      tool: 'memory_store',
+      params: { 
+        key: { exists: true },
+        value: { contains: 'Alice' }
       }
+    }
+  },
+  {
+    id: 'memory_retrieve_basic',
+    tool: 'memory_retrieve',
+    category: 'memory_operations',
+    difficulty: 'easy',
+    prompt: 'What is the user\'s name that I stored earlier?',
+    expected: {
+      tool: 'memory_retrieve',
+      params: { key: { exists: true } }
+    }
+  },
+  {
+    id: 'memory_list_basic',
+    tool: 'memory_list',
+    category: 'memory_operations',
+    difficulty: 'easy',
+    prompt: 'Show me all the things I have stored in memory',
+    expected: {
+      tool: 'memory_list',
+      params: {}
+    }
+  },
+
+  // ========== TEXT ==========
+  {
+    id: 'text_summarize_basic',
+    tool: 'text_summarize',
+    category: 'text_operations',
+    difficulty: 'medium',
+    prompt: 'Summarize this long article: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."',
+    expected: {
+      tool: 'text_summarize',
+      params: { text: { exists: true } }
+    }
+  },
+  {
+    id: 'diff_files_basic',
+    tool: 'diff_files',
+    category: 'text_operations',
+    difficulty: 'medium',
+    prompt: 'Compare the files "old.txt" and "new.txt" and show me the differences',
+    expected: {
+      tool: 'diff_files',
+      params: { 
+        file1: { contains: 'old' },
+        file2: { contains: 'new' }
+      }
+    }
+  },
+
+  // ========== PROCESS ==========
+  {
+    id: 'process_list_basic',
+    tool: 'process_list',
+    category: 'process_operations',
+    difficulty: 'easy',
+    prompt: 'Show me all running processes that contain "node"',
+    expected: {
+      tool: 'process_list',
+      params: { filter: { contains: 'node' } }
+    }
+  },
+
+  // ========== ARCHIVE ==========
+  {
+    id: 'zip_create_basic',
+    tool: 'zip_create',
+    category: 'archive_operations',
+    difficulty: 'medium',
+    prompt: 'Create a zip file called "backup.zip" containing the "src" folder',
+    expected: {
+      tool: 'zip_create',
+      params: { 
+        output: { contains: 'backup.zip' },
+        sources: { exists: true }
+      }
+    }
+  },
+  {
+    id: 'zip_extract_basic',
+    tool: 'zip_extract',
+    category: 'archive_operations',
+    difficulty: 'medium',
+    prompt: 'Extract the archive "data.zip" to the current directory',
+    expected: {
+      tool: 'zip_extract',
+      params: { archive: { contains: 'data.zip' } }
     }
   }
 ];
