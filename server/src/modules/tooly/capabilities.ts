@@ -116,6 +116,11 @@ const MODEL_PROFILES_DIR = path.join(__dirname, '../../../data/model-profiles');
 // ============================================================
 
 export const ALL_TOOLS = [
+  // RAG - Semantic Code Search (Use FIRST for code understanding)
+  'rag_query',
+  'rag_status',
+  'rag_index',
+  
   // File Operations (Official MCP Filesystem Server names)
   'read_file',
   'read_multiple_files',
@@ -238,6 +243,7 @@ export const REMOVED_TOOLS = [
 ];
 
 export const TOOL_CATEGORIES: Record<string, string[]> = {
+  'RAG - Semantic Search': ['rag_query', 'rag_status', 'rag_index'],
   'File Operations': ['read_file', 'read_multiple_files', 'write_file', 'edit_file', 'delete_file', 'copy_file', 'move_file', 'get_file_info', 'list_directory', 'search_files', 'create_directory', 'delete_directory', 'list_allowed_directories'],
   'Git Operations': ['git_status', 'git_diff', 'git_log', 'git_init', 'git_add', 'git_commit', 'git_push', 'git_pull', 'git_checkout', 'git_stash', 'git_stash_pop', 'git_reset', 'git_clone', 'git_branch_create', 'git_branch_list', 'git_blame', 'git_show'],
   'NPM Operations': ['npm_run', 'npm_install', 'npm_uninstall', 'npm_init', 'npm_test', 'npm_build', 'npm_list'],
