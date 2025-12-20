@@ -9,7 +9,7 @@
     "rag-server"
   ],
   "scripts": {
-    "dev": "npm run dev:client",
+    "dev": "concurrently -n server,client,rag -c blue,green,magenta \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:rag\"",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run dev",
     "dev:mcp": "cd mcp-server && npm run dev",
@@ -33,6 +33,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "puppeteer": "^24.33.1"
   }
 }

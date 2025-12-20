@@ -9,8 +9,9 @@ export interface RAGConfig {
   
   // LM Studio embedding config
   lmstudio: {
-    model: string;      // selected from dropdown (e.g., nomic-embed-text-v1.5)
-    loadOnDemand: boolean;  // default: true - load when needed, unload after
+    model: string;           // Embedding model (e.g., nomic-embed-text-v1.5)
+    chatModel?: string;      // Chat model for summaries (e.g., qwen/qwen3-4b)
+    loadOnDemand: boolean;   // default: false - keep loaded for performance
   };
   
   // HNSWLib storage config
@@ -38,6 +39,36 @@ export interface RAGConfig {
     path: string | null;      // current project path
     autoDetect: boolean;      // default: true
   };
+  
+  // === HIERARCHICAL RAG SETTINGS ===
+  
+  // Summarization settings
+  summarization: {
+    enabled: boolean;              // Generate LLM summaries for chunks/files
+    chunkSummaries: boolean;       // Summarize individual chunks
+    fileSummaries: boolean;        // Aggregate chunk summaries into file summaries
+    asyncGeneration: boolean;      // Generate summaries in background (non-blocking)
+  };
+  
+  // Dependency graph settings
+  dependencyGraph: {
+    enabled: boolean;              // Build import/export dependency graph
+    includeCallGraph: boolean;     // Track function call relationships (heavier)
+  };
+  
+  // Query enhancement settings
+  queryEnhancement: {
+    enableHyde: boolean;           // HyDE: generate hypothetical code before search
+    enableQueryExpansion: boolean; // Expand query with synonyms/related terms
+    enableContextualChunks: boolean; // Embed metadata with code (file path, name, etc.)
+    enableMultiVector: boolean;    // Store both code and summary embeddings
+  };
+  
+  // Query routing settings
+  queryRouting: {
+    enabled: boolean;              // Auto-route queries to appropriate layer
+    defaultStrategy: 'code' | 'summary' | 'hybrid' | 'auto';
+  };
 }
 
 export const defaultConfig: RAGConfig = {
@@ -46,7 +77,8 @@ export const defaultConfig: RAGConfig = {
   
   lmstudio: {
     model: '',
-    loadOnDemand: true
+    chatModel: '',
+    loadOnDemand: false  // Keep loaded for performance
   },
   
   storage: {
@@ -101,6 +133,31 @@ export const defaultConfig: RAGConfig = {
   project: {
     path: null,
     autoDetect: true
+  },
+  
+  // Hierarchical RAG defaults
+  summarization: {
+    enabled: true,
+    chunkSummaries: true,
+    fileSummaries: true,
+    asyncGeneration: true  // Non-blocking by default
+  },
+  
+  dependencyGraph: {
+    enabled: true,
+    includeCallGraph: false  // Heavier, off by default
+  },
+  
+  queryEnhancement: {
+    enableHyde: false,              // Optional: adds latency
+    enableQueryExpansion: false,    // Optional: adds latency
+    enableContextualChunks: true,   // Always on: zero cost, big benefit
+    enableMultiVector: true         // Store both code + summary embeddings
+  },
+  
+  queryRouting: {
+    enabled: true,
+    defaultStrategy: 'auto'
   }
 };
 
@@ -141,6 +198,54 @@ export interface CodeChunk {
   imports: string[];
   signature?: string;
   tokens: number;
+}
+
+// Enriched chunk with summary (hierarchical RAG)
+export interface EnrichedChunk extends CodeChunk {
+  summary?: string;           // LLM-generated summary
+  purpose?: string;           // What this code does (authentication, validation, etc.)
+  summaryEmbedding?: number[]; // Separate embedding for summary
+  contextualContent?: string; // Code + metadata for contextual embedding
+}
+
+// File summary (aggregated from chunks)
+export interface FileSummary {
+  filePath: string;
+  summary: string;            // High-level description
+  responsibility: string;     // Main purpose (e.g., "user authentication")
+  exports: string[];          // Exported symbols
+  imports: ImportInfo[];      // Import relationships
+  chunkIds: string[];         // References to chunks in this file
+  chunkCount: number;
+  embedding?: number[];       // File-level embedding
+  lastUpdated: string;
+}
+
+export interface ImportInfo {
+  from: string;               // Import source (e.g., "./database", "express")
+  names: string[];            // Imported names
+  isExternal: boolean;        // Is it from node_modules?
+}
+
+// Dependency graph
+export interface DependencyGraph {
+  nodes: Map<string, DependencyNode>;
+  edges: DependencyEdge[];
+  lastBuilt: string;
+}
+
+export interface DependencyNode {
+  filePath: string;
+  imports: string[];          // Files this imports
+  exports: string[];          // Exported symbols
+  fileType: 'service' | 'route' | 'component' | 'util' | 'config' | 'test' | 'unknown';
+}
+
+export interface DependencyEdge {
+  from: string;               // Source file
+  to: string;                 // Target file
+  type: 'imports' | 'calls' | 'extends' | 'implements';
+  symbols: string[];          // Which symbols are used
 }
 
 // Chunk visualization interface (for 2D scatter plot)

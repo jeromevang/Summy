@@ -5,7 +5,7 @@
  * 1. Scan directory for code files
  * 2. Parse and chunk files using tree-sitter
  * 3. Generate embeddings via LM Studio
- * 4. Store vectors in HNSWLib
+ * 4. Store vectors in HNSWLib/Vectra
  * 5. Save metadata to SQLite
  * 
  * Features:
@@ -13,6 +13,7 @@
  * - Incremental updates (only re-index changed files)
  * - File watching for auto-reindex
  * - Cancellation support
+ * - Hierarchical RAG: summaries, dependency graph, multi-vector
  */
 
 import { glob } from 'glob';
@@ -22,10 +23,18 @@ import crypto from 'crypto';
 import { watch, FSWatcher } from 'chokidar';
 import { v4 as uuidv4 } from 'uuid';
 
-import { IndexProgress, CodeChunk, defaultConfig, RAGConfig } from '../config.js';
+import { IndexProgress, CodeChunk, EnrichedChunk, FileSummary, defaultConfig, RAGConfig } from '../config.js';
 import { Chunker, getChunker, detectLanguage } from './chunker.js';
 import { getLMStudioEmbedder, LMStudioEmbedder } from '../embeddings/lmstudio.js';
 import { getHNSWLibStore, HNSWLibStore } from '../storage/hnswlib.js';
+import { 
+  initializeSummarizer, 
+  isSummarizerReady, 
+  summarizeChunk, 
+  summarizeFile,
+  buildContextualContent 
+} from './summarizer.js';
+import { analyzeFile as analyzeFileDeps, serializeGraph, loadGraph } from './graph-builder.js';
 
 // Progress callback type
 export type ProgressCallback = (progress: IndexProgress) => void;
@@ -43,6 +52,9 @@ export interface StoredChunk {
   content: string;
   signature: string | null;
   createdAt: string;
+  // Hierarchical RAG additions
+  summary?: string;
+  purpose?: string;
 }
 
 export class Indexer {
@@ -64,6 +76,12 @@ export class Indexer {
   
   // In-memory chunk storage for browser
   private storedChunks: Map<string, StoredChunk> = new Map();
+  
+  // File summaries storage
+  private fileSummaries: Map<string, FileSummary> = new Map();
+  
+  // Pending summary generation (async mode)
+  private pendingSummaries: Set<string> = new Set();
   
   constructor(config: Partial<RAGConfig> = {}) {
     this.config = { ...defaultConfig, ...config };
@@ -209,6 +227,34 @@ export class Indexer {
   }
 
   /**
+   * Get all file summaries
+   */
+  getFileSummaries(): FileSummary[] {
+    return Array.from(this.fileSummaries.values());
+  }
+
+  /**
+   * Get a single file summary
+   */
+  getFileSummary(filePath: string): FileSummary | null {
+    return this.fileSummaries.get(filePath) || null;
+  }
+
+  /**
+   * Search file summaries by keyword
+   */
+  searchFileSummaries(query: string, limit: number = 5): FileSummary[] {
+    const lower = query.toLowerCase();
+    return Array.from(this.fileSummaries.values())
+      .filter(f => 
+        f.summary.toLowerCase().includes(lower) ||
+        f.responsibility.toLowerCase().includes(lower) ||
+        f.filePath.toLowerCase().includes(lower)
+      )
+      .slice(0, limit);
+  }
+
+  /**
    * Hash file content for change detection
    */
   private hashContent(content: string): string {
@@ -277,7 +323,7 @@ export class Indexer {
   }
   
   /**
-   * Index a single file
+   * Index a single file with hierarchical RAG support
    */
   private async indexFile(filePath: string, projectPath: string): Promise<CodeChunk[]> {
     // Read file content
@@ -303,19 +349,66 @@ export class Indexer {
     // Chunk the file
     const chunks = await this.chunker.chunkFile(relativePath, content);
     
-    // Generate embeddings
+    // === DEPENDENCY GRAPH ===
+    // Analyze imports/exports for dependency graph
+    let imports: { from: string; names: string[]; isExternal: boolean }[] = [];
+    if (this.config.dependencyGraph?.enabled) {
+      const analysis = analyzeFileDeps(relativePath, content, language);
+      imports = analysis.imports;
+    }
+    
+    // Generate embeddings (with optional contextual augmentation)
     const embeddings: number[][] = [];
+    const summaryEmbeddings: number[][] = [];
+    const enrichedChunks: EnrichedChunk[] = [];
+    
     for (const chunk of chunks) {
       if (this.isCancelled) break;
       
       try {
-        const embedding = await this.embedder.embedSingle(chunk.content);
+        // === CONTEXTUAL CHUNK AUGMENTATION ===
+        // Embed metadata + code instead of just code
+        let contentToEmbed = chunk.content;
+        if (this.config.queryEnhancement?.enableContextualChunks) {
+          contentToEmbed = buildContextualContent(chunk);
+        }
+        
+        const embedding = await this.embedder.embedSingle(contentToEmbed);
         embeddings.push(embedding);
         this.progress.embeddingsGenerated++;
         this.emitProgress();
+        
+        // === SUMMARY GENERATION ===
+        let enrichedChunk: EnrichedChunk = { ...chunk };
+        if (this.config.summarization?.enabled && this.config.summarization?.chunkSummaries) {
+          if (this.config.summarization.asyncGeneration) {
+            // Queue for async generation
+            this.pendingSummaries.add(chunk.id);
+            enrichedChunk = { ...chunk };
+          } else if (isSummarizerReady()) {
+            // Generate summary synchronously
+            enrichedChunk = await summarizeChunk(chunk);
+          }
+        }
+        enrichedChunks.push(enrichedChunk);
+        
+        // === MULTI-VECTOR: Generate summary embedding ===
+        if (this.config.queryEnhancement?.enableMultiVector && enrichedChunk.summary) {
+          try {
+            const summaryEmb = await this.embedder.embedSingle(enrichedChunk.summary);
+            summaryEmbeddings.push(summaryEmb);
+          } catch {
+            summaryEmbeddings.push([]);
+          }
+        } else {
+          summaryEmbeddings.push([]);
+        }
+        
       } catch (error) {
         console.error(`[Indexer] Failed to embed chunk in ${relativePath}:`, error);
         embeddings.push([]); // Empty embedding as placeholder
+        summaryEmbeddings.push([]);
+        enrichedChunks.push({ ...chunk });
       }
     }
     
@@ -326,6 +419,7 @@ export class Indexer {
       if (embeddings[i].length === 0) continue;
       
       const chunk = chunks[i];
+      const enriched = enrichedChunks[i];
       
       // Store with chunk metadata in vector store (so we don't need DB for queries)
       const vectorId = await this.vectorStore.add(embeddings[i], chunk.id, {
@@ -336,8 +430,26 @@ export class Indexer {
         symbolName: chunk.name,
         symbolType: chunk.type,
         language: chunk.language,
-        signature: chunk.signature
+        signature: chunk.signature,
+        summary: enriched.summary,
+        purpose: enriched.purpose
       });
+      
+      // === MULTI-VECTOR: Store summary embedding with different ID ===
+      if (summaryEmbeddings[i]?.length > 0) {
+        await this.vectorStore.add(summaryEmbeddings[i], `${chunk.id}_summary`, {
+          content: enriched.summary || '',
+          filePath: relativePath,
+          startLine: chunk.startLine,
+          endLine: chunk.endLine,
+          symbolName: chunk.name,
+          symbolType: chunk.type,
+          language: chunk.language,
+          signature: chunk.signature,
+          isSummaryVector: true,
+          originalChunkId: chunk.id
+        });
+      }
       
       // Store chunk for browser access
       this.storeChunk({
@@ -351,7 +463,9 @@ export class Indexer {
         tokens: chunk.tokens,
         content: chunk.content,
         signature: chunk.signature || null,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        summary: enriched.summary,
+        purpose: enriched.purpose
       });
       
       // Save metadata to DB (optional, for richer querying)
@@ -369,7 +483,9 @@ export class Indexer {
           symbolType: chunk.type,
           language: chunk.language,
           imports: chunk.imports,
-          signature: chunk.signature
+          signature: chunk.signature,
+          summary: enriched.summary,
+          purpose: enriched.purpose
         });
       }
       
@@ -386,6 +502,14 @@ export class Indexer {
         chunkCount: chunks.length,
         language
       });
+    }
+    
+    // === FILE SUMMARY ===
+    if (this.config.summarization?.enabled && this.config.summarization?.fileSummaries) {
+      if (!this.config.summarization.asyncGeneration && isSummarizerReady()) {
+        const fileSummary = await summarizeFile(relativePath, enrichedChunks, imports);
+        this.fileSummaries.set(relativePath, fileSummary);
+      }
     }
     
     return chunks;
