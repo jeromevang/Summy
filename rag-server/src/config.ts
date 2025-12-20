@@ -30,6 +30,7 @@ export interface RAGConfig {
   watcher: {
     enabled: boolean;         // default: true
     debounceMs: number;       // default: 2000ms
+    paths?: string[];         // specific subdirs to watch (e.g., ["server/src", "client/src"])
   };
   
   // Project settings
