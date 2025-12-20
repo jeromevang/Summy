@@ -2,194 +2,334 @@
   "modelId": "gemma-3-27b-tools-i1@iq1_m",
   "displayName": "gemma-3-27b-tools-i1@iq1_m",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T16:57:44.932Z",
-  "testVersion": 4,
-  "score": 89,
+  "testedAt": "2025-12-20T17:50:19.941Z",
+  "testVersion": 5,
+  "score": 87,
   "toolFormat": "openai_tools",
   "capabilities": {
-    "file_read": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 2,
-      "testsFailed": 0,
-      "avgLatency": 4425.5,
-      "lastTested": "2025-12-19T16:57:44.932Z"
-    },
-    "file_write": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 2980,
-      "lastTested": "2025-12-19T16:57:44.932Z"
-    },
-    "file_patch": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 3301,
-      "lastTested": "2025-12-19T16:57:44.932Z"
-    },
-    "file_list": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1469,
-      "lastTested": "2025-12-19T16:57:44.932Z"
-    },
-    "file_search": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1668,
-      "lastTested": "2025-12-19T16:57:44.932Z"
-    },
-    "create_new_file": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 846,
-      "lastTested": "2025-12-19T16:57:44.932Z"
-    },
-    "folder_create": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1749,
-      "lastTested": "2025-12-19T16:57:44.932Z"
-    },
-    "folder_delete": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1736,
-      "lastTested": "2025-12-19T16:57:44.932Z"
-    },
     "git_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1278,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1301,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1547,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1475,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1895,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 2020,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1980,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1740,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "git_add": {
       "supported": true,
-      "score": 73,
+      "score": 100,
       "testsPassed": 1,
-      "testsFailed": 1,
-      "avgLatency": 1758,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "testsFailed": 0,
+      "avgLatency": 1584,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1751,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1781,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1383,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1646,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1434,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1233,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1450,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1563,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1725,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1560,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2800,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 2350,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2300,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1925,
+      "lastTested": "2025-12-20T17:50:19.941Z",
+      "nativeAliases": [
+        "open_browser"
+      ]
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1986,
-      "lastTested": "2025-12-19T16:57:44.932Z"
+      "avgLatency": 1883,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     },
     "mcp_rules": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 0
+    },
+    "read_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 1975.5,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "write_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2444,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "edit_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4114,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "list_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1652,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "search_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2061,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "create_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1789,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "delete_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2143,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "delete_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1765,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "get_file_info": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2196,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "git_blame": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2890,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "git_show": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1711,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "npm_test": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1459,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "web_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4956,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "browser_take_screenshot": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 2370,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "shell_exec": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1783,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "memory_store": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 807,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "memory_retrieve": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1855,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "memory_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1447,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "text_summarize": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4913,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "diff_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2428,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "process_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1533,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "zip_create": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2170,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "zip_extract": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2184,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "rag_query": {
+      "supported": true,
+      "score": 86,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 2432,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "rag_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1445,
+      "lastTested": "2025-12-20T17:50:19.941Z"
+    },
+    "rag_index": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1755,
+      "lastTested": "2025-12-20T17:50:19.941Z"
     }
   },
   "enabledTools": [
-    "file_read",
-    "file_write",
-    "file_patch",
-    "file_list",
-    "file_search",
-    "folder_create",
-    "folder_delete",
     "git_diff",
     "git_log",
     "git_commit",
@@ -200,150 +340,278 @@
     "npm_uninstall",
     "http_request",
     "browser_navigate",
-    "run_python"
+    "run_python",
+    "read_file",
+    "write_file",
+    "edit_file",
+    "list_directory",
+    "search_files",
+    "create_directory",
+    "delete_file",
+    "delete_directory",
+    "get_file_info",
+    "git_blame",
+    "web_search",
+    "shell_exec",
+    "memory_retrieve",
+    "text_summarize",
+    "diff_files",
+    "process_list",
+    "zip_create",
+    "zip_extract",
+    "rag_query",
+    "rag_index"
   ],
   "testResults": [
     {
-      "testId": "file_read_basic",
+      "testId": "read_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ct80n3a495m94xphp4kri\",\"object\":\"chat.completion\",\"created\":1766163421,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of config.json.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"951911126\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":436,\"completion_tokens\":48,\"total_tokens\":484},\"stats\":{},\"sy"
+      "response": "{\"id\":\"chatcmpl-5jstmym7kmhnjuhml572g\",\"object\":\"chat.completion\",\"created\":1766252935,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of config.json.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"726156672\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":442,\"completion_tokens\":48,\"total_tokens\":490},\"stats\":{},\"sy"
     },
     {
-      "testId": "file_read_nested",
+      "testId": "read_file_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-8l9bpsfc2ehbaqlnzb84k\",\"object\":\"chat.completion\",\"created\":1766163423,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of the file located at src/utils/helpers.ts.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"193917169\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":438,\"completion_tokens\":5"
+      "response": "{\"id\":\"chatcmpl-tp3khjsiyrutzp8gte\",\"object\":\"chat.completion\",\"created\":1766252937,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of the file located at src/utils/helpers.ts.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"337973566\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":444,\"completion_tokens\":59,\""
     },
     {
-      "testId": "file_write_basic",
+      "testId": "write_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-9z576imdzcit9qzt095zcf\",\"object\":\"chat.completion\",\"created\":1766163426,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we can create a new file named \\\"hello.js\\\" and write content into it.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"479902718\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\""
+      "response": "{\"id\":\"chatcmpl-8zwvdqkj1ws76jz760jtbc\",\"object\":\"chat.completion\",\"created\":1766252939,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we write the file.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"415047907\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":486,\"completion_tokens\":"
     },
     {
-      "testId": "file_patch_basic",
+      "testId": "edit_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-5djpmu33q1odpbcbr2n7ih\",\"object\":\"chat.completion\",\"created\":1766163429,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we can modify the file:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"503249012\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":510,\"completion_tokens\":66,\"tot"
+      "response": "{\"id\":\"chatcmpl-31ewms9xd4394t8fzhwe0f\",\"object\":\"chat.completion\",\"created\":1766252941,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we can edit the file:\\n\\n1.  We need to use the `edit_file` tool to make changes to app.js. We will perform edits on the file by specifying the old port number and replacing it with the new port number. \\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"972111965\",\"function\":{\"name\":\"edit_file\",\"ar"
     },
     {
-      "testId": "file_list_basic",
+      "testId": "list_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-bo6f8k2aq7sh9rnq6fiz84\",\"object\":\"chat.completion\",\"created\":1766163432,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"529697122\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":33,\"total_tokens\":454},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-0qrdv53vbc1s585xtchtlkg\",\"object\":\"chat.completion\",\"created\":1766252945,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's list the files and directories in the src directory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"308850108\",\"function\":{\"name\":\"list_directory\",\"arguments\":\"{\\\"path\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":434,\"completion_tokens\":48,\"total_tokens\":48"
     },
     {
-      "testId": "file_search_basic",
+      "testId": "search_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-i6h76y3i5h9wynhfc9u3xq\",\"object\":\"chat.completion\",\"created\":1766252947,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's search for TypeScript files within the project. I need to use `search_files` tool.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"259695750\",\"function\":{\"name\":\"search_files\",\"arguments\":\"{\\\"directory\\\":\\\"/\\\",\\\"pattern\\\":\\\"*.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_t"
+    },
+    {
+      "testId": "create_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-1gohrg5ji65nn5fpy3anr8\",\"object\":\"chat.completion\",\"created\":1766163433,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's search for all occurrences of \\\"TODO\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"451386950\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":459,\"completion_tokens\":46,\"total_tokens\":505},\"stats\":{},\""
+      "response": "{\"id\":\"chatcmpl-9bocddjrtkdjm0mdtiibwj\",\"object\":\"chat.completion\",\"created\":1766252949,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can create a new directory for you. Let's call the tool `create_directory`.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"191930012\",\"function\":{\"name\":\"create_directory\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":431,\"completion_t"
+    },
+    {
+      "testId": "delete_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-yw93kz7qn2hfxoja52tdvn\",\"object\":\"chat.completion\",\"created\":1766252951,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: delete the file named \\\"old_config.json\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"179098839\",\"function\":{\"name\":\"delete_file\",\"arguments\":\"{\\\"path\\\":\\\"old_config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":59,\"t"
+    },
+    {
+      "testId": "delete_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-po2lb0noyym35pydbns\",\"object\":\"chat.completion\",\"created\":1766252953,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will delete the directory named \\\"temp\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"433606125\",\"function\":{\"name\":\"delete_directory\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":428,\"completion_tokens\":45,\"total_tokens\":473},\"stats\":{},\"s"
+    },
+    {
+      "testId": "get_file_info_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-k51fgyjyzhdyomaru73un9\",\"object\":\"chat.completion\",\"created\":1766252955,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can get information about the `package.json` file using the `get_file_info` tool.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"566181229\",\"function\":{\"name\":\"get_file_info\",\"arguments\":\"{\\\"path\\\":\\\"package.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":435,\"complet"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-6qahcba77l5nxzvl21is1s\",\"object\":\"chat.completion\",\"created\":1766163435,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"860204056\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":385,\"completion_tokens\":28,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-ia4yemfh0b5s9o2hwiqyh\",\"object\":\"chat.completion\",\"created\":1766252957,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"329403319\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":385,\"completion_tokens\":28,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-wk7p6bdyzg8ywmm7drykd\",\"object\":\"chat.completion\",\"created\":1766163436,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"309480431\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":422,\"completion_tokens\":33,\"total_tokens\":455},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-mwkt9mnxq5k2f23n86jhos\",\"object\":\"chat.completion\",\"created\":1766252958,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"373191141\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":449,\"completion_tokens\":33,\"total_tokens\":482},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-6esabyj6ggcfrxugchylvh\",\"object\":\"chat.completion\",\"created\":1766163438,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"812364951\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":415,\"completion_tokens\":32,\"total_tokens\":447},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-zgq35epar7inj6mkjveusi\",\"object\":\"chat.completion\",\"created\":1766252960,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"git_log\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"553220352\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5,\\\"format\\\":\\\"oneline\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":472,\"completion_tokens\":43,\"total_tokens\":515},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-too"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-46ihxvio6ltcqw6ae7yddn\",\"object\":\"chat.completion\",\"created\":1766163440,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's where we commit our changes! Let's get this fixed. \\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"181191466\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":427,\"completion_tokens\":54,\"total_toke"
+      "response": "{\"id\":\"chatcmpl-1ncnl8y03ax3qnqy6wz0qm\",\"object\":\"chat.completion\",\"created\":1766252962,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's commit those changes!\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"762260223\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":44,\"total_tokens\":468},\"stats\":{},\"system_fin"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ux7dbj95b6wfppii405mg\",\"object\":\"chat.completion\",\"created\":1766163442,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"526988499\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":37,\"total_tokens\":469},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i"
-    },
-    {
-      "testId": "npm_run_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-9e6t42x4ffq9k6nlk03tt\",\"object\":\"chat.completion\",\"created\":1766163444,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"757163388\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":31,\"total_tokens\":455},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
-    },
-    {
-      "testId": "npm_install_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-sq6cq5ycgre06ywvqhjebfu\",\"object\":\"chat.completion\",\"created\":1766163445,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"241720081\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":420,\"completion_tokens\":32,\"total_tokens\":452},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
-    },
-    {
-      "testId": "http_request_get",
-      "passed": true,
-      "score": 99,
-      "response": "{\"id\":\"chatcmpl-lshhugd3f9kyszqsf16ekj\",\"object\":\"chat.completion\",\"created\":1766163446,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can fetch data from https://api.example.com/users using the `http_request` tool. Let's get started!\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"864558927\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usa"
-    },
-    {
-      "testId": "browser_navigate_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-din477haxzhnysveart8tm\",\"object\":\"chat.completion\",\"created\":1766163449,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will navigate to GitHub and return the page content.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"165032286\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":486,\"completi"
-    },
-    {
-      "testId": "create_new_file_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-kbeky3fxsbi2nj9k5973mw\",\"object\":\"chat.completion\",\"created\":1766163451,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will create a new file named \\\"README.md\\\".\\n\\n[TOOL_RESULT]\\n<result>\\n[END_TOOL_RESULT]\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":458,\"completion_tokens\":34,\"total_tokens\":492},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
-    },
-    {
-      "testId": "folder_create_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-dwbf3ps8r24sn6804ekr\",\"object\":\"chat.completion\",\"created\":1766163452,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will create a new directory named \\\"components\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"685324086\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":46,\"total_tokens\":471},\""
-    },
-    {
-      "testId": "folder_delete_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-xcg7m4hd62zm2erxwqte\",\"object\":\"chat.completion\",\"created\":1766163454,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will delete the directory named \\\"temp\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"834101054\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":426,\"completion_tokens\":45,\"total_tokens\":471},\"stats\":{},\"sys"
+      "response": "{\"id\":\"chatcmpl-lhpilmi0abexf20r2xlti\",\"object\":\"chat.completion\",\"created\":1766252963,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"125900049\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":431,\"completion_tokens\":37,\"total_tokens\":468},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i"
     },
     {
       "testId": "git_add_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-c0sgpspu8y7ona5zzaib3n\",\"object\":\"chat.completion\",\"created\":1766163456,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"986159911\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":434,\"completion_tokens\":33,\"total_tokens\":467},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
-    },
-    {
-      "testId": "git_add_all",
-      "passed": false,
-      "score": 45,
-      "response": "{\"id\":\"chatcmpl-7xi2er95td7k5hhbkv9uys\",\"object\":\"chat.completion\",\"created\":1766163458,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's stage all files for commit. Here is the tool call:\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"768289546\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"all\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":429,\"completion_tokens\":49,\"total_tokens\":478},\"stats\":{"
+      "response": "{\"id\":\"chatcmpl-abamczhr6do2t80t17lnm\",\"object\":\"chat.completion\",\"created\":1766252965,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"670446017\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":33,\"total_tokens\":454},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-uyune8gqisgx8dswcyhsie\",\"object\":\"chat.completion\",\"created\":1766163459,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"239507923\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":386,\"completion_tokens\":30,\"total_tokens\":416},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-fqecefj1rtdmjm78yt2dxi\",\"object\":\"chat.completion\",\"created\":1766252967,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's list all git branches.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"672771360\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{\\\"all\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":416,\"completion_tokens\":44,\"total_tokens\":460},\"stats\":{},\"system_fingerprint\":\""
+    },
+    {
+      "testId": "git_blame_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-83eo52ks6e8zqptid9l53i\",\"object\":\"chat.completion\",\"created\":1766252968,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's start by blaming lines in server.ts. I need to specify which lines I want blamed. Let's blame all lines for now.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"912420203\",\"function\":{\"name\":\"git_blame\",\"arguments\":\"{\\\"file\\\":\\\"server.ts\\\",\\\"startLine\\\":1,\\\"endLine\\\":10}\"}}]},\"logprobs\":null,\"finish_r"
+    },
+    {
+      "testId": "git_show_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-myg16mfbk7mnaf1453629k\",\"object\":\"chat.completion\",\"created\":1766252971,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I can do. To show details of the latest commit, I need to use git_show.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"988518640\",\"function\":{\"name\":\"git_show\",\"arguments\":\"{\\\"ref\\\":\\\"latest\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":448,\"completion_tokens\":"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-6s71fgv2tm478fpabuvl9f\",\"object\":\"chat.completion\",\"created\":1766252973,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"593600869\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":423,\"completion_tokens\":31,\"total_tokens\":454},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-1dlm8txb137iim5n6sf6l1a\",\"object\":\"chat.completion\",\"created\":1766252974,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can install the lodash package using npm_install.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"909173366\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":442,\"completion_tokens\":48,\"total_tokens\":490},\""
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-7e52favowf9tef1kc08r\",\"object\":\"chat.completion\",\"created\":1766163461,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will remove the axios package using npm uninstall.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"454714855\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":45,\"total_tokens\":469},\"s"
+      "response": "{\"id\":\"chatcmpl-8csrk0qro4p482f0ywny\",\"object\":\"chat.completion\",\"created\":1766252976,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will uninstall the axios package using npm_uninstall.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"348336163\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":423,\"completion_tokens\":46,\"total_tokens\":469}"
+    },
+    {
+      "testId": "npm_test_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-qlvg7hqenilfeyzj9t6m1f\",\"object\":\"chat.completion\",\"created\":1766252977,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's run npm test!\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"193702520\",\"function\":{\"name\":\"npm_test\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":383,\"completion_tokens\":39,\"total_tokens\":422},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-7szyztnwfwvugzv3op507i\",\"object\":\"chat.completion\",\"created\":1766252979,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can fetch data from https://api.example.com/users using the `http_request` tool. Let's get started!\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"379368336\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usa"
+    },
+    {
+      "testId": "web_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-2us959kytayfcfryg7wzpk\",\"object\":\"chat.completion\",\"created\":1766252981,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"TypeScript generics allow type parameters in generic functions and classes, enabling flexibility and code reuse. They can be used to define types for various scenarios like specifying constraints or creating reusable components. Here's a breakdown of TypeScript generics:\\n\\n**Type Parameters:** Generics are def"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-uptpcqoempq08w0ysduligg\",\"object\":\"chat.completion\",\"created\":1766252986,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will navigate to GitHub and retrieve the page title.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"865487862\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":50,\"tota"
+    },
+    {
+      "testId": "browser_screenshot_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-henz55u6715f372k9fp2wf\",\"object\":\"chat.completion\",\"created\":1766252988,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will take a screenshot of the current page. Let's save it to a file named \\\"screenshot.png\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"675556102\",\"function\":{\"name\":\"browser_take_screenshot\",\"arguments\":\"{\\\"path\\\":\\\"screenshot.png\\\",\\\"fullPage\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_call"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-7iqaclh83fpt3vbtqr8kj\",\"object\":\"chat.completion\",\"created\":1766163462,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's the tool call:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"228980658\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":426,\"completion_tokens\":47,\"total_tokens\":473},\"stats\":{},\"system_fing"
+      "response": "{\"id\":\"chatcmpl-ubfqeq5lmki5xbiotcgmwj\",\"object\":\"chat.completion\",\"created\":1766252990,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's the tool call:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"513559028\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":47,\"total_tokens\":472},\"stats\":{},\"system_fin"
+    },
+    {
+      "testId": "shell_exec_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-5ng42tw8d4sxvs5q4n9krm\",\"object\":\"chat.completion\",\"created\":1766252992,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's execute the shell command \\\"echo Hello\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"731839225\",\"function\":{\"name\":\"shell_exec\",\"arguments\":\"{\\\"command\\\":\\\"echo Hello\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":478,\"completion_tokens\":47,\"total_tokens\":525},\"st"
+    },
+    {
+      "testId": "memory_store_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-gp8fhdtpyqnwdsqbzb6j9\",\"object\":\"chat.completion\",\"created\":1766252994,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I understand. I will use the available tools when appropriate and respond normally otherwise. I know Alice is my user's name. \\n\\nLet's begin!\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":454,\"completion_tokens\":37,\"total_tokens\":491},\"stats\":{},\"system_fingerprint\""
+    },
+    {
+      "testId": "memory_retrieve_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-dljciqfde56vd9dhmbag37\",\"object\":\"chat.completion\",\"created\":1766252995,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To find out what the user's name is, I need to retrieve it from memory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"675099313\",\"function\":{\"name\":\"memory_retrieve\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":428,\"completion_tokens\":54,\"tota"
+    },
+    {
+      "testId": "memory_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-1kae678nts2j2y4yvfscge\",\"object\":\"chat.completion\",\"created\":1766252997,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what you have stored in memory:\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"699254326\",\"function\":{\"name\":\"memory_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":388,\"completion_tokens\":41,\"total_tokens\":429},\"stats\":{},\"system_fingerprint\":\"gemma-"
+    },
+    {
+      "testId": "text_summarize_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-xy07m2jgvncmszq9givcg\",\"object\":\"chat.completion\",\"created\":1766252998,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"This is a short article, so it shouldn't be too difficult to summarize! It says: \\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.\\\"\\n\\nLet's try summarizing this text u"
+    },
+    {
+      "testId": "diff_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-zn5i5vaeraqmi2030acoq\",\"object\":\"chat.completion\",\"created\":1766253003,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: Compare the files \\\"old.txt\\\" and \\\"new.txt\\\" and show me the differences.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"407564304\",\"function\":{\"name\":\"diff_files\",\"arguments\":\"{\\\"file1\\\":\\\"old.txt\\\",\\\"file2\\\":\\\"new.txt\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{"
+    },
+    {
+      "testId": "process_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-owjo6fhwabe23wax86p458\",\"object\":\"chat.completion\",\"created\":1766253005,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's the tool call:\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"116185278\",\"function\":{\"name\":\"process_list\",\"arguments\":\"{\\\"filter\\\":\\\"node\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":416,\"completion_tokens\":41,\"total_tokens\":457},\"stats\":{},\"system_fingerprint\":\"gemma"
+    },
+    {
+      "testId": "zip_create_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-j1le298579lrpua87txkyc\",\"object\":\"chat.completion\",\"created\":1766253007,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can create a zip archive of the \\\"src\\\" folder. Here's how it will work:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"740069372\",\"function\":{\"name\":\"zip_create\",\"arguments\":\"{\\\"output\\\":\\\"backup.zip\\\",\\\"sources\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":481,"
+    },
+    {
+      "testId": "zip_extract_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-bc0y1ulgqbi1giqcsq28jz\",\"object\":\"chat.completion\",\"created\":1766253009,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: extract the archive \\\"data.zip\\\" to the current directory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"445881712\",\"function\":{\"name\":\"zip_extract\",\"arguments\":\"{\\\"archive\\\":\\\"data.zip\\\",\\\"destination\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tok"
+    },
+    {
+      "testId": "rag_query_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-uhhrkq1ve6ufgtcovn7fi\",\"object\":\"chat.completion\",\"created\":1766253011,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's search the codebase for where user authentication is handled using `rag_query`.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"743573170\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"where is user authentication handled?\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"u"
+    },
+    {
+      "testId": "rag_query_with_filter",
+      "passed": true,
+      "score": 72,
+      "response": "{\"id\":\"chatcmpl-92wgh8lbp2vy83zufhdft\",\"object\":\"chat.completion\",\"created\":1766253014,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's find those TypeScript files! I will use `rag_query` to search for relevant code snippets.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"939553444\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"TypeScript files handling database connections\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason"
+    },
+    {
+      "testId": "rag_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-rl9e8x5nc6g33sb1r8vstg\",\"object\":\"chat.completion\",\"created\":1766253016,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will check the status of the RAG indexing system.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"253788420\",\"function\":{\"name\":\"rag_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":404,\"completion_tokens\":44,\"total_tokens\":448},\"stats\":{},\"system_finger"
+    },
+    {
+      "testId": "rag_index_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-untsvl6c6h8aeyd882tnbc\",\"object\":\"chat.completion\",\"created\":1766253018,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"163035721\",\"function\":{\"name\":\"rag_index\",\"arguments\":\"{\\\"projectPath\\\":\\\"/home/user/myproject\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":443,\"completion_tokens\":39,\"total_tokens\":482},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-to"
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T16:56:56.788Z",
+    "testedAt": "2025-12-20T17:48:50.213Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -433,16 +701,25 @@
       8192
     ],
     "latencies": {
-      "2048": 2063,
-      "4096": 1858,
-      "8192": 2014
+      "2048": 1702,
+      "4096": 1712,
+      "8192": 1681
     },
     "maxUsableContext": 8192,
     "recommendedContext": 8192,
     "modelMaxContext": 131072,
-    "minLatency": 1858,
+    "minLatency": 1681,
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },
-  "contextLength": 8192
+  "contextLength": 8192,
+  "discoveredNativeTools": [
+    "get_weather",
+    "send_email",
+    "open_browser"
+  ],
+  "unmappedNativeTools": [
+    "get_weather",
+    "send_email"
+  ]
 }
