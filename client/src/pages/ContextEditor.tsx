@@ -1116,6 +1116,165 @@ const SourceMessage = ({ msg }: { msg: any }) => {
   );
 };
 
+// Agentic Response Card - Groups tool calls and results inside assistant response
+const AgenticResponseCard = ({ 
+  agenticData, 
+  finalResponse 
+}: { 
+  agenticData: {
+    iterations: number;
+    toolExecutions: Array<{
+      toolName: string;
+      mcpTool: string;
+      args: any;
+      result: string;
+      toolCallId: string;
+    }>;
+  };
+  finalResponse?: string;
+}) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [expandedTools, setExpandedTools] = useState<Set<number>>(new Set());
+  
+  // Determine status based on results
+  const hasError = agenticData.toolExecutions.some(exec => 
+    exec.result?.toLowerCase().includes('error') || 
+    exec.result?.toLowerCase().includes('failed')
+  );
+  const hasNoResponse = !finalResponse || finalResponse.trim() === '';
+  
+  // Status-based colors
+  const statusConfig = hasError 
+    ? { border: 'border-red-500/50', bg: 'bg-red-500/10', color: 'text-red-400', icon: '❌' }
+    : hasNoResponse
+      ? { border: 'border-orange-500/50', bg: 'bg-orange-500/10', color: 'text-orange-400', icon: '⚠️' }
+      : { border: 'border-cyan-500/50', bg: 'bg-cyan-500/10', color: 'text-cyan-400', icon: '🔄' };
+  
+  const toggleTool = (idx: number) => {
+    setExpandedTools(prev => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+  
+  const truncateResult = (result: string, maxLen: number = 300): string => {
+    if (result.length <= maxLen) return result;
+    return result.substring(0, maxLen) + '...';
+  };
+  
+  return (
+    <div className="mb-3 p-3 rounded-lg border border-purple-500/30 bg-purple-500/10">
+      {/* Assistant Header */}
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-xs font-medium text-purple-400">✨ assistant</span>
+        <span className="text-xs px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400">
+          agentic
+        </span>
+        <span className="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-400">
+          ← from LLM
+        </span>
+      </div>
+      
+      {/* Agentic Processing Container */}
+      <div className={`mb-3 rounded-lg border ${statusConfig.border} ${statusConfig.bg}`}>
+        {/* Agentic Header */}
+        <div 
+          className="flex items-center justify-between p-2 cursor-pointer hover:bg-white/5"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex items-center gap-2">
+            <span className={`text-sm ${statusConfig.color}`}>{statusConfig.icon}</span>
+            <span className={`text-xs font-medium ${statusConfig.color}`}>
+              Agentic Processing
+            </span>
+            <span className="text-xs text-gray-500">
+              {agenticData.iterations} iteration{agenticData.iterations !== 1 ? 's' : ''} • {agenticData.toolExecutions.length} tool call{agenticData.toolExecutions.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+          <span className="text-xs text-gray-500">{isExpanded ? '▼' : '▶'}</span>
+        </div>
+        
+        {/* Tool Executions */}
+        {isExpanded && (
+          <div className="px-2 pb-2 space-y-2">
+            {agenticData.toolExecutions.map((exec, idx) => {
+              const isToolExpanded = expandedTools.has(idx);
+              const hasToolError = exec.result?.toLowerCase().includes('error');
+              
+              return (
+                <div key={exec.toolCallId || idx} className="rounded border border-gray-700 bg-[#0d0d0d]">
+                  {/* Tool Call Header */}
+                  <div 
+                    className="flex items-center justify-between p-2 cursor-pointer hover:bg-gray-800/50"
+                    onClick={() => toggleTool(idx)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-orange-400">🔧</span>
+                      <span className="text-xs font-medium text-orange-400">{exec.toolName}</span>
+                      {exec.toolName !== exec.mcpTool && (
+                        <span className="text-xs text-gray-500">→ {exec.mcpTool}</span>
+                      )}
+                      {hasToolError && (
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">error</span>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-500">{isToolExpanded ? '▼' : '▶'}</span>
+                  </div>
+                  
+                  {/* Tool Details (collapsed by default) */}
+                  {isToolExpanded && (
+                    <div className="p-2 pt-0 space-y-2">
+                      {/* Arguments */}
+                      <div className="p-2 rounded bg-gray-800/50">
+                        <div className="text-xs text-gray-400 mb-1">📤 Arguments</div>
+                        <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap max-h-32 overflow-y-auto scrollbar-thin">
+                          {JSON.stringify(exec.args, null, 2)}
+                        </pre>
+                      </div>
+                      
+                      {/* Result */}
+                      <div className={`p-2 rounded ${hasToolError ? 'bg-red-500/10' : 'bg-green-500/10'}`}>
+                        <div className={`text-xs mb-1 ${hasToolError ? 'text-red-400' : 'text-green-400'}`}>
+                          📥 Result
+                        </div>
+                        <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap max-h-48 overflow-y-auto scrollbar-thin">
+                          {exec.result}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Collapsed preview */}
+                  {!isToolExpanded && exec.result && (
+                    <div className="px-2 pb-2">
+                      <pre className="text-xs text-gray-500 font-mono truncate">
+                        {truncateResult(exec.result, 100)}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      
+      {/* Final Response */}
+      {finalResponse ? (
+        <div className="text-sm text-gray-200 whitespace-pre-wrap break-words">
+          {finalResponse}
+        </div>
+      ) : (
+        <div className="text-sm text-orange-400 italic">
+          No text response generated
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Compression mode names
 const COMPRESSION_MODES = [
   { value: 0, label: 'None', description: 'Original - no compression', color: 'gray' },
@@ -1263,6 +1422,12 @@ const ContextEditor: React.FC = () => {
   const [syncScroll, setSyncScroll] = useState(true);
   const [wsConnected, setWsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [turnStatus, setTurnStatus] = useState<{
+    status: 'idle' | 'thinking' | 'running_tool' | 'complete';
+    message: string;
+    tool?: string;
+    iteration?: number;
+  } | null>(null);
   const [loadingVersions, setLoadingVersions] = useState(false);
   const [showSystemMessages, setShowSystemMessages] = useState(true);
   const [systemPromptExpanded, setSystemPromptExpanded] = useState(false);
@@ -1383,6 +1548,18 @@ Rules:
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
+          
+          // Handle turn status updates for live "thinking" bubbles
+          if (message.type === 'turn_status' && message.data?.sessionId === sessionId) {
+            const { status, message: statusMessage, tool, iteration } = message.data;
+            if (status === 'complete') {
+              // Clear status after a short delay
+              setTimeout(() => setTurnStatus(null), 1000);
+            } else {
+              setTurnStatus({ status, message: statusMessage, tool, iteration });
+            }
+          }
+          
           if (message.type === 'session_updated' && message.data?.id === sessionId) {
             // Update session in real-time
             setSession(message.data);
@@ -1544,10 +1721,30 @@ Rules:
       }
     }
     
-    // Add response message if it has content
+    // Check for agentic loop data
+    const toolyMeta = (turn.response as any)?.toolyMeta || turn.toolyMeta;
+    const isAgentic = toolyMeta?.agenticLoop && toolyMeta?.toolExecutions?.length > 0;
+    
+    // Add response message
     if (turn.response) {
       const responseMsg = turn.response.choices?.[0]?.message;
-      if (responseMsg) {
+      const responseContent = responseMsg?.content || turn.response.content || '';
+      
+      if (isAgentic) {
+        // Group agentic data with final response
+        messages.push({
+          role: 'assistant_agentic',
+          content: responseContent,
+          _source: '← from LLM (agentic)',
+          _turnId: turn.id,
+          _turnNumber: turnIdx,
+          _timestamp: turn.timestamp,
+          _agenticData: {
+            iterations: toolyMeta.iterations || 1,
+            toolExecutions: toolyMeta.toolExecutions
+          }
+        });
+      } else if (responseMsg) {
         messages.push({
           ...responseMsg,
           _source: '← from LLM',
@@ -1565,39 +1762,6 @@ Rules:
           _turnNumber: turnIdx,
           _timestamp: turn.timestamp
         });
-      }
-      
-      // Add agentic loop tool executions if present
-      const toolyMeta = (turn.response as any)?.toolyMeta || turn.toolyMeta;
-      if (toolyMeta?.agenticLoop && toolyMeta?.toolExecutions?.length > 0) {
-        // Add a marker for the agentic loop
-        messages.push({
-          role: 'agentic',
-          content: `🔄 Agentic Loop Executed (${toolyMeta.iterations} iterations)`,
-          _source: '⚡ middleware agentic execution',
-          _turnId: turn.id,
-          _turnNumber: turnIdx,
-          _timestamp: turn.timestamp,
-          _isAgenticHeader: true
-        });
-        
-        // Add each tool execution
-        for (const exec of toolyMeta.toolExecutions) {
-          messages.push({
-            role: 'tool',
-            content: exec.result,
-            tool_call_id: exec.toolCallId,
-            _source: `⚡ MCP: ${exec.toolName} → ${exec.mcpTool}`,
-            _turnId: turn.id,
-            _turnNumber: turnIdx,
-            _timestamp: turn.timestamp,
-            _agenticExecution: {
-              toolName: exec.toolName,
-              mcpTool: exec.mcpTool,
-              args: exec.args
-            }
-          });
-        }
       }
     }
     
@@ -2044,11 +2208,67 @@ Rules:
                 });
             })()}
             
+            {/* Live Status Bubble - Shows thinking/running tool status */}
+            {turnStatus && (viewMode === 'timeline' || viewMode === 'messages') && (
+              <div className="mb-4 flex justify-start">
+                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl max-w-[80%] ${
+                  turnStatus.status === 'thinking' 
+                    ? 'bg-purple-500/20 border border-purple-500/40' 
+                    : turnStatus.status === 'running_tool'
+                      ? 'bg-orange-500/20 border border-orange-500/40'
+                      : 'bg-green-500/20 border border-green-500/40'
+                }`}>
+                  {/* Animated dots for thinking */}
+                  {turnStatus.status === 'thinking' && (
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  )}
+                  
+                  {/* Tool icon for running tool */}
+                  {turnStatus.status === 'running_tool' && (
+                    <span className="text-lg animate-spin">🔧</span>
+                  )}
+                  
+                  {/* Complete check */}
+                  {turnStatus.status === 'complete' && (
+                    <span className="text-lg">✅</span>
+                  )}
+                  
+                  <span className={`text-sm ${
+                    turnStatus.status === 'thinking' 
+                      ? 'text-purple-300' 
+                      : turnStatus.status === 'running_tool'
+                        ? 'text-orange-300'
+                        : 'text-green-300'
+                  }`}>
+                    {turnStatus.message}
+                  </span>
+                  
+                  {turnStatus.iteration && turnStatus.iteration > 1 && (
+                    <span className="text-xs text-gray-500">
+                      (iteration {turnStatus.iteration})
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            
             {/* Source View - Raw context messages for selected turn */}
             {viewMode === 'messages' && getRawSourceMessages()
               .filter(m => showSystemMessages || (m.role !== 'system'))
               .map((msg, idx) => (
-                <SourceMessage key={`source-${idx}`} msg={msg} />
+                msg.role === 'assistant_agentic' && msg._agenticData ? (
+                  <AgenticResponseCard 
+                    key={`agentic-${idx}`}
+                    agenticData={msg._agenticData}
+                    finalResponse={msg.content}
+                  />
+                ) : (
+                  <SourceMessage key={`source-${idx}`} msg={msg} />
+                )
               ))}
             
             {/* Source Data View - Raw JSON for selected turn */}

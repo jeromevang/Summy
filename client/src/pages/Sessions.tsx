@@ -21,7 +21,8 @@ interface ContextSession {
   name: string;
   ide: string;
   created: string;
-  conversations: any[];
+  conversations?: any[];
+  turnCount?: number;  // From database API
   originalSize?: number;
   summarizedSize?: number;
   summary?: any;
@@ -205,7 +206,7 @@ const Sessions: React.FC = () => {
                       {session.name}
                     </h3>
                     <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/20 text-purple-400">
-                      {session.conversations.length} turns
+                      {session.turnCount ?? session.conversations?.length ?? 0} turns
                     </span>
                     {/* Compression status badges */}
                     {session.compression?.enabled && (
