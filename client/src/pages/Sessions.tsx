@@ -96,6 +96,35 @@ const Sessions: React.FC = () => {
     }
   };
 
+  const clearAllSessions = async () => {
+    if (sessions.length === 0) return;
+    
+    const confirmed = confirm(
+      `⚠️ WARNING: This will permanently delete ALL ${sessions.length} sessions!\n\n` +
+      `This action cannot be undone.\n\n` +
+      `Are you sure you want to continue?`
+    );
+    
+    if (!confirmed) return;
+    
+    // Double confirmation for safety
+    const doubleConfirm = confirm(
+      `🚨 FINAL WARNING 🚨\n\n` +
+      `You are about to delete ${sessions.length} sessions.\n\n` +
+      `Type OK to confirm deletion.`
+    );
+    
+    if (!doubleConfirm) return;
+
+    try {
+      await axios.delete('http://localhost:3001/api/sessions');
+      setSessions([]);
+    } catch (error) {
+      console.error('Failed to clear sessions:', error);
+      alert('Failed to clear sessions. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -141,6 +170,14 @@ const Sessions: React.FC = () => {
               className="px-4 py-2 bg-[#2d2d2d] hover:bg-[#3d3d3d] text-gray-300 rounded-lg transition-colors disabled:opacity-50"
             >
               + Create
+            </button>
+            <button
+              onClick={clearAllSessions}
+              disabled={sessions.length === 0}
+              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title={sessions.length === 0 ? 'No sessions to clear' : `Clear all ${sessions.length} sessions`}
+            >
+              🗑️ Clear All
             </button>
           </div>
         </div>

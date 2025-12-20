@@ -1,0 +1,10 @@
+{
+  "ide": "Unknown",
+  "version": "1.0.0",
+  "description": "Default tool mappings for unknown IDEs - uses all model-enabled tools directly",
+  "modelSuffix": null,
+  
+  "mappings": {},
+  
+  "ideOnly": {}
+}

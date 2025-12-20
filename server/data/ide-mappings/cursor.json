@@ -1,0 +1,101 @@
+{
+  "ide": "Cursor",
+  "version": "1.0.0",
+  "description": "Cursor IDE tool mappings",
+  "modelSuffix": "cursor",
+  
+  "mappings": {
+    "Read": {
+      "mcp": "read_file",
+      "params": {
+        "path": "path"
+      },
+      "description": "Read file contents"
+    },
+    "Write": {
+      "mcp": "write_file",
+      "params": {
+        "path": "path",
+        "contents": "contents"
+      },
+      "description": "Write file contents"
+    },
+    "StrReplace": {
+      "mcp": "edit_file",
+      "transform": "cursorStrReplaceToMcpEdit",
+      "description": "String replacement in file"
+    },
+    "Shell": {
+      "mcp": "shell_exec",
+      "params": {
+        "command": "command"
+      },
+      "description": "Execute shell command"
+    },
+    "LS": {
+      "mcp": "list_directory",
+      "params": {
+        "target_directory": "path"
+      },
+      "description": "List directory contents"
+    },
+    "Grep": {
+      "mcp": "search_files",
+      "params": {
+        "pattern": "pattern",
+        "path": "path"
+      },
+      "description": "Search with grep"
+    },
+    "Glob": {
+      "mcp": "search_files",
+      "params": {
+        "glob_pattern": "pattern"
+      },
+      "description": "Find files by glob pattern"
+    }
+  },
+  
+  "ideOnly": {
+    "SemanticSearch": {
+      "description": "Semantic code search (Cursor handles internally)",
+      "action": "passthrough"
+    },
+    "TodoWrite": {
+      "description": "Task management (Cursor handles internally)",
+      "action": "passthrough"
+    },
+    "SwitchMode": {
+      "description": "Mode switching (Cursor handles internally)",
+      "action": "passthrough"
+    },
+    "ReadLints": {
+      "description": "Read linter errors (Cursor handles internally)",
+      "action": "passthrough"
+    },
+    "EditNotebook": {
+      "description": "Jupyter notebook editing (Cursor handles internally)",
+      "action": "passthrough"
+    },
+    "Delete": {
+      "description": "Delete file (Cursor handles internally)",
+      "action": "passthrough"
+    }
+  },
+  
+  "browserTools": {
+    "cursor-browser-extension-browser_navigate": { "mcp": "browser_navigate" },
+    "cursor-browser-extension-browser_snapshot": { "mcp": "browser_snapshot" },
+    "cursor-browser-extension-browser_click": { "mcp": "browser_click" },
+    "cursor-browser-extension-browser_type": { "mcp": "browser_type" },
+    "cursor-browser-extension-browser_take_screenshot": { "mcp": "browser_screenshot" },
+    "cursor-browser-extension-browser_navigate_back": { "mcp": "browser_navigate_back" },
+    "cursor-browser-extension-browser_press_key": { "mcp": "browser_press_key" },
+    "cursor-browser-extension-browser_hover": { "mcp": "browser_hover" },
+    "cursor-browser-extension-browser_drag": { "mcp": "browser_drag" },
+    "cursor-browser-extension-browser_select_option": { "mcp": "browser_select_option" },
+    "cursor-browser-extension-browser_tabs": { "mcp": "browser_tabs" },
+    "cursor-browser-extension-browser_console_messages": { "mcp": "browser_console_messages" },
+    "cursor-browser-extension-browser_network_requests": { "mcp": "browser_network_requests" }
+  }
+}

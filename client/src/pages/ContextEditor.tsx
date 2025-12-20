@@ -218,10 +218,18 @@ const ToolCallCard = ({
   const [copiedResult, setCopiedResult] = useState(false);
   
   // Determine status based on result
+  // Only mark as error if there's an explicit error object from MCP, not based on content text
   const hasResult = !!result;
-  const isError = result?.content?.toLowerCase().includes('error') || 
-                  result?.content?.toLowerCase().includes('failed') ||
-                  result?.content?.toLowerCase().includes('exception');
+  const isError = (() => {
+    if (!result) return false;
+    // Only check for explicit error objects from MCP server
+    if (result.isError === true) return true;
+    try {
+      const parsed = JSON.parse(result.content);
+      if (parsed.isError === true || parsed.error === true) return true;
+    } catch { /* not JSON or no error field */ }
+    return false;
+  })();
   const status = !hasResult ? 'pending' : isError ? 'failed' : 'success';
   
   const statusColors = {
@@ -667,8 +675,18 @@ const ProcessingTimeline = ({
   // Merge tool calls with results
   const mergedToolCalls: ToolyToolCallMeta[] = toolyMeta?.toolCalls || requestToolCalls.map(tc => {
     const result = toolResults.find(tr => tr.tool_call_id === tc.id);
-    const isError = result?.content?.toLowerCase().includes('error') || 
-                    result?.content?.toLowerCase().includes('failed');
+    
+    // Only mark as error if there's an explicit error object from MCP
+    const isError = (() => {
+      if (!result) return false;
+      if ((result as any).isError === true) return true;
+      try {
+        const parsed = JSON.parse(result.content);
+        if (parsed.isError === true || parsed.error === true) return true;
+      } catch { /* not JSON */ }
+      return false;
+    })();
+    
     return {
       id: tc.id || 'unknown',
       name: tc.function?.name || tc.name || 'unknown',
@@ -914,6 +932,116 @@ const Message = ({
         >
           {isExpanded ? 'Show less' : 'Show more'}
         </button>
+      )}
+    </div>
+  );
+};
+
+// Source Message component - shows raw message data for Source View
+const SourceMessage = ({ msg }: { msg: any }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const roleConfig: Record<string, { icon: string; color: string; bg: string; border: string }> = {
+    system: { icon: '⚙️', color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30' },
+    user: { icon: '👤', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30' },
+    assistant: { icon: '✨', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30' },
+    tool: { icon: '🔧', color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/30' },
+  };
+  
+  const config = roleConfig[msg.role] || { icon: '📄', color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/30' };
+  const hasToolCalls = msg.tool_calls && Array.isArray(msg.tool_calls) && msg.tool_calls.length > 0;
+  const isToolResult = msg.role === 'tool';
+  
+  // IDE messages (user + assistant without tool calls) get plain text, others get code block styling
+  const isIDEMessage = msg.role === 'user' || (msg.role === 'assistant' && !hasToolCalls);
+  
+  // Format content for display
+  const formatContent = (content: any): string => {
+    if (!content) return '';
+    if (typeof content === 'string') return content;
+    return JSON.stringify(content, null, 2);
+  };
+  
+  const content = formatContent(msg.content);
+  const maxLength = 500;
+  const isTruncated = content.length > maxLength;
+  const displayContent = isExpanded ? content : content.substring(0, maxLength);
+  
+  return (
+    <div className={`mb-2 p-3 rounded-lg border ${config.border} ${config.bg}`}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className={`text-xs font-medium ${config.color}`}>
+            {config.icon} {msg.role}
+          </span>
+          {msg._source && (
+            <span className="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-400">
+              {msg._source}
+            </span>
+          )}
+          {hasToolCalls && (
+            <span className="text-xs px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400">
+              {msg.tool_calls.length} tool call{msg.tool_calls.length > 1 ? 's' : ''}
+            </span>
+          )}
+          {isToolResult && msg.tool_call_id && (
+            <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 font-mono">
+              {msg.name || 'tool'}
+            </span>
+          )}
+        </div>
+      </div>
+      
+      {/* Content */}
+      {content && (
+        <div className="mb-2">
+          {isIDEMessage ? (
+            <div className="text-sm text-gray-200 whitespace-pre-wrap break-words">
+              {displayContent}
+              {isTruncated && !isExpanded && '...'}
+            </div>
+          ) : (
+            <pre className="text-sm text-gray-200 whitespace-pre-wrap break-words font-mono bg-[#0d0d0d] p-2 rounded max-h-64 overflow-y-auto">
+              {displayContent}
+              {isTruncated && !isExpanded && '...'}
+            </pre>
+          )}
+          {isTruncated && (
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="mt-1 text-xs text-purple-400 hover:text-purple-300"
+            >
+              {isExpanded ? 'Show less' : 'Show more'}
+            </button>
+          )}
+        </div>
+      )}
+      
+      {/* Tool Calls */}
+      {hasToolCalls && (
+        <div className="space-y-2">
+          {msg.tool_calls.map((tc: any, idx: number) => (
+            <div key={tc.id || idx} className="p-2 rounded bg-[#0d0d0d] border border-orange-500/20">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs text-orange-400 font-medium">🔧 {tc.function?.name || tc.name}</span>
+                <span className="text-xs text-gray-500 font-mono">{tc.id}</span>
+              </div>
+              <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+                {typeof tc.function?.arguments === 'string' 
+                  ? (() => { try { return JSON.stringify(JSON.parse(tc.function.arguments), null, 2); } catch { return tc.function.arguments; } })()
+                  : JSON.stringify(tc.function?.arguments || tc.arguments, null, 2)}
+              </pre>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Tool Result metadata */}
+      {isToolResult && msg.tool_call_id && (
+        <div className="text-xs text-gray-500 font-mono mt-1">
+          tool_call_id: {msg.tool_call_id}
+        </div>
       )}
     </div>
   );
@@ -1301,6 +1429,50 @@ Rules:
     return turn.response?.choices?.[0]?.message?.content || '';
   };
 
+  // Get RAW source messages - exactly what's in the API context, no filtering
+  const getRawSourceMessages = (): any[] => {
+    if (!session) return [];
+    const messages: any[] = [];
+    
+    for (const turn of session.conversations) {
+      // Add ALL request messages exactly as they are
+      if (turn.request?.messages) {
+        for (const msg of turn.request.messages) {
+          messages.push({
+            ...msg,
+            _source: 'request',
+            _turnId: turn.id,
+            _timestamp: turn.timestamp
+          });
+        }
+      }
+      
+      // Add response message if it has content
+      if (turn.response) {
+        const responseMsg = turn.response.choices?.[0]?.message;
+        if (responseMsg) {
+          messages.push({
+            ...responseMsg,
+            _source: 'response',
+            _turnId: turn.id,
+            _timestamp: turn.timestamp
+          });
+        } else if (turn.response.content) {
+          // Streaming response
+          messages.push({
+            role: 'assistant',
+            content: turn.response.content,
+            _source: 'response',
+            _turnId: turn.id,
+            _timestamp: turn.timestamp
+          });
+        }
+      }
+    }
+    
+    return messages;
+  };
+
   const getAllMessages = (): any[] => {
     if (!session) return [];
     const messages: any[] = [];
@@ -1418,8 +1590,14 @@ Rules:
         });
         i++;
       } else {
-        // Regular message
-        grouped.push(msg);
+        // Regular message - skip assistant messages that have no meaningful content
+        // (these are messages where the LLM only made tool calls with no text)
+        const hasNoContent = msg.role === 'assistant' && 
+          (!msg.content || msg.content.trim() === '' || msg.content === 'null');
+        
+        if (!hasNoContent) {
+          grouped.push(msg);
+        }
         i++;
       }
     }
@@ -1449,7 +1627,7 @@ Rules:
       <div className="text-center py-12 bg-[#0d0d0d] min-h-screen">
         <p className="text-gray-400">Session not found.</p>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/sessions')}
           className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
         >
           Back to Sessions
@@ -1472,7 +1650,7 @@ Rules:
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/sessions')}
               className="p-2 hover:bg-[#2d2d2d] rounded-lg text-gray-400 hover:text-white"
             >
               ←
@@ -1581,7 +1759,7 @@ Rules:
                   : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
               }`}
             >
-              📋 Timeline
+              💬 IDE View
             </button>
             <button
               onClick={() => setViewMode('messages')}
@@ -1591,7 +1769,7 @@ Rules:
                   : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
               }`}
             >
-              💬 Messages
+              📄 Source View
             </button>
           </div>
           
@@ -1614,12 +1792,13 @@ Rules:
         {/* Left Panel - Original (always) */}
         <div className="flex-1 flex flex-col border-r border-[#2d2d2d]">
           <div className="px-4 py-2 bg-[#1a1a1a] border-b border-[#2d2d2d]">
-            <span className="text-sm font-medium text-gray-300">📝 Original</span>
+            <span className="text-sm font-medium text-gray-300">
+              {viewMode === 'timeline' ? '📝 Original' : '📄 Raw Context'}
+            </span>
             <span className="text-xs text-gray-500 ml-2">
               {viewMode === 'timeline' 
                 ? `${session?.conversations.length || 0} turns`
-                : `${groupedMessages.filter(m => showSystemMessages || m.role !== 'system').length} items`}
-              {' '}({groupedMessages.filter(m => m.role === 'tool_group').reduce((acc, m) => acc + m.toolCalls.length, 0)} tool calls)
+                : `${getRawSourceMessages().filter(m => showSystemMessages || m.role !== 'system').length} messages`}
               {' '}• ~{Math.round(JSON.stringify(allMessages).length / 4).toLocaleString()} tokens
             </span>
           </div>
@@ -1641,65 +1820,12 @@ Rules:
               />
             ))}
             
-            {/* Messages View - Flat message list */}
-            {viewMode === 'messages' && groupedMessages
+            {/* Source View - Raw context messages exactly as in API */}
+            {viewMode === 'messages' && getRawSourceMessages()
               .filter(m => showSystemMessages || (m.role !== 'system'))
-              .map((msg, idx) => {
-                // System Prompt - use new SystemPromptCard
-                if (msg.role === 'system') {
-                  return (
-                    <SystemPromptCard
-                      key={`system-${idx}`}
-                      content={msg.content}
-                      source="Conversation"
-                    />
-                  );
-                }
-                
-                // Tool Group - show tool calls with results using ToolCallCard
-                if (msg.role === 'tool_group') {
-                  return (
-                    <div key={`toolgroup-${idx}`} className="mb-2">
-                      {msg.toolCalls.map((tc: ToolCallInfo, tcIdx: number) => (
-                        <ToolCallCard
-                          key={`tc-${idx}-${tcIdx}`}
-                          toolCall={tc}
-                          result={msg.toolResults.get(tc.id)}
-                        />
-                      ))}
-                    </div>
-                  );
-                }
-                
-                // Orphan tool result
-                if (msg.role === 'tool_result_orphan') {
-                  return (
-                    <div key={`orphan-${idx}`} className="mb-2 p-3 rounded-lg border border-orange-500/30 bg-orange-500/5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm">🔧</span>
-                        <span className="text-xs font-medium text-orange-400">
-                          Tool Result {msg.name ? `(${msg.name})` : ''}
-                        </span>
-                      </div>
-                      <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-2 rounded overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto">
-                        {msg.content}
-                      </pre>
-                    </div>
-                  );
-                }
-                
-                // Regular message
-                return (
-                  <Message
-                    key={idx}
-                    role={msg.role}
-                    content={msg.content || ''}
-                    isTool={false}
-                    keywords={compressionMode > 0 ? keywords : []}
-                    keywordMap={keywordMap}
-                  />
-                );
-              })}
+              .map((msg, idx) => (
+                <SourceMessage key={`source-${idx}`} msg={msg} />
+              ))}
           </div>
         </div>
 
