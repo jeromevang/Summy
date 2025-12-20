@@ -210,6 +210,12 @@ Parameters:
 - body (optional): Request body
 - timeout (optional): Timeout in milliseconds`,
 
+  url_fetch_content: `### url_fetch_content
+Fetch the content of a URL and return readable text. Best for fetching webpage content.
+Parameters:
+- url (required): The URL to fetch content from
+- extractText (optional): Extract readable text from HTML (default: true)`,
+
   // ========== BROWSER (Playwright MCP-compatible) ==========
   browser_navigate: `### browser_navigate
 Navigate to a URL in the browser.
@@ -259,6 +265,13 @@ Parameters:
 Get accessibility snapshot of the current page.
 Parameters: none
 Returns: Page structure for understanding content`,
+
+  browser_fetch_content: `### browser_fetch_content
+Navigate to a URL using the browser, handle cookie/consent popups automatically, and return the page text content. Best for dynamic pages or sites with consent gates.
+Parameters:
+- url (required): URL to fetch content from
+- waitTime (optional): Time to wait for page load in ms (default: 2000)
+- dismissPopups (optional): Try to dismiss cookie/consent popups (default: true)`,
 
   browser_take_screenshot: `### browser_take_screenshot
 Take a screenshot of the current page.
@@ -974,6 +987,21 @@ export const TOOL_SCHEMAS: Record<string, OpenAIToolSchema> = {
       }
     }
   },
+  url_fetch_content: {
+    type: 'function',
+    function: {
+      name: 'url_fetch_content',
+      description: 'Fetch the content of a URL and return readable text. Best for fetching webpage content.',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'URL to fetch content from' },
+          extractText: { type: 'boolean', description: 'Extract readable text from HTML (default: true)' }
+        },
+        required: ['url']
+      }
+    }
+  },
   // ========== BROWSER (Playwright MCP-compatible) ==========
   browser_navigate: {
     type: 'function',
@@ -1087,6 +1115,22 @@ export const TOOL_SCHEMAS: Record<string, OpenAIToolSchema> = {
       name: 'browser_snapshot',
       description: 'Get accessibility snapshot of the current page',
       parameters: { type: 'object', properties: {}, required: [] }
+    }
+  },
+  browser_fetch_content: {
+    type: 'function',
+    function: {
+      name: 'browser_fetch_content',
+      description: 'Navigate to a URL using browser, handle cookie/consent popups, and return page text content',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'URL to fetch content from' },
+          waitTime: { type: 'number', description: 'Time to wait for page load in ms (default: 2000)' },
+          dismissPopups: { type: 'boolean', description: 'Try to dismiss cookie/consent popups (default: true)' }
+        },
+        required: ['url']
+      }
     }
   },
   browser_take_screenshot: {
