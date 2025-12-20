@@ -934,33 +934,16 @@ const AGENTIC_CONFIG = {
 
 /**
  * Stream a status bubble to the IDE via SSE
- * This shows thinking/tool execution status in Continue/VSCode
  * 
- * Format: Compact inline status updates that don't clutter the response
+ * NOTE: DISABLED - Status bubbles were being saved as part of the assistant's
+ * response content, polluting the conversation history. The IDE concatenates
+ * all delta.content chunks, so there's no way to send ephemeral status without
+ * it being saved. Status is now only sent via WebSocket to the Summy dashboard.
  */
 const streamStatusBubble = (res: any, status: string, icon: string = '🔄', isLast: boolean = false) => {
-  if (!res || res.writableEnded) return;
-  
-  try {
-    // Compact format: just icon + status, inline
-    // Use a pipe separator for multiple statuses, or newline for final
-    const separator = isLast ? '\n\n---\n\n' : ' ';
-    const bubble = `${icon} ${status}${separator}`;
-    const chunk = JSON.stringify({
-      id: `status-${Date.now()}`,
-      object: 'chat.completion.chunk',
-      created: Math.floor(Date.now() / 1000),
-      model: 'status',
-      choices: [{
-        index: 0,
-        delta: { content: bubble },
-        finish_reason: null
-      }]
-    });
-    res.write(`data: ${chunk}\n\n`);
-  } catch (err) {
-    // Ignore write errors (connection may be closed)
-  }
+  // Disabled: Status bubbles pollute saved responses
+  // Status is broadcast via WebSocket instead (broadcastToClients)
+  return;
 };
 
 /**

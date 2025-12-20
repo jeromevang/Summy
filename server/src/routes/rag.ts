@@ -256,7 +256,7 @@ router.get('/models', async (req: Request, res: Response) => {
       const response = await fetch(`${lmstudioUrl}/v1/models`);
       
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as { data?: any[] };
         console.log('[RAG] LM Studio returned models:', data.data?.length || 0);
         
         // Known embedding model patterns
@@ -324,7 +324,7 @@ router.post('/index', async (req: Request, res: Response) => {
     
     // First update RAG server config with the model
     await ragClient.updateConfig({
-      lmstudio: { model: embeddingModel }
+      lmstudio: { model: embeddingModel, loadOnDemand: false }
     });
     
     // Then start indexing
