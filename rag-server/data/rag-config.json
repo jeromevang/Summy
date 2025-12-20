@@ -3,7 +3,7 @@
   "wsPort": 3003,
   "lmstudio": {
     "model": "text-embedding-nomic-embed-text-v1.5@q8_0",
-    "loadOnDemand": true
+    "loadOnDemand": false
   },
   "storage": {
     "dataPath": "./data/indices"

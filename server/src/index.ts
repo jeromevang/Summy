@@ -933,6 +933,37 @@ const AGENTIC_CONFIG = {
 };
 
 /**
+ * Stream a status bubble to the IDE via SSE
+ * This shows thinking/tool execution status in Continue/VSCode
+ * 
+ * Format: Compact inline status updates that don't clutter the response
+ */
+const streamStatusBubble = (res: any, status: string, icon: string = '🔄', isLast: boolean = false) => {
+  if (!res || res.writableEnded) return;
+  
+  try {
+    // Compact format: just icon + status, inline
+    // Use a pipe separator for multiple statuses, or newline for final
+    const separator = isLast ? '\n\n---\n\n' : ' ';
+    const bubble = `${icon} ${status}${separator}`;
+    const chunk = JSON.stringify({
+      id: `status-${Date.now()}`,
+      object: 'chat.completion.chunk',
+      created: Math.floor(Date.now() / 1000),
+      model: 'status',
+      choices: [{
+        index: 0,
+        delta: { content: bubble },
+        finish_reason: null
+      }]
+    });
+    res.write(`data: ${chunk}\n\n`);
+  } catch (err) {
+    // Ignore write errors (connection may be closed)
+  }
+};
+
+/**
  * Summarize a large tool result using the LLM
  */
 const summarizeToolResult = async (
@@ -970,6 +1001,8 @@ SUMMARY:`;
  * Execute tools from LLM response and continue conversation until final answer
  * This handles the case where LLM returns tool_calls - we execute them via MCP
  * and continue the conversation until we get a text-only response.
+ * 
+ * @param res - Optional Express response object to stream status bubbles to IDE
  */
 const executeAgenticLoop = async (
   initialResponse: any,
@@ -977,7 +1010,8 @@ const executeAgenticLoop = async (
   llmCallFn: (messages: any[]) => Promise<any>,
   ideMapping: IDEMapping,
   sessionId: string,
-  maxIterations: number = 10
+  maxIterations: number = 10,
+  res?: any  // Express response for streaming status to IDE
 ): Promise<AgenticLoopResult> => {
   const toolExecutions: AgenticLoopResult['toolExecutions'] = [];
   const agenticMessages: AgenticLoopResult['agenticMessages'] = [];
@@ -1004,6 +1038,11 @@ const executeAgenticLoop = async (
     iteration: 0
   });
 
+  // Stream brief "thinking" indicator if there's initial intent
+  if (res && initialIntent) {
+    streamStatusBubble(res, 'Thinking...', '🤔');
+  }
+
   while (iterations < maxIterations) {
     iterations++;
 
@@ -1029,6 +1068,16 @@ const executeAgenticLoop = async (
         message: 'Response ready',
         iterations
       });
+      
+      // Stream completion status to IDE (with separator before response)
+      if (toolExecutions.length > 0) {
+        const successCount = toolExecutions.filter(t => !t.isError).length;
+        const errorCount = toolExecutions.filter(t => t.isError).length;
+        const statusText = errorCount > 0 
+          ? `Done: ${successCount} tools succeeded, ${errorCount} failed`
+          : `Done: ${toolExecutions.length} tool${toolExecutions.length > 1 ? 's' : ''} executed`;
+        streamStatusBubble(res, statusText, '✨', true); // isLast=true adds separator
+      }
       
       console.log(`[Agentic] Loop complete after ${iterations} iterations`);
       return { finalResponse: currentResponse, toolExecutions, iterations, agenticMessages, initialIntent };
@@ -1115,6 +1164,9 @@ const executeAgenticLoop = async (
         iteration: iterations
       });
 
+      // Stream status to IDE
+      streamStatusBubble(res, `Running \`${toolName}\`...`, '🔧');
+
       // Check if tool is mapped to MCP
       const mapped = ideMapping.mappings[toolName];
       let result: any;
@@ -1157,6 +1209,25 @@ const executeAgenticLoop = async (
         }
       }
 
+      // === DETECT ERROR MESSAGES IN RESULTS ===
+      // Some tools return error messages as successful results (e.g., "Error: fetch failed")
+      // We need to detect these and mark them as errors
+      if (!isError && result && typeof result === 'string') {
+        const errorPatterns = [
+          /^Error:/i,
+          /^MCP error/i,
+          /error:.*fetch failed/i,
+          /error:.*connection refused/i,
+          /error:.*ECONNREFUSED/i,
+          /error:.*timeout/i,
+        ];
+        
+        if (errorPatterns.some(pattern => pattern.test(result))) {
+          console.warn(`[Agentic] Detected error in tool result: ${result.substring(0, 100)}`);
+          isError = true;
+        }
+      }
+
       // === SMART SUMMARIZATION FOR LARGE RESULTS ===
       let processedResult = result;
       if (!isError && result && result.length > AGENTIC_CONFIG.MAX_RESULT_SIZE) {
@@ -1167,8 +1238,14 @@ const executeAgenticLoop = async (
           message: `Summarizing large result from ${toolName}...`,
           iteration: iterations
         });
+        // Don't stream "summarizing" status - too verbose
         processedResult = await summarizeToolResult(result, mcpToolName, args, llmCallFn);
         console.log(`[Agentic] Summarized to ${processedResult.length} chars`);
+        
+        // Only warn if summarization failed
+        if (processedResult.includes('Summarization failed')) {
+          streamStatusBubble(res, `⚠️ Result truncated (${Math.round(result.length/1024)}KB)`, '');
+        }
       }
       
       // Track accumulated context size
@@ -1183,6 +1260,14 @@ const executeAgenticLoop = async (
         toolCallId,
         isError
       });
+
+      // Stream completion status to IDE
+      const sizeInfo = processedResult?.length > 1000 ? ` (${Math.round(processedResult.length/1024)}KB)` : '';
+      if (isError) {
+        streamStatusBubble(res, `\`${toolName}\` failed: ${result?.substring(0, 80)}...`, '❌');
+      } else {
+        streamStatusBubble(res, `\`${toolName}\` completed${sizeInfo}`, '✅');
+      }
 
       // Use processedResult (potentially summarized) for LLM context
       const toolResultContent = typeof processedResult === 'string' ? processedResult : JSON.stringify(processedResult);
@@ -1222,6 +1307,7 @@ const executeAgenticLoop = async (
         role: 'system',
         content: `IMPORTANT: You have gathered a lot of information (${accumulatedContextSize} chars). Please synthesize what you have learned and provide your final answer now. Do not make any more tool calls.`
       });
+      streamStatusBubble(res, `Context limit reached (${Math.round(accumulatedContextSize/1024)}KB), generating response...`, '⚠️');
     }
 
     // Broadcast: Thinking again after tool execution
@@ -1231,6 +1317,10 @@ const executeAgenticLoop = async (
       message: 'Processing response...',
       iteration: iterations
     });
+
+    // Don't stream iteration status - too verbose
+    // Just log it for debugging
+    console.log(`[Agentic] Processing iteration ${iterations}`);
 
     // Call LLM again with updated context
     console.log(`[Agentic] Calling LLM with ${currentMessages.length} messages`);
@@ -1244,6 +1334,9 @@ const executeAgenticLoop = async (
     message: 'Max iterations reached',
     iterations: maxIterations
   });
+
+  // Stream max iterations warning to IDE
+  streamStatusBubble(res, `Max iterations (${maxIterations}) reached`, '⚠️');
 
   console.warn(`[Agentic] Max iterations (${maxIterations}) reached`);
   
@@ -1718,7 +1811,9 @@ const proxyToOpenAI = async (req: any, res: any) => {
                   messagesToSend,
                   llmCallFn,
                   ideMappingConfig,
-                  req.sessionId
+                  req.sessionId,
+                  10,  // maxIterations
+                  res  // Pass response for streaming status bubbles
                 );
                 
                 console.log(`[Agentic] Completed with ${toolExecutions.length} tool executions in ${iterations} iterations`);

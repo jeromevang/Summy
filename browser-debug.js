@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-
+ 
 async function debugBrowser() {
   console.log('Launching browser for debug...');
   const browser = await puppeteer.launch({ 
