@@ -319,7 +319,7 @@ const ToolCallCard = ({
                 {copiedArgs ? '✓ Copied' : 'Copy'}
               </button>
             </div>
-            <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-3 rounded-lg overflow-x-auto font-mono max-h-48 overflow-y-auto">
+            <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-3 rounded-lg overflow-x-auto font-mono max-h-48 overflow-y-auto scrollbar-thin">
               {formatArgs(toolCall.arguments)}
             </pre>
           </div>
@@ -343,7 +343,7 @@ const ToolCallCard = ({
                   {copiedResult ? '✓ Copied' : 'Copy'}
                 </button>
               </div>
-              <pre className={`text-xs bg-[#0d0d0d] p-3 rounded-lg overflow-x-auto font-mono max-h-64 overflow-y-auto whitespace-pre-wrap ${isError ? 'text-red-300' : 'text-gray-300'}`}>
+              <pre className={`text-xs bg-[#0d0d0d] p-3 rounded-lg overflow-x-auto font-mono max-h-64 overflow-y-auto scrollbar-thin whitespace-pre-wrap ${isError ? 'text-red-300' : 'text-gray-300'}`}>
                 {truncateContent(result.content, 2000)}
               </pre>
               
@@ -445,7 +445,7 @@ const SystemPromptCard = ({
       {/* Content */}
       <div className="px-4 pb-3">
         {isExpanded ? (
-          <pre className="text-xs text-gray-300 whitespace-pre-wrap bg-[#0d0d0d] p-3 rounded-lg border border-[#2d2d2d] max-h-96 overflow-y-auto font-mono">
+          <pre className="text-xs text-gray-300 whitespace-pre-wrap bg-[#0d0d0d] p-3 rounded-lg border border-[#2d2d2d] max-h-96 overflow-y-auto scrollbar-thin font-mono">
             {content}
           </pre>
         ) : (
@@ -524,7 +524,7 @@ const TimelinePhase = ({
                   {copied ? '✓' : 'Copy'}
                 </button>
               </div>
-              <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded max-h-48 overflow-y-auto whitespace-pre-wrap font-mono">
+              <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded max-h-48 overflow-y-auto scrollbar-thin whitespace-pre-wrap font-mono">
                 {phase.systemPrompt || '(No system prompt)'}
               </pre>
             </div>
@@ -533,7 +533,7 @@ const TimelinePhase = ({
             {phase.reasoning && (
               <div className="mt-2">
                 <div className="text-xs text-blue-400 mb-1">💭 AI Reasoning</div>
-                <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded max-h-48 overflow-y-auto whitespace-pre-wrap font-mono">
+                <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded max-h-48 overflow-y-auto scrollbar-thin whitespace-pre-wrap font-mono">
                   {phase.reasoning}
                 </pre>
               </div>
@@ -606,7 +606,7 @@ const TimelineToolCall = ({
                   {copiedArgs ? '✓' : 'Copy'}
                 </button>
               </div>
-              <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded overflow-x-auto font-mono max-h-32 overflow-y-auto">
+              <pre className="text-xs text-gray-400 bg-[#0a0a0a] p-2 rounded overflow-x-auto font-mono max-h-32 overflow-y-auto scrollbar-thin">
                 {JSON.stringify(toolCall.arguments, null, 2)}
               </pre>
             </div>
@@ -633,7 +633,7 @@ const TimelineToolCall = ({
                     {copiedResult ? '✓' : 'Copy'}
                   </button>
                 </div>
-                <pre className={`text-xs p-2 rounded overflow-x-auto max-h-48 overflow-y-auto font-mono whitespace-pre-wrap ${
+                <pre className={`text-xs p-2 rounded overflow-x-auto max-h-48 overflow-y-auto scrollbar-thin font-mono whitespace-pre-wrap ${
                   toolCall.status === 'failed' ? 'text-red-300 bg-red-500/10' : 'text-gray-400 bg-[#0a0a0a]'
                 }`}>
                   {typeof toolCall.result === 'string' 
@@ -1002,7 +1002,7 @@ const SourceMessage = ({ msg }: { msg: any }) => {
               {isTruncated && !isExpanded && '...'}
             </div>
           ) : (
-            <pre className="text-sm text-gray-200 whitespace-pre-wrap break-words font-mono bg-[#0d0d0d] p-2 rounded max-h-64 overflow-y-auto">
+            <pre className="text-sm text-gray-200 whitespace-pre-wrap break-words font-mono bg-[#0d0d0d] p-2 rounded max-h-64 overflow-y-auto scrollbar-thin">
               {displayContent}
               {isTruncated && !isExpanded && '...'}
             </pre>
@@ -1438,9 +1438,21 @@ Rules:
       // Add ALL request messages exactly as they are
       if (turn.request?.messages) {
         for (const msg of turn.request.messages) {
+          // Determine descriptive source based on role
+          let source = '→ to LLM';
+          if (msg.role === 'tool') {
+            source = '→ tool result to LLM';
+          } else if (msg.role === 'system') {
+            source = '→ system to LLM';
+          } else if (msg.role === 'user') {
+            source = '→ user to LLM';
+          } else if (msg.role === 'assistant' && msg.tool_calls) {
+            source = '→ context to LLM';
+          }
+          
           messages.push({
             ...msg,
-            _source: 'request',
+            _source: source,
             _turnId: turn.id,
             _timestamp: turn.timestamp
           });
@@ -1453,7 +1465,7 @@ Rules:
         if (responseMsg) {
           messages.push({
             ...responseMsg,
-            _source: 'response',
+            _source: '← from LLM',
             _turnId: turn.id,
             _timestamp: turn.timestamp
           });
@@ -1462,7 +1474,7 @@ Rules:
           messages.push({
             role: 'assistant',
             content: turn.response.content,
-            _source: 'response',
+            _source: '← from LLM',
             _turnId: turn.id,
             _timestamp: turn.timestamp
           });
@@ -1804,7 +1816,7 @@ Rules:
           </div>
           <div 
             ref={leftPanelRef}
-            className="flex-1 overflow-y-auto p-4"
+            className="flex-1 overflow-y-auto p-4 scrollbar-thin"
             onScroll={() => handleScroll('left')}
           >
             {/* Timeline View - Turn-based with expandable details */}
@@ -1857,7 +1869,7 @@ Rules:
           </div>
           <div 
             ref={rightPanelRef}
-            className="flex-1 overflow-y-auto p-4"
+            className="flex-1 overflow-y-auto p-4 scrollbar-thin"
             onScroll={() => handleScroll('right')}
           >
             {loadingVersions ? (
@@ -1919,7 +1931,7 @@ Rules:
                               <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-400">PRESERVED</span>
                             )}
                           </div>
-                          <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-2 rounded overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto">
+                          <pre className="text-xs text-gray-300 bg-[#0d0d0d] p-2 rounded overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto scrollbar-thin">
                             {msg.content}
                           </pre>
                         </div>
