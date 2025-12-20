@@ -17,7 +17,7 @@ Context management middleware for LLM conversations between IDEs and cloud provi
 - OpenAI API key
 - LMStudio (optional, for summarization)
 
-### Installation
+### Installation ###
 
 ```bash
 # Install all dependencies
@@ -57,7 +57,7 @@ npm run dev:server
 ```
 
 **Server Status:** Check the indicator in the web interface navigation bar.
-
+ 
 ### URLs
 - **Client Interface**: http://localhost:5173
 - **Server API**: http://localhost:3001

@@ -567,10 +567,18 @@ export class Indexer {
       ignoreInitial: true
     });
     
-    const queueChange = (filePath: string) => {
-      if (!this.shouldIncludeFile(filePath)) return;
+    const queueChange = (filePath: string, eventType: string = 'change') => {
+      // Log every file change detected
+      const relativePath = path.relative(projectPath, filePath).replace(/\\/g, '/');
+      console.log(`[Watcher] ${eventType}: ${relativePath}`);
+      
+      if (!this.shouldIncludeFile(filePath)) {
+        console.log(`[Watcher] Skipped (not included): ${relativePath}`);
+        return;
+      }
       
       this.pendingChanges.add(filePath);
+      console.log(`[Watcher] Queued: ${relativePath} (pending: ${this.pendingChanges.size})`);
       
       // Debounce
       if (this.debounceTimer) {
@@ -581,7 +589,8 @@ export class Indexer {
         const changes = [...this.pendingChanges];
         this.pendingChanges.clear();
         
-        console.log(`[Indexer] Re-indexing ${changes.length} changed files`);
+        console.log(`[Indexer] Re-indexing ${changes.length} changed files:`);
+        changes.forEach(f => console.log(`  - ${path.relative(projectPath, f).replace(/\\/g, '/')}`))
         
         for (const file of changes) {
           try {
@@ -597,8 +606,8 @@ export class Indexer {
       }, this.config.watcher.debounceMs);
     };
     
-    this.fileWatcher.on('change', queueChange);
-    this.fileWatcher.on('add', queueChange);
+    this.fileWatcher.on('change', (fp) => queueChange(fp, 'change'));
+    this.fileWatcher.on('add', (fp) => queueChange(fp, 'add'));
     this.fileWatcher.on('unlink', async (filePath) => {
       // Remove from index
       const relativePath = path.relative(projectPath, filePath).replace(/\\/g, '/');
