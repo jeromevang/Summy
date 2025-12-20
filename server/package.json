@@ -39,7 +39,7 @@
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/http-proxy-middleware": "^0.19.3",
-    "@types/node": "^25.0.3",
+    "@types/node": "^22.19.3",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",

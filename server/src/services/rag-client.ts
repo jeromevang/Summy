@@ -199,7 +199,7 @@ class RAGClient {
     try {
       const response = await fetch(`${this.httpUrl}/api/rag/config`);
       if (!response.ok) return null;
-      return await response.json();
+      return await response.json() as RAGConfig;
     } catch {
       return null;
     }
@@ -228,7 +228,7 @@ class RAGClient {
     try {
       const response = await fetch(`${this.httpUrl}/api/rag/stats`);
       if (!response.ok) return null;
-      return await response.json();
+      return await response.json() as RAGStats;
     } catch {
       return null;
     }
@@ -241,7 +241,7 @@ class RAGClient {
     try {
       const response = await fetch(`${this.httpUrl}/api/rag/models`);
       if (!response.ok) return [];
-      return await response.json();
+      return await response.json() as EmbeddingModel[];
     } catch {
       return [];
     }
@@ -257,7 +257,7 @@ class RAGClient {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ projectPath })
       });
-      return await response.json();
+      return await response.json() as { success: boolean; message: string };
     } catch (error: any) {
       return { success: false, message: error.message };
     }
@@ -332,7 +332,7 @@ class RAGClient {
       });
       
       if (!response.ok) return null;
-      return await response.json();
+      return await response.json() as { results: RAGQueryResult[]; latency: number };
     } catch {
       return null;
     }
@@ -358,7 +358,7 @@ class RAGClient {
     try {
       const response = await fetch(`${this.httpUrl}/api/rag/visualization`);
       if (!response.ok) return [];
-      return await response.json();
+      return await response.json() as any[];
     } catch {
       return [];
     }
@@ -410,7 +410,7 @@ class RAGClient {
     try {
       const response = await fetch(`${this.httpUrl}/api/rag/chunks/${chunkId}/similar?limit=${limit}`);
       if (!response.ok) return [];
-      return await response.json();
+      return await response.json() as any[];
     } catch {
       return [];
     }
