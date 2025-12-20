@@ -14,6 +14,7 @@
 import Parser from 'tree-sitter';
 import { CodeChunk } from '../config.js';
 import { v4 as uuidv4 } from 'uuid';
+import { initializeTokenizer, countTokensSync, isTokenizerReady, estimateTokensFast } from './tokenizer.js';
 
 // Language grammars (dynamically imported)
 let TypeScript: any = null;
@@ -169,10 +170,13 @@ function getSignature(node: Parser.SyntaxNode, sourceCode: string): string {
   return text.split('\n')[0].trim();
 }
 
-// Count tokens (rough estimate based on whitespace and symbols)
+// Count tokens using actual tokenizer (falls back to calibrated estimate if not ready)
 function estimateTokens(text: string): number {
-  // Rough approximation: ~4 chars per token on average for code
-  return Math.ceil(text.length / 4);
+  if (isTokenizerReady()) {
+    return countTokensSync(text);
+  }
+  // Fallback: use calibrated estimate (default ~2 chars per token for code)
+  return estimateTokensFast(text);
 }
 
 // Extract imports from file
@@ -213,19 +217,28 @@ export class Chunker {
   constructor(options: ChunkerOptions = {}) {
     this.parser = new Parser();
     this.options = {
-      maxChunkTokens: options.maxChunkTokens || 1500,
+      maxChunkTokens: options.maxChunkTokens || 1800,  // Safe for 2048 context (leaves 248 token buffer)
       minChunkTokens: options.minChunkTokens || 50,
       includeImports: options.includeImports !== false
     };
   }
   
   /**
-   * Initialize the chunker (load grammars)
+   * Initialize the chunker (load grammars and tokenizer)
    */
   async initialize(): Promise<void> {
     if (!grammarsLoaded) {
       await loadGrammars();
       grammarsLoaded = true;
+    }
+    
+    // Initialize tokenizer for accurate token counting
+    if (!isTokenizerReady()) {
+      try {
+        await initializeTokenizer();
+      } catch (error) {
+        console.warn('[Chunker] Tokenizer initialization failed, using estimates:', error);
+      }
     }
   }
   

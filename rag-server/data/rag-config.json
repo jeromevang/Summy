@@ -1,0 +1,58 @@
+{
+  "port": 3002,
+  "wsPort": 3003,
+  "lmstudio": {
+    "model": "text-embedding-nomic-embed-text-v1.5@q8_0",
+    "loadOnDemand": true
+  },
+  "storage": {
+    "dataPath": "./data/indices"
+  },
+  "indexing": {
+    "chunkSize": 1800,
+    "chunkOverlap": 50,
+    "includePatterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.py",
+      "**/*.go",
+      "**/*.rs",
+      "**/*.java",
+      "**/*.c",
+      "**/*.cpp",
+      "**/*.h",
+      "**/*.hpp",
+      "**/*.cs",
+      "**/*.rb",
+      "**/*.php",
+      "**/*.swift",
+      "**/*.kt",
+      "**/*.scala",
+      "**/*.vue",
+      "**/*.svelte"
+    ],
+    "excludePatterns": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/coverage/**",
+      "**/__pycache__/**",
+      "**/venv/**",
+      "**/.venv/**",
+      "**/target/**",
+      "**/vendor/**"
+    ]
+  },
+  "watcher": {
+    "enabled": true,
+    "debounceMs": 2000
+  },
+  "project": {
+    "path": "C:\\Users\\Jerome\\Documents\\Projects\\Summy",
+    "autoDetect": true
+  }
+}
