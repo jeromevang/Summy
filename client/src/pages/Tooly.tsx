@@ -1850,17 +1850,77 @@ const Tooly: React.FC = () => {
                     })()}
                   </div>
 
-                  {/* Tool Categories with Toggles */}
+                  {/* Enhanced Tool Configuration */}
                   <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                    <h4 className="text-sm font-medium text-gray-400 mb-2">Tool Configuration</h4>
-                    <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#4d4d4d] scrollbar-track-transparent">
-                      {Object.entries(selectedModel.capabilities).map(([tool, cap]) => (
-                        <div key={tool} className="p-2 bg-[#1a1a1a] rounded-lg">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                    {/* Header with count and actions */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-medium text-white">Tools</h4>
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-purple-500/20 text-purple-400">
+                          {selectedModel.enabledTools?.length || 0}/{Object.keys(selectedModel.capabilities).length} enabled
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={async () => {
+                            // Enable all tools with score >= 70
+                            const toEnable = Object.entries(selectedModel.capabilities)
+                              .filter(([_, cap]) => cap.score >= 70)
+                              .map(([tool]) => tool);
+                            for (const tool of toEnable) {
+                              if (!selectedModel.enabledTools?.includes(tool)) {
+                                await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/tools/${tool}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ enabled: true })
+                                });
+                              }
+                            }
+                            await fetchModelProfile(selectedModel.modelId);
+                          }}
+                          className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded hover:bg-green-500/30 transition-colors"
+                          title="Enable all tools with score >= 70%"
+                        >
+                          Enable Passing
+                        </button>
+                        <button
+                          onClick={() => {
+                            setTestProgress({
+                              modelId: selectedModel.modelId,
+                              toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                            });
+                            runModelTests(selectedModel.modelId, selectedModel.provider);
+                          }}
+                          disabled={testingModel === selectedModel.modelId}
+                          className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 rounded hover:bg-purple-500/30 transition-colors disabled:opacity-50"
+                        >
+                          {testingModel === selectedModel.modelId ? 'Testing...' : 'Run Tests'}
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {/* Tool list */}
+                    <div className="space-y-1 max-h-56 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#4d4d4d] scrollbar-track-transparent">
+                      {Object.entries(selectedModel.capabilities)
+                        .sort(([, a], [, b]) => (b.score || 0) - (a.score || 0))
+                        .map(([tool, cap]) => {
+                          const isEnabled = selectedModel.enabledTools?.includes(tool) || false;
+                          const score = cap.score || 0;
+                          const status = cap.testsPassed > 0 ? 'passed' : cap.testsFailed > 0 ? 'failed' : 'untested';
+                          
+                          return (
+                            <div 
+                              key={tool} 
+                              className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${
+                                isEnabled 
+                                  ? 'bg-[#1a1a1a] border border-purple-500/30' 
+                                  : 'bg-[#151515] border border-transparent'
+                              }`}
+                            >
+                              {/* Toggle */}
                               <input
                                 type="checkbox"
-                                checked={selectedModel.enabledTools?.includes(tool) || false}
+                                checked={isEnabled}
                                 onChange={async (e) => {
                                   try {
                                     await fetch(`/api/tooly/models/${encodeURIComponent(selectedModel.modelId)}/tools/${tool}`, {
@@ -1873,16 +1933,64 @@ const Tooly: React.FC = () => {
                                     console.error('Failed to toggle tool:', error);
                                   }
                                 }}
-                                className="w-3 h-3 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500"
+                                className="w-3.5 h-3.5 rounded border-gray-600 bg-[#0d0d0d] text-purple-500 focus:ring-purple-500 focus:ring-offset-0"
                               />
-                              <span className={`text-xs font-medium ${cap.supported ? 'text-white' : 'text-gray-500'}`}>
+                              
+                              {/* Tool name */}
+                              <span className={`flex-1 text-xs font-medium ${isEnabled ? 'text-white' : 'text-gray-500'}`}>
                                 {tool}
                               </span>
+                              
+                              {/* Score badge */}
+                              <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${
+                                score >= 70 ? 'bg-green-500/20 text-green-400' :
+                                score >= 40 ? 'bg-yellow-500/20 text-yellow-400' :
+                                score > 0 ? 'bg-red-500/20 text-red-400' :
+                                'bg-gray-500/20 text-gray-500'
+                              }`}>
+                                {score > 0 ? `${score}%` : '--'}
+                              </span>
+                              
+                              {/* Status indicator */}
+                              <span className={`text-[10px] ${
+                                status === 'passed' ? 'text-green-400' :
+                                status === 'failed' ? 'text-red-400' :
+                                'text-gray-500'
+                              }`}>
+                                {status === 'passed' ? '✓' : status === 'failed' ? '✗' : '○'}
+                              </span>
                             </div>
-                            <span className={`text-xs ${cap.score >= 70 ? 'text-green-400' : cap.score >= 40 ? 'text-yellow-400' : 'text-red-400'}`}>
-                              {cap.score}%
+                          );
+                        })}
+                    </div>
+                  </div>
+
+                  {/* IDE Aliases */}
+                  <div className="p-3 bg-[#2d2d2d] rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Use in your IDE</h4>
+                    <p className="text-[10px] text-gray-500 mb-2">Copy the model name with IDE suffix to your IDE config:</p>
+                    <div className="space-y-2">
+                      {['cursor', 'continue'].map((ide) => (
+                        <div 
+                          key={ide}
+                          className="flex items-center justify-between px-3 py-2 bg-[#1a1a1a] rounded-lg border border-[#3d3d3d]"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className={`text-xs font-medium ${ide === 'cursor' ? 'text-green-400' : 'text-blue-400'}`}>
+                              {ide.charAt(0).toUpperCase() + ide.slice(1)}
                             </span>
+                            <code className="text-xs text-white font-mono">
+                              {selectedModel.modelId}-{ide}
+                            </code>
                           </div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${selectedModel.modelId}-${ide}`);
+                            }}
+                            className="px-2 py-1 text-[10px] bg-[#2d2d2d] text-gray-400 rounded hover:bg-[#3d3d3d] hover:text-white transition-colors"
+                          >
+                            Copy
+                          </button>
                         </div>
                       ))}
                     </div>

@@ -1278,7 +1278,7 @@ const executeAgenticLoop = async (
 /**
  * Check if a response requires agentic tool execution
  */
-const shouldExecuteAgentically = (response: any, ideMapping: IDEMapping): boolean => {
+const shouldExecuteAgentically = (response: any, ideMapping: IDEMapping, mcpToolsAdded: string[] = []): boolean => {
   const toolCalls = response.tool_calls || 
                     response.choices?.[0]?.message?.tool_calls;
   
@@ -1286,11 +1286,19 @@ const shouldExecuteAgentically = (response: any, ideMapping: IDEMapping): boolea
     return false;
   }
 
-  // Check if any tool call is mapped to MCP
+  // Check if any tool call is mapped to MCP or is a direct MCP extension tool
   for (const tc of toolCalls) {
     const toolName = tc.function?.name || tc.name;
+    
+    // Check IDE mappings
     if (ideMapping.mappings[toolName]) {
       console.log(`[Agentic] Tool ${toolName} is mapped - will execute agentically`);
+      return true;
+    }
+    
+    // Check if it's a direct MCP extension tool we added
+    if (mcpToolsAdded.includes(toolName)) {
+      console.log(`[Agentic] Tool ${toolName} is MCP extension - will execute agentically`);
       return true;
     }
   }
@@ -1684,7 +1692,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
             const parsedResponse = parseStreamingResponse(fullContent);
             
             // Check if we need to execute tools agentically
-            if (shouldExecuteAgentically(parsedResponse, ideMappingConfig)) {
+            if (shouldExecuteAgentically(parsedResponse, ideMappingConfig, mcpToolsToAdd)) {
               console.log('[Agentic] Tool calls detected, executing via MCP...');
               
               // Create LLM call function for the loop
@@ -1780,7 +1788,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
           });
         } else {
           // Non-streaming: check for agentic execution
-          if (shouldExecuteAgentically(response.data, ideMappingConfig)) {
+          if (shouldExecuteAgentically(response.data, ideMappingConfig, mcpToolsToAdd)) {
             console.log('[Agentic] Tool calls detected (non-streaming), executing via MCP...');
             
             const llmCallFn = async (msgs: any[]): Promise<any> => {
