@@ -10,6 +10,29 @@
 // ============================================================
 
 export const TOOL_PROMPTS: Record<string, string> = {
+  // ========== RAG - SEMANTIC CODE SEARCH (Use FIRST for code understanding) ==========
+  rag_query: `### rag_query
+**PREFERRED FOR CODE SEARCH** - Use this FIRST for any code search or understanding task.
+Semantic AI-powered search that finds relevant code by meaning in a single call.
+Use for: "find X", "where is Y handled", "how does Z work", "search for", "look for"
+Much more efficient than multiple grep/search calls.
+Parameters:
+- query (required): Natural language query - ask like you would ask a colleague
+- limit (optional): Maximum results to return (default: 5)
+- fileTypes (optional): Filter by file types (e.g., ['ts', 'js', 'py'])
+- paths (optional): Filter by path patterns (e.g., ['src/', 'lib/'])
+Returns: Code snippets with file paths, line numbers, symbols, and relevance scores`,
+
+  rag_status: `### rag_status
+Get the status of the RAG indexing system.
+Parameters: none
+Returns: Project path, indexing status, file count, chunk count`,
+
+  rag_index: `### rag_index
+Start indexing a project directory for semantic search.
+Parameters:
+- projectPath (required): Absolute path to the project directory to index`,
+
   // ========== FILE OPERATIONS (Official MCP Filesystem Server) ==========
   read_file: `### read_file
 Read the complete contents of a file from the file system.
@@ -63,6 +86,8 @@ Parameters:
 
   search_files: `### search_files
 Recursively search for files and directories matching a pattern.
+NOTE: For semantic code understanding, use rag_query first - it's more efficient.
+Use search_files only for exact pattern/regex matching.
 Parameters:
 - directory (required): Starting directory for the search
 - pattern (required): Search pattern (glob like *.ts or regex)`,
@@ -482,6 +507,47 @@ export interface OpenAIToolSchema {
 }
 
 export const TOOL_SCHEMAS: Record<string, OpenAIToolSchema> = {
+  // ========== RAG - SEMANTIC CODE SEARCH (Use FIRST for code understanding) ==========
+  rag_query: {
+    type: 'function',
+    function: {
+      name: 'rag_query',
+      description: 'PREFERRED FOR CODE SEARCH: Semantic AI-powered search that finds relevant code by meaning in a single call. Use this FIRST for any code search task like "find X", "where is Y", "how does Z work". Returns code snippets with file paths, line numbers, symbols, and relevance scores. Much more efficient than multiple grep calls.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: 'Natural language query - ask like you would ask a colleague: "where is authentication handled", "how does the database connect"' },
+          limit: { type: 'number', description: 'Maximum number of results to return (default: 5)' },
+          fileTypes: { type: 'array', items: { type: 'string' }, description: 'Filter by file types (e.g., ["ts", "js", "py"])' },
+          paths: { type: 'array', items: { type: 'string' }, description: 'Filter by path patterns (e.g., ["src/", "lib/"])' }
+        },
+        required: ['query']
+      }
+    }
+  },
+  rag_status: {
+    type: 'function',
+    function: {
+      name: 'rag_status',
+      description: 'Get the status of the RAG indexing system including project path, indexing status, file count, and chunk count',
+      parameters: { type: 'object', properties: {}, required: [] }
+    }
+  },
+  rag_index: {
+    type: 'function',
+    function: {
+      name: 'rag_index',
+      description: 'Start indexing a project directory for semantic code search',
+      parameters: {
+        type: 'object',
+        properties: {
+          projectPath: { type: 'string', description: 'Absolute path to the project directory to index' }
+        },
+        required: ['projectPath']
+      }
+    }
+  },
+
   // ========== FILE OPERATIONS (Official MCP Filesystem Server) ==========
   read_file: {
     type: 'function',
@@ -629,7 +695,7 @@ export const TOOL_SCHEMAS: Record<string, OpenAIToolSchema> = {
     type: 'function',
     function: {
       name: 'search_files',
-      description: 'Recursively search for files and directories matching a pattern',
+      description: 'Recursively search for files matching a pattern. For semantic code understanding, use rag_query first - it is more efficient. Use search_files only for exact pattern/regex matching.',
       parameters: {
         type: 'object',
         properties: {

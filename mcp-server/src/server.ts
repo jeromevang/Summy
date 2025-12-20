@@ -230,6 +230,20 @@ function resolvePath(filePath: string): string {
 const mcpRules = {
   tool_use_policy: "prefer_tools",
   security: "only operate on files within the project directory",
+  search_strategy: {
+    priority: "ALWAYS use rag_query FIRST for any code search, understanding, or exploration task",
+    guidance: [
+      "Use rag_query for: 'find X', 'where is Y handled', 'how does Z work', 'search for', 'look for'",
+      "rag_query uses semantic AI search - finds code by meaning, not just exact text matches",
+      "A single rag_query call replaces multiple grep/search calls - much more efficient",
+      "Only use grep/search_files AFTER rag_query if you need exact regex patterns"
+    ]
+  },
+  rag_tools: {
+    rag_query: "PREFERRED: Semantic AI code search - finds relevant code in one call",
+    rag_status: "Check RAG indexing status and statistics",
+    rag_index: "Index a project directory for semantic search"
+  },
   browser_tools: {
     browser_navigate: "navigate to a URL",
     browser_go_back: "go back in history",
@@ -259,7 +273,7 @@ const mcpRules = {
     file_move: "move or rename a file",
     file_info: "get file metadata",
     file_list: "list directory contents",
-    file_search: "search for text in files",
+    file_search: "search for text in files (use rag_query first for semantic search)",
     folder_create: "create directories",
     folder_delete: "delete directories"
   }
@@ -2079,9 +2093,9 @@ server.registerTool("zip_extract", {
 const RAG_SERVER_URL = process.env.RAG_SERVER_URL || 'http://localhost:3002';
 
 server.registerTool("rag_query", {
-  description: "Search the codebase semantically using RAG. Returns relevant code snippets based on natural language queries.",
+  description: "PREFERRED CODE SEARCH: Semantic AI-powered search that finds relevant code by meaning in a single call. Use this FIRST for any code search task like 'find X', 'where is Y', 'how does Z work'. Returns code snippets with file paths, line numbers, symbols, and relevance scores. Much more efficient than multiple grep calls.",
   inputSchema: z.object({
-    query: z.string().describe("Natural language query describing what you're looking for"),
+    query: z.string().describe("Natural language query - ask like you would ask a colleague: 'where is authentication handled', 'how does the database connect'"),
     limit: z.number().optional().describe("Maximum number of results to return (default: 5)"),
     fileTypes: z.array(z.string()).optional().describe("Filter by file types (e.g., ['ts', 'js', 'py'])"),
     paths: z.array(z.string()).optional().describe("Filter by path patterns (e.g., ['src/', 'lib/'])")

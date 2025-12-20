@@ -25,6 +25,11 @@ const __dirname = path.dirname(__filename);
  * Common synonyms for matching native tool names to MCP tools
  */
 const TOOL_SYNONYMS: Record<string, string[]> = {
+  // RAG - Semantic Code Search (PREFERRED for code understanding)
+  'rag_query': ['semantic_search', 'code_search', 'search_code', 'find_code', 'codebase_search', 'semantic_query', 'rag', 'vector_search', 'ai_search'],
+  'rag_status': ['rag_info', 'index_status', 'search_status', 'vector_status'],
+  'rag_index': ['index_code', 'index_codebase', 'build_index', 'create_index', 'reindex'],
+  
   // File Operations (Official MCP names)
   'read_file': ['file_read', 'get_file', 'cat', 'load_file', 'read', 'file_get', 'get_file_content', 'read_content'],
   'read_multiple_files': ['read_files', 'get_files', 'batch_read', 'multi_read'],
@@ -812,6 +817,55 @@ export const TEST_DEFINITIONS: TestDefinition[] = [
     expected: {
       tool: 'zip_extract',
       params: { archive: { contains: 'data.zip' } }
+    }
+  },
+
+  // ========== RAG - SEMANTIC CODE SEARCH (PREFERRED for code understanding) ==========
+  {
+    id: 'rag_query_basic',
+    tool: 'rag_query',
+    category: 'rag_operations',
+    difficulty: 'easy',
+    prompt: 'Search the codebase for where user authentication is handled',
+    expected: {
+      tool: 'rag_query',
+      params: { query: { exists: true } }
+    }
+  },
+  {
+    id: 'rag_query_with_filter',
+    tool: 'rag_query',
+    category: 'rag_operations',
+    difficulty: 'medium',
+    prompt: 'Find all TypeScript files that handle database connections',
+    expected: {
+      tool: 'rag_query',
+      params: { 
+        query: { exists: true },
+        fileTypes: { exists: true }
+      }
+    }
+  },
+  {
+    id: 'rag_status_basic',
+    tool: 'rag_status',
+    category: 'rag_operations',
+    difficulty: 'easy',
+    prompt: 'Check the status of the RAG indexing system',
+    expected: {
+      tool: 'rag_status',
+      params: {}
+    }
+  },
+  {
+    id: 'rag_index_basic',
+    tool: 'rag_index',
+    category: 'rag_operations',
+    difficulty: 'medium',
+    prompt: 'Index the project directory at "/home/user/myproject" for semantic search',
+    expected: {
+      tool: 'rag_index',
+      params: { projectPath: { exists: true } }
     }
   }
 ];
