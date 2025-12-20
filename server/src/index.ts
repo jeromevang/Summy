@@ -21,6 +21,7 @@ import { modelManager } from './services/lmstudio-model-manager.js';
 import { ideMapping, type IDEMapping } from './services/ide-mapping.js';
 import { TOOL_SCHEMAS } from './modules/tooly/tool-prompts.js';
 import { ALL_TOOLS, capabilities } from './modules/tooly/capabilities.js';
+import { db, type ContextMessage, type ContextTurn } from './services/database.js';
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -759,40 +760,48 @@ const extractConversationId = (req: any): string => {
   return `conv_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 };
 
-// Session storage functions
-const saveSession = async (session: ContextSession): Promise<void> => {
-  const filePath = path.join(SESSIONS_DIR, `${session.id}.json`);
-  await fs.writeJson(filePath, session, { spaces: 2 });
-
-  // Broadcast session update to all clients
-  broadcastToClients('session_updated', session);
+// Session storage functions (using database)
+// Note: saveSession is now a no-op since we use the database
+// Keeping it for backward compatibility with compression features
+// IMPORTANT: Don't broadcast here - it causes infinite loops with the client
+const saveSession = async (_session: ContextSession): Promise<void> => {
+  // No-op: Session data is in database now
+  // Compression cache updates are in-memory only until we add to DB schema
+  // TODO: Add compression cache to database schema
 };
 
 const loadSession = async (sessionId: string): Promise<ContextSession | null> => {
   try {
-    const filePath = path.join(SESSIONS_DIR, `${sessionId}.json`);
-    return await fs.readJson(filePath);
+    const dbSession = db.getContextSession(sessionId);
+    if (!dbSession) return null;
+    
+    // Convert to old format
+    return {
+      id: dbSession.id,
+      name: dbSession.name,
+      ide: dbSession.ide,
+      created: dbSession.createdAt,
+      conversations: dbSession.turns.map(turn => ({
+        id: turn.id,
+        timestamp: turn.createdAt || new Date().toISOString(),
+        request: turn.rawRequest,
+        response: turn.rawResponse
+      }))
+    };
   } catch {
     return null;
   }
 };
 
 const listSessions = async (): Promise<ContextSession[]> => {
-  const files = await fs.readdir(SESSIONS_DIR);
-  const sessions: ContextSession[] = [];
-
-  for (const file of files) {
-    if (file.endsWith('.json')) {
-      try {
-        const session = await fs.readJson(path.join(SESSIONS_DIR, file));
-        sessions.push(session);
-      } catch {
-        // Skip invalid files
-      }
-    }
-  }
-
-  return sessions.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+  const dbSessions = db.listContextSessions(100, 0);
+  return dbSessions.map(s => ({
+    id: s.id,
+    name: s.name,
+    ide: s.ide,
+    created: s.createdAt,
+    conversations: []
+  }));
 };
 
 // Extend Express Request type for our custom properties
@@ -898,6 +907,15 @@ interface AgenticLoopResult {
     toolCallId: string;
   }>;
   iterations: number;
+  // All messages generated during the agentic loop (with sources)
+  agenticMessages: Array<{
+    role: string;
+    content?: string;
+    tool_calls?: any[];
+    tool_call_id?: string;
+    name?: string;
+    _source: 'llm' | 'mcp' | 'middleware';
+  }>;
 }
 
 /**
@@ -910,12 +928,22 @@ const executeAgenticLoop = async (
   messages: any[],
   llmCallFn: (messages: any[]) => Promise<any>,
   ideMapping: IDEMapping,
+  sessionId: string,
   maxIterations: number = 10
 ): Promise<AgenticLoopResult> => {
   const toolExecutions: AgenticLoopResult['toolExecutions'] = [];
+  const agenticMessages: AgenticLoopResult['agenticMessages'] = [];
   let currentResponse = initialResponse;
   let currentMessages = [...messages];
   let iterations = 0;
+
+  // Broadcast: Starting agentic loop
+  broadcastToClients('turn_status', { 
+    sessionId, 
+    status: 'thinking', 
+    message: 'Processing tool calls...',
+    iteration: 0
+  });
 
   while (iterations < maxIterations) {
     iterations++;
@@ -925,9 +953,26 @@ const executeAgenticLoop = async (
                       currentResponse.choices?.[0]?.message?.tool_calls;
     
     if (!toolCalls || toolCalls.length === 0) {
-      // No tool calls, we're done
+      // No tool calls, we're done - add final response to agenticMessages
+      const finalContent = currentResponse.choices?.[0]?.message?.content || currentResponse.content || '';
+      if (finalContent) {
+        agenticMessages.push({
+          role: 'assistant',
+          content: finalContent,
+          _source: 'llm'
+        });
+      }
+      
+      // Broadcast: Complete
+      broadcastToClients('turn_status', { 
+        sessionId, 
+        status: 'complete', 
+        message: 'Response ready',
+        iterations
+      });
+      
       console.log(`[Agentic] Loop complete after ${iterations} iterations`);
-      return { finalResponse: currentResponse, toolExecutions, iterations };
+      return { finalResponse: currentResponse, toolExecutions, iterations, agenticMessages };
     }
 
     console.log(`[Agentic] Iteration ${iterations}: Processing ${toolCalls.length} tool calls`);
@@ -939,6 +984,14 @@ const executeAgenticLoop = async (
       tool_calls: toolCalls
     };
     currentMessages.push(assistantMessage);
+    
+    // Track this assistant message with tool_calls
+    agenticMessages.push({
+      role: 'assistant',
+      content: assistantMessage.content || '',
+      tool_calls: toolCalls,
+      _source: 'llm'
+    });
 
     // Execute each tool call
     for (const tc of toolCalls) {
@@ -955,6 +1008,15 @@ const executeAgenticLoop = async (
       }
 
       console.log(`[Agentic] Executing tool: ${toolName} with args:`, args);
+      
+      // Broadcast: Running tool
+      broadcastToClients('turn_status', { 
+        sessionId, 
+        status: 'running_tool', 
+        message: `Running ${toolName}...`,
+        tool: toolName,
+        iteration: iterations
+      });
 
       // Check if tool is mapped to MCP
       const mapped = ideMapping.mappings[toolName];
@@ -1003,23 +1065,50 @@ const executeAgenticLoop = async (
         toolCallId
       });
 
+      const toolResultContent = typeof result === 'string' ? result : JSON.stringify(result);
+
       // Add tool result to messages
       currentMessages.push({
         role: 'tool',
-        content: typeof result === 'string' ? result : JSON.stringify(result),
+        content: toolResultContent,
         tool_call_id: toolCallId
+      });
+
+      // Track tool result in agenticMessages
+      agenticMessages.push({
+        role: 'tool',
+        content: toolResultContent,
+        tool_call_id: toolCallId,
+        name: mcpToolName,
+        _source: 'mcp'
       });
 
       console.log(`[Agentic] Tool ${toolName} result length: ${result?.length || 0} chars`);
     }
+
+    // Broadcast: Thinking again after tool execution
+    broadcastToClients('turn_status', { 
+      sessionId, 
+      status: 'thinking', 
+      message: 'Processing response...',
+      iteration: iterations
+    });
 
     // Call LLM again with updated context
     console.log(`[Agentic] Calling LLM with ${currentMessages.length} messages`);
     currentResponse = await llmCallFn(currentMessages);
   }
 
+  // Broadcast: Max iterations reached
+  broadcastToClients('turn_status', { 
+    sessionId, 
+    status: 'complete', 
+    message: 'Max iterations reached',
+    iterations: maxIterations
+  });
+
   console.warn(`[Agentic] Max iterations (${maxIterations}) reached`);
-  return { finalResponse: currentResponse, toolExecutions, iterations };
+  return { finalResponse: currentResponse, toolExecutions, iterations, agenticMessages };
 };
 
 /**
@@ -1047,12 +1136,12 @@ const shouldExecuteAgentically = (response: any, ideMapping: IDEMapping): boolea
 
 // Create session immediately on request
 const createSessionFromRequest = async (req: any): Promise<void> => {
-  console.log('🔥 EMERGENCY DEBUG: createSessionFromRequest called for:', req.sessionId);
-  let session = await loadSession(req.sessionId);
-  console.log('🔥 EMERGENCY DEBUG: loadSession result:', session ? 'EXISTS' : 'NULL');
+  console.log('[Session] createSessionFromRequest called for:', req.sessionId);
+  
+  // Check if session exists in database
+  const sessionExists = db.contextSessionExists(req.sessionId);
 
-  if (!session) {
-    console.log('🔥 EMERGENCY DEBUG: Creating new session');
+  if (!sessionExists) {
     // Extract meaningful name from first user message
     let sessionName = `Conversation ${new Date().toLocaleString()}`;
     if (req.requestBody?.messages?.length > 0) {
@@ -1065,52 +1154,118 @@ const createSessionFromRequest = async (req: any): Promise<void> => {
       }
     }
 
-    session = {
+    // Extract system prompt from request
+    const systemMessage = req.requestBody?.messages?.find((m: any) => m.role === 'system');
+    const systemPrompt = systemMessage?.content;
+
+    const ide = req.headers['x-ide'] || req.headers['user-agent']?.split(' ')[0] || 'Unknown';
+
+    // Create session in database only
+    db.createContextSession({
       id: req.sessionId,
       name: sessionName,
-      ide: req.headers['x-ide'] || req.headers['user-agent']?.split(' ')[0] || 'Unknown',
-      created: new Date().toISOString(),
-      conversations: []
-    };
+      ide,
+      ideMapping: req.ideMapping || undefined,
+      systemPrompt
+    });
 
-    console.log('🔥 EMERGENCY DEBUG: About to save session:', session.id);
-    await saveSession(session);
-    console.log('🔥 EMERGENCY DEBUG: Session saved successfully');
+    console.log('[Session] Created in DB:', req.sessionId);
 
-    addDebugEntry('session', `✅ Auto-created session: ${session.id}`, {
-      name: session.name,
-      ide: session.ide,
+    addDebugEntry('session', `✅ Auto-created session: ${req.sessionId}`, {
+      name: sessionName,
+      ide,
       isStreaming: req.isStreaming
     });
-  } else {
-    console.log('🔥 EMERGENCY DEBUG: Session already exists, skipping creation');
   }
 };
 
-// Update session with response data
-const updateSessionWithResponse = async (sessionId: string, requestBody: any, responseData: any): Promise<void> => {
-  let session = await loadSession(sessionId);
-  
-  if (!session) {
-    addDebugEntry('error', `Session not found for update: ${sessionId}`, {});
-    return;
+// Update session with response data (database only)
+const updateSessionWithResponse = async (
+  sessionId: string, 
+  requestBody: any, 
+  responseData: any,
+  agenticMessages?: AgenticLoopResult['agenticMessages']
+): Promise<void> => {
+  try {
+    const turnNumber = db.getLatestTurnNumber(sessionId) + 1;
+    const previousToolSetId = db.getPreviousToolSetId(sessionId);
+    
+    // Build messages array from request + agentic loop + response
+    const messages: ContextMessage[] = [];
+    let sequence = 0;
+    
+    // Add request messages (from IDE)
+    if (requestBody?.messages) {
+      for (const msg of requestBody.messages) {
+        // Skip system messages (stored at session level)
+        if (msg.role === 'system') continue;
+        
+        messages.push({
+          sequence: sequence++,
+          role: msg.role,
+          content: msg.content || undefined,
+          toolCalls: msg.tool_calls || undefined,
+          toolCallId: msg.tool_call_id || undefined,
+          source: 'ide'
+        });
+      }
+    }
+    
+    // Add agentic loop messages if present
+    if (agenticMessages && agenticMessages.length > 0) {
+      for (const msg of agenticMessages) {
+        messages.push({
+          sequence: sequence++,
+          role: msg.role as any,
+          content: msg.content || undefined,
+          toolCalls: msg.tool_calls || undefined,
+          toolCallId: msg.tool_call_id || undefined,
+          name: msg.name || undefined,
+          source: msg._source
+        });
+      }
+    } else {
+      // No agentic loop - add the response directly
+      const responseContent = responseData.choices?.[0]?.message?.content || 
+                             responseData.content || '';
+      const responseToolCalls = responseData.choices?.[0]?.message?.tool_calls ||
+                               responseData.tool_calls;
+      
+      if (responseContent || responseToolCalls) {
+        messages.push({
+          sequence: sequence++,
+          role: 'assistant',
+          content: responseContent || undefined,
+          toolCalls: responseToolCalls || undefined,
+          source: 'llm'
+        });
+      }
+    }
+    
+    // Add turn to database (includes raw_request and raw_response for debugging)
+    db.addContextTurn({
+      sessionId,
+      turnNumber,
+      tools: requestBody?.tools,
+      previousToolSetId: previousToolSetId || undefined,
+      rawRequest: requestBody,
+      rawResponse: responseData,
+      isAgentic: !!agenticMessages && agenticMessages.length > 0,
+      agenticIterations: responseData.toolyMeta?.iterations || 0,
+      messages
+    });
+    
+    console.log(`[DB] Saved turn ${turnNumber} with ${messages.length} messages`);
+    
+    addDebugEntry('response', `✅ Captured turn ${turnNumber} for session: ${sessionId}`, {
+      turnNumber,
+      messageCount: messages.length,
+      isAgentic: !!agenticMessages && agenticMessages.length > 0
+    });
+  } catch (dbError: any) {
+    console.error('[DB] Failed to save turn to database:', dbError.message);
+    addDebugEntry('error', `Failed to save turn: ${dbError.message}`, { sessionId });
   }
-
-  const turn: ConversationTurn = {
-    id: uuidv4(),
-    timestamp: new Date().toISOString(),
-    request: requestBody,
-    response: responseData
-  };
-
-  session.conversations.push(turn);
-  await saveSession(session);
-
-  addDebugEntry('response', `✅ Captured turn ${session.conversations.length} for session: ${session.id}`, {
-    turnCount: session.conversations.length,
-    responseType: responseData.type || 'json',
-    contentLength: responseData.content?.length || 0
-  });
 };
 
 // Manual proxy function using axios - MUCH SIMPLER!
@@ -1123,6 +1278,13 @@ const proxyToOpenAI = async (req: any, res: any) => {
 
     // CREATE SESSION IMMEDIATELY (this was the key missing piece!)
     await createSessionFromRequest(req);
+
+    // Broadcast: Turn started (thinking)
+    broadcastToClients('turn_status', { 
+      sessionId: req.sessionId, 
+      status: 'thinking', 
+      message: 'Waiting for response...'
+    });
 
     // Validate API key
     const apiKey = process.env.OPENAI_API_KEY;
@@ -1313,11 +1475,12 @@ const proxyToOpenAI = async (req: any, res: any) => {
               };
               
               try {
-                const { finalResponse, toolExecutions, iterations } = await executeAgenticLoop(
+                const { finalResponse, toolExecutions, iterations, agenticMessages } = await executeAgenticLoop(
                   parsedResponse,
                   messagesToSend,
                   llmCallFn,
-                  ideMappingConfig
+                  ideMappingConfig,
+                  req.sessionId
                 );
                 
                 console.log(`[Agentic] Completed with ${toolExecutions.length} tool executions in ${iterations} iterations`);
@@ -1349,7 +1512,7 @@ const proxyToOpenAI = async (req: any, res: any) => {
                     iterations
                   }
                 };
-                await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse);
+                await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse, agenticMessages);
                 res.end();
               } catch (agentError: any) {
                 console.error('[Agentic] Loop failed:', agentError.message);
@@ -1364,6 +1527,14 @@ const proxyToOpenAI = async (req: any, res: any) => {
               // No mapped tool calls, stream normally
               res.write(fullContent);
               await updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+              
+              // Broadcast: Complete
+              broadcastToClients('turn_status', { 
+                sessionId: req.sessionId, 
+                status: 'complete', 
+                message: 'Response ready'
+              });
+              
               res.end();
             }
           });
@@ -1390,18 +1561,19 @@ const proxyToOpenAI = async (req: any, res: any) => {
               return loopResponse.data;
             };
             
-            const { finalResponse, toolExecutions, iterations } = await executeAgenticLoop(
+            const { finalResponse, toolExecutions, iterations, agenticMessages } = await executeAgenticLoop(
               response.data,
               messagesToSend,
               llmCallFn,
-              ideMappingConfig
+              ideMappingConfig,
+              req.sessionId
             );
             
             const enrichedResponse = {
               ...finalResponse,
               toolyMeta: { agenticLoop: true, toolExecutions, iterations }
             };
-            await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse);
+            await updateSessionWithResponse(req.sessionId, req.requestBody, enrichedResponse, agenticMessages);
             res.json(finalResponse);
           } else {
             await updateSessionWithResponse(req.sessionId, req.requestBody, response.data);
@@ -1631,10 +1803,18 @@ app.use((req, res, next) => {
 });
 */
 
-// Session management API
+// Session management API (using database)
 app.get('/api/sessions', async (req, res) => {
   try {
-    const sessions = await listSessions();
+    // Get sessions from database and convert to old format for backward compatibility
+    const dbSessions = db.listContextSessions(100, 0);
+    const sessions = dbSessions.map(s => ({
+      id: s.id,
+      name: s.name,
+      ide: s.ide,
+      created: s.createdAt,
+      turnCount: s.turnCount
+    }));
     res.json(sessions);
   } catch (error) {
     res.status(500).json({ error: 'Failed to load sessions' });
@@ -1643,10 +1823,26 @@ app.get('/api/sessions', async (req, res) => {
 
 app.get('/api/sessions/:id', async (req, res) => {
   try {
-    const session = await loadSession(req.params.id);
-    if (!session) {
+    // Get session from database and convert to old format
+    const dbSession = db.getContextSession(req.params.id);
+    if (!dbSession) {
       return res.status(404).json({ error: 'Session not found' });
     }
+    
+    // Convert to old format expected by client
+    const session: ContextSession = {
+      id: dbSession.id,
+      name: dbSession.name,
+      ide: dbSession.ide,
+      created: dbSession.createdAt,
+      conversations: dbSession.turns.map(turn => ({
+        id: turn.id,
+        timestamp: turn.createdAt || new Date().toISOString(),
+        request: turn.rawRequest,
+        response: turn.rawResponse
+      }))
+    };
+    
     res.json(session);
   } catch (error) {
     res.status(500).json({ error: 'Failed to load session' });
@@ -1655,43 +1851,24 @@ app.get('/api/sessions/:id', async (req, res) => {
 
 app.post('/api/sessions', async (req, res) => {
   try {
-    const session: ContextSession = {
-      id: uuidv4(),
-      name: req.body.name || `Session ${new Date().toLocaleString()}`,
-      ide: req.body.ide || 'Unknown',
-      created: new Date().toISOString(),
-      conversations: []
-    };
-
-    await saveSession(session);
-    res.json(session);
+    const id = uuidv4();
+    const name = req.body.name || `Session ${new Date().toLocaleString()}`;
+    const ide = req.body.ide || 'Unknown';
+    
+    db.createContextSession({ id, name, ide });
+    
+    res.json({ id, name, ide, created: new Date().toISOString(), conversations: [] });
   } catch (error) {
     res.status(500).json({ error: 'Failed to create session' });
   }
 });
 
-app.put('/api/sessions/:id', async (req, res) => {
-  try {
-    const session = await loadSession(req.params.id);
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found' });
-    }
-
-    // Update session properties
-    if (req.body.name) session.name = req.body.name;
-    if (req.body.conversations) session.conversations = req.body.conversations;
-
-    await saveSession(session);
-    res.json(session);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update session' });
-  }
-});
-
 app.delete('/api/sessions/:id', async (req, res) => {
   try {
-    const filePath = path.join(SESSIONS_DIR, `${req.params.id}.json`);
-    await fs.remove(filePath);
+    const deleted = db.deleteContextSession(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete session' });
@@ -1701,19 +1878,109 @@ app.delete('/api/sessions/:id', async (req, res) => {
 // Delete ALL sessions
 app.delete('/api/sessions', async (req, res) => {
   try {
-    const files = await fs.readdir(SESSIONS_DIR);
-    const jsonFiles = files.filter(f => f.endsWith('.json'));
-    
-    let deleted = 0;
-    for (const file of jsonFiles) {
-      await fs.remove(path.join(SESSIONS_DIR, file));
-      deleted++;
-    }
-    
-    addDebugEntry('session', `🗑️ Cleared all sessions: ${deleted} files deleted`, {});
+    const deleted = db.clearAllContextSessions();
+    addDebugEntry('session', `🗑️ Cleared all sessions: ${deleted} deleted`, {});
     res.json({ success: true, deleted });
   } catch (error) {
     res.status(500).json({ error: 'Failed to clear sessions' });
+  }
+});
+
+// ============================================================
+// CONTEXT SESSIONS API (New normalized database)
+// ============================================================
+
+// List context sessions from database
+app.get('/api/context-sessions', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+    const sessions = db.listContextSessions(limit, offset);
+    res.json(sessions);
+  } catch (error: any) {
+    console.error('[API] Failed to list context sessions:', error.message);
+    res.status(500).json({ error: 'Failed to load sessions' });
+  }
+});
+
+// Get single context session with all turns and messages
+app.get('/api/context-sessions/:id', async (req, res) => {
+  try {
+    const session = db.getContextSession(req.params.id);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    res.json(session);
+  } catch (error: any) {
+    console.error('[API] Failed to get context session:', error.message);
+    res.status(500).json({ error: 'Failed to load session' });
+  }
+});
+
+// Get single turn with messages
+app.get('/api/context-turns/:id', async (req, res) => {
+  try {
+    const turn = db.getContextTurn(req.params.id);
+    if (!turn) {
+      return res.status(404).json({ error: 'Turn not found' });
+    }
+    res.json(turn);
+  } catch (error: any) {
+    console.error('[API] Failed to get turn:', error.message);
+    res.status(500).json({ error: 'Failed to load turn' });
+  }
+});
+
+// Delete context session
+app.delete('/api/context-sessions/:id', async (req, res) => {
+  try {
+    const deleted = db.deleteContextSession(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[API] Failed to delete context session:', error.message);
+    res.status(500).json({ error: 'Failed to delete session' });
+  }
+});
+
+// Clear all context sessions
+app.delete('/api/context-sessions', async (req, res) => {
+  try {
+    const deleted = db.clearAllContextSessions();
+    res.json({ success: true, deleted });
+  } catch (error: any) {
+    console.error('[API] Failed to clear context sessions:', error.message);
+    res.status(500).json({ error: 'Failed to clear sessions' });
+  }
+});
+
+// Get tool set by ID
+app.get('/api/tool-sets/:id', async (req, res) => {
+  try {
+    const tools = db.getToolSet(req.params.id);
+    if (!tools) {
+      return res.status(404).json({ error: 'Tool set not found' });
+    }
+    res.json({ tools });
+  } catch (error: any) {
+    console.error('[API] Failed to get tool set:', error.message);
+    res.status(500).json({ error: 'Failed to load tool set' });
+  }
+});
+
+// Get system prompt by ID
+app.get('/api/system-prompts/:id', async (req, res) => {
+  try {
+    const content = db.getSystemPrompt(req.params.id);
+    if (!content) {
+      return res.status(404).json({ error: 'System prompt not found' });
+    }
+    res.json({ content });
+  } catch (error: any) {
+    console.error('[API] Failed to get system prompt:', error.message);
+    res.status(500).json({ error: 'Failed to load system prompt' });
   }
 });
 
