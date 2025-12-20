@@ -198,6 +198,7 @@ interface ToolResultInfo {
   tool_call_id: string;
   content: string;
   name?: string;
+  isError?: boolean;
 }
 
 // Parse tool calls from assistant message
@@ -228,18 +229,9 @@ const ToolCallCard = ({
   const [copiedResult, setCopiedResult] = useState(false);
   
   // Determine status based on result
-  // Only mark as error if there's an explicit error object from MCP, not based on content text
+  // Use explicit isError flag from MCP server (set in catch block)
   const hasResult = !!result;
-  const isError = (() => {
-    if (!result) return false;
-    // Only check for explicit error objects from MCP server
-    if (result.isError === true) return true;
-    try {
-      const parsed = JSON.parse(result.content);
-      if (parsed.isError === true || parsed.error === true) return true;
-    } catch { /* not JSON or no error field */ }
-    return false;
-  })();
+  const isError = result?.isError === true;
   const status = !hasResult ? 'pending' : isError ? 'failed' : 'success';
   
   const statusColors = {
@@ -692,7 +684,7 @@ const ProcessingTimeline = ({
     name: `${exec.toolName} → ${exec.mcpTool}`,
     arguments: exec.args,
     result: exec.result,
-    status: 'success' as const,
+    status: exec.isError ? 'error' as const : 'success' as const,
     latencyMs: undefined
   }));
   
@@ -1129,18 +1121,17 @@ const AgenticResponseCard = ({
       args: any;
       result: string;
       toolCallId: string;
+      isError?: boolean;
     }>;
+    initialIntent?: string; // The first assistant text before tool execution
   };
   finalResponse?: string;
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [expandedTools, setExpandedTools] = useState<Set<number>>(new Set());
   
-  // Determine status based on results
-  const hasError = agenticData.toolExecutions.some(exec => 
-    exec.result?.toLowerCase().includes('error') || 
-    exec.result?.toLowerCase().includes('failed')
-  );
+  // Determine status based on isError flag from server (set in catch block)
+  const hasError = agenticData.toolExecutions.some(exec => exec.isError === true);
   const hasNoResponse = !finalResponse || finalResponse.trim() === '';
   
   // Status-based colors
@@ -1162,6 +1153,30 @@ const AgenticResponseCard = ({
   const truncateResult = (result: string, maxLen: number = 300): string => {
     if (result.length <= maxLen) return result;
     return result.substring(0, maxLen) + '...';
+  };
+  
+  const [copied, setCopied] = useState(false);
+  
+  const copyAgenticData = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Don't toggle expand/collapse
+    // Copy only essential troubleshooting data (keep it small)
+    const sourceData = {
+      iterations: agenticData.iterations,
+      toolCount: agenticData.toolExecutions.length,
+      initialIntent: agenticData.initialIntent || null,
+      tools: agenticData.toolExecutions.map(exec => ({
+        tool: exec.toolName,
+        mcp: exec.mcpTool,
+        args: exec.args,
+        resultLength: exec.result?.length || 0,
+        isError: exec.isError || false,
+        resultPreview: exec.result?.substring(0, 200) + (exec.result?.length > 200 ? '...' : '')
+      })),
+      hasResponse: !!finalResponse && finalResponse.trim() !== ''
+    };
+    navigator.clipboard.writeText(JSON.stringify(sourceData, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
   
   return (
@@ -1193,15 +1208,37 @@ const AgenticResponseCard = ({
               {agenticData.iterations} iteration{agenticData.iterations !== 1 ? 's' : ''} • {agenticData.toolExecutions.length} tool call{agenticData.toolExecutions.length !== 1 ? 's' : ''}
             </span>
           </div>
-          <span className="text-xs text-gray-500">{isExpanded ? '▼' : '▶'}</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={copyAgenticData}
+              className="text-xs px-2 py-0.5 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
+              title="Copy agentic data as JSON"
+            >
+              {copied ? '✓ Copied' : '📋 Copy'}
+            </button>
+            <span className="text-xs text-gray-500">{isExpanded ? '▼' : '▶'}</span>
+          </div>
         </div>
         
-        {/* Tool Executions */}
+        {/* Expanded Content */}
         {isExpanded && (
           <div className="px-2 pb-2 space-y-2">
+            {/* Initial Intent - The "thinking" text before tool execution */}
+            {agenticData.initialIntent && (
+              <div className="rounded border border-purple-500/30 bg-purple-500/5 p-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-purple-400">💭</span>
+                  <span className="text-xs font-medium text-purple-400">Initial Intent</span>
+                  <span className="text-xs text-gray-500 italic">(not sent to IDE)</span>
+                </div>
+                <p className="text-sm text-gray-300">{agenticData.initialIntent}</p>
+              </div>
+            )}
+            
+            {/* Tool Executions */}
             {agenticData.toolExecutions.map((exec, idx) => {
               const isToolExpanded = expandedTools.has(idx);
-              const hasToolError = exec.result?.toLowerCase().includes('error');
+              const hasToolError = exec.isError === true;
               
               return (
                 <div key={exec.toolCallId || idx} className="rounded border border-gray-700 bg-[#0d0d0d]">
@@ -1741,7 +1778,8 @@ Rules:
           _timestamp: turn.timestamp,
           _agenticData: {
             iterations: toolyMeta.iterations || 1,
-            toolExecutions: toolyMeta.toolExecutions
+            toolExecutions: toolyMeta.toolExecutions,
+            initialIntent: toolyMeta.initialIntent
           }
         });
       } else if (responseMsg) {
