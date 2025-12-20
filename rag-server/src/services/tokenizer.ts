@@ -1,160 +1,52 @@
 /**
- * Tokenizer Service using @xenova/transformers
+ * Lightweight Tokenizer Service
  * 
- * Provides accurate token counting for embedding models.
- * Loads the actual tokenizer used by the embedding model.
+ * Uses character-based estimation for token counting.
+ * No heavy dependencies - just math.
+ * 
+ * Rationale: Loading @xenova/transformers just for token counting
+ * costs 100s of MB of heap. For chunking purposes, estimation is fine.
  */
 
-import { AutoTokenizer, PreTrainedTokenizer } from '@xenova/transformers';
+// Calibrated ratio for code (empirically determined for BERT-style tokenizers)
+// Code averages ~3.5-4 chars per token due to camelCase, underscores, etc.
+const CODE_CHARS_PER_TOKEN = 3.8;
 
-// Singleton tokenizer instance
-let tokenizer: PreTrainedTokenizer | null = null;
-let isLoading = false;
-let loadPromise: Promise<void> | null = null;
+// For prose/comments, slightly higher
+const PROSE_CHARS_PER_TOKEN = 4.2;
 
-// Calibrated ratio from actual tokenization (updated during runtime)
-let calibratedRatio = 2.0; // Conservative default: ~2 chars per token for code
-
-// Default model for tokenizer (Nomic uses BERT-style tokenizer)
-const DEFAULT_TOKENIZER_MODEL = 'nomic-ai/nomic-embed-text-v1.5';
+// Default ratio (blend)
+let calibratedRatio = 3.9;
 
 /**
- * Initialize the tokenizer
+ * Initialize the tokenizer (no-op now, kept for API compatibility)
  */
-export async function initializeTokenizer(model?: string): Promise<void> {
-  if (tokenizer) return;
-  
-  if (isLoading && loadPromise) {
-    await loadPromise;
-    return;
-  }
-  
-  isLoading = true;
-  const modelName = model || DEFAULT_TOKENIZER_MODEL;
-  
-  console.log(`[Tokenizer] Loading tokenizer for ${modelName}...`);
-  
-  loadPromise = (async () => {
-    try {
-      tokenizer = await AutoTokenizer.from_pretrained(modelName, {
-        // Use local cache
-        cache_dir: './data/tokenizer-cache'
-      });
-      console.log(`[Tokenizer] Loaded successfully`);
-      
-      // Calibrate ratio with a sample
-      await calibrateRatio();
-    } catch (error) {
-      console.warn(`[Tokenizer] Failed to load ${modelName}, falling back to bert-base-uncased:`, error);
-      try {
-        // Fallback to a common BERT tokenizer
-        tokenizer = await AutoTokenizer.from_pretrained('bert-base-uncased', {
-          cache_dir: './data/tokenizer-cache'
-        });
-        console.log(`[Tokenizer] Loaded fallback tokenizer`);
-        await calibrateRatio();
-      } catch (fallbackError) {
-        console.error(`[Tokenizer] Failed to load fallback tokenizer:`, fallbackError);
-        // Keep using conservative estimate
-      }
-    }
-  })();
-  
-  await loadPromise;
-  isLoading = false;
+export async function initializeTokenizer(_model?: string): Promise<void> {
+  console.log(`[Tokenizer] Using lightweight char-based estimation (${calibratedRatio.toFixed(1)} chars/token)`);
 }
 
 /**
- * Calibrate the character-to-token ratio using sample code
- */
-async function calibrateRatio(): Promise<void> {
-  if (!tokenizer) return;
-  
-  // Sample code snippet for calibration
-  const sample = `
-export async function processData(input: string[], options: ProcessOptions = {}): Promise<Result[]> {
-  const results: Result[] = [];
-  for (const item of input) {
-    if (options.validate && !isValid(item)) {
-      console.warn(\`Invalid item: \${item}\`);
-      continue;
-    }
-    const processed = await transform(item, options);
-    results.push({ data: processed, timestamp: Date.now() });
-  }
-  return results;
-}
-`;
-  
-  try {
-    const encoded = tokenizer(sample, {
-      return_tensors: false,
-      padding: false,
-      truncation: false
-    });
-    
-    const tokens = encoded.input_ids?.length || encoded.length;
-    if (tokens > 0) {
-      calibratedRatio = sample.length / tokens;
-      console.log(`[Tokenizer] Calibrated ratio: ${calibratedRatio.toFixed(2)} chars/token`);
-    }
-  } catch (error) {
-    console.warn('[Tokenizer] Calibration failed, using default ratio');
-  }
-}
-
-/**
- * Count tokens in text accurately (async)
+ * Count tokens in text (async for API compatibility)
  */
 export async function countTokens(text: string): Promise<number> {
-  if (!tokenizer) {
-    await initializeTokenizer();
-  }
-  
-  if (!tokenizer) {
-    // Ultimate fallback: use calibrated ratio
-    return Math.ceil(text.length / calibratedRatio);
-  }
-  
-  try {
-    const encoded = tokenizer(text, {
-      return_tensors: false,
-      padding: false,
-      truncation: false
-    });
-    
-    return encoded.input_ids?.length || encoded.length || Math.ceil(text.length / calibratedRatio);
-  } catch (error) {
-    console.error('[Tokenizer] Error counting tokens:', error);
-    return Math.ceil(text.length / calibratedRatio);
-  }
+  return countTokensSync(text);
 }
 
 /**
- * Count tokens synchronously (uses cached tokenizer or calibrated estimate)
+ * Count tokens synchronously using character estimation
  */
 export function countTokensSync(text: string): number {
-  if (!tokenizer) {
-    // Use calibrated ratio estimate
-    return Math.ceil(text.length / calibratedRatio);
-  }
+  if (!text) return 0;
   
-  try {
-    // @xenova/transformers tokenizer call is sync after loading
-    const encoded = tokenizer(text, {
-      return_tensors: false,
-      padding: false,
-      truncation: false
-    });
-    
-    return encoded.input_ids?.length || encoded.length || Math.ceil(text.length / calibratedRatio);
-  } catch {
-    return Math.ceil(text.length / calibratedRatio);
-  }
+  // Detect if mostly code or prose
+  const codeIndicators = (text.match(/[{}()\[\];=><]/g) || []).length;
+  const ratio = codeIndicators > text.length * 0.02 ? CODE_CHARS_PER_TOKEN : PROSE_CHARS_PER_TOKEN;
+  
+  return Math.ceil(text.length / ratio);
 }
 
 /**
- * Get estimated tokens using calibrated ratio (fast, no tokenizer needed)
+ * Get estimated tokens using calibrated ratio (fast)
  */
 export function estimateTokensFast(text: string): number {
   return Math.ceil(text.length / calibratedRatio);
@@ -164,45 +56,38 @@ export function estimateTokensFast(text: string): number {
  * Truncate text to fit within token limit
  */
 export async function truncateToTokenLimit(text: string, maxTokens: number): Promise<string> {
-  if (!tokenizer) {
-    await initializeTokenizer();
+  const estimatedChars = Math.floor(maxTokens * calibratedRatio);
+  
+  if (text.length <= estimatedChars) {
+    return text;
   }
   
-  if (!tokenizer) {
-    // Rough truncation using calibrated ratio
-    const estimatedChars = Math.floor(maxTokens * calibratedRatio);
-    return text.slice(0, estimatedChars);
+  // Try to break at a sensible boundary (newline, space)
+  let cutoff = estimatedChars;
+  const lastNewline = text.lastIndexOf('\n', cutoff);
+  const lastSpace = text.lastIndexOf(' ', cutoff);
+  
+  if (lastNewline > cutoff * 0.8) {
+    cutoff = lastNewline;
+  } else if (lastSpace > cutoff * 0.9) {
+    cutoff = lastSpace;
   }
   
-  try {
-    const encoded = tokenizer(text, {
-      return_tensors: false,
-      padding: false,
-      truncation: true,
-      max_length: maxTokens
-    });
-    
-    // Decode back to text
-    return tokenizer.decode(encoded.input_ids, { skip_special_tokens: true });
-  } catch (error) {
-    console.error('[Tokenizer] Error truncating:', error);
-    const estimatedChars = Math.floor(maxTokens * calibratedRatio);
-    return text.slice(0, estimatedChars);
-  }
+  return text.slice(0, cutoff);
 }
 
 /**
- * Check if tokenizer is ready
+ * Check if tokenizer is ready (always true now)
  */
 export function isTokenizerReady(): boolean {
-  return tokenizer !== null;
+  return true;
 }
 
 /**
- * Get the loaded tokenizer instance
+ * Get the loaded tokenizer instance (null - no longer used)
  */
-export function getTokenizer(): PreTrainedTokenizer | null {
-  return tokenizer;
+export function getTokenizer(): null {
+  return null;
 }
 
 /**

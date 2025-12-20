@@ -49,7 +49,8 @@
   },
   "watcher": {
     "enabled": true,
-    "debounceMs": 2000
+    "debounceMs": 2000,
+    "paths": ["server/src", "client/src", "rag-server/src", "mcp-server/src"]
   },
   "project": {
     "path": "C:\\Users\\Jerome\\Documents\\Projects\\Summy",

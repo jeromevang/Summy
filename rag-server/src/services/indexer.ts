@@ -559,12 +559,22 @@ export class Indexer {
     
     this.stopWatcher();
     
-    console.log(`[Indexer] Starting file watcher on ${projectPath}`);
+    // Use specific watch paths if configured, otherwise watch project root
+    // Watching specific subdirs is much more memory-efficient than root + ignore
+    const watchPaths = this.config.watcher.paths?.length 
+      ? this.config.watcher.paths.map(p => path.join(projectPath, p))
+      : [projectPath];
     
-    this.fileWatcher = watch(projectPath, {
+    console.log(`[Indexer] Starting file watcher on: ${watchPaths.join(', ')}`);
+    
+    this.fileWatcher = watch(watchPaths, {
       ignored: this.config.indexing.excludePatterns,
       persistent: true,
-      ignoreInitial: true
+      ignoreInitial: true,
+      // Use polling only if needed (less memory than fsevents on some systems)
+      usePolling: false,
+      // Limit depth to avoid deep traversal
+      depth: 10
     });
     
     const queueChange = (filePath: string, eventType: string = 'change') => {
