@@ -68,7 +68,7 @@ fs.ensureDirSync(SESSIONS_DIR);
 // Debug logging
 interface DebugEntry {
   timestamp: string;
-  type: 'request' | 'response' | 'session' | 'error';
+  type: 'request' | 'response' | 'session' | 'error' | 'warning';
   message: string;
   data?: any;
 }
