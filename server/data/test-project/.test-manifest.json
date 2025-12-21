@@ -1,0 +1,274 @@
+{
+  "project": "test-project",
+  "version": "1.0.0",
+  "description": "Curated test project for model capability probing",
+  "indexPath": "test-project-index",
+  
+  "stacks": [
+    "node",
+    "react",
+    "react-native",
+    "java",
+    "mendix"
+  ],
+  
+  "bugs": {
+    "node-api/src/routes/auth.ts:85": {
+      "type": "security",
+      "severity": "critical",
+      "description": "JWT refresh token not properly validated - using jwt.decode instead of jwt.verify",
+      "line": 85,
+      "expectedFix": "Replace jwt.decode with jwt.verify and check against stored tokens"
+    },
+    "node-api/src/services/db.service.ts:47": {
+      "type": "resource_leak",
+      "severity": "high",
+      "description": "Database connection not released on error path",
+      "line": 47,
+      "expectedFix": "Wrap in try-finally block to ensure client.release() is always called"
+    },
+    "react-web/src/components/LoginForm.tsx:49": {
+      "type": "security",
+      "severity": "critical",
+      "description": "XSS vulnerability - dangerouslySetInnerHTML with user input",
+      "line": 49,
+      "expectedFix": "Remove dangerouslySetInnerHTML, use text content instead"
+    },
+    "react-web/src/hooks/useApi.ts:32": {
+      "type": "bug",
+      "severity": "medium",
+      "description": "Missing error handling and request cancellation on unmount",
+      "line": 32,
+      "expectedFix": "Add try-catch with AbortController for request cancellation"
+    },
+    "java-service/src/main/java/com/testproject/service/UserService.java:30": {
+      "type": "security",
+      "severity": "critical",
+      "description": "SQL Injection vulnerability - string concatenation in SQL query",
+      "line": 30,
+      "expectedFix": "Use parameterized queries with JPA setParameter"
+    }
+  },
+  
+  "architecture": {
+    "pattern": "layered",
+    "layers": ["controllers", "services", "models", "middleware"],
+    "entryPoints": [
+      "node-api/src/index.ts",
+      "react-web/src/App.tsx",
+      "react-native-app/App.tsx",
+      "java-service/src/main/java/com/testproject/Application.java",
+      "mendix-widget/src/TestWidget.tsx"
+    ],
+    "sharedCode": "shared-utils"
+  },
+  
+  "dependencies": {
+    "node-api/src/index.ts": [
+      "node-api/src/routes/auth.ts",
+      "node-api/src/routes/users.ts",
+      "node-api/src/routes/products.ts",
+      "node-api/src/middleware/auth.middleware.ts",
+      "node-api/src/middleware/logger.ts",
+      "node-api/src/services/db.service.ts"
+    ],
+    "node-api/src/routes/auth.ts": [
+      "node-api/src/services/auth.service.ts",
+      "node-api/src/types/index.ts"
+    ],
+    "react-web/src/App.tsx": [
+      "react-web/src/context/AuthContext.tsx",
+      "react-web/src/components/LoginForm.tsx",
+      "react-web/src/components/UserList.tsx",
+      "react-web/src/components/ProductCard.tsx"
+    ],
+    "react-web/src/components/LoginForm.tsx": [
+      "react-web/src/hooks/useAuth.ts"
+    ],
+    "react-web/src/hooks/useAuth.ts": [
+      "react-web/src/context/AuthContext.tsx"
+    ]
+  },
+  
+  "tests": {
+    "3.1_rag_priority": {
+      "prompt": "How does authentication work in this project?",
+      "expectedTool": "rag_query",
+      "expectedFiles": ["node-api/src/routes/auth.ts", "node-api/src/services/auth.service.ts"],
+      "expectedBehavior": "Model should use RAG first to find auth-related files",
+      "variants": [
+        {
+          "id": "3.1a",
+          "prompt": "Explain the login flow",
+          "difficulty": "easy"
+        },
+        {
+          "id": "3.1b",
+          "prompt": "Where is user authentication handled?",
+          "difficulty": "medium"
+        }
+      ]
+    },
+    "3.2_hierarchical_search": {
+      "prompt": "What's the overall architecture of this project?",
+      "expectedTool": "rag_query",
+      "expectedBehavior": "Should leverage file summaries and dependency graph",
+      "variants": [
+        {
+          "id": "3.2a",
+          "prompt": "How are the different parts of this codebase connected?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "3.2b",
+          "prompt": "Give me a high-level overview of the project structure",
+          "difficulty": "hard"
+        }
+      ]
+    },
+    "4.1_bug_detection_jwt": {
+      "prompt": "Review the token refresh endpoint for security issues",
+      "expectedTool": "rag_query",
+      "expectedFiles": ["node-api/src/routes/auth.ts"],
+      "expectedBehavior": "Should identify jwt.decode vs jwt.verify vulnerability",
+      "variants": [
+        {
+          "id": "4.1a",
+          "prompt": "Is the refresh token validation secure?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "4.1b",
+          "prompt": "Find security vulnerabilities in auth.ts",
+          "difficulty": "hard"
+        }
+      ]
+    },
+    "4.2_bug_detection_sql": {
+      "prompt": "Check the Java UserService for SQL injection vulnerabilities",
+      "expectedTool": "rag_query",
+      "expectedFiles": ["java-service/src/main/java/com/testproject/service/UserService.java"],
+      "expectedBehavior": "Should identify raw string concatenation in SQL",
+      "variants": [
+        {
+          "id": "4.2a",
+          "prompt": "Is the search query in UserService.java safe?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "4.2b",
+          "prompt": "Review database queries for injection vulnerabilities",
+          "difficulty": "hard"
+        }
+      ]
+    },
+    "4.3_bug_detection_xss": {
+      "prompt": "Check the React LoginForm for XSS vulnerabilities",
+      "expectedTool": "rag_query",
+      "expectedFiles": ["react-web/src/components/LoginForm.tsx"],
+      "expectedBehavior": "Should identify dangerouslySetInnerHTML vulnerability",
+      "variants": [
+        {
+          "id": "4.3a",
+          "prompt": "Is user input properly sanitized in LoginForm?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "4.3b",
+          "prompt": "Find XSS issues in the React components",
+          "difficulty": "hard"
+        }
+      ]
+    },
+    "5.1_navigate_to_auth": {
+      "prompt": "Find where user passwords are hashed",
+      "expectedTool": "rag_query",
+      "expectedFiles": ["node-api/src/routes/auth.ts"],
+      "expectedBehavior": "Should locate bcrypt.hash usage",
+      "variants": [
+        {
+          "id": "5.1a",
+          "prompt": "Where is password hashing implemented?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "5.1b",
+          "prompt": "How is password security handled in this codebase?",
+          "difficulty": "medium"
+        }
+      ]
+    },
+    "5.2_navigate_cross_stack": {
+      "prompt": "Find how authentication works in both React and Node",
+      "expectedTool": "rag_query",
+      "expectedFiles": [
+        "node-api/src/routes/auth.ts",
+        "react-web/src/context/AuthContext.tsx"
+      ],
+      "expectedBehavior": "Should navigate across technology stacks",
+      "variants": [
+        {
+          "id": "5.2a",
+          "prompt": "Show me the auth implementation across frontend and backend",
+          "difficulty": "hard"
+        }
+      ]
+    },
+    "6.1_architecture_understanding": {
+      "prompt": "Explain the architecture pattern used in this project",
+      "expectedBehavior": "Should identify layered architecture with controllers, services, models",
+      "variants": [
+        {
+          "id": "6.1a",
+          "prompt": "What design patterns are used?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "6.1b",
+          "prompt": "Describe how the layers interact",
+          "difficulty": "hard"
+        }
+      ]
+    },
+    "6.2_shared_code_identification": {
+      "prompt": "Is there any shared code between the projects?",
+      "expectedTool": "rag_query",
+      "expectedFiles": ["shared-utils/src/index.ts"],
+      "expectedBehavior": "Should identify shared-utils package",
+      "variants": [
+        {
+          "id": "6.2a",
+          "prompt": "Are there reusable utilities in this codebase?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "7.1_proactive_security": {
+      "prompt": "Look at the database service and tell me if you see any issues",
+      "expectedTool": "rag_query",
+      "expectedFiles": ["node-api/src/services/db.service.ts"],
+      "expectedBehavior": "Should proactively identify connection leak without being asked",
+      "variants": [
+        {
+          "id": "7.1a",
+          "prompt": "Review db.service.ts",
+          "difficulty": "medium"
+        }
+      ]
+    },
+    "7.2_proactive_improvement": {
+      "prompt": "Review the useApi hook",
+      "expectedTool": "rag_query",
+      "expectedFiles": ["react-web/src/hooks/useApi.ts"],
+      "expectedBehavior": "Should suggest error handling and cancellation improvements",
+      "variants": [
+        {
+          "id": "7.2a",
+          "prompt": "Can this hook be improved?",
+          "difficulty": "easy"
+        }
+      ]
+    }
+  }
+}
+

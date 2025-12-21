@@ -303,7 +303,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T18:25:19.061Z",
+    "testedAt": "2025-12-21T00:01:19.228Z",
     "emitTest": {
       "passed": false,
       "score": 0,
@@ -346,44 +346,7 @@
     },
     "toolScore": 0,
     "reasoningScore": 0,
-    "overallScore": 0,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
-      },
-      "multiStepPlanning": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
-      },
-      "contextContinuity": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
-      },
-      "logicalConsistency": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
-      },
-      "edgeCaseHandling": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
-      }
-    }
+    "overallScore": 0
   },
   "role": "none",
   "contextLatency": {

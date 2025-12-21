@@ -327,7 +327,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T17:57:45.462Z",
+    "testedAt": "2025-12-20T23:51:34.147Z",
     "emitTest": {
       "passed": false,
       "score": 15,
@@ -369,45 +369,8 @@
       "details": "No tool calls emitted with reordered schema"
     },
     "toolScore": 17,
-    "reasoningScore": 81,
-    "overallScore": 49,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": true,
-        "score": 80,
-        "details": "Valid intent JSON with reasoning"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": true,
-        "score": 100,
-        "details": "Correctly chose read based on condition"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": true,
-        "score": 80,
-        "details": "Identified conflict in text response"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 40,
-        "details": "Missing required fields"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 70,
-        "details": "Mentions edge case in text response"
-      }
-    }
+    "reasoningScore": 0,
+    "overallScore": 17
   },
   "role": "none",
   "contextLatency": {

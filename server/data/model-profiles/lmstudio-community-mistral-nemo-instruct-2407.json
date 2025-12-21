@@ -338,16 +338,16 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T17:22:32.578Z",
+    "testedAt": "2025-12-20T23:45:39.822Z",
     "emitTest": {
       "passed": true,
-      "score": 95,
-      "details": "XML format succeeded (OpenAI format failed: No tool calls emitted)"
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
     },
     "schemaTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect schema adherence - read schema and used correct field names and values"
+      "passed": false,
+      "score": 0,
+      "details": "No tool calls emitted"
     },
     "selectionTest": {
       "passed": true,
@@ -365,9 +365,9 @@
       "details": "Correct: chose search_web for real-time data with appropriate query"
     },
     "multiToolEmitTest": {
-      "passed": false,
-      "score": 40,
-      "details": "Only one tool call emitted when two were required"
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: emitted 2 read_file calls with correct paths"
     },
     "argumentValidationTest": {
       "passed": true,
@@ -375,52 +375,15 @@
       "details": "Perfect: all types and nested structures correct"
     },
     "schemaReorderTest": {
-      "passed": false,
-      "score": 0,
-      "details": "No tool calls emitted with reordered schema"
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 85,
-    "reasoningScore": 74,
-    "overallScore": 80,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": true,
-        "score": 80,
-        "details": "Valid intent JSON with reasoning"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 50,
-        "details": "Unclear action: FileManager"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 60,
-        "details": "Remembered endpoint but no JSON"
-      },
-      "logicalConsistency": {
-        "passed": false,
-        "score": 30,
-        "details": "Failed to identify logical conflict"
-      },
-      "explanation": {
-        "passed": true,
-        "score": 100,
-        "details": "Provided reasoning before action"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 100,
-        "details": "Properly handles edge case with fallback"
-      }
-    }
+    "reasoningScore": 0,
+    "overallScore": 85
   },
-  "role": "executor",
+  "role": "main",
   "contextLatency": {
     "testedContextSizes": [
       2048,

@@ -361,28 +361,50 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T11:09:46.913Z",
+    "testedAt": "2025-12-20T23:48:38.011Z",
     "emitTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Valid tool call with correct parameters"
+      "passed": false,
+      "score": 0,
+      "details": "OpenAI format test failed"
     },
     "schemaTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect schema adherence - read schema and used correct field names and values"
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
     },
     "selectionTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Correct tool selected with correct file path"
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
     },
     "suppressionTest": {
-      "passed": true,
-      "score": 70,
-      "details": "No tool called but mentioned tools in response"
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
     },
-    "overallScore": 94
+    "nearIdenticalSelectionTest": {
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
+    },
+    "multiToolEmitTest": {
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
+    },
+    "argumentValidationTest": {
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
+    },
+    "schemaReorderTest": {
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
+    },
+    "toolScore": 0,
+    "reasoningScore": 0,
+    "overallScore": 0
   },
-  "role": "both"
+  "role": "none"
 }

@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
+import TestEditor from '../components/TestEditor';
+import type { CustomTest } from '../components/TestEditor';
+import { Recommendations } from '../components/Recommendations';
+import type { Recommendation } from '../components/Recommendations';
+import { ModelDetailV2 } from '../components/ModelDetailV2';
 
 // ============================================================
 // TYPES
@@ -22,6 +28,12 @@ interface ReasoningProbeResults {
   edgeCaseHandling: ProbeTestResult;
 }
 
+interface ExtendedProbeResult {
+  name: string;
+  passed: boolean;
+  score?: number;
+}
+
 interface ProbeResults {
   testedAt: string;
   // Core tool probes (1.1 - 1.4)
@@ -36,6 +48,13 @@ interface ProbeResults {
   schemaReorderTest?: ProbeTestResult;
   // Reasoning
   reasoningProbes?: ReasoningProbeResults;
+  // Extended probes
+  strategicRAGProbes?: ExtendedProbeResult[];
+  architecturalProbes?: ExtendedProbeResult[];
+  navigationProbes?: ExtendedProbeResult[];
+  helicopterProbes?: ExtendedProbeResult[];
+  proactiveProbes?: ExtendedProbeResult[];
+  intentProbes?: ExtendedProbeResult[];
   toolScore?: number;
   reasoningScore?: number;
   overallScore: number;
@@ -50,6 +69,20 @@ interface ContextLatencyData {
   minLatency?: number;
   isInteractiveSpeed?: boolean;
   speedRating?: 'excellent' | 'good' | 'acceptable' | 'slow' | 'very_slow';
+}
+
+interface ModelInfo {
+  name?: string;
+  author?: string;
+  description?: string;
+  parameters?: string;
+  architecture?: string;
+  contextLength?: number;
+  license?: string;
+  quantization?: string;
+  capabilities?: string[];
+  tags?: string[];
+  source?: string;
 }
 
 interface ModelProfile {
@@ -68,6 +101,20 @@ interface ModelProfile {
   systemPrompt?: string;
   discoveredNativeTools?: string[];  // ALL tools the model claims to support
   unmappedNativeTools?: string[];    // Tools that couldn't be matched to any MCP tool
+  scoreBreakdown?: {
+    ragScore?: number;
+    bugDetectionScore?: number;
+    architecturalScore?: number;
+    navigationScore?: number;
+    proactiveScore?: number;
+    toolScore?: number;
+    reasoningScore?: number;
+    intentScore?: number;
+    overallScore?: number;
+  };
+  badges?: Array<{ id: string; name: string; icon: string }>;
+  modelInfo?: ModelInfo;
+  recommendations?: Recommendation[];
 }
 
 interface DiscoveredModel {
@@ -111,12 +158,51 @@ type TabId = 'models' | 'tests' | 'logs';
 // ============================================================
 
 const Tooly: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabId>('models');
   const [models, setModels] = useState<DiscoveredModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<ModelProfile | null>(null);
   const selectedModelRef = useRef<string | null>(null);
   const [tests, setTests] = useState<TestDefinition[]>([]);
   const [logs, setLogs] = useState<ExecutionLog[]>([]);
+  
+  // Tests tab state
+  const [customTests, setCustomTests] = useState<any[]>([]);
+  const [builtInTests, setBuiltInTests] = useState<any[]>([]);
+  const [testEditorOpen, setTestEditorOpen] = useState(false);
+  const [editingTest, setEditingTest] = useState<CustomTest | null>(null);
+  const [selectedTest, setSelectedTest] = useState<any | null>(null);
+  const [testCategoryFilter, setTestCategoryFilter] = useState('all');
+  const [testSearchFilter, setTestSearchFilter] = useState('');
+  const [tryingTest, setTryingTest] = useState(false);
+  const [testResult, setTestResult] = useState<any | null>(null);
+  
+  // Collapsible section states for model detail pane
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    scores: true,
+    breakdown: true,
+    badges: true,
+    info: false,
+    recommendations: true,
+    probes: false,
+    latency: false,
+    tools: false,
+  });
+  
+  // V1/V2 version toggle for right pane
+  const [detailPaneVersion, setDetailPaneVersion] = useState<'v1' | 'v2'>(() => {
+    const saved = localStorage.getItem('tooly_detailPaneVersion');
+    return (saved as 'v1' | 'v2') || 'v2';
+  });
+  
+  // Persist version preference
+  useEffect(() => {
+    localStorage.setItem('tooly_detailPaneVersion', detailPaneVersion);
+  }, [detailPaneVersion]);
+  
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
   const [loading, setLoading] = useState(true);
   const [testingModel, setTestingModel] = useState<string | null>(null);
   const [providerFilter, setProviderFilter] = useState<'all' | 'lmstudio' | 'openai' | 'azure'>(() => {
@@ -187,10 +273,34 @@ const Tooly: React.FC = () => {
   } | null>(null);
   const cancelTestAllRef = useRef(false);
 
-  // Keep ref in sync with selectedModel
+  // Test intents state
+  const [testingIntents, setTestingIntents] = useState(false);
+  const [intentProgress, setIntentProgress] = useState<{
+    current: number;
+    total: number;
+    currentModelName: string;
+  } | null>(null);
+  const cancelIntentTestRef = useRef(false);
+
+  // Keep ref in sync with selectedModel and persist to localStorage
   useEffect(() => {
     selectedModelRef.current = selectedModel?.modelId || null;
+    if (selectedModel?.modelId) {
+      localStorage.setItem('tooly_selectedModelId', selectedModel.modelId);
+    }
   }, [selectedModel?.modelId]);
+  
+  // Restore selected model from localStorage on mount
+  useEffect(() => {
+    const savedModelId = localStorage.getItem('tooly_selectedModelId');
+    if (savedModelId && !selectedModel && models.length > 0) {
+      // Check if the saved model exists in the current models list
+      const modelExists = models.some(m => m.id === savedModelId);
+      if (modelExists) {
+        fetchModelProfile(savedModelId);
+      }
+    }
+  }, [models]); // Trigger when models are loaded
 
   // Listen for WebSocket progress updates with auto-reconnect
   useEffect(() => {
@@ -488,6 +598,7 @@ const Tooly: React.FC = () => {
   useEffect(() => {
     fetchModels();
     fetchTests();
+    fetchCustomTests();
     fetchLogs();
     fetchSettings();
     fetchMcpStatus();
@@ -532,6 +643,89 @@ const Tooly: React.FC = () => {
     }
   };
 
+  const fetchCustomTests = async () => {
+    try {
+      const res = await fetch('/api/tooly/custom-tests');
+      if (res.ok) {
+        const data = await res.json();
+        setCustomTests(data.customTests || []);
+        setBuiltInTests(data.builtInTests || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch custom tests:', error);
+    }
+  };
+
+  const handleSaveTest = async (test: CustomTest) => {
+    const method = test.id ? 'PUT' : 'POST';
+    const url = test.id 
+      ? `/api/tooly/custom-tests/${encodeURIComponent(test.id)}`
+      : '/api/tooly/custom-tests';
+    
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(test),
+    });
+    
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to save test');
+    }
+    
+    await fetchCustomTests();
+  };
+
+  const handleDeleteTest = async (testId: string) => {
+    if (!confirm('Delete this test?')) return;
+    
+    try {
+      const res = await fetch(`/api/tooly/custom-tests/${encodeURIComponent(testId)}`, {
+        method: 'DELETE',
+      });
+      
+      if (res.ok) {
+        await fetchCustomTests();
+        if (selectedTest?.id === testId) {
+          setSelectedTest(null);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete test:', error);
+    }
+  };
+
+  const handleTryTest = async (test: any) => {
+    if (!mainModelId) {
+      alert('Please select a main model first');
+      return;
+    }
+    
+    setTryingTest(true);
+    setTestResult(null);
+    setSelectedTest(test);
+    
+    try {
+      const res = await fetch(`/api/tooly/custom-tests/${encodeURIComponent(test.id)}/try`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ modelId: mainModelId }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setTestResult(data);
+      } else {
+        const err = await res.json();
+        setTestResult({ error: err.error || 'Failed to try test' });
+      }
+    } catch (error: any) {
+      setTestResult({ error: error.message || 'Failed to try test' });
+    } finally {
+      setTryingTest(false);
+    }
+  };
+
   const fetchLogs = async () => {
     try {
       const res = await fetch('/api/tooly/logs');
@@ -546,7 +740,8 @@ const Tooly: React.FC = () => {
 
   const fetchModelProfile = async (modelId: string) => {
     try {
-      const res = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}`);
+      // Use /detail endpoint to get scoreBreakdown, badges, etc.
+      const res = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/detail`);
       if (res.ok) {
         const profile = await res.json();
         setSelectedModel(profile);
@@ -1009,45 +1204,51 @@ const Tooly: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Model List */}
             <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">Available Models</h3>
-                {/* Filters */}
-                <div className="flex items-center gap-4">
-                  {/* Provider Filter */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">Provider:</span>
-                    <select
-                      value={providerFilter}
-                      onChange={(e) => setProviderFilter(e.target.value as any)}
-                      className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
-                    >
-                      <option value="all">All</option>
-                      <option value="lmstudio" disabled={!availableProviders.lmstudio}>
-                        LM Studio {availableProviders.lmstudio ? '' : '(offline)'}
-                      </option>
-                      <option value="openai" disabled={!availableProviders.openai}>
-                        OpenAI {availableProviders.openai ? '' : '(no key)'}
-                      </option>
-                      <option value="azure" disabled={!availableProviders.azure}>
-                        Azure {availableProviders.azure ? '' : '(not configured)'}
-                      </option>
-                    </select>
+              <div className="flex flex-col gap-3 mb-4">
+                {/* Header row */}
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-white">Available Models</h3>
+                  {/* Filters */}
+                  <div className="flex items-center gap-3">
+                    {/* Provider Filter */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Provider:</span>
+                      <select
+                        value={providerFilter}
+                        onChange={(e) => setProviderFilter(e.target.value as any)}
+                        className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
+                      >
+                        <option value="all">All</option>
+                        <option value="lmstudio" disabled={!availableProviders.lmstudio}>
+                          LM Studio {availableProviders.lmstudio ? '' : '(offline)'}
+                        </option>
+                        <option value="openai" disabled={!availableProviders.openai}>
+                          OpenAI {availableProviders.openai ? '' : '(no key)'}
+                        </option>
+                        <option value="azure" disabled={!availableProviders.azure}>
+                          Azure {availableProviders.azure ? '' : '(not configured)'}
+                        </option>
+                      </select>
+                    </div>
+                    
+                    {/* Test Mode */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Mode:</span>
+                      <select
+                        value={testMode}
+                        onChange={(e) => setTestMode(e.target.value as any)}
+                        className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
+                        title="Controls model loading/unloading during tests"
+                      >
+                        <option value="quick">Quick</option>
+                        <option value="keep_on_success">Keep</option>
+                        <option value="manual">Manual</option>
+                      </select>
+                    </div>
                   </div>
-                  
-                  {/* Test Mode */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">Test Mode:</span>
-                    <select
-                      value={testMode}
-                      onChange={(e) => setTestMode(e.target.value as any)}
-                      className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
-                      title="Controls model loading/unloading during tests"
-                    >
-                      <option value="quick">Quick (unload after)</option>
-                      <option value="keep_on_success">Keep on Success</option>
-                      <option value="manual">Manual (no unload)</option>
-                    </select>
-                  </div>
+                </div>
+                {/* Action buttons row */}
+                <div className="flex items-center gap-2">
                   {/* Test All Models Button */}
                   <button
                     onClick={async () => {
@@ -1171,6 +1372,58 @@ const Tooly: React.FC = () => {
                   >
                     {testingAllModels ? '⏹️ Stop' : '🧪 Test All'}
                   </button>
+                  
+                  {/* Test Intents Button */}
+                  <button
+                    onClick={async () => {
+                      if (testingIntents) {
+                        cancelIntentTestRef.current = true;
+                        return;
+                      }
+                      
+                      const modelsToTest = models.filter(m => m.provider === 'lmstudio');
+                      if (modelsToTest.length === 0) return;
+                      
+                      setTestingIntents(true);
+                      cancelIntentTestRef.current = false;
+                      
+                      for (let i = 0; i < modelsToTest.length; i++) {
+                        if (cancelIntentTestRef.current) break;
+                        
+                        const model = modelsToTest[i];
+                        setIntentProgress({
+                          current: i + 1,
+                          total: modelsToTest.length,
+                          currentModelName: model.displayName
+                        });
+                        
+                        try {
+                          await fetch(`/api/tooly/probe/${encodeURIComponent(model.id)}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                              categories: ['8.x'], // Intent Recognition only
+                              mode: 'quick' 
+                            })
+                          });
+                        } catch (error) {
+                          console.error(`Failed to test intents for ${model.id}:`, error);
+                        }
+                      }
+                      
+                      await fetchModels();
+                      setTestingIntents(false);
+                      setTimeout(() => setIntentProgress(null), 3000);
+                    }}
+                    disabled={models.filter(m => m.provider === 'lmstudio').length === 0 || testingAllModels}
+                    className={`px-3 py-1 text-xs rounded transition-colors ${
+                      testingIntents 
+                        ? 'bg-red-600 hover:bg-red-700 text-white' 
+                        : 'bg-orange-600 hover:bg-orange-700 text-white'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {testingIntents ? '⏹️ Stop' : '🎯 Test Intents'}
+                  </button>
                 </div>
               </div>
               
@@ -1199,6 +1452,28 @@ const Tooly: React.FC = () => {
                   {!testingAllModels && testAllProgress.skipped.length > 0 && (
                     <p className="text-xs text-yellow-400 mt-1">
                       Skipped (too slow): {testAllProgress.skipped.join(', ')}
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {/* Intent Test Progress */}
+              {intentProgress && (
+                <div className="mb-4 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-orange-400">
+                      🎯 Testing Intents ({intentProgress.current}/{intentProgress.total})
+                    </span>
+                  </div>
+                  <div className="w-full bg-[#1a1a1a] rounded-full h-2 mb-2">
+                    <div 
+                      className="bg-orange-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${(intentProgress.current / intentProgress.total) * 100}%` }}
+                    />
+                  </div>
+                  {testingIntents && (
+                    <p className="text-xs text-gray-500">
+                      Testing: {intentProgress.currentModelName}
                     </p>
                   )}
                 </div>
@@ -1279,68 +1554,348 @@ const Tooly: React.FC = () => {
             </div>
 
             {/* Model Details */}
-            <div className="flex flex-col max-h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
+            <div className={`flex flex-col ${detailPaneVersion === 'v2' ? 'flex-1 overflow-hidden' : 'max-h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent'}`}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-semibold text-white">
                     {selectedModel ? selectedModel.displayName : 'Select a Model'}
                   </h3>
                   {selectedModel && getRoleBadge(selectedModel.role)}
+                  {selectedModel && (
+                    <button
+                      onClick={() => navigate(`/tooly/model/${encodeURIComponent(selectedModel.modelId)}`)}
+                      className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
+                      title="View full model profile"
+                    >
+                      Full Profile →
+                    </button>
+                  )}
                 </div>
                 {selectedModel && (
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setAsMainModel(selectedModel.id)}
+                      onClick={() => setAsMainModel(selectedModel.modelId)}
                       disabled={savingDualModel}
                       className={`px-3 py-1 text-xs rounded-lg transition-colors ${
-                        mainModelId === selectedModel.id
+                        mainModelId === selectedModel.modelId
                           ? 'bg-purple-600 text-white'
                           : 'bg-[#2d2d2d] text-gray-300 hover:bg-purple-600/50 hover:text-white'
                       }`}
                     >
-                      {mainModelId === selectedModel.id ? '✓ Main' : 'Use as Main'}
+                      {mainModelId === selectedModel.modelId ? '✓ Main' : 'Use as Main'}
                     </button>
                     <button
-                      onClick={() => setAsExecutorModel(selectedModel.id)}
+                      onClick={() => setAsExecutorModel(selectedModel.modelId)}
                       disabled={savingDualModel}
                       className={`px-3 py-1 text-xs rounded-lg transition-colors ${
-                        executorModelId === selectedModel.id
+                        executorModelId === selectedModel.modelId
                           ? 'bg-blue-600 text-white'
                           : 'bg-[#2d2d2d] text-gray-300 hover:bg-blue-600/50 hover:text-white'
                       }`}
                     >
-                      {executorModelId === selectedModel.id ? '✓ Executor' : 'Use as Executor'}
+                      {executorModelId === selectedModel.modelId ? '✓ Executor' : 'Use as Executor'}
                     </button>
                   </div>
                 )}
               </div>
-              {selectedModel ? (
-                <div className="space-y-4">
-                  {/* Scores - 3 columns */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="p-3 bg-[#2d2d2d] rounded-lg text-center">
-                      <span className="text-gray-400 text-xs">🔧 Tool</span>
-                      <p className="text-xl font-bold text-white">
+              
+              {/* V1/V2 Version Toggle */}
+              {selectedModel && (
+                <div className="flex items-center gap-1 mb-3 p-1 bg-[#1a1a1a] rounded-lg w-fit">
+                  <button
+                    onClick={() => setDetailPaneVersion('v1')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                      detailPaneVersion === 'v1'
+                        ? 'bg-[#2d2d2d] text-white'
+                        : 'text-gray-500 hover:text-gray-300'
+                    }`}
+                  >
+                    Classic v1
+                  </button>
+                  <button
+                    onClick={() => setDetailPaneVersion('v2')}
+                    className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+                      detailPaneVersion === 'v2'
+                        ? 'bg-teal-600 text-white'
+                        : 'text-gray-500 hover:text-gray-300'
+                    }`}
+                  >
+                    Visual v2
+                  </button>
+                </div>
+              )}
+              
+              {selectedModel && detailPaneVersion === 'v2' ? (
+                <div className="flex-1 overflow-hidden">
+                  <ModelDetailV2
+                    profile={{
+                      modelId: selectedModel.modelId,
+                      displayName: selectedModel.displayName,
+                      provider: selectedModel.provider,
+                      role: selectedModel.role || 'none',
+                      score: selectedModel.score,
+                      scoreBreakdown: selectedModel.scoreBreakdown,
+                      contextLatency: selectedModel.contextLatency ? {
+                        latencies: selectedModel.contextLatency.latencies as unknown as Record<string, number>,
+                        speedRating: (selectedModel.contextLatency.speedRating === 'very_slow' ? 'slow' : selectedModel.contextLatency.speedRating) as 'excellent' | 'good' | 'acceptable' | 'slow' | undefined,
+                        maxUsableContext: selectedModel.contextLatency.maxUsableContext,
+                        isInteractiveSpeed: selectedModel.contextLatency.isInteractiveSpeed,
+                        recommendedContext: selectedModel.contextLatency.recommendedContext,
+                      } : undefined,
+                      badges: selectedModel.badges,
+                      recommendations: selectedModel.recommendations?.map(r => {
+                        // Map status to suitability
+                        const statusToSuitability: Record<string, 'excellent' | 'good' | 'fair' | 'poor'> = {
+                          'excellent': 'excellent',
+                          'good': 'good',
+                          'caution': 'fair',
+                          'not_suitable': 'poor',
+                        };
+                        return {
+                          task: r.task,
+                          suitability: statusToSuitability[r.status] || 'good',
+                        };
+                      }),
+                      modelInfo: selectedModel.modelInfo,
+                      toolCategories: undefined,
+                      probeResults: selectedModel.probeResults ? {
+                        coreProbes: [
+                          { name: 'Emit Test', passed: selectedModel.probeResults.emitTest?.passed || false },
+                          { name: 'Schema Test', passed: selectedModel.probeResults.schemaTest?.passed || false },
+                          { name: 'Selection Test', passed: selectedModel.probeResults.selectionTest?.passed || false },
+                          { name: 'Suppression Test', passed: selectedModel.probeResults.suppressionTest?.passed || false },
+                        ],
+                        strategicRAGProbes: selectedModel.probeResults.strategicRAGProbes,
+                        architecturalProbes: selectedModel.probeResults.architecturalProbes,
+                        navigationProbes: selectedModel.probeResults.navigationProbes,
+                        helicopterProbes: selectedModel.probeResults.helicopterProbes,
+                        proactiveProbes: selectedModel.probeResults.proactiveProbes,
+                        intentProbes: selectedModel.probeResults.intentProbes,
+                      } : undefined,
+                    }}
+                    testProgress={(() => {
+                      // Calculate live test progress for this model
+                      const isThisModel = testProgress.modelId === selectedModel.modelId;
+                      const probeP = isThisModel ? testProgress.probeProgress : undefined;
+                      const toolsP = isThisModel ? testProgress.toolsProgress : undefined;
+                      
+                      if (!probeP && !toolsP) return undefined;
+                      
+                      const isRunning = probeP?.status === 'running' || toolsP?.status === 'running';
+                      const current = (probeP?.current ?? 0) + (toolsP?.current ?? 0);
+                      const total = (probeP?.total ?? 0) + (toolsP?.total ?? 0);
+                      const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+                      const currentCategory = probeP?.status === 'running' ? 'Probe Tests' : 'Tool Tests';
+                      const currentTest = probeP?.currentTest || toolsP?.currentTest;
+                      
+                      return {
+                        isRunning,
+                        current,
+                        total,
+                        currentCategory,
+                        currentTest,
+                        percent,
+                      };
+                    })()}
+                    modelLoading={{
+                      isLoading: modelLoading.modelId === selectedModel.modelId && (modelLoading.status === 'loading' || modelLoading.status === 'unloading'),
+                      status: modelLoading.status as 'loading' | 'unloading' | undefined,
+                      message: modelLoading.message,
+                    }}
+                    isRunningTests={probingModel === selectedModel.modelId || testingModel === selectedModel.modelId}
+                    onRunTests={async () => {
+                      // Clear previous scores first to show real-time updates
+                      if (selectedModel) {
+                        setSelectedModel({
+                          ...selectedModel,
+                          scoreBreakdown: {
+                            ...selectedModel.scoreBreakdown,
+                            ragScore: 0,
+                            architecturalScore: 0,
+                            navigationScore: 0,
+                            bugDetectionScore: 0,
+                            intentScore: 0,
+                            reasoningScore: 0,
+                            proactiveScore: 0,
+                          },
+                          probeResults: selectedModel.probeResults ? {
+                            ...selectedModel.probeResults,
+                            strategicRAGProbes: [],
+                            architecturalProbes: [],
+                            navigationProbes: [],
+                            helicopterProbes: [],
+                            proactiveProbes: [],
+                            intentProbes: [],
+                          } : undefined,
+                        });
+                      }
+                      
+                      // Run all tests
+                      await runProbeTests(selectedModel.modelId, selectedModel.provider);
+                      await runModelTests(selectedModel.modelId, selectedModel.provider);
+                    }}
+                    onSetAsMain={() => setAsMainModel(selectedModel.modelId)}
+                    onSetAsExecutor={() => setAsExecutorModel(selectedModel.modelId)}
+                  />
+                </div>
+              ) : selectedModel ? (
+                <div className="space-y-3">
+                  {/* === PRIMARY SCORES - Always visible === */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="p-4 bg-gradient-to-br from-purple-900/40 to-purple-800/20 border border-purple-500/30 rounded-xl text-center">
+                      <span className="text-purple-300 text-xs font-medium">Tool Score</span>
+                      <p className="text-3xl font-bold text-white mt-1">
                         {testProgress.modelId === selectedModel.modelId && testProgress.toolsProgress?.status === 'running'
                           ? testProgress.toolsProgress.score
                           : selectedModel.score ?? 0}
                       </p>
                     </div>
-                    <div className="p-3 bg-[#2d2d2d] rounded-lg text-center">
-                      <span className="text-gray-400 text-xs">🔬 Probe</span>
-                      <p className="text-xl font-bold text-white">
+                    <div className="p-4 bg-gradient-to-br from-blue-900/40 to-blue-800/20 border border-blue-500/30 rounded-xl text-center">
+                      <span className="text-blue-300 text-xs font-medium">Probe Score</span>
+                      <p className="text-3xl font-bold text-white mt-1">
                         {testProgress.modelId === selectedModel.modelId && testProgress.probeProgress?.status === 'running'
                           ? testProgress.probeProgress.score
                           : selectedModel.probeResults?.toolScore ?? 0}
                       </p>
                     </div>
-                    <div className="p-3 bg-[#2d2d2d] rounded-lg text-center">
-                      <span className="text-gray-400 text-xs">🧠 Reason</span>
-                      <p className="text-xl font-bold text-white">
+                    <div className="p-4 bg-gradient-to-br from-emerald-900/40 to-emerald-800/20 border border-emerald-500/30 rounded-xl text-center">
+                      <span className="text-emerald-300 text-xs font-medium">Reasoning</span>
+                      <p className="text-3xl font-bold text-white mt-1">
                         {selectedModel.probeResults?.reasoningScore ?? 0}
                       </p>
                     </div>
                   </div>
+
+                  {/* === BADGES - Inline with labels === */}
+                  {selectedModel.badges && selectedModel.badges.length > 0 && (
+                    <div className="flex flex-wrap gap-2 py-2">
+                      {selectedModel.badges.map(badge => (
+                        <span 
+                          key={badge.id}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#2d2d2d] hover:bg-[#3d3d3d] rounded-full text-xs text-gray-200 transition-colors"
+                        >
+                          <span>{badge.icon}</span>
+                          <span>{badge.name}</span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* === COLLAPSIBLE: Skill Breakdown === */}
+                  {selectedModel.scoreBreakdown && (
+                    <div className="border border-[#3d3d3d] rounded-lg overflow-hidden">
+                      <button 
+                        onClick={() => toggleSection('breakdown')}
+                        className="w-full flex items-center justify-between p-3 bg-[#252525] hover:bg-[#2d2d2d] transition-colors"
+                      >
+                        <span className="text-sm font-medium text-gray-300">Skill Breakdown</span>
+                        <span className="text-gray-500">{expandedSections.breakdown ? '−' : '+'}</span>
+                      </button>
+                      {expandedSections.breakdown && (
+                        <div className="p-3 bg-[#1a1a1a] grid grid-cols-2 gap-2">
+                          {[
+                            { label: 'RAG Search', icon: '🔍', score: selectedModel.scoreBreakdown.ragScore },
+                            { label: 'Architecture', icon: '🏗️', score: selectedModel.scoreBreakdown.architecturalScore },
+                            { label: 'Navigation', icon: '🧭', score: selectedModel.scoreBreakdown.navigationScore },
+                            { label: 'Proactive', icon: '💡', score: selectedModel.scoreBreakdown.proactiveScore },
+                            { label: 'Intent', icon: '🎯', score: selectedModel.scoreBreakdown.intentScore },
+                            { label: 'Bug Detection', icon: '🐛', score: selectedModel.scoreBreakdown.bugDetectionScore },
+                            { label: 'Reasoning', icon: '🧠', score: selectedModel.scoreBreakdown.reasoningScore },
+                            { label: 'Overall', icon: '⭐', score: selectedModel.scoreBreakdown.overallScore ?? selectedModel.score },
+                          ].map(({ label, icon, score }) => (
+                            <div key={label} className="flex items-center justify-between p-2 bg-[#252525] rounded">
+                              <span className="text-xs text-gray-400">{icon} {label}</span>
+                              <span className={`text-sm font-semibold ${
+                                (score ?? 0) >= 80 ? 'text-green-400' : 
+                                (score ?? 0) >= 50 ? 'text-yellow-400' : 
+                                (score ?? 0) > 0 ? 'text-red-400' : 'text-gray-500'
+                              }`}>
+                                {score ?? '—'}%
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* === COLLAPSIBLE: Model Info === */}
+                  {selectedModel.modelInfo && (
+                    <div className="border border-[#3d3d3d] rounded-lg overflow-hidden">
+                      <button 
+                        onClick={() => toggleSection('info')}
+                        className="w-full flex items-center justify-between p-3 bg-[#252525] hover:bg-[#2d2d2d] transition-colors"
+                      >
+                        <span className="text-sm font-medium text-gray-300">Model Information</span>
+                        <span className="text-gray-500">{expandedSections.info ? '−' : '+'}</span>
+                      </button>
+                      {expandedSections.info && (
+                        <div className="p-3 bg-[#1a1a1a] space-y-2">
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            {selectedModel.modelInfo.author && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-500">Author</span>
+                                <span className="text-gray-200">{selectedModel.modelInfo.author}</span>
+                              </div>
+                            )}
+                            {selectedModel.modelInfo.parameters && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-500">Size</span>
+                                <span className="text-gray-200">{selectedModel.modelInfo.parameters}</span>
+                              </div>
+                            )}
+                            {selectedModel.modelInfo.architecture && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-500">Architecture</span>
+                                <span className="text-gray-200">{selectedModel.modelInfo.architecture}</span>
+                              </div>
+                            )}
+                            {selectedModel.modelInfo.license && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-gray-500">License</span>
+                                <span className="text-gray-200">{selectedModel.modelInfo.license}</span>
+                              </div>
+                            )}
+                          </div>
+                          {selectedModel.modelInfo.description && (
+                            <p className="text-gray-400 text-xs mt-2">
+                              {selectedModel.modelInfo.description}
+                            </p>
+                          )}
+                          {selectedModel.modelInfo.capabilities && selectedModel.modelInfo.capabilities.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {selectedModel.modelInfo.capabilities.slice(0, 8).map((cap, i) => (
+                                <span key={i} className="px-2 py-0.5 bg-[#2d2d2d] rounded text-[10px] text-gray-400">
+                                  {cap}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* === COLLAPSIBLE: Recommendations === */}
+                  {selectedModel.recommendations && selectedModel.recommendations.length > 0 && (
+                    <div className="border border-[#3d3d3d] rounded-lg overflow-hidden">
+                      <button 
+                        onClick={() => toggleSection('recommendations')}
+                        className="w-full flex items-center justify-between p-3 bg-[#252525] hover:bg-[#2d2d2d] transition-colors"
+                      >
+                        <span className="text-sm font-medium text-gray-300">Best For</span>
+                        <span className="text-gray-500">{expandedSections.recommendations ? '−' : '+'}</span>
+                      </button>
+                      {expandedSections.recommendations && (
+                        <div className="p-3 bg-[#1a1a1a]">
+                          <Recommendations 
+                            recommendations={selectedModel.recommendations.slice(0, 4)} 
+                            onAlternativeClick={(id) => navigate(`/tooly/model/${encodeURIComponent(id)}`)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Run All Tests Button */}
                   <button
@@ -1493,21 +2048,29 @@ const Tooly: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Probe Results */}
+                  {/* === COLLAPSIBLE: Probe Results === */}
                   {selectedModel.probeResults && (
-                    <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                      {/* Score Summary */}
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-medium text-gray-400">Probe Test Results</h4>
-                        <div className="flex items-center gap-3 text-xs">
-                          <span className="text-gray-400">Tool: <span className="text-white font-medium">{selectedModel.probeResults?.toolScore ?? '-'}%</span></span>
-                          <span className="text-gray-400">Reasoning: <span className="text-white font-medium">{selectedModel.probeResults?.reasoningScore ?? '-'}%</span></span>
+                    <div className="border border-[#3d3d3d] rounded-lg overflow-hidden">
+                      <button 
+                        onClick={() => toggleSection('probes')}
+                        className="w-full flex items-center justify-between p-3 bg-[#252525] hover:bg-[#2d2d2d] transition-colors"
+                      >
+                        <span className="text-sm font-medium text-gray-300">Probe Test Results</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-gray-500">
+                            Tool: <span className="text-white">{selectedModel.probeResults?.toolScore ?? '-'}%</span>
+                            {' / '}
+                            Rsn: <span className="text-white">{selectedModel.probeResults?.reasoningScore ?? '-'}%</span>
+                          </span>
+                          <span className="text-gray-500">{expandedSections.probes ? '−' : '+'}</span>
                         </div>
-                      </div>
+                      </button>
+                      {expandedSections.probes && (
+                        <div className="p-3 bg-[#1a1a1a] space-y-3">
                       
                       {/* Core Tool Behavior Probes */}
-                      <div className="mb-3">
-                        <p className="text-xs text-gray-500 mb-2">Tool Behavior - Core (1.1-1.4)</p>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">Tool Behavior - Core</p>
                         <div className="grid grid-cols-2 gap-2">
                           {[
                             { name: 'Emit', key: 'emitTest', icon: '📤' },
@@ -1535,8 +2098,8 @@ const Tooly: React.FC = () => {
                       </div>
                       
                       {/* Enhanced Tool Behavior Probes */}
-                      <div className="mb-3">
-                        <p className="text-xs text-gray-500 mb-2">Tool Behavior - Enhanced (1.5-1.8)</p>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">Tool Behavior - Enhanced</p>
                         <div className="grid grid-cols-2 gap-2">
                           {[
                             { name: 'Similar Tools', key: 'nearIdenticalSelectionTest', icon: '🔍' },
@@ -1566,7 +2129,7 @@ const Tooly: React.FC = () => {
                       {/* Reasoning Probes */}
                       {selectedModel.probeResults.reasoningProbes && (
                         <div>
-                          <p className="text-xs text-gray-500 mb-2">Reasoning (2.x)</p>
+                          <p className="text-xs text-gray-500 mb-2">Reasoning</p>
                           <div className="grid grid-cols-2 gap-2">
                             {[
                               { name: 'Intent', key: 'intentExtraction', icon: '🎯' },
@@ -1596,31 +2159,39 @@ const Tooly: React.FC = () => {
                           </div>
                         </div>
                       )}
+                        </div>
+                      )}
                     </div>
                   )}
 
-                  {/* Context Latency */}
+                  {/* === COLLAPSIBLE: Context Latency === */}
                   {selectedModel.contextLatency && (
-                    <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-sm font-medium text-gray-400">Context Latency Profile</h4>
-                        {/* Speed Rating Badge */}
-                        {selectedModel.contextLatency.speedRating && (
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                            selectedModel.contextLatency.speedRating === 'excellent' ? 'bg-green-500/20 text-green-400' :
-                            selectedModel.contextLatency.speedRating === 'good' ? 'bg-blue-500/20 text-blue-400' :
-                            selectedModel.contextLatency.speedRating === 'acceptable' ? 'bg-yellow-500/20 text-yellow-400' :
-                            selectedModel.contextLatency.speedRating === 'slow' ? 'bg-orange-500/20 text-orange-400' :
-                            'bg-red-500/20 text-red-400'
-                          }`}>
-                            {selectedModel.contextLatency.speedRating === 'excellent' ? '🚀 Excellent' :
-                             selectedModel.contextLatency.speedRating === 'good' ? '✅ Good' :
-                             selectedModel.contextLatency.speedRating === 'acceptable' ? '⚡ Acceptable' :
-                             selectedModel.contextLatency.speedRating === 'slow' ? '🐢 Slow' :
-                             '⚠️ Very Slow'}
-                          </span>
-                        )}
-                      </div>
+                    <div className="border border-[#3d3d3d] rounded-lg overflow-hidden">
+                      <button 
+                        onClick={() => toggleSection('latency')}
+                        className="w-full flex items-center justify-between p-3 bg-[#252525] hover:bg-[#2d2d2d] transition-colors"
+                      >
+                        <span className="text-sm font-medium text-gray-300">Context Latency</span>
+                        <div className="flex items-center gap-3">
+                          {selectedModel.contextLatency.speedRating && (
+                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                              selectedModel.contextLatency.speedRating === 'excellent' ? 'bg-green-500/20 text-green-400' :
+                              selectedModel.contextLatency.speedRating === 'good' ? 'bg-blue-500/20 text-blue-400' :
+                              selectedModel.contextLatency.speedRating === 'acceptable' ? 'bg-yellow-500/20 text-yellow-400' :
+                              selectedModel.contextLatency.speedRating === 'slow' ? 'bg-orange-500/20 text-orange-400' :
+                              'bg-red-500/20 text-red-400'
+                            }`}>
+                              {selectedModel.contextLatency.speedRating === 'excellent' ? '🚀' :
+                               selectedModel.contextLatency.speedRating === 'good' ? '✅' :
+                               selectedModel.contextLatency.speedRating === 'acceptable' ? '⚡' :
+                               selectedModel.contextLatency.speedRating === 'slow' ? '🐢' : '⚠️'}
+                            </span>
+                          )}
+                          <span className="text-gray-500">{expandedSections.latency ? '−' : '+'}</span>
+                        </div>
+                      </button>
+                      {expandedSections.latency && (
+                        <div className="p-3 bg-[#1a1a1a] space-y-2">
                       
                       {/* Speed Warning */}
                       {selectedModel.contextLatency.isInteractiveSpeed === false && (
@@ -1687,69 +2258,74 @@ const Tooly: React.FC = () => {
                           )}
                         </div>
                       </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
-                  {/* Context Length */}
-                  <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-gray-400">Context Length</span>
-                      <div className="flex items-center gap-2">
-                        {selectedModel.maxContextLength && (
-                          <span className="text-xs text-gray-500">
-                            max: {selectedModel.maxContextLength.toLocaleString()}
-                          </span>
-                        )}
-                        {selectedModel.contextLength && (
-                          <button
-                            onClick={() => removeContextLength(selectedModel.modelId)}
-                            className="text-xs text-red-400 hover:text-red-300"
-                          >
-                            Remove custom
-                          </button>
-                        )}
+                  {/* === COLLAPSIBLE: Advanced Settings === */}
+                  <div className="border border-[#3d3d3d] rounded-lg overflow-hidden">
+                    <button 
+                      onClick={() => toggleSection('tools')}
+                      className="w-full flex items-center justify-between p-3 bg-[#252525] hover:bg-[#2d2d2d] transition-colors"
+                    >
+                      <span className="text-sm font-medium text-gray-300">Advanced Settings</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-gray-500">
+                          {selectedModel.enabledTools?.length || 0} tools
+                        </span>
+                        <span className="text-gray-500">{expandedSections.tools ? '−' : '+'}</span>
                       </div>
+                    </button>
+                    {expandedSections.tools && (
+                      <div className="p-3 bg-[#1a1a1a] space-y-4">
+
+                  {/* Context Length */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-400">Context Length</span>
+                      {selectedModel.contextLength && (
+                        <button
+                          onClick={() => removeContextLength(selectedModel.modelId)}
+                          className="text-xs text-red-400 hover:text-red-300"
+                        >
+                          Reset
+                        </button>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={editingContextLength ?? selectedModel.contextLength ?? defaultContextLength}
-                        onChange={(e) => {
-                          const newValue = parseInt(e.target.value);
-                          setEditingContextLength(newValue);
-                          updateContextLength(selectedModel.modelId, newValue);
-                        }}
-                        className="flex-1 bg-[#0d0d0d] border border-[#3d3d3d] rounded px-2 py-1 text-white text-sm focus:border-purple-500 focus:outline-none"
-                      >
-                        {(() => {
-                          const maxCtx = selectedModel.maxContextLength || 1048576;
-                          const allSizes = [
-                            { value: 2048, label: '2,048 (2K)' },
-                            { value: 4096, label: '4,096 (4K)' },
-                            { value: 8192, label: '8,192 (8K)' },
-                            { value: 16384, label: '16,384 (16K)' },
-                            { value: 32768, label: '32,768 (32K)' },
-                            { value: 65536, label: '65,536 (64K)' },
-                            { value: 131072, label: '131,072 (128K)' },
-                            { value: 1048576, label: '1,048,576 (1M)' },
-                          ];
-                          return allSizes
-                            .filter(size => size.value <= maxCtx)
-                            .map(size => (
-                              <option key={size.value} value={size.value}>{size.label}</option>
-                            ));
-                        })()}
-                      </select>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {selectedModel.contextLength 
-                        ? '📌 Custom value set for this model' 
-                        : `Using global default (${defaultContextLength.toLocaleString()})`}
-                    </p>
+                    <select
+                      value={editingContextLength ?? selectedModel.contextLength ?? defaultContextLength}
+                      onChange={(e) => {
+                        const newValue = parseInt(e.target.value);
+                        setEditingContextLength(newValue);
+                        updateContextLength(selectedModel.modelId, newValue);
+                      }}
+                      className="w-full bg-[#252525] border border-[#3d3d3d] rounded px-2 py-1.5 text-white text-sm focus:border-purple-500 focus:outline-none"
+                    >
+                      {(() => {
+                        const maxCtx = selectedModel.maxContextLength || 1048576;
+                        const allSizes = [
+                          { value: 2048, label: '2K' },
+                          { value: 4096, label: '4K' },
+                          { value: 8192, label: '8K' },
+                          { value: 16384, label: '16K' },
+                          { value: 32768, label: '32K' },
+                          { value: 65536, label: '64K' },
+                          { value: 131072, label: '128K' },
+                          { value: 1048576, label: '1M' },
+                        ];
+                        return allSizes
+                          .filter(size => size.value <= maxCtx)
+                          .map(size => (
+                            <option key={size.value} value={size.value}>{size.label}</option>
+                          ));
+                      })()}
+                    </select>
                   </div>
 
                   {/* Native Tool Calls Section */}
-                  <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                    <h4 className="text-sm font-medium text-gray-400 mb-2">Native Tool Calls</h4>
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">Native Tool Mappings</p>
                     {(() => {
                       // Use discoveredNativeTools if available, otherwise fall back to collecting from nativeAliases
                       const discoveredTools = selectedModel.discoveredNativeTools || [];
@@ -1842,7 +2418,7 @@ const Tooly: React.FC = () => {
                           </div>
                           {unmappedTools.length > 0 && (
                             <p className="text-[10px] text-orange-400/70 mt-2">
-                              ⚠️ {unmappedTools.length} tool(s) have no MCP server equivalent
+                              ⚠️ {unmappedTools.length} unmapped
                             </p>
                           )}
                         </div>
@@ -1850,16 +2426,12 @@ const Tooly: React.FC = () => {
                     })()}
                   </div>
 
-                  {/* Enhanced Tool Configuration */}
-                  <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                    {/* Header with count and actions */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-medium text-white">Tools</h4>
-                        <span className="px-2 py-0.5 text-xs rounded-full bg-purple-500/20 text-purple-400">
-                          {selectedModel.enabledTools?.length || 0}/{Object.keys(selectedModel.capabilities).length} enabled
-                        </span>
-                      </div>
+                  {/* Tool List */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-400">
+                        Tool Capabilities ({selectedModel.enabledTools?.length || 0}/{Object.keys(selectedModel.capabilities).length})
+                      </span>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={async () => {
@@ -1965,38 +2537,26 @@ const Tooly: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* IDE Aliases */}
-                  <div className="p-3 bg-[#2d2d2d] rounded-lg">
-                    <h4 className="text-sm font-medium text-gray-400 mb-2">Use in your IDE</h4>
-                    <p className="text-[10px] text-gray-500 mb-2">Copy the model name with IDE suffix to your IDE config:</p>
-                    <div className="space-y-2">
+                  {/* IDE Aliases (inside Advanced Settings) */}
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">IDE Aliases</p>
+                    <div className="flex gap-2">
                       {['cursor', 'continue'].map((ide) => (
-                        <div 
+                        <button 
                           key={ide}
-                          className="flex items-center justify-between px-3 py-2 bg-[#1a1a1a] rounded-lg border border-[#3d3d3d]"
+                          onClick={() => navigator.clipboard.writeText(`${selectedModel.modelId}-${ide}`)}
+                          className="flex-1 px-2 py-1.5 bg-[#252525] border border-[#3d3d3d] rounded text-xs text-gray-300 hover:bg-[#3d3d3d] transition-colors"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs font-medium ${ide === 'cursor' ? 'text-green-400' : 'text-blue-400'}`}>
-                              {ide.charAt(0).toUpperCase() + ide.slice(1)}
-                            </span>
-                            <code className="text-xs text-white font-mono">
-                              {selectedModel.modelId}-{ide}
-                            </code>
-                          </div>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(`${selectedModel.modelId}-${ide}`);
-                            }}
-                            className="px-2 py-1 text-[10px] bg-[#2d2d2d] text-gray-400 rounded hover:bg-[#3d3d3d] hover:text-white transition-colors"
-                          >
-                            Copy
-                          </button>
-                        </div>
+                          {ide.charAt(0).toUpperCase() + ide.slice(1)}: Copy
+                        </button>
                       ))}
                     </div>
                   </div>
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Actions */}
+                  {/* Quick Actions */}
                   <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => {
@@ -2101,39 +2661,237 @@ const Tooly: React.FC = () => {
           </div>
         )}
 
-        {/* Tests Tab */}
+        {/* Tests Tab - Split Layout */}
         {activeTab === 'tests' && (
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Test Definitions</h3>
-            {tests.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No test definitions found.</p>
-            ) : (
-              <div className="space-y-2">
-                {tests.map((test) => (
-                  <div
-                    key={test.id}
-                    className="p-4 rounded-lg border border-[#2d2d2d] hover:border-[#3d3d3d]"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-white font-medium">{test.id}</p>
-                        <p className="text-gray-500 text-sm">{test.tool} • {test.category}</p>
-                      </div>
-                      <span className={`px-2 py-1 text-xs rounded ${
-                        test.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
-                        test.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-red-500/20 text-red-400'
-                      }`}>
-                        {test.difficulty}
-                      </span>
-                    </div>
-                    <p className="text-gray-400 text-sm mt-2 truncate">{test.prompt}</p>
-                  </div>
-                ))}
+          <div className="flex gap-4 h-[calc(100vh-280px)]">
+            {/* Left: Test List */}
+            <div className="w-1/2 flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Tests</h3>
+                <button
+                  onClick={() => { setEditingTest(null); setTestEditorOpen(true); }}
+                  className="px-3 py-1 text-xs bg-purple-600 hover:bg-purple-500 text-white rounded"
+                >
+                  + New Test
+                </button>
               </div>
-            )}
+              
+              {/* Filters */}
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="text"
+                  value={testSearchFilter}
+                  onChange={e => setTestSearchFilter(e.target.value)}
+                  placeholder="Search..."
+                  className="flex-1 px-2 py-1 text-xs bg-[#2d2d2d] border border-[#3d3d3d] rounded text-gray-300 focus:border-purple-500 focus:outline-none"
+                />
+                <select
+                  value={testCategoryFilter}
+                  onChange={e => setTestCategoryFilter(e.target.value)}
+                  className="px-2 py-1 text-xs bg-[#2d2d2d] border border-[#3d3d3d] rounded text-gray-300 focus:border-purple-500 focus:outline-none"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="custom">Custom</option>
+                  <option value="3.x">Strategic RAG</option>
+                  <option value="4.x">Architectural</option>
+                  <option value="5.x">Navigation</option>
+                  <option value="6.x">Helicopter</option>
+                  <option value="7.x">Proactive</option>
+                  <option value="8.x">Intent</option>
+                </select>
+              </div>
+              
+              {/* Test List */}
+              <div className="flex-1 overflow-y-auto space-y-2 scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
+                {/* Custom Tests */}
+                {customTests
+                  .filter(t => testCategoryFilter === 'all' || t.category === testCategoryFilter)
+                  .filter(t => !testSearchFilter || t.name.toLowerCase().includes(testSearchFilter.toLowerCase()) || t.prompt.toLowerCase().includes(testSearchFilter.toLowerCase()))
+                  .map(test => (
+                    <div
+                      key={test.id}
+                      onClick={() => { setSelectedTest(test); setTestResult(null); }}
+                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                        selectedTest?.id === test.id 
+                          ? 'border-purple-500 bg-purple-500/10' 
+                          : 'border-[#2d2d2d] hover:border-[#3d3d3d]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium text-sm truncate">{test.name}</p>
+                          <p className="text-gray-500 text-xs">📝 Custom • {test.category}</p>
+                        </div>
+                        <div className="flex items-center gap-1 ml-2">
+                          <span className={`px-1.5 py-0.5 text-xs rounded ${
+                            test.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
+                            test.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {test.difficulty}
+                          </span>
+                          <button
+                            onClick={e => { e.stopPropagation(); setEditingTest(test); setTestEditorOpen(true); }}
+                            className="p-1 text-gray-400 hover:text-white"
+                            title="Edit"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={e => { e.stopPropagation(); handleDeleteTest(test.id); }}
+                            className="p-1 text-gray-400 hover:text-red-400"
+                            title="Delete"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-gray-400 text-xs mt-1 truncate">{test.prompt}</p>
+                    </div>
+                  ))}
+                
+                {/* Built-in Tests */}
+                {builtInTests
+                  .filter(t => testCategoryFilter === 'all' || t.category === testCategoryFilter)
+                  .filter(t => !testSearchFilter || t.name.toLowerCase().includes(testSearchFilter.toLowerCase()) || t.prompt.toLowerCase().includes(testSearchFilter.toLowerCase()))
+                  .map(test => (
+                    <div
+                      key={test.id}
+                      onClick={() => { setSelectedTest(test); setTestResult(null); }}
+                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                        selectedTest?.id === test.id 
+                          ? 'border-blue-500 bg-blue-500/10' 
+                          : 'border-[#2d2d2d] hover:border-[#3d3d3d]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium text-sm truncate">{test.name}</p>
+                          <p className="text-gray-500 text-xs">{test.categoryIcon} {test.categoryName}</p>
+                        </div>
+                        <span className="px-1.5 py-0.5 text-xs bg-blue-500/20 text-blue-400 rounded">
+                          built-in
+                        </span>
+                      </div>
+                      <p className="text-gray-400 text-xs mt-1 truncate">{test.prompt}</p>
+                    </div>
+                  ))}
+                
+                {customTests.length === 0 && builtInTests.length === 0 && (
+                  <p className="text-gray-500 text-center py-8">No tests found</p>
+                )}
+              </div>
+            </div>
+            
+            {/* Right: Test Details / Chat */}
+            <div className="w-1/2 flex flex-col border-l border-[#2d2d2d] pl-4">
+              {selectedTest ? (
+                <>
+                  {/* Test Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">{selectedTest.name}</h3>
+                      <p className="text-gray-500 text-sm">
+                        {selectedTest.categoryIcon || '📝'} {selectedTest.categoryName || selectedTest.category}
+                        {selectedTest.expectedTool && ` • Expected: ${selectedTest.expectedTool}`}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleTryTest(selectedTest)}
+                      disabled={tryingTest || !mainModelId}
+                      className={`px-4 py-2 text-sm rounded transition-colors ${
+                        tryingTest 
+                          ? 'bg-gray-600 text-gray-300' 
+                          : 'bg-green-600 hover:bg-green-500 text-white'
+                      } disabled:opacity-50`}
+                    >
+                      {tryingTest ? '⏳ Running...' : '▶️ Try Test'}
+                    </button>
+                  </div>
+                  
+                  {/* Test Prompt */}
+                  <div className="mb-4">
+                    <label className="text-xs text-gray-500 mb-1 block">Prompt</label>
+                    <div className="p-3 bg-[#1a1a1a] border border-[#2d2d2d] rounded text-sm text-gray-300 font-mono">
+                      {selectedTest.prompt}
+                    </div>
+                  </div>
+                  
+                  {/* Expected Behavior */}
+                  {selectedTest.expectedBehavior && (
+                    <div className="mb-4">
+                      <label className="text-xs text-gray-500 mb-1 block">Expected Behavior</label>
+                      <div className="p-3 bg-[#1a1a1a] border border-[#2d2d2d] rounded text-sm text-gray-400">
+                        {selectedTest.expectedBehavior}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Test Result */}
+                  {testResult && (
+                    <div className="flex-1 overflow-y-auto">
+                      <label className="text-xs text-gray-500 mb-1 block">Result</label>
+                      {testResult.error ? (
+                        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-sm text-red-400">
+                          {testResult.error}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {/* Tool Calls */}
+                          {testResult.result?.toolCalls?.length > 0 && (
+                            <div>
+                              <span className="text-xs text-gray-500">Tool Calls:</span>
+                              {testResult.result.toolCalls.map((tc: any, i: number) => (
+                                <div key={i} className="mt-1 p-2 bg-purple-500/10 border border-purple-500/30 rounded text-xs">
+                                  <span className="text-purple-400">{tc.function?.name || tc.name}</span>
+                                  {tc.function?.arguments && (
+                                    <pre className="mt-1 text-gray-400 overflow-x-auto">
+                                      {typeof tc.function.arguments === 'string' 
+                                        ? tc.function.arguments 
+                                        : JSON.stringify(tc.function.arguments, null, 2)}
+                                    </pre>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* Response Content */}
+                          {testResult.result?.content && (
+                            <div>
+                              <span className="text-xs text-gray-500">Response:</span>
+                              <div className="mt-1 p-3 bg-[#1a1a1a] border border-[#2d2d2d] rounded text-sm text-gray-300 whitespace-pre-wrap">
+                                {testResult.result.content}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Model Info */}
+                          <div className="text-xs text-gray-500">
+                            Model: {testResult.result?.model}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Select a test to view details
+                </div>
+              )}
+            </div>
           </div>
         )}
+        
+        {/* Test Editor Modal */}
+        <TestEditor
+          isOpen={testEditorOpen}
+          onClose={() => { setTestEditorOpen(false); setEditingTest(null); }}
+          onSave={handleSaveTest}
+          editingTest={editingTest}
+        />
 
         {/* Logs Tab */}
         {activeTab === 'logs' && (

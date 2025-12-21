@@ -655,7 +655,19 @@ class CapabilitiesService {
     modelId: string,
     probeResults: ProbeResults,
     role: 'main' | 'executor' | 'both' | 'none',
-    contextLatency?: ContextLatencyData
+    contextLatency?: ContextLatencyData,
+    scoreBreakdown?: {
+      toolScore?: number;
+      reasoningScore?: number;
+      ragScore?: number;
+      bugDetectionScore?: number;
+      architecturalScore?: number;
+      navigationScore?: number;
+      helicopterScore?: number;
+      proactiveScore?: number;
+      intentScore?: number;
+      overallScore?: number;
+    }
   ): Promise<void> {
     let profile = await this.getProfile(modelId);
     if (!profile) {
@@ -666,6 +678,11 @@ class CapabilitiesService {
     profile.probeResults = probeResults;
     profile.role = role;
     
+    // Update overall score from probe results
+    if (probeResults.overallScore) {
+      profile.score = probeResults.overallScore;
+    }
+    
     if (contextLatency) {
       profile.contextLatency = contextLatency;
       // Auto-set recommended context if not manually overridden
@@ -673,9 +690,14 @@ class CapabilitiesService {
         profile.contextLength = contextLatency.recommendedContext;
       }
     }
+    
+    // Store scoreBreakdown if provided
+    if (scoreBreakdown) {
+      (profile as any).scoreBreakdown = scoreBreakdown;
+    }
 
     await this.saveProfile(profile);
-    console.log(`[Capabilities] Updated probe results for ${modelId}: role=${role}`);
+    console.log(`[Capabilities] Updated probe results for ${modelId}: role=${role}, score=${probeResults.overallScore || 'N/A'}`);
   }
 
   /**

@@ -5,6 +5,7 @@ import Settings from './pages/Settings';
 import Sessions from './pages/Sessions';
 import ContextEditor from './pages/ContextEditor';
 import Tooly from './pages/Tooly';
+import ModelDetail from './pages/ModelDetail';
 import Debug from './pages/Debug';
 import RAG from './pages/RAG';
 import Layout from './components/Layout';
@@ -51,6 +52,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/tooly" element={<Tooly />} />
+            <Route path="/tooly/model/:modelId" element={<ModelDetail />} />
             <Route path="/rag" element={<RAG />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/debug" element={<Debug />} />

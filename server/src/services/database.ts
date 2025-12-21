@@ -396,6 +396,29 @@ CREATE TABLE IF NOT EXISTS rag_config (
   project_auto_detect INTEGER DEFAULT 1,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Custom test definitions for Tooly
+CREATE TABLE IF NOT EXISTS custom_tests (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  prompt TEXT NOT NULL,
+  expected_tool TEXT,
+  expected_behavior TEXT,
+  difficulty TEXT DEFAULT 'medium',
+  variants TEXT, -- JSON array
+  is_builtin INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Model info cache
+CREATE TABLE IF NOT EXISTS model_info (
+  model_id TEXT PRIMARY KEY,
+  info TEXT, -- JSON
+  fetched_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  source TEXT -- 'huggingface', 'ollama', 'web'
+);
 `;
 
 // ============================================================
@@ -1796,6 +1819,157 @@ class DatabaseService {
       console.error('[DB] Failed to save RAG config:', error);
       return false;
     }
+  }
+
+  // ============================================================
+  // CUSTOM TESTS CRUD
+  // ============================================================
+
+  createCustomTest(test: {
+    id?: string;
+    name: string;
+    category: string;
+    prompt: string;
+    expectedTool?: string;
+    expectedBehavior?: string;
+    difficulty?: string;
+    variants?: any[];
+  }): string {
+    const id = test.id || uuidv4();
+    const now = new Date().toISOString();
+    
+    const stmt = this.db.prepare(`
+      INSERT INTO custom_tests (id, name, category, prompt, expected_tool, expected_behavior, difficulty, variants, is_builtin, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+    `);
+    
+    stmt.run(
+      id,
+      test.name,
+      test.category,
+      test.prompt,
+      test.expectedTool || null,
+      test.expectedBehavior || null,
+      test.difficulty || 'medium',
+      test.variants ? JSON.stringify(test.variants) : null,
+      now,
+      now
+    );
+    
+    return id;
+  }
+
+  getCustomTests(): any[] {
+    const stmt = this.db.prepare('SELECT * FROM custom_tests ORDER BY category, name');
+    const rows = stmt.all() as any[];
+    
+    return rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      category: row.category,
+      prompt: row.prompt,
+      expectedTool: row.expected_tool,
+      expectedBehavior: row.expected_behavior,
+      difficulty: row.difficulty,
+      variants: row.variants ? JSON.parse(row.variants) : [],
+      isBuiltin: row.is_builtin === 1,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
+  }
+
+  getCustomTest(id: string): any | null {
+    const stmt = this.db.prepare('SELECT * FROM custom_tests WHERE id = ?');
+    const row = stmt.get(id) as any;
+    
+    if (!row) return null;
+    
+    return {
+      id: row.id,
+      name: row.name,
+      category: row.category,
+      prompt: row.prompt,
+      expectedTool: row.expected_tool,
+      expectedBehavior: row.expected_behavior,
+      difficulty: row.difficulty,
+      variants: row.variants ? JSON.parse(row.variants) : [],
+      isBuiltin: row.is_builtin === 1,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    };
+  }
+
+  updateCustomTest(id: string, updates: {
+    name?: string;
+    category?: string;
+    prompt?: string;
+    expectedTool?: string;
+    expectedBehavior?: string;
+    difficulty?: string;
+    variants?: any[];
+  }): boolean {
+    const test = this.getCustomTest(id);
+    if (!test || test.isBuiltin) return false;
+    
+    const now = new Date().toISOString();
+    const stmt = this.db.prepare(`
+      UPDATE custom_tests SET
+        name = COALESCE(?, name),
+        category = COALESCE(?, category),
+        prompt = COALESCE(?, prompt),
+        expected_tool = COALESCE(?, expected_tool),
+        expected_behavior = COALESCE(?, expected_behavior),
+        difficulty = COALESCE(?, difficulty),
+        variants = COALESCE(?, variants),
+        updated_at = ?
+      WHERE id = ? AND is_builtin = 0
+    `);
+    
+    const result = stmt.run(
+      updates.name || null,
+      updates.category || null,
+      updates.prompt || null,
+      updates.expectedTool || null,
+      updates.expectedBehavior || null,
+      updates.difficulty || null,
+      updates.variants ? JSON.stringify(updates.variants) : null,
+      now,
+      id
+    );
+    
+    return result.changes > 0;
+  }
+
+  deleteCustomTest(id: string): boolean {
+    const stmt = this.db.prepare('DELETE FROM custom_tests WHERE id = ? AND is_builtin = 0');
+    const result = stmt.run(id);
+    return result.changes > 0;
+  }
+
+  // ============================================================
+  // MODEL INFO CACHE
+  // ============================================================
+
+  cacheModelInfo(modelId: string, info: any, source: string): void {
+    const stmt = this.db.prepare(`
+      INSERT OR REPLACE INTO model_info (model_id, info, fetched_at, source)
+      VALUES (?, ?, ?, ?)
+    `);
+    stmt.run(modelId, JSON.stringify(info), new Date().toISOString(), source);
+  }
+
+  getCachedModelInfo(modelId: string): any | null {
+    const stmt = this.db.prepare('SELECT * FROM model_info WHERE model_id = ?');
+    const row = stmt.get(modelId) as any;
+    
+    if (!row) return null;
+    
+    return {
+      modelId: row.model_id,
+      info: JSON.parse(row.info),
+      fetchedAt: row.fetched_at,
+      source: row.source,
+    };
   }
 
   // ============================================================

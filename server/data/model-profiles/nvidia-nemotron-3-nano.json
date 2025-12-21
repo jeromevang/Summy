@@ -342,7 +342,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T17:30:50.350Z",
+    "testedAt": "2025-12-20T23:47:41.347Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -384,47 +384,10 @@
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 81,
-    "reasoningScore": 83,
-    "overallScore": 82,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": false,
-        "score": 30,
-        "details": "Response contains invalid JSON"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": true,
-        "score": 100,
-        "details": "Correctly chose read based on condition"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": true,
-        "score": 80,
-        "details": "Identified conflict in text response"
-      },
-      "explanation": {
-        "passed": true,
-        "score": 100,
-        "details": "Provided reasoning before action"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 70,
-        "details": "Mentions edge case in text response"
-      }
-    }
+    "reasoningScore": 0,
+    "overallScore": 81
   },
-  "role": "none",
+  "role": "main",
   "contextLatency": {
     "testedContextSizes": [
       2048,

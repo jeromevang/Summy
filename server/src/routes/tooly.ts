@@ -11,11 +11,14 @@ import { LMStudioClient } from '@lmstudio/sdk';
 import { modelDiscovery } from '../services/model-discovery.js';
 import { analytics } from '../services/analytics.js';
 import { db } from '../services/database.js';
-import { capabilities, ALL_TOOLS } from '../modules/tooly/capabilities.js';
+import { capabilities, ALL_TOOLS, TOOL_CATEGORIES, ModelProfile } from '../modules/tooly/capabilities.js';
 import { testEngine, TEST_DEFINITIONS } from '../modules/tooly/test-engine.js';
-import { probeEngine } from '../modules/tooly/probe-engine.js';
+import { probeEngine, PROBE_CATEGORIES } from '../modules/tooly/probe-engine.js';
 import { rollback } from '../modules/tooly/rollback.js';
 import { mcpClient } from '../modules/tooly/mcp-client.js';
+import { calculateBadges, extractBadgeScores } from '../modules/tooly/badges.js';
+import { calculateRecommendations } from '../modules/tooly/recommendations.js';
+import { lookupModelInfo } from '../services/model-info-lookup.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -141,6 +144,23 @@ router.get('/models/:modelId', async (req, res) => {
 });
 
 /**
+ * GET /api/tooly/models/:modelId/info
+ * Lookup model information from HuggingFace or inference
+ */
+router.get('/models/:modelId/info', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const skipCache = req.query.refresh === 'true';
+    
+    const info = await lookupModelInfo(modelId, skipCache);
+    res.json(info);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to lookup model info:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * POST /api/tooly/models/:modelId/test
  * Run capability tests for a model
  */
@@ -240,7 +260,16 @@ router.post('/models/:modelId/probe', async (req, res) => {
     const result = await probeEngine.runAllProbes(modelId, provider, testSettings, {
       contextLength: 2048, // Minimal context for behavioral probe testing
       timeout: 30000,
-      runLatencyProfile
+      runLatencyProfile,
+      // Explicitly enable all probe categories
+      runReasoningProbes: true,
+      runStrategicProbes: true,
+      runArchitecturalProbes: true,
+      runNavigationProbes: true,
+      runHelicopterProbes: true,
+      runProactiveProbes: true,
+      runIntentProbes: true,
+      quickMode: false,  // Full mode - run all probes
     });
 
     // Build probe results for saving
@@ -275,12 +304,41 @@ router.post('/models/:modelId/probe', async (req, res) => {
       };
     }
 
+    // Save strategic probes (3.x - 7.x) if available
+    if (result.strategicRAGProbes) {
+      probeResultsToSave.strategicRAGProbes = result.strategicRAGProbes;
+    }
+    if (result.architecturalProbes) {
+      probeResultsToSave.architecturalProbes = result.architecturalProbes;
+    }
+    if (result.navigationProbes) {
+      probeResultsToSave.navigationProbes = result.navigationProbes;
+    }
+    if (result.helicopterProbes) {
+      probeResultsToSave.helicopterProbes = result.helicopterProbes;
+    }
+    if (result.proactiveProbes) {
+      probeResultsToSave.proactiveProbes = result.proactiveProbes;
+    }
+    
+    // Save intent probes (8.x) if available
+    if (result.intentProbes) {
+      probeResultsToSave.intentProbes = result.intentProbes;
+      probeResultsToSave.intentScores = result.intentScores;
+    }
+    
+    // Save score breakdown if available
+    if (result.scoreBreakdown) {
+      probeResultsToSave.scoreBreakdown = result.scoreBreakdown;
+    }
+
     // Save probe results to model profile
     await capabilities.updateProbeResults(
       modelId,
       probeResultsToSave,
       result.role,
-      result.contextLatency
+      result.contextLatency,
+      result.scoreBreakdown
     );
 
     res.json(result);
@@ -555,6 +613,423 @@ router.get('/tests/:tool', (req, res) => {
 });
 
 // ============================================================
+// CUSTOM TEST CRUD
+// ============================================================
+
+/**
+ * GET /api/tooly/custom-tests
+ * Get all custom tests (user-created + built-in probe tests)
+ */
+router.get('/custom-tests', (req, res) => {
+  try {
+    const customTests = db.getCustomTests();
+    
+    // Also include built-in probe tests for display
+    const builtInTests = [
+      ...PROBE_CATEGORIES.flatMap((cat: any) => 
+        cat.probes.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          category: cat.id,
+          categoryName: cat.name,
+          categoryIcon: cat.icon,
+          prompt: p.prompt,
+          expectedTool: p.expectedTool,
+          expectedBehavior: p.expectedBehavior,
+          difficulty: 'medium',
+          isBuiltin: true,
+        }))
+      )
+    ];
+    
+    res.json({
+      customTests,
+      builtInTests,
+      totalCustom: customTests.length,
+      totalBuiltIn: builtInTests.length,
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get custom tests:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/custom-tests
+ * Create a new custom test
+ */
+router.post('/custom-tests', (req, res) => {
+  try {
+    const { name, category, prompt, expectedTool, expectedBehavior, difficulty, variants } = req.body;
+    
+    if (!name || !category || !prompt) {
+      res.status(400).json({ error: 'name, category, and prompt are required' });
+      return;
+    }
+    
+    const id = db.createCustomTest({
+      name,
+      category,
+      prompt,
+      expectedTool,
+      expectedBehavior,
+      difficulty,
+      variants,
+    });
+    
+    res.json({ id, success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to create custom test:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/tooly/custom-tests/:id
+ * Update a custom test
+ */
+router.put('/custom-tests/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    
+    const success = db.updateCustomTest(id, updates);
+    
+    if (!success) {
+      res.status(404).json({ error: 'Test not found or is built-in' });
+      return;
+    }
+    
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to update custom test:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/tooly/custom-tests/:id
+ * Delete a custom test
+ */
+router.delete('/custom-tests/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const success = db.deleteCustomTest(id);
+    
+    if (!success) {
+      res.status(404).json({ error: 'Test not found or is built-in' });
+      return;
+    }
+    
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to delete custom test:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/custom-tests/:id/try
+ * Try a test on the currently selected model
+ */
+router.post('/custom-tests/:id/try', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { modelId, prompt: overridePrompt } = req.body;
+    
+    // Get the test
+    let test = db.getCustomTest(id);
+    
+    // If not a custom test, check built-in probes
+    if (!test) {
+      for (const cat of PROBE_CATEGORIES) {
+        const probe = (cat as any).probes.find((p: any) => p.id === id);
+        if (probe) {
+          test = {
+            id: probe.id,
+            name: probe.name,
+            prompt: probe.prompt,
+            expectedTool: probe.expectedTool,
+            expectedBehavior: probe.expectedBehavior,
+          };
+          break;
+        }
+      }
+    }
+    
+    if (!test) {
+      res.status(404).json({ error: 'Test not found' });
+      return;
+    }
+    
+    // Get model settings
+    let settings: any = {};
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch {
+      // Use defaults
+    }
+    
+    // Use provided modelId or fall back to settings
+    const targetModel = modelId || settings.mainModelId || settings.lmstudioModel;
+    if (!targetModel) {
+      res.status(400).json({ error: 'No model selected' });
+      return;
+    }
+    
+    const testPrompt = overridePrompt || test.prompt;
+    
+    // Build comprehensive tool definitions matching MCP server
+    const testTools = [
+      // RAG Tools (primary for code understanding)
+      {
+        type: 'function',
+        function: {
+          name: 'rag_query',
+          description: 'Search the codebase using semantic search. Use this FIRST for any code understanding or exploration tasks.',
+          parameters: {
+            type: 'object',
+            properties: { 
+              query: { type: 'string', description: 'Natural language search query' },
+              topK: { type: 'number', description: 'Number of results to return' }
+            },
+            required: ['query']
+          }
+        }
+      },
+      // File Operations
+      {
+        type: 'function',
+        function: {
+          name: 'read_file',
+          description: 'Read the contents of a file from the filesystem',
+          parameters: {
+            type: 'object',
+            properties: { path: { type: 'string', description: 'Path to the file to read' } },
+            required: ['path']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'write_file',
+          description: 'Write content to a file',
+          parameters: {
+            type: 'object',
+            properties: { 
+              path: { type: 'string' }, 
+              content: { type: 'string' } 
+            },
+            required: ['path', 'content']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'list_directory',
+          description: 'List contents of a directory',
+          parameters: {
+            type: 'object',
+            properties: { path: { type: 'string' } },
+            required: ['path']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'search_files',
+          description: 'Search for files matching a pattern',
+          parameters: {
+            type: 'object',
+            properties: { 
+              path: { type: 'string' }, 
+              pattern: { type: 'string' },
+              regex: { type: 'boolean' }
+            },
+            required: ['path', 'pattern']
+          }
+        }
+      },
+      // Git Operations
+      {
+        type: 'function',
+        function: {
+          name: 'git_status',
+          description: 'Get the git status of a repository',
+          parameters: {
+            type: 'object',
+            properties: { path: { type: 'string' } },
+            required: ['path']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'git_diff',
+          description: 'Get the git diff of a repository',
+          parameters: {
+            type: 'object',
+            properties: { path: { type: 'string' } },
+            required: ['path']
+          }
+        }
+      },
+      // Shell/Execution
+      {
+        type: 'function',
+        function: {
+          name: 'shell_exec',
+          description: 'Execute a shell command',
+          parameters: {
+            type: 'object',
+            properties: { 
+              command: { type: 'string' },
+              cwd: { type: 'string' }
+            },
+            required: ['command']
+          }
+        }
+      },
+      // Web/Browser
+      {
+        type: 'function',
+        function: {
+          name: 'web_search',
+          description: 'Search the web for information',
+          parameters: {
+            type: 'object',
+            properties: { query: { type: 'string' } },
+            required: ['query']
+          }
+        }
+      }
+    ];
+    
+    // Make a simple chat completion to test
+    const axios = (await import('axios')).default;
+    const response = await axios.post(
+      `${settings.lmstudioUrl || 'http://localhost:1234'}/v1/chat/completions`,
+      {
+        model: targetModel,
+        messages: [
+          { 
+            role: 'system', 
+            content: `You are a helpful coding assistant working on a test project.
+            
+IMPORTANT: Use the available tools when appropriate:
+- Use rag_query FIRST for any code understanding, search, or exploration tasks
+- Use read_file to examine specific files
+- Use search_files to find files by pattern
+- Use git_status/git_diff for version control information
+- Use shell_exec for running commands
+
+The test project is located at: server/data/test-project/
+It contains: node-api/, react-web/, java-service/, mendix-widget/, react-native-app/, shared-utils/`
+          },
+          { role: 'user', content: testPrompt }
+        ],
+        tools: testTools,
+        tool_choice: 'auto',
+        temperature: 0,
+        max_tokens: 1000,
+      },
+      { timeout: 45000 }
+    );
+    
+    const message = response.data.choices?.[0]?.message;
+    
+    res.json({
+      success: true,
+      test: {
+        id: test.id,
+        name: test.name,
+        prompt: testPrompt,
+        expectedTool: test.expectedTool,
+        expectedBehavior: test.expectedBehavior,
+      },
+      result: {
+        content: message?.content || '',
+        toolCalls: message?.tool_calls || [],
+        model: targetModel,
+      }
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to try test:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/test-project/tree
+ * Get the test project file structure for the file picker
+ */
+router.get('/test-project/tree', async (req, res) => {
+  try {
+    const testProjectPath = path.join(__dirname, '../../data/test-project');
+    
+    const buildTree = async (dirPath: string, relativePath: string = ''): Promise<any[]> => {
+      const entries: any[] = [];
+      
+      if (!await fs.pathExists(dirPath)) {
+        return entries;
+      }
+      
+      const items = await fs.readdir(dirPath, { withFileTypes: true });
+      
+      for (const item of items) {
+        const itemPath = path.join(dirPath, item.name);
+        const itemRelativePath = relativePath ? `${relativePath}/${item.name}` : item.name;
+        
+        if (item.isDirectory()) {
+          // Skip node_modules, dist, etc.
+          if (['node_modules', 'dist', 'build', '.git', '__pycache__'].includes(item.name)) {
+            continue;
+          }
+          
+          entries.push({
+            name: item.name,
+            path: itemRelativePath,
+            type: 'directory',
+            children: await buildTree(itemPath, itemRelativePath),
+          });
+        } else {
+          entries.push({
+            name: item.name,
+            path: itemRelativePath,
+            type: 'file',
+          });
+        }
+      }
+      
+      // Sort: directories first, then files
+      entries.sort((a, b) => {
+        if (a.type === b.type) return a.name.localeCompare(b.name);
+        return a.type === 'directory' ? -1 : 1;
+      });
+      
+      return entries;
+    };
+    
+    const tree = await buildTree(testProjectPath);
+    
+    res.json({
+      tree,
+      basePath: 'server/data/test-project',
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get test project tree:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
 // EXECUTION LOGS
 // ============================================================
 
@@ -784,6 +1259,277 @@ router.post('/parse-model', (req, res) => {
     res.json(parsed);
   } catch (error: any) {
     console.error('[Tooly] Failed to parse model:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// LEADERBOARDS
+// ============================================================
+
+/**
+ * GET /api/tooly/leaderboards
+ * Get top 3 models per category
+ */
+router.get('/leaderboards', async (req, res) => {
+  try {
+    // Get all profiles
+    const allProfiles = await capabilities.getAllProfiles();
+    
+    // Define leaderboard categories
+    const leaderboardCategories = [
+      { id: 'rag', name: 'Best for RAG', icon: '🔍', scoreKey: 'ragScore' },
+      { id: 'architect', name: 'Best Architect', icon: '🏗️', scoreKey: 'architecturalScore' },
+      { id: 'navigator', name: 'Best Navigator', icon: '🧭', scoreKey: 'navigationScore' },
+      { id: 'reviewer', name: 'Best Reviewer', icon: '🐛', scoreKey: 'bugDetectionScore' },
+      { id: 'proactive', name: 'Most Proactive', icon: '💡', scoreKey: 'proactiveScore' },
+      { id: 'overall', name: 'Best Overall', icon: '🏆', scoreKey: 'overallScore' },
+    ];
+    
+    const leaderboards = leaderboardCategories.map((category: { id: string; name: string; icon: string; scoreKey: string }) => {
+      // Sort profiles by this category's score
+      const sorted = allProfiles
+        .map((profile: ModelProfile) => {
+          const badgeScores = extractBadgeScores(profile);
+          const score = (badgeScores as Record<string, number | undefined>)[category.scoreKey] ?? 
+                       profile.probeResults?.overallScore ?? 
+                       profile.score ?? 0;
+          return {
+            modelId: profile.modelId,
+            displayName: profile.displayName || profile.modelId.split('/').pop() || profile.modelId,
+            score: Math.round(score),
+          };
+        })
+        .filter((p: { score: number }) => p.score > 0)
+        .sort((a: { score: number }, b: { score: number }) => b.score - a.score)
+        .slice(0, 3)
+        .map((entry: { modelId: string; displayName: string; score: number }, index: number) => ({ ...entry, rank: index + 1 }));
+      
+      return {
+        id: category.id,
+        name: category.name,
+        icon: category.icon,
+        description: `Top models for ${category.name.toLowerCase()}`,
+        entries: sorted,
+      };
+    });
+    
+    res.json({ categories: leaderboards });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get leaderboards:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// ENHANCED MODEL DETAIL
+// ============================================================
+
+/**
+ * GET /api/tooly/models/:modelId/detail
+ * Get detailed model profile with badges, recommendations, and tool categories
+ */
+router.get('/models/:modelId/detail', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const profile = await capabilities.getProfile(modelId);
+    
+    if (!profile) {
+      res.status(404).json({ error: 'Model profile not found' });
+      return;
+    }
+    
+    // Extract badge scores and calculate badges
+    const badgeScores = extractBadgeScores(profile);
+    const badges = calculateBadges(badgeScores);
+    
+    // Get all profiles for alternative recommendations
+    const allProfilesForAlts = await capabilities.getAllProfiles();
+    const alternatives = allProfilesForAlts
+      .filter((p: ModelProfile) => p.modelId !== modelId)
+      .map((p: ModelProfile) => ({
+        modelId: p.modelId,
+        modelName: p.displayName || p.modelId,
+        scores: extractBadgeScores(p),
+      }));
+    
+    // Calculate recommendations
+    const recommendations = calculateRecommendations(badgeScores, alternatives);
+    
+    // Get tool categories
+    const toolCategories = Object.entries(TOOL_CATEGORIES).map(([name, tools]) => {
+      const toolsWithStatus = tools.map(tool => ({
+        name: tool,
+        enabled: profile.enabledTools?.includes(tool) || false,
+        score: profile.capabilities?.[tool]?.score || 0,
+      }));
+      
+      return {
+        name,
+        tools: toolsWithStatus,
+        enabledCount: toolsWithStatus.filter(t => t.enabled).length,
+        totalCount: tools.length,
+        score: Math.round(
+          toolsWithStatus.filter(t => t.score > 0).reduce((sum, t) => sum + t.score, 0) / 
+          (toolsWithStatus.filter(t => t.score > 0).length || 1)
+        ),
+      };
+    });
+    
+    // Build complete score breakdown
+    const scoreBreakdown = {
+      ragScore: badgeScores.ragScore,
+      bugDetectionScore: badgeScores.bugDetectionScore,
+      architecturalScore: badgeScores.architecturalScore,
+      navigationScore: badgeScores.navigationScore,
+      proactiveScore: badgeScores.proactiveScore,
+      toolScore: badgeScores.toolScore,
+      reasoningScore: badgeScores.reasoningScore,
+      intentScore: badgeScores.intentScore,
+      overallScore: profile.score,
+    };
+    
+    // Lookup model info (async, don't block response)
+    let modelInfo = null;
+    try {
+      modelInfo = await lookupModelInfo(modelId);
+    } catch (e) {
+      // Ignore lookup failures
+    }
+    
+    res.json({
+      ...profile,
+      badges,
+      recommendations,
+      toolCategories,
+      scoreBreakdown,
+      modelInfo,
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get model detail:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/probe/:modelId
+ * Run probes for a model with optional category filter
+ */
+router.post('/probe/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { categories, mode = 'full' } = req.body || {};
+    
+    // Load settings
+    let settings: any = {};
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch {
+      // Use defaults
+    }
+    
+    const probeOptions = {
+      runLatencyProfile: mode === 'full',
+      runReasoningProbes: !categories || categories.includes('2.x'),
+      categories: categories || undefined,  // Filter to specific categories
+      quickMode: mode === 'quick',  // FIXED: was incorrectly named 'mode' instead of 'quickMode'
+      // Enable all extended probes when no specific categories selected
+      runStrategicProbes: !categories || categories.includes('3.x'),
+      runArchitecturalProbes: !categories || categories.includes('4.x'),
+      runNavigationProbes: !categories || categories.includes('5.x'),
+      runHelicopterProbes: !categories || categories.includes('6.x'),
+      runProactiveProbes: !categories || categories.includes('7.x'),
+      runIntentProbes: !categories || categories.includes('8.x'),
+    };
+    
+    console.log(`[Tooly] Running probes for ${modelId} (mode: ${mode}, categories: ${categories?.join(', ') || 'all'})`);
+    
+    const testSettings = {
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+      openaiApiKey: process.env.OPENAI_API_KEY,
+      azureResourceName: settings.azureResourceName,
+      azureApiKey: settings.azureApiKey,
+      azureDeploymentName: settings.azureDeploymentName,
+      azureApiVersion: settings.azureApiVersion
+    };
+    
+    const result = await probeEngine.runAllProbes(
+      modelId,
+      'lmstudio',
+      testSettings,
+      probeOptions
+    );
+    
+    // Build probe results for saving (same as /models/:modelId/probe)
+    const probeResultsToSave: any = {
+      testedAt: result.completedAt,
+      emitTest: result.emitTest ? { passed: result.emitTest.passed, score: result.emitTest.score, details: result.emitTest.details } : undefined,
+      schemaTest: result.schemaTest ? { passed: result.schemaTest.passed, score: result.schemaTest.score, details: result.schemaTest.details } : undefined,
+      selectionTest: result.selectionTest ? { passed: result.selectionTest.passed, score: result.selectionTest.score, details: result.selectionTest.details } : undefined,
+      suppressionTest: result.suppressionTest ? { passed: result.suppressionTest.passed, score: result.suppressionTest.score, details: result.suppressionTest.details } : undefined,
+      nearIdenticalSelectionTest: result.nearIdenticalSelectionTest ? { passed: result.nearIdenticalSelectionTest.passed, score: result.nearIdenticalSelectionTest.score, details: result.nearIdenticalSelectionTest.details } : undefined,
+      multiToolEmitTest: result.multiToolEmitTest ? { passed: result.multiToolEmitTest.passed, score: result.multiToolEmitTest.score, details: result.multiToolEmitTest.details } : undefined,
+      argumentValidationTest: result.argumentValidationTest ? { passed: result.argumentValidationTest.passed, score: result.argumentValidationTest.score, details: result.argumentValidationTest.details } : undefined,
+      schemaReorderTest: result.schemaReorderTest ? { passed: result.schemaReorderTest.passed, score: result.schemaReorderTest.score, details: result.schemaReorderTest.details } : undefined,
+      toolScore: result.toolScore,
+      reasoningScore: result.reasoningScore,
+      overallScore: result.overallScore
+    };
+
+    if (result.reasoningProbes) {
+      probeResultsToSave.reasoningProbes = {
+        intentExtraction: { passed: result.reasoningProbes.intentExtraction.passed, score: result.reasoningProbes.intentExtraction.score, details: result.reasoningProbes.intentExtraction.details },
+        multiStepPlanning: { passed: result.reasoningProbes.multiStepPlanning.passed, score: result.reasoningProbes.multiStepPlanning.score, details: result.reasoningProbes.multiStepPlanning.details },
+        conditionalReasoning: { passed: result.reasoningProbes.conditionalReasoning.passed, score: result.reasoningProbes.conditionalReasoning.score, details: result.reasoningProbes.conditionalReasoning.details },
+        contextContinuity: { passed: result.reasoningProbes.contextContinuity.passed, score: result.reasoningProbes.contextContinuity.score, details: result.reasoningProbes.contextContinuity.details },
+        logicalConsistency: { passed: result.reasoningProbes.logicalConsistency.passed, score: result.reasoningProbes.logicalConsistency.score, details: result.reasoningProbes.logicalConsistency.details },
+        explanation: { passed: result.reasoningProbes.explanation.passed, score: result.reasoningProbes.explanation.score, details: result.reasoningProbes.explanation.details },
+        edgeCaseHandling: { passed: result.reasoningProbes.edgeCaseHandling.passed, score: result.reasoningProbes.edgeCaseHandling.score, details: result.reasoningProbes.edgeCaseHandling.details }
+      };
+    }
+
+    // Save strategic probes (3.x - 7.x)
+    if (result.strategicRAGProbes) {
+      probeResultsToSave.strategicRAGProbes = result.strategicRAGProbes;
+    }
+    if (result.architecturalProbes) {
+      probeResultsToSave.architecturalProbes = result.architecturalProbes;
+    }
+    if (result.navigationProbes) {
+      probeResultsToSave.navigationProbes = result.navigationProbes;
+    }
+    if (result.helicopterProbes) {
+      probeResultsToSave.helicopterProbes = result.helicopterProbes;
+    }
+    if (result.proactiveProbes) {
+      probeResultsToSave.proactiveProbes = result.proactiveProbes;
+    }
+    
+    // Save intent probes (8.x)
+    if (result.intentProbes) {
+      probeResultsToSave.intentProbes = result.intentProbes;
+      probeResultsToSave.intentScores = result.intentScores;
+    }
+    
+    // Save score breakdown
+    if (result.scoreBreakdown) {
+      probeResultsToSave.scoreBreakdown = result.scoreBreakdown;
+    }
+
+    // Save probe results to model profile
+    await capabilities.updateProbeResults(
+      modelId,
+      probeResultsToSave,
+      result.role,
+      result.contextLatency,
+      result.scoreBreakdown
+    );
+    
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to run probes:', error);
     res.status(500).json({ error: error.message });
   }
 });

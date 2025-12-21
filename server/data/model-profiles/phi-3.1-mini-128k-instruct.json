@@ -344,7 +344,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T17:55:02.087Z",
+    "testedAt": "2025-12-20T23:51:21.146Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -386,47 +386,10 @@
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 100,
-    "reasoningScore": 80,
-    "overallScore": 90,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": true,
-        "score": 80,
-        "details": "Valid intent JSON with reasoning"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 50,
-        "details": "Unclear action: "
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": false,
-        "score": 30,
-        "details": "Failed to identify logical conflict"
-      },
-      "explanation": {
-        "passed": true,
-        "score": 100,
-        "details": "Provided reasoning before action"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 100,
-        "details": "Properly handles edge case with fallback"
-      }
-    }
+    "reasoningScore": 0,
+    "overallScore": 100
   },
-  "role": "executor",
+  "role": "both",
   "contextLatency": {
     "testedContextSizes": [
       2048,

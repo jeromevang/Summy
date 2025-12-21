@@ -324,7 +324,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T17:41:26.896Z",
+    "testedAt": "2025-12-20T23:49:25.729Z",
     "emitTest": {
       "passed": false,
       "score": 10,
@@ -342,8 +342,8 @@
     },
     "suppressionTest": {
       "passed": true,
-      "score": 85,
-      "details": "No tool called, but response was: \"We have a user query about how to get a list of al\""
+      "score": 70,
+      "details": "No tool called but mentioned tools in response"
     },
     "nearIdenticalSelectionTest": {
       "passed": false,
@@ -365,46 +365,9 @@
       "score": 0,
       "details": "No tool calls emitted with reordered schema"
     },
-    "toolScore": 14,
-    "reasoningScore": 26,
-    "overallScore": 20,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found in response"
-      },
-      "multiStepPlanning": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON array found in response"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found"
-      },
-      "contextContinuity": {
-        "passed": false,
-        "score": 40,
-        "details": "Failed to use endpoint from previous context"
-      },
-      "logicalConsistency": {
-        "passed": false,
-        "score": 30,
-        "details": "Failed to identify logical conflict"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found"
-      },
-      "edgeCaseHandling": {
-        "passed": false,
-        "score": 30,
-        "details": "Did not address the edge case"
-      }
-    }
+    "toolScore": 12,
+    "reasoningScore": 0,
+    "overallScore": 12
   },
   "role": "none",
   "contextLatency": {

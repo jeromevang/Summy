@@ -327,7 +327,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T18:26:11.259Z",
+    "testedAt": "2025-12-21T00:01:32.535Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -369,45 +369,8 @@
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 53,
-    "reasoningScore": 50,
-    "overallScore": 52,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found in response"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found"
-      },
-      "contextContinuity": {
-        "passed": false,
-        "score": 20,
-        "details": "No context retention"
-      },
-      "logicalConsistency": {
-        "passed": true,
-        "score": 100,
-        "details": "Correctly identified conflict in structured format"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 70,
-        "details": "Mentions edge case in text response"
-      }
-    }
+    "reasoningScore": 0,
+    "overallScore": 53
   },
   "role": "executor",
   "contextLatency": {

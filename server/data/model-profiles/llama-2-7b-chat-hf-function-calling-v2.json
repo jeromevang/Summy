@@ -7,70 +7,6 @@
   "score": 83,
   "toolFormat": "openai_tools",
   "capabilities": {
-    "file_read": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 2,
-      "testsFailed": 0,
-      "avgLatency": 1490.5,
-      "lastTested": "2025-12-19T17:05:43.919Z"
-    },
-    "file_write": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 539,
-      "lastTested": "2025-12-19T17:05:43.919Z"
-    },
-    "file_patch": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 680,
-      "lastTested": "2025-12-19T17:05:43.919Z"
-    },
-    "file_list": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 618,
-      "lastTested": "2025-12-19T17:05:43.919Z"
-    },
-    "file_search": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 470,
-      "lastTested": "2025-12-19T17:05:43.919Z"
-    },
-    "create_new_file": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 415,
-      "lastTested": "2025-12-19T17:05:43.919Z"
-    },
-    "folder_create": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 357,
-      "lastTested": "2025-12-19T17:05:43.919Z"
-    },
-    "folder_delete": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 368,
-      "lastTested": "2025-12-19T17:05:43.919Z"
-    },
     "git_status": {
       "supported": false,
       "score": 45,
@@ -183,14 +119,6 @@
     }
   },
   "enabledTools": [
-    "file_read",
-    "file_write",
-    "file_patch",
-    "file_list",
-    "file_search",
-    "create_new_file",
-    "folder_create",
-    "folder_delete",
     "git_diff",
     "git_log",
     "git_commit",
@@ -341,7 +269,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T17:05:30.762Z",
+    "testedAt": "2025-12-20T23:33:34.320Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -383,47 +311,10 @@
       "details": "No tool calls emitted with reordered schema"
     },
     "toolScore": 82,
-    "reasoningScore": 54,
-    "overallScore": 68,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": true,
-        "score": 80,
-        "details": "Valid intent JSON with reasoning"
-      },
-      "multiStepPlanning": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON array found in response"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 25,
-        "details": "Invalid JSON"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": false,
-        "score": 30,
-        "details": "Failed to identify logical conflict"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 25,
-        "details": "Invalid JSON"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 100,
-        "details": "Properly handles edge case with fallback"
-      }
-    }
+    "reasoningScore": 0,
+    "overallScore": 82
   },
-  "role": "executor",
+  "role": "both",
   "contextLatency": {
     "testedContextSizes": [
       2048,
