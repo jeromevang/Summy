@@ -17,6 +17,10 @@ interface MetricsData {
   gpuMemory: number;
   gpuTemp: number;
   gpuName: string;
+  // VRAM details (new)
+  vramUsedMB: number;
+  vramTotalMB: number;
+  vramPercent: number;
 }
 
 interface NvidiaSmiData {
@@ -24,6 +28,9 @@ interface NvidiaSmiData {
   memory: number;
   temperature: number;
   name: string;
+  // VRAM details (new)
+  vramUsedMB: number;
+  vramTotalMB: number;
 }
 
 class SystemMetricsService {
@@ -104,7 +111,9 @@ class SystemMetricsService {
         utilization,
         memory: Math.round((memoryUsed / memoryTotal) * 100),
         temperature,
-        name
+        name,
+        vramUsedMB: memoryUsed,
+        vramTotalMB: memoryTotal
       };
     } catch {
       return null;
@@ -125,7 +134,10 @@ class SystemMetricsService {
           gpu: nvData.utilization,
           gpuMemory: nvData.memory,
           gpuTemp: nvData.temperature,
-          gpuName: nvData.name
+          gpuName: nvData.name,
+          vramUsedMB: nvData.vramUsedMB,
+          vramTotalMB: nvData.vramTotalMB,
+          vramPercent: nvData.memory
         };
       }
     }
@@ -134,15 +146,20 @@ class SystemMetricsService {
     const gpuData = await si.graphics();
     const gpu = gpuData.controllers[0];
     
+    const vramUsedMB = gpu?.memoryUsed ?? 0;
+    const vramTotalMB = gpu?.memoryTotal ?? 0;
+    const vramPercent = vramTotalMB > 0 ? Math.round((vramUsedMB / vramTotalMB) * 100) : 0;
+    
     return {
       timestamp: Date.now(),
       cpu: Math.round(cpuLoad.currentLoad),
       gpu: gpu?.utilizationGpu ?? 0,
-      gpuMemory: gpu?.memoryUsed && gpu?.memoryTotal 
-        ? Math.round((gpu.memoryUsed / gpu.memoryTotal) * 100) 
-        : 0,
+      gpuMemory: vramPercent,
       gpuTemp: gpu?.temperatureGpu ?? 0,
-      gpuName: this.gpuName
+      gpuName: this.gpuName,
+      vramUsedMB,
+      vramTotalMB,
+      vramPercent
     };
   }
 

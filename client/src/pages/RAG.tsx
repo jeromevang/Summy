@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 // Types
 interface RAGConfig {
@@ -179,9 +180,9 @@ const RAG: React.FC = () => {
   const [isLoadingChunks, setIsLoadingChunks] = useState(false);
   const [selectedChunk, setSelectedChunk] = useState<ChunkInfo | null>(null);
 
-  // Load data - each call is independent so one failure doesn't block others
+  // Load data via HTTP (initial load and fallback)
   const loadData = useCallback(async () => {
-    // Check connection
+    // Check connection via HTTP health endpoint
     try {
       const healthRes = await axios.get(`${API_BASE}/health`);
       setIsConnected(healthRes.data.healthy);
@@ -190,55 +191,105 @@ const RAG: React.FC = () => {
       setIsConnected(false);
     }
     
-    // Load stats
-    try {
-      const statsRes = await axios.get(`${API_BASE}/stats`);
-      setStats(statsRes.data);
-      if (statsRes.data.projectPath) {
-        setProjectPath(statsRes.data.projectPath);
-      }
-    } catch (error) {
-      console.error('Failed to load RAG stats:', error);
-    }
-    
-    // Load config - now persisted in database, always available
-    try {
-      const configRes = await axios.get(`${API_BASE}/config`);
-      setConfig(configRes.data);
-      if (configRes.data.lmstudio?.model) {
-        setSelectedModel(configRes.data.lmstudio.model);
-      }
-      // Load project path from config if not already set
-      if (configRes.data.project?.path && !projectPath) {
-        setProjectPath(configRes.data.project.path);
-      }
-    } catch (error) {
-      console.log('Failed to load RAG config:', error);
-    }
-    
-    // Load models - this works even without RAG server (queries LM Studio directly)
+    // Load models via HTTP (LM Studio query, not cached in RAG server state)
     try {
       const modelsRes = await axios.get(`${API_BASE}/models`);
       setModels(Array.isArray(modelsRes.data) ? modelsRes.data : []);
     } catch (error) {
       console.error('Failed to load embedding models:', error);
     }
-    
-    // Load progress
-    try {
-      const progressRes = await axios.get(`${API_BASE}/index/status`);
-      setProgress(progressRes.data);
-    } catch (error) {
-      console.error('Failed to load indexing progress:', error);
+  }, []);
+  
+  // Request refresh via WebSocket
+  const requestRefresh = useCallback(() => {
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'getStats' }));
+      ws.send(JSON.stringify({ type: 'getConfig' }));
+      ws.send(JSON.stringify({ type: 'getProgress' }));
+      ws.send(JSON.stringify({ type: 'getModels' }));
     }
   }, []);
 
+  // WebSocket connection for real-time updates
+  const wsRef = useRef<ReconnectingWebSocket | null>(null);
+  
   useEffect(() => {
+    // Initial data load (for things not covered by WebSocket)
     loadData();
     
-    // Poll for updates
-    const interval = setInterval(loadData, 5000);
-    return () => clearInterval(interval);
+    // Connect to RAG server WebSocket
+    const ws = new ReconnectingWebSocket('ws://localhost:3003');
+    wsRef.current = ws;
+    
+    ws.onopen = () => {
+      console.log('[RAG] WebSocket connected');
+      setIsConnected(true);
+    };
+    
+    ws.onclose = () => {
+      console.log('[RAG] WebSocket disconnected');
+      setIsConnected(false);
+    };
+    
+    ws.onerror = () => {
+      setIsConnected(false);
+    };
+    
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        
+        switch (message.type) {
+          case 'stats':
+            setStats(message.data);
+            if (message.data.projectPath) {
+              setProjectPath(message.data.projectPath);
+            }
+            break;
+            
+          case 'config':
+            setConfig(message.data);
+            if (message.data.lmstudio?.model) {
+              setSelectedModel(message.data.lmstudio.model);
+            }
+            if (message.data.project?.path && !projectPath) {
+              setProjectPath(message.data.project.path);
+            }
+            break;
+            
+          case 'indexProgress':
+            setProgress(message.data);
+            break;
+            
+          case 'models':
+            setModels(Array.isArray(message.data) ? message.data : []);
+            break;
+            
+          case 'indexCleared':
+            // Refresh stats after index cleared
+            ws.send(JSON.stringify({ type: 'getStats' }));
+            break;
+        }
+      } catch (e) {
+        // Ignore parse errors
+      }
+    };
+    
+    // Request models (not sent automatically on connect)
+    const requestModels = () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'getModels' }));
+      }
+    };
+    
+    // Request models after a short delay to ensure connection is ready
+    const modelsTimeout = setTimeout(requestModels, 500);
+    
+    return () => {
+      clearTimeout(modelsTimeout);
+      ws.close();
+    };
   }, [loadData]);
 
   // Open folder picker

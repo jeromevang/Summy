@@ -39,12 +39,14 @@ let config: RAGConfig = { ...defaultConfig };
 // Services
 let indexer: Indexer;
 
-// Save config to disk
+// Save config to disk and broadcast
 async function saveConfig(): Promise<void> {
   try {
     await fs.mkdir('./data', { recursive: true });
     await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2));
     console.log('[RAG Server] Config saved to', CONFIG_FILE);
+    // Broadcast config update to all connected clients
+    broadcast('config', config);
   } catch (err) {
     console.error('[RAG Server] Failed to save config:', err);
   }
@@ -101,6 +103,52 @@ function broadcast(type: string, data: any): void {
       client.send(message);
     }
   });
+}
+
+// Get current stats for broadcasting
+async function getStats() {
+  const vectorStore = getHNSWLibStore(config.storage.dataPath);
+  const embedder = getLMStudioEmbedder();
+  
+  let diskUsage = 0;
+  try {
+    const indexPath = path.resolve(config.storage.dataPath);
+    const files = await fs.readdir(indexPath);
+    for (const file of files) {
+      const stat = await fs.stat(path.join(indexPath, file));
+      diskUsage += stat.size;
+    }
+  } catch {
+    // Ignore if path doesn't exist
+  }
+  
+  return {
+    projectPath: config.project.path,
+    status: indexer.getProgress().status,
+    totalFiles: indexer.getProgress().processedFiles,
+    totalChunks: indexer.getProgress().chunksCreated,
+    totalVectors: vectorStore.size,
+    dimensions: vectorStore.dimensions,
+    storageSize: diskUsage,
+    embeddingModel: config.lmstudio.model,
+    embeddingModelLoaded: embedder.isLoaded,
+    fileWatcherActive: config.watcher.enabled && !!config.project.path
+  };
+}
+
+// Broadcast stats to all clients
+async function broadcastStats(): Promise<void> {
+  try {
+    const stats = await getStats();
+    broadcast('stats', stats);
+  } catch (error) {
+    console.error('[RAG Server] Failed to broadcast stats:', error);
+  }
+}
+
+// Broadcast config to all clients
+function broadcastConfig(): void {
+  broadcast('config', config);
 }
 
 // Initialize services
@@ -299,12 +347,17 @@ app.post('/api/rag/index', async (req: Request, res: Response) => {
     indexer.indexProject(projectPath).then(async result => {
       console.log('[RAG Server] Indexing completed:', result);
       
+      // Broadcast updated stats
+      await broadcastStats();
+      
       // Start file watcher
       if (config.watcher.enabled) {
         indexer.startWatcher(projectPath);
       }
-    }).catch(error => {
+    }).catch(async error => {
       console.error('[RAG Server] Indexing failed:', error);
+      // Broadcast stats even on failure
+      await broadcastStats();
     });
     
   } catch (error: any) {
@@ -726,12 +779,42 @@ initializeServices().then(() => {
   // Start WebSocket server
   const wss = new WebSocketServer({ port: WS_PORT });
 
-  wss.on('connection', (ws: WebSocket) => {
+  wss.on('connection', async (ws: WebSocket) => {
     console.log('[RAG Server] WebSocket client connected');
     wsClients.add(ws);
     
-    // Send current status on connection
+    // Send current state on connection
     ws.send(JSON.stringify({ type: 'indexProgress', data: indexer.getProgress() }));
+    ws.send(JSON.stringify({ type: 'config', data: config }));
+    
+    try {
+      const stats = await getStats();
+      ws.send(JSON.stringify({ type: 'stats', data: stats }));
+    } catch (error) {
+      console.error('[RAG Server] Failed to send initial stats:', error);
+    }
+    
+    // Handle client messages (requests for data refresh)
+    ws.on('message', async (data) => {
+      try {
+        const message = JSON.parse(data.toString());
+        
+        if (message.type === 'getStats') {
+          const stats = await getStats();
+          ws.send(JSON.stringify({ type: 'stats', data: stats }));
+        } else if (message.type === 'getConfig') {
+          ws.send(JSON.stringify({ type: 'config', data: config }));
+        } else if (message.type === 'getProgress') {
+          ws.send(JSON.stringify({ type: 'indexProgress', data: indexer.getProgress() }));
+        } else if (message.type === 'getModels') {
+          const embedder = getLMStudioEmbedder();
+          const models = await embedder.listModels();
+          ws.send(JSON.stringify({ type: 'models', data: models }));
+        }
+      } catch (error) {
+        console.error('[RAG Server] Failed to handle WS message:', error);
+      }
+    });
     
     ws.on('close', () => {
       console.log('[RAG Server] WebSocket client disconnected');

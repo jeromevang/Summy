@@ -16,5 +16,14 @@
   "proxyMode": "tooly",
   "enableDualModel": false,
   "mainModelId": "qwen/qwen3-coder-30b",
-  "executorModelId": ""
+  "executorModelId": "",
+  "smallModel": {
+    "enabled": true,
+    "modelId": "qwen2.5-coder-0.5b-instruct",
+    "maxTokens": 150,
+    "temperature": 0,
+    "timeout": 5000,
+    "cacheEnabled": true,
+    "cacheTTL": 300000
+  }
 }

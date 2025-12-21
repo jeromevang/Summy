@@ -5,7 +5,8 @@
  * 
  * Key behaviors:
  * - Dedicated 'rag-embedder' identifier to avoid conflicts with chat models
- * - Load on-demand, unload when done
+ * - Load on-demand and KEEP loaded (never auto-unload)
+ * - Never unload other models (chat models stay loaded)
  * - Singleton pattern to prevent race conditions
  */
 
@@ -48,6 +49,19 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
       this.client = new LMStudioClient();
     }
     return this.client;
+  }
+  
+  /**
+   * Check if embedding model is actually loaded in LM Studio
+   */
+  private async isModelLoadedInLMStudio(): Promise<boolean> {
+    try {
+      const client = this.getClient();
+      const loadedEmbeddings = await client.embedding.listLoaded();
+      return loadedEmbeddings.some(m => m.path === this.model || m.identifier === this.model);
+    } catch {
+      return false;
+    }
   }
   
   /**
@@ -157,11 +171,36 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
     try {
       console.log(`[LMStudioEmbedder] Loading model: ${this.model}`);
       
-      // Load embedding model using v1.5 API
-      this.embeddingModel = await client.embedding.model(this.model);
+      // Check if embedding model is already loaded in LM Studio
+      const alreadyLoaded = await this.isModelLoadedInLMStudio();
+      
+      if (alreadyLoaded) {
+        console.log(`[LMStudioEmbedder] Model already loaded in LM Studio, getting reference...`);
+        // Just get a reference to the already-loaded model
+        this.embeddingModel = await client.embedding.model(this.model);
+      } else {
+        console.log(`[LMStudioEmbedder] Model not loaded, loading now (will keep loaded)...`);
+        
+        // Load the embedding model explicitly - this will NOT unload other models
+        // The embedding.load() method loads the model alongside any existing chat models
+        try {
+          this.embeddingModel = await client.embedding.load(this.model, {
+            identifier: RAG_EMBEDDER_IDENTIFIER
+          });
+          console.log(`[LMStudioEmbedder] Model loaded with identifier: ${RAG_EMBEDDER_IDENTIFIER}`);
+        } catch (loadError: any) {
+          // If load() fails (API version mismatch), fall back to model() which assumes pre-loaded
+          if (loadError.message?.includes('not a function') || loadError.message?.includes('is not defined')) {
+            console.log(`[LMStudioEmbedder] Fallback: using model() reference (ensure model is loaded in LM Studio)`);
+            this.embeddingModel = await client.embedding.model(this.model);
+          } else {
+            throw loadError;
+          }
+        }
+      }
       
       this.isLoaded = true;
-      console.log(`[LMStudioEmbedder] Model loaded: ${this.model}`);
+      console.log(`[LMStudioEmbedder] Model ready: ${this.model}`);
       
       // Try to detect dimensions by doing a test embedding
       try {
@@ -181,24 +220,51 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
   }
   
   /**
-   * Unload the embedding model
+   * Clear the internal model reference.
+   * NOTE: This does NOT unload the model from LM Studio - the model stays loaded
+   * for quick re-use. This just clears our internal reference.
    */
   async unload(): Promise<void> {
     if (!this.isLoaded) {
       return;
     }
     
+    console.log(`[LMStudioEmbedder] Clearing model reference (model stays loaded in LM Studio)`);
+    
+    // Just clear our internal reference - model stays loaded in LM Studio
+    this.embeddingModel = null;
+    this.isLoaded = false;
+  }
+  
+  /**
+   * Force unload the embedding model from LM Studio.
+   * Use this only when explicitly requested (e.g., to free VRAM).
+   */
+  async forceUnload(): Promise<void> {
     try {
-      console.log(`[LMStudioEmbedder] Unloading model`);
+      const client = this.getClient();
       
-      // Just clear the reference - let LM Studio manage the actual model
+      console.log(`[LMStudioEmbedder] Force unloading model from LM Studio...`);
+      
+      // Try to unload by identifier first, then by model path
+      try {
+        await client.embedding.unload(RAG_EMBEDDER_IDENTIFIER);
+      } catch {
+        try {
+          await client.embedding.unload(this.model);
+        } catch {
+          // Model might already be unloaded
+        }
+      }
+      
       this.embeddingModel = null;
       this.isLoaded = false;
       
-      console.log(`[LMStudioEmbedder] Model unloaded`);
+      console.log(`[LMStudioEmbedder] Model force unloaded`);
       
     } catch (error: any) {
-      console.error(`[LMStudioEmbedder] Failed to unload:`, error);
+      console.error(`[LMStudioEmbedder] Failed to force unload:`, error);
+      this.embeddingModel = null;
       this.isLoaded = false;
     }
   }
@@ -230,8 +296,15 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
     } catch (error: any) {
       console.error('[LMStudioEmbedder] Embedding failed:', error);
       
-      // If model was unloaded externally, try reloading
-      if (error.message?.includes('not loaded') || error.message?.includes('not found')) {
+      // If model was unloaded externally (by LM Studio UI or VRAM pressure), reload it
+      const needsReload = 
+        error.message?.includes('not loaded') || 
+        error.message?.includes('not found') ||
+        error.message?.includes('unloaded') ||
+        error.message?.includes('Cannot find model');
+      
+      if (needsReload) {
+        console.log('[LMStudioEmbedder] Model was unloaded externally, reloading...');
         this.isLoaded = false;
         this.embeddingModel = null;
         await this.load();

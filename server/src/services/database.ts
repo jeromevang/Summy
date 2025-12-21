@@ -419,6 +419,111 @@ CREATE TABLE IF NOT EXISTS model_info (
   fetched_at TEXT DEFAULT CURRENT_TIMESTAMP,
   source TEXT -- 'huggingface', 'ollama', 'web'
 );
+
+-- ============================================================
+-- TOOLY AGENTIC HUB TABLES (New)
+-- ============================================================
+
+-- Model optimization profiles (v2)
+CREATE TABLE IF NOT EXISTS model_profiles_v2 (
+  model_id TEXT PRIMARY KEY,
+  display_name TEXT,
+  provider TEXT DEFAULT 'lmstudio',
+  raw_scores TEXT, -- JSON: AgenticScores
+  trainability_scores TEXT, -- JSON: TrainabilityScores
+  failure_profile TEXT, -- JSON: FailureProfile
+  precedence_matrix TEXT, -- JSON: PrecedenceMatrix
+  stateful_profile TEXT, -- JSON
+  anti_patterns TEXT, -- JSON: AntiPatternDetection
+  score_breakdown TEXT, -- JSON: ScoreBreakdown
+  recommended_role TEXT,
+  optimal_pairings TEXT, -- JSON array of model IDs
+  optimal_settings TEXT, -- JSON: ModelOptimalSettings
+  mcp_config_path TEXT,
+  tested_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  test_version INTEGER DEFAULT 1
+);
+
+-- Test history (for trends)
+CREATE TABLE IF NOT EXISTS test_history (
+  id TEXT PRIMARY KEY,
+  model_id TEXT NOT NULL,
+  test_mode TEXT, -- 'quick', 'standard', 'deep', 'optimization'
+  scores TEXT, -- JSON: ScoreBreakdown
+  duration_ms INTEGER,
+  test_count INTEGER,
+  passed_count INTEGER,
+  failed_count INTEGER,
+  timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Global user preferences (memory)
+CREATE TABLE IF NOT EXISTS memory_global (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  confidence REAL DEFAULT 1.0,
+  source TEXT, -- 'user_correction', 'observed_behavior', 'explicit_preference'
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Project-specific knowledge
+CREATE TABLE IF NOT EXISTS memory_project (
+  id TEXT PRIMARY KEY,
+  project_path TEXT NOT NULL,
+  key TEXT NOT NULL,
+  value TEXT NOT NULL,
+  importance TEXT DEFAULT 'normal', -- 'critical', 'high', 'normal', 'low'
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(project_path, key)
+);
+
+-- Learned patterns from interactions
+CREATE TABLE IF NOT EXISTS memory_patterns (
+  id TEXT PRIMARY KEY,
+  pattern_type TEXT NOT NULL, -- 'preference', 'correction', 'behavior', 'rule'
+  trigger TEXT NOT NULL,
+  action TEXT NOT NULL,
+  confidence REAL DEFAULT 0.5,
+  success_rate REAL DEFAULT 1.0,
+  occurrence_count INTEGER DEFAULT 1,
+  source TEXT, -- 'user_correction', 'observed_behavior', 'explicit_preference'
+  last_used TEXT DEFAULT CURRENT_TIMESTAMP,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Interaction history for learning (sparse storage)
+CREATE TABLE IF NOT EXISTS learning_interactions (
+  id TEXT PRIMARY KEY,
+  model_id TEXT NOT NULL,
+  user_request TEXT,
+  model_response TEXT,
+  tool_calls TEXT, -- JSON array
+  user_feedback TEXT, -- 'positive', 'negative', 'correction'
+  correction TEXT,
+  extracted_pattern_id TEXT REFERENCES memory_patterns(id),
+  timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- MCP model configurations
+CREATE TABLE IF NOT EXISTS mcp_model_configs (
+  model_id TEXT PRIMARY KEY,
+  tool_format TEXT DEFAULT 'openai', -- 'openai', 'xml'
+  enabled_tools TEXT, -- JSON array
+  disabled_tools TEXT, -- JSON array
+  tool_overrides TEXT, -- JSON
+  system_prompt_additions TEXT, -- JSON array
+  context_budget TEXT, -- JSON: ContextBudget
+  optimal_settings TEXT, -- JSON
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_test_history_model ON test_history(model_id);
+CREATE INDEX IF NOT EXISTS idx_memory_project_path ON memory_project(project_path);
+CREATE INDEX IF NOT EXISTS idx_memory_patterns_type ON memory_patterns(pattern_type);
+CREATE INDEX IF NOT EXISTS idx_learning_interactions_model ON learning_interactions(model_id);
 `;
 
 // ============================================================
@@ -1984,6 +2089,34 @@ class DatabaseService {
   runCleanup(): { backupsDeleted: number } {
     const backupsDeleted = this.cleanupExpiredBackups();
     return { backupsDeleted };
+  }
+
+  // ============================================================
+  // GENERIC QUERY METHODS (for new routes)
+  // ============================================================
+
+  /**
+   * Run a SELECT query and return all results
+   */
+  query(sql: string, params: any[] = []): any[] {
+    const stmt = this.db.prepare(sql);
+    return stmt.all(...params);
+  }
+
+  /**
+   * Run an INSERT/UPDATE/DELETE statement
+   */
+  run(sql: string, params: any[] = []): { changes: number; lastInsertRowid: number | bigint } {
+    const stmt = this.db.prepare(sql);
+    return stmt.run(...params);
+  }
+
+  /**
+   * Get a single row
+   */
+  get(sql: string, params: any[] = []): any {
+    const stmt = this.db.prepare(sql);
+    return stmt.get(...params);
   }
 }
 

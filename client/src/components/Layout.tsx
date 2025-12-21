@@ -12,6 +12,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   
   // Check if we're on the context editor page (dark theme)
   const isContextEditor = location.pathname.startsWith('/session/');
+  
+  // Check if we're on tooly pages (full width)
+  const isToolyPage = location.pathname.startsWith('/tooly');
 
   if (isContextEditor) {
     // Render without layout for context editor (it has its own full-page layout)
@@ -100,7 +103,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </nav>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className={`${isToolyPage ? 'w-full px-4' : 'max-w-7xl mx-auto'} py-6 sm:px-6 lg:px-8`}>
         {children}
       </main>
 
