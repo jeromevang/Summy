@@ -4,7 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Sessions from './pages/Sessions';
 import ContextEditor from './pages/ContextEditor';
-import Tooly from './pages/Tooly';
+import Tooly from './pages/tooly';
 import ModelDetail from './pages/ModelDetail';
 import Debug from './pages/Debug';
 import RAG from './pages/RAG';

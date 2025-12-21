@@ -2,8 +2,8 @@
   "modelId": "gemma-3-27b-tools-i1@iq1_m",
   "displayName": "gemma-3-27b-tools-i1@iq1_m",
   "provider": "lmstudio",
-  "testedAt": "2025-12-20T17:50:19.941Z",
-  "testVersion": 5,
+  "testedAt": "2025-12-21T19:38:50.045Z",
+  "testVersion": 6,
   "score": 87,
   "toolFormat": "openai_tools",
   "capabilities": {
@@ -12,96 +12,96 @@
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1301,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1344,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1475,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1648,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2020,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2072,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1740,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1809,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "git_add": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1584,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1731,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1781,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1874,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1646,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1872,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1233,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1617,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1563,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1898,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1560,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1761,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2350,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2678,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1925,
-      "lastTested": "2025-12-20T17:50:19.941Z",
+      "avgLatency": 2097,
+      "lastTested": "2025-12-21T19:38:50.045Z",
       "nativeAliases": [
         "open_browser"
       ]
@@ -111,8 +111,8 @@
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1883,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2024,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -125,208 +125,208 @@
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 1975.5,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2060,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "write_file": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2444,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2531,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "edit_file": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4114,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 4208,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "list_directory": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1652,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1819,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "search_files": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2061,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2263,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "create_directory": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1789,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2018,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "delete_file": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2143,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2227,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "delete_directory": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1765,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1839,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "get_file_info": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2196,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2291,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "git_blame": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2890,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2948,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "git_show": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1711,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2006,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "npm_test": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1459,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1504,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "web_search": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4956,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 5689,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "browser_take_screenshot": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 2370,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2503,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "shell_exec": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1783,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1853,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "memory_store": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 807,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 899,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "memory_retrieve": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1855,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1994,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "memory_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1447,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1555,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "text_summarize": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4913,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 5189,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "diff_files": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2428,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2614,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "process_list": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1533,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1678,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "zip_create": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2170,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2350,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "zip_extract": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2184,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2513,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "rag_query": {
       "supported": true,
       "score": 86,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 2432,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 2653.5,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "rag_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1445,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1638,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     },
     "rag_index": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1755,
-      "lastTested": "2025-12-20T17:50:19.941Z"
+      "avgLatency": 1967,
+      "lastTested": "2025-12-21T19:38:50.045Z"
     }
   },
   "enabledTools": [
@@ -367,251 +367,251 @@
       "testId": "read_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-5jstmym7kmhnjuhml572g\",\"object\":\"chat.completion\",\"created\":1766252935,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of config.json.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"726156672\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":442,\"completion_tokens\":48,\"total_tokens\":490},\"stats\":{},\"sy"
+      "response": "{\"id\":\"chatcmpl-kq2c916fjn5faj0afvwk5\",\"object\":\"chat.completion\",\"created\":1766345838,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of config.json.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"959624842\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":442,\"completion_tokens\":48,\"total_tokens\":490},\"stats\":{},\"sy"
     },
     {
       "testId": "read_file_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-tp3khjsiyrutzp8gte\",\"object\":\"chat.completion\",\"created\":1766252937,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of the file located at src/utils/helpers.ts.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"337973566\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":444,\"completion_tokens\":59,\""
+      "response": "{\"id\":\"chatcmpl-w2rqei3xusrdz0v6asd7p8\",\"object\":\"chat.completion\",\"created\":1766345840,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will read the contents of the file located at src/utils/helpers.ts.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"609180376\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":444,\"completion_tokens\":"
     },
     {
       "testId": "write_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-8zwvdqkj1ws76jz760jtbc\",\"object\":\"chat.completion\",\"created\":1766252939,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we write the file.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"415047907\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":486,\"completion_tokens\":"
+      "response": "{\"id\":\"chatcmpl-zf89ugp68xdqet4sdbxetd\",\"object\":\"chat.completion\",\"created\":1766345842,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we write the file.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"532201100\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":486,\"completion_tokens\":"
     },
     {
       "testId": "edit_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-31ewms9xd4394t8fzhwe0f\",\"object\":\"chat.completion\",\"created\":1766252941,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we can edit the file:\\n\\n1.  We need to use the `edit_file` tool to make changes to app.js. We will perform edits on the file by specifying the old port number and replacing it with the new port number. \\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"972111965\",\"function\":{\"name\":\"edit_file\",\"ar"
+      "response": "{\"id\":\"chatcmpl-xn6h1v8ktxswvlz0hwxyj\",\"object\":\"chat.completion\",\"created\":1766345844,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's how we can edit the file:\\n\\n1.  We need to use the `edit_file` tool to make changes to app.js. We will perform edits on the file by specifying the old port number and replacing it with the new port number. \\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"607691589\",\"function\":{\"name\":\"edit_file\",\"arg"
     },
     {
       "testId": "list_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-0qrdv53vbc1s585xtchtlkg\",\"object\":\"chat.completion\",\"created\":1766252945,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's list the files and directories in the src directory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"308850108\",\"function\":{\"name\":\"list_directory\",\"arguments\":\"{\\\"path\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":434,\"completion_tokens\":48,\"total_tokens\":48"
+      "response": "{\"id\":\"chatcmpl-hd38ppi4nlmgssk5yut4ir\",\"object\":\"chat.completion\",\"created\":1766345848,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's list the files and directories in the src directory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"257824410\",\"function\":{\"name\":\"list_directory\",\"arguments\":\"{\\\"path\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":434,\"completion_tokens\":48,\"total_tokens\":482"
     },
     {
       "testId": "search_files_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-i6h76y3i5h9wynhfc9u3xq\",\"object\":\"chat.completion\",\"created\":1766252947,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's search for TypeScript files within the project. I need to use `search_files` tool.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"259695750\",\"function\":{\"name\":\"search_files\",\"arguments\":\"{\\\"directory\\\":\\\"/\\\",\\\"pattern\\\":\\\"*.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_t"
+      "response": "{\"id\":\"chatcmpl-r1ikc55elkpbvbtg4rk5b\",\"object\":\"chat.completion\",\"created\":1766345850,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's search for TypeScript files within the project. I need to use `search_files` tool.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"566498112\",\"function\":{\"name\":\"search_files\",\"arguments\":\"{\\\"directory\\\":\\\"/\\\",\\\"pattern\\\":\\\"*.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_to"
     },
     {
       "testId": "create_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-9bocddjrtkdjm0mdtiibwj\",\"object\":\"chat.completion\",\"created\":1766252949,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can create a new directory for you. Let's call the tool `create_directory`.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"191930012\",\"function\":{\"name\":\"create_directory\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":431,\"completion_t"
+      "response": "{\"id\":\"chatcmpl-vqo1wq68r27ra8av5wdzp\",\"object\":\"chat.completion\",\"created\":1766345853,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can create a new directory for you. Let's call the tool `create_directory`.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"653189440\",\"function\":{\"name\":\"create_directory\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":431,\"completion_to"
     },
     {
       "testId": "delete_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-yw93kz7qn2hfxoja52tdvn\",\"object\":\"chat.completion\",\"created\":1766252951,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: delete the file named \\\"old_config.json\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"179098839\",\"function\":{\"name\":\"delete_file\",\"arguments\":\"{\\\"path\\\":\\\"old_config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":59,\"t"
+      "response": "{\"id\":\"chatcmpl-yste5eiwwmascfooo43hh\",\"object\":\"chat.completion\",\"created\":1766345855,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: delete the file named \\\"old_config.json\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"146597235\",\"function\":{\"name\":\"delete_file\",\"arguments\":\"{\\\"path\\\":\\\"old_config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":59,\"to"
     },
     {
       "testId": "delete_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-po2lb0noyym35pydbns\",\"object\":\"chat.completion\",\"created\":1766252953,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will delete the directory named \\\"temp\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"433606125\",\"function\":{\"name\":\"delete_directory\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":428,\"completion_tokens\":45,\"total_tokens\":473},\"stats\":{},\"s"
+      "response": "{\"id\":\"chatcmpl-nmznhzdgt6q7m9hm3uk7s\",\"object\":\"chat.completion\",\"created\":1766345857,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will delete the directory named \\\"temp\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"347923858\",\"function\":{\"name\":\"delete_directory\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":428,\"completion_tokens\":45,\"total_tokens\":473},\"stats\":{},"
     },
     {
       "testId": "get_file_info_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-k51fgyjyzhdyomaru73un9\",\"object\":\"chat.completion\",\"created\":1766252955,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can get information about the `package.json` file using the `get_file_info` tool.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"566181229\",\"function\":{\"name\":\"get_file_info\",\"arguments\":\"{\\\"path\\\":\\\"package.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":435,\"complet"
+      "response": "{\"id\":\"chatcmpl-uemm6idsl9bfhjukrcc3en\",\"object\":\"chat.completion\",\"created\":1766345859,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can get information about the `package.json` file using the `get_file_info` tool.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"474903389\",\"function\":{\"name\":\"get_file_info\",\"arguments\":\"{\\\"path\\\":\\\"package.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":435,\"complet"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-ia4yemfh0b5s9o2hwiqyh\",\"object\":\"chat.completion\",\"created\":1766252957,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"329403319\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":385,\"completion_tokens\":28,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-dljhgd6oxqtbcxp82zdyml\",\"object\":\"chat.completion\",\"created\":1766345861,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"785159558\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":385,\"completion_tokens\":28,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-mwkt9mnxq5k2f23n86jhos\",\"object\":\"chat.completion\",\"created\":1766252958,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"373191141\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":449,\"completion_tokens\":33,\"total_tokens\":482},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-x5i1o498hhg0gl3jp4v6e\",\"object\":\"chat.completion\",\"created\":1766345862,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"410145411\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":449,\"completion_tokens\":33,\"total_tokens\":482},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-zgq35epar7inj6mkjveusi\",\"object\":\"chat.completion\",\"created\":1766252960,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"git_log\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"553220352\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5,\\\"format\\\":\\\"oneline\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":472,\"completion_tokens\":43,\"total_tokens\":515},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-too"
+      "response": "{\"id\":\"chatcmpl-n2nb3b1njt4lpizs9qpzr\",\"object\":\"chat.completion\",\"created\":1766345864,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"git_log\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"357132842\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5,\\\"format\\\":\\\"oneline\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":472,\"completion_tokens\":43,\"total_tokens\":515},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tool"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-1ncnl8y03ax3qnqy6wz0qm\",\"object\":\"chat.completion\",\"created\":1766252962,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's commit those changes!\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"762260223\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":44,\"total_tokens\":468},\"stats\":{},\"system_fin"
+      "response": "{\"id\":\"chatcmpl-uichtnkczvv9gpdus5sqn\",\"object\":\"chat.completion\",\"created\":1766345866,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's commit those changes!\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"486557755\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":424,\"completion_tokens\":44,\"total_tokens\":468},\"stats\":{},\"system_fing"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-lhpilmi0abexf20r2xlti\",\"object\":\"chat.completion\",\"created\":1766252963,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"125900049\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":431,\"completion_tokens\":37,\"total_tokens\":468},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i"
+      "response": "{\"id\":\"chatcmpl-h6y6akdob1p2ucneuu5dsx\",\"object\":\"chat.completion\",\"created\":1766345868,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"319943962\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":431,\"completion_tokens\":37,\"total_tokens\":468},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-"
     },
     {
       "testId": "git_add_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-abamczhr6do2t80t17lnm\",\"object\":\"chat.completion\",\"created\":1766252965,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"670446017\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":33,\"total_tokens\":454},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-fwy6kga58ysvcgcdix8fp\",\"object\":\"chat.completion\",\"created\":1766345870,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"321324355\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":421,\"completion_tokens\":33,\"total_tokens\":454},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-fqecefj1rtdmjm78yt2dxi\",\"object\":\"chat.completion\",\"created\":1766252967,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's list all git branches.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"672771360\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{\\\"all\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":416,\"completion_tokens\":44,\"total_tokens\":460},\"stats\":{},\"system_fingerprint\":\""
+      "response": "{\"id\":\"chatcmpl-ss5jfaksms7szite6ldaf\",\"object\":\"chat.completion\",\"created\":1766345871,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's list all git branches.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"101410092\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{\\\"all\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":416,\"completion_tokens\":44,\"total_tokens\":460},\"stats\":{},\"system_fingerprint\":\"g"
     },
     {
       "testId": "git_blame_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-83eo52ks6e8zqptid9l53i\",\"object\":\"chat.completion\",\"created\":1766252968,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's start by blaming lines in server.ts. I need to specify which lines I want blamed. Let's blame all lines for now.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"912420203\",\"function\":{\"name\":\"git_blame\",\"arguments\":\"{\\\"file\\\":\\\"server.ts\\\",\\\"startLine\\\":1,\\\"endLine\\\":10}\"}}]},\"logprobs\":null,\"finish_r"
+      "response": "{\"id\":\"chatcmpl-y6k3znkpiesc9mm9okppok\",\"object\":\"chat.completion\",\"created\":1766345873,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's start by blaming lines in server.ts. I need to specify which lines I want blamed. Let's blame all lines for now.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"630481848\",\"function\":{\"name\":\"git_blame\",\"arguments\":\"{\\\"file\\\":\\\"server.ts\\\",\\\"startLine\\\":1,\\\"endLine\\\":10}\"}}]},\"logprobs\":null,\"finish_r"
     },
     {
       "testId": "git_show_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-myg16mfbk7mnaf1453629k\",\"object\":\"chat.completion\",\"created\":1766252971,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I can do. To show details of the latest commit, I need to use git_show.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"988518640\",\"function\":{\"name\":\"git_show\",\"arguments\":\"{\\\"ref\\\":\\\"latest\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":448,\"completion_tokens\":"
+      "response": "{\"id\":\"chatcmpl-hlb19pertrf945yp8vfb7\",\"object\":\"chat.completion\",\"created\":1766345876,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I can do. To show details of the latest commit, I need to use git_show.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"660602450\",\"function\":{\"name\":\"git_show\",\"arguments\":\"{\\\"ref\\\":\\\"latest\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":448,\"completion_tokens\":5"
     },
     {
       "testId": "npm_run_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-6s71fgv2tm478fpabuvl9f\",\"object\":\"chat.completion\",\"created\":1766252973,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"593600869\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":423,\"completion_tokens\":31,\"total_tokens\":454},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
+      "response": "{\"id\":\"chatcmpl-qm8n5boka2h5a18dua17e3\",\"object\":\"chat.completion\",\"created\":1766345878,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"327444441\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":423,\"completion_tokens\":31,\"total_tokens\":454},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
     },
     {
       "testId": "npm_install_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-1dlm8txb137iim5n6sf6l1a\",\"object\":\"chat.completion\",\"created\":1766252974,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can install the lodash package using npm_install.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"909173366\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":442,\"completion_tokens\":48,\"total_tokens\":490},\""
+      "response": "{\"id\":\"chatcmpl-k8i5gil19jdken1487oe1d\",\"object\":\"chat.completion\",\"created\":1766345880,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can install the lodash package using npm_install.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"797309096\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":442,\"completion_tokens\":48,\"total_tokens\":490},\"s"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-8csrk0qro4p482f0ywny\",\"object\":\"chat.completion\",\"created\":1766252976,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will uninstall the axios package using npm_uninstall.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"348336163\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":423,\"completion_tokens\":46,\"total_tokens\":469}"
+      "response": "{\"id\":\"chatcmpl-c3df75v9axf76il07tvt4e\",\"object\":\"chat.completion\",\"created\":1766345882,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will uninstall the axios package using npm_uninstall.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"740123216\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":423,\"completion_tokens\":46,\"total_tokens\":46"
     },
     {
       "testId": "npm_test_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-qlvg7hqenilfeyzj9t6m1f\",\"object\":\"chat.completion\",\"created\":1766252977,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's run npm test!\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"193702520\",\"function\":{\"name\":\"npm_test\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":383,\"completion_tokens\":39,\"total_tokens\":422},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m"
+      "response": "{\"id\":\"chatcmpl-itvivckfuqwf027fcspz\",\"object\":\"chat.completion\",\"created\":1766345883,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's run npm test!\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"962205699\",\"function\":{\"name\":\"npm_test\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":383,\"completion_tokens\":39,\"total_tokens\":422},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tools-i1@iq1_m\"}"
     },
     {
       "testId": "http_request_get",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-7szyztnwfwvugzv3op507i\",\"object\":\"chat.completion\",\"created\":1766252979,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can fetch data from https://api.example.com/users using the `http_request` tool. Let's get started!\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"379368336\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usa"
+      "response": "{\"id\":\"chatcmpl-f7bv5af2j8smo1m2v9tt8\",\"object\":\"chat.completion\",\"created\":1766345885,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can fetch data from https://api.example.com/users using the `http_request` tool. Let's get started!\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"459188091\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usag"
     },
     {
       "testId": "web_search_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2us959kytayfcfryg7wzpk\",\"object\":\"chat.completion\",\"created\":1766252981,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"TypeScript generics allow type parameters in generic functions and classes, enabling flexibility and code reuse. They can be used to define types for various scenarios like specifying constraints or creating reusable components. Here's a breakdown of TypeScript generics:\\n\\n**Type Parameters:** Generics are def"
+      "response": "{\"id\":\"chatcmpl-kc4bmnb5wmpnt55l2ujcrf\",\"object\":\"chat.completion\",\"created\":1766345888,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"TypeScript generics allow type parameters in generic functions and classes, enabling flexibility and code reuse. They can be used to define types for various scenarios like specifying constraints or creating reusable components. Here's a breakdown of TypeScript generics:\\n\\n**Type Parameters:** Generics are def"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-uptpcqoempq08w0ysduligg\",\"object\":\"chat.completion\",\"created\":1766252986,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will navigate to GitHub and retrieve the page title.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"865487862\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":50,\"tota"
+      "response": "{\"id\":\"chatcmpl-tldp844feffuk95n010ob\",\"object\":\"chat.completion\",\"created\":1766345893,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will navigate to GitHub and retrieve the page title.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"558040247\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":432,\"completion_tokens\":50,\"total_"
     },
     {
       "testId": "browser_screenshot_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-henz55u6715f372k9fp2wf\",\"object\":\"chat.completion\",\"created\":1766252988,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will take a screenshot of the current page. Let's save it to a file named \\\"screenshot.png\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"675556102\",\"function\":{\"name\":\"browser_take_screenshot\",\"arguments\":\"{\\\"path\\\":\\\"screenshot.png\\\",\\\"fullPage\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_call"
+      "response": "{\"id\":\"chatcmpl-7mhuq1zsmb5tauve5zbdhc\",\"object\":\"chat.completion\",\"created\":1766345895,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will take a screenshot of the current page. Let's save it to a file named \\\"screenshot.png\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"500206251\",\"function\":{\"name\":\"browser_take_screenshot\",\"arguments\":\"{\\\"path\\\":\\\"screenshot.png\\\",\\\"fullPage\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_call"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ubfqeq5lmki5xbiotcgmwj\",\"object\":\"chat.completion\",\"created\":1766252990,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's the tool call:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"513559028\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":47,\"total_tokens\":472},\"stats\":{},\"system_fin"
+      "response": "{\"id\":\"chatcmpl-mtcz0wx4e845h4njzrpzg\",\"object\":\"chat.completion\",\"created\":1766345898,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's the tool call:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"917295623\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":47,\"total_tokens\":472},\"stats\":{},\"system_fing"
     },
     {
       "testId": "shell_exec_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-5ng42tw8d4sxvs5q4n9krm\",\"object\":\"chat.completion\",\"created\":1766252992,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's execute the shell command \\\"echo Hello\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"731839225\",\"function\":{\"name\":\"shell_exec\",\"arguments\":\"{\\\"command\\\":\\\"echo Hello\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":478,\"completion_tokens\":47,\"total_tokens\":525},\"st"
+      "response": "{\"id\":\"chatcmpl-fu9hoageyk442qcnbmxfc\",\"object\":\"chat.completion\",\"created\":1766345900,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's execute the shell command \\\"echo Hello\\\".\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"334011061\",\"function\":{\"name\":\"shell_exec\",\"arguments\":\"{\\\"command\\\":\\\"echo Hello\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":478,\"completion_tokens\":47,\"total_tokens\":525},\"sta"
     },
     {
       "testId": "memory_store_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-gp8fhdtpyqnwdsqbzb6j9\",\"object\":\"chat.completion\",\"created\":1766252994,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I understand. I will use the available tools when appropriate and respond normally otherwise. I know Alice is my user's name. \\n\\nLet's begin!\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":454,\"completion_tokens\":37,\"total_tokens\":491},\"stats\":{},\"system_fingerprint\""
+      "response": "{\"id\":\"chatcmpl-s1mdifazhfyi1mmck3es\",\"object\":\"chat.completion\",\"created\":1766345902,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I understand. I will use the available tools when appropriate and respond normally otherwise. I know Alice is my user's name. \\n\\nLet's begin!\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":454,\"completion_tokens\":37,\"total_tokens\":491},\"stats\":{},\"system_fingerprint\":"
     },
     {
       "testId": "memory_retrieve_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-dljciqfde56vd9dhmbag37\",\"object\":\"chat.completion\",\"created\":1766252995,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To find out what the user's name is, I need to retrieve it from memory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"675099313\",\"function\":{\"name\":\"memory_retrieve\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":428,\"completion_tokens\":54,\"tota"
+      "response": "{\"id\":\"chatcmpl-z9psxrqdd8kff2pfqpype\",\"object\":\"chat.completion\",\"created\":1766345903,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To find out what the user's name is, I need to retrieve it from memory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"398854866\",\"function\":{\"name\":\"memory_retrieve\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":428,\"completion_tokens\":54,\"total"
     },
     {
       "testId": "memory_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-1kae678nts2j2y4yvfscge\",\"object\":\"chat.completion\",\"created\":1766252997,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what you have stored in memory:\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"699254326\",\"function\":{\"name\":\"memory_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":388,\"completion_tokens\":41,\"total_tokens\":429},\"stats\":{},\"system_fingerprint\":\"gemma-"
+      "response": "{\"id\":\"chatcmpl-y3d3pqsu3fajupfcuzyg5\",\"object\":\"chat.completion\",\"created\":1766345905,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what you have stored in memory:\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"192567393\",\"function\":{\"name\":\"memory_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":388,\"completion_tokens\":41,\"total_tokens\":429},\"stats\":{},\"system_fingerprint\":\"gemma-3"
     },
     {
       "testId": "text_summarize_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-xy07m2jgvncmszq9givcg\",\"object\":\"chat.completion\",\"created\":1766252998,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"This is a short article, so it shouldn't be too difficult to summarize! It says: \\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.\\\"\\n\\nLet's try summarizing this text u"
+      "response": "{\"id\":\"chatcmpl-daggl4o26gl0wb8vts5ygy\",\"object\":\"chat.completion\",\"created\":1766345906,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"This is a short article, so it shouldn't be too difficult to summarize! It says: \\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.\\\"\\n\\nLet's try summarizing this text "
     },
     {
       "testId": "diff_files_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-zn5i5vaeraqmi2030acoq\",\"object\":\"chat.completion\",\"created\":1766253003,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: Compare the files \\\"old.txt\\\" and \\\"new.txt\\\" and show me the differences.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"407564304\",\"function\":{\"name\":\"diff_files\",\"arguments\":\"{\\\"file1\\\":\\\"old.txt\\\",\\\"file2\\\":\\\"new.txt\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{"
+      "response": "{\"id\":\"chatcmpl-hlzg62ze4rnxmgm3oh4of\",\"object\":\"chat.completion\",\"created\":1766345911,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: Compare the files \\\"old.txt\\\" and \\\"new.txt\\\" and show me the differences.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"185442469\",\"function\":{\"name\":\"diff_files\",\"arguments\":\"{\\\"file1\\\":\\\"old.txt\\\",\\\"file2\\\":\\\"new.txt\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{"
     },
     {
       "testId": "process_list_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-owjo6fhwabe23wax86p458\",\"object\":\"chat.completion\",\"created\":1766253005,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's the tool call:\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"116185278\",\"function\":{\"name\":\"process_list\",\"arguments\":\"{\\\"filter\\\":\\\"node\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":416,\"completion_tokens\":41,\"total_tokens\":457},\"stats\":{},\"system_fingerprint\":\"gemma"
+      "response": "{\"id\":\"chatcmpl-52qgvh6zufh0fxwjvk3e85t\",\"object\":\"chat.completion\",\"created\":1766345914,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's the tool call:\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"918462005\",\"function\":{\"name\":\"process_list\",\"arguments\":\"{\\\"filter\\\":\\\"node\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":416,\"completion_tokens\":41,\"total_tokens\":457},\"stats\":{},\"system_fingerprint\":\"gemm"
     },
     {
       "testId": "zip_create_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-j1le298579lrpua87txkyc\",\"object\":\"chat.completion\",\"created\":1766253007,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can create a zip archive of the \\\"src\\\" folder. Here's how it will work:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"740069372\",\"function\":{\"name\":\"zip_create\",\"arguments\":\"{\\\"output\\\":\\\"backup.zip\\\",\\\"sources\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":481,"
+      "response": "{\"id\":\"chatcmpl-txlsm63bjo9au8yxcv0v5d\",\"object\":\"chat.completion\",\"created\":1766345916,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I can create a zip archive of the \\\"src\\\" folder. Here's how it will work:\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"181857001\",\"function\":{\"name\":\"zip_create\",\"arguments\":\"{\\\"output\\\":\\\"backup.zip\\\",\\\"sources\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":481,"
     },
     {
       "testId": "zip_extract_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-bc0y1ulgqbi1giqcsq28jz\",\"object\":\"chat.completion\",\"created\":1766253009,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: extract the archive \\\"data.zip\\\" to the current directory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"445881712\",\"function\":{\"name\":\"zip_extract\",\"arguments\":\"{\\\"archive\\\":\\\"data.zip\\\",\\\"destination\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tok"
+      "response": "{\"id\":\"chatcmpl-yr90x9sau8q2u1ac7v41i6\",\"object\":\"chat.completion\",\"created\":1766345918,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, here's what I will do: extract the archive \\\"data.zip\\\" to the current directory.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"842007824\",\"function\":{\"name\":\"zip_extract\",\"arguments\":\"{\\\"archive\\\":\\\"data.zip\\\",\\\"destination\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tok"
     },
     {
       "testId": "rag_query_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-uhhrkq1ve6ufgtcovn7fi\",\"object\":\"chat.completion\",\"created\":1766253011,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's search the codebase for where user authentication is handled using `rag_query`.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"743573170\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"where is user authentication handled?\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"u"
+      "response": "{\"id\":\"chatcmpl-ffux1qeg02ppbxf77dbeff\",\"object\":\"chat.completion\",\"created\":1766345921,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's search the codebase for where user authentication is handled using `rag_query`.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"260786301\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"where is user authentication handled?\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\""
     },
     {
       "testId": "rag_query_with_filter",
       "passed": true,
       "score": 72,
-      "response": "{\"id\":\"chatcmpl-92wgh8lbp2vy83zufhdft\",\"object\":\"chat.completion\",\"created\":1766253014,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's find those TypeScript files! I will use `rag_query` to search for relevant code snippets.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"939553444\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"TypeScript files handling database connections\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason"
+      "response": "{\"id\":\"chatcmpl-on5z8l4n6bmibxj8opu3o\",\"object\":\"chat.completion\",\"created\":1766345923,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, let's find those TypeScript files! I will use `rag_query` to search for relevant code snippets.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"962044043\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"TypeScript files handling database connections\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason"
     },
     {
       "testId": "rag_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-rl9e8x5nc6g33sb1r8vstg\",\"object\":\"chat.completion\",\"created\":1766253016,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will check the status of the RAG indexing system.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"253788420\",\"function\":{\"name\":\"rag_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":404,\"completion_tokens\":44,\"total_tokens\":448},\"stats\":{},\"system_finger"
+      "response": "{\"id\":\"chatcmpl-v9b7tyd2kmqu7k94opl1h\",\"object\":\"chat.completion\",\"created\":1766345926,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Okay, I will check the status of the RAG indexing system.\\n\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"457179262\",\"function\":{\"name\":\"rag_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":404,\"completion_tokens\":44,\"total_tokens\":448},\"stats\":{},\"system_fingerp"
     },
     {
       "testId": "rag_index_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-untsvl6c6h8aeyd882tnbc\",\"object\":\"chat.completion\",\"created\":1766253018,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"163035721\",\"function\":{\"name\":\"rag_index\",\"arguments\":\"{\\\"projectPath\\\":\\\"/home/user/myproject\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":443,\"completion_tokens\":39,\"total_tokens\":482},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-to"
+      "response": "{\"id\":\"chatcmpl-mh0nf2195pcp6v7p1ykn\",\"object\":\"chat.completion\",\"created\":1766345928,\"model\":\"gemma-3-27b-tools-i1@iq1_m\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"183423976\",\"function\":{\"name\":\"rag_index\",\"arguments\":\"{\\\"projectPath\\\":\\\"/home/user/myproject\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":443,\"completion_tokens\":39,\"total_tokens\":482},\"stats\":{},\"system_fingerprint\":\"gemma-3-27b-tool"
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-20T23:32:36.049Z",
+    "testedAt": "2025-12-21T19:37:11.588Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -653,10 +653,942 @@
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 100,
-    "reasoningScore": 0,
-    "overallScore": 100
+    "reasoningScore": 86,
+    "overallScore": 68,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": true,
+        "score": 80,
+        "details": "Valid intent JSON with reasoning"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 50,
+        "details": "Unclear action: package.json"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": true,
+        "score": 100,
+        "details": "Provided reasoning before action"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    },
+    "strategicRAGProbes": [
+      {
+        "id": "3.1",
+        "name": "RAG Priority",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 6187,
+        "details": "Correctly used RAG as first tool",
+        "expectedBehavior": "Model should call rag_query BEFORE file reads",
+        "variants": [
+          {
+            "id": "3.1a",
+            "prompt": "Explain the login flow",
+            "passed": true,
+            "score": 100,
+            "response": "Okay, let's explore the login flow in the codebase. I will start by using `rag_query` to find relevant code related to login functionality. Then I can read files if needed.\n\n\n"
+          },
+          {
+            "id": "3.1b",
+            "prompt": "Where is user authentication handled?",
+            "passed": false,
+            "score": 0,
+            "response": "To understand where user authentication is handled, I' *rag_query* to find out how authentication works in the codebase. Specifically, I want to know what files contain information on authentication. "
+          }
+        ]
+      },
+      {
+        "id": "3.2",
+        "name": "Hierarchical Search",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 9018,
+        "details": "Used RAG but query could be broader",
+        "expectedBehavior": "Should use broader query to get architectural overview",
+        "variants": [
+          {
+            "id": "3.2a",
+            "prompt": "How are the different parts of this codebase connected?",
+            "passed": true,
+            "score": 60,
+            "response": "This is a good question! To understand how all the pieces connect, I'd like to start by using semantic search to get an overview of the codebase. Then I can read specific files and see how they intera"
+          },
+          {
+            "id": "3.2b",
+            "prompt": "Give me a high-level overview of the project structure",
+            "passed": false,
+            "score": 0,
+            "response": "Okay, here's a high-level overview of the project structure. It appears this codebase is built using semantic search to find code and understand how things work. The tools available allow us to query "
+          }
+        ]
+      },
+      {
+        "id": "3.3",
+        "name": "Tool Chaining",
+        "category": "3.x",
+        "passed": true,
+        "score": 70,
+        "latency": 4403,
+        "details": "Used RAG but no follow-up read",
+        "expectedBehavior": "Should RAG first, then read_file for details",
+        "variants": [
+          {
+            "id": "3.3a",
+            "prompt": "Find the JWT validation logic and explain how it works",
+            "passed": true,
+            "score": 70,
+            "response": "To find the JWT validation logic, I'l start with a semantic search using `rag_query`. Then I can examine the code to understand how it works.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "3.4",
+        "name": "Error Recovery",
+        "category": "3.x",
+        "passed": false,
+        "score": 30,
+        "latency": 4637,
+        "details": "Did not acknowledge search failure",
+        "expectedBehavior": "Should acknowledge not found and offer alternatives",
+        "variants": [
+          {
+            "id": "3.4a",
+            "prompt": "Where is the blockchain integration?",
+            "passed": false,
+            "score": 30,
+            "response": "To understand where the blockchain integration happens, I need to start with a semantic search of the codebase.\n\n[TOOL_RESULT]\n[END_TOOL_RESULT]\n\n"
+          }
+        ]
+      },
+      {
+        "id": "3.5",
+        "name": "Result Synthesis",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 5494,
+        "details": "Good synthesis of flow",
+        "expectedBehavior": "Should search, then synthesize coherent explanation",
+        "variants": [
+          {
+            "id": "3.5a",
+            "prompt": "Trace a user login request from frontend to backend",
+            "passed": true,
+            "score": 100,
+            "response": "Okay, let's trace a user login request from frontend to backend. I'll start by searching for files related to user login using semantic search with `rag_query`. Then I can read those files and see how"
+          }
+        ]
+      },
+      {
+        "id": "3.6",
+        "name": "Self-Correction",
+        "category": "3.x",
+        "passed": true,
+        "score": 50,
+        "latency": 4887,
+        "details": "Only one RAG query, could refine",
+        "expectedBehavior": "Should try different queries if first doesnt find it",
+        "variants": [
+          {
+            "id": "3.6a",
+            "prompt": "Find how roles are enforced in the API",
+            "passed": true,
+            "score": 50,
+            "response": "To find how roles are enforced, I'd like to start with semantic search using `rag_query`. This will help me understand where roles are implemented and how they work.\n\n\n"
+          }
+        ]
+      }
+    ],
+    "architecturalProbes": [
+      {
+        "id": "4.1",
+        "name": "Code Comprehension",
+        "category": "4.x",
+        "passed": true,
+        "score": 60,
+        "latency": 6612,
+        "details": "Partial understanding",
+        "expectedBehavior": "Should explain JWT validation and user attachment",
+        "variants": [
+          {
+            "id": "4.1a",
+            "prompt": "Explain what db.service does",
+            "passed": false,
+            "score": 20,
+            "response": "Okay, let's figure out what `db.service` does. I'll start by using semantic search to find where `db.service` is used and how it's implemented.\n\n\n"
+          },
+          {
+            "id": "4.1b",
+            "prompt": "How does the UserService class work?",
+            "passed": true,
+            "score": 60,
+            "response": "To understand how the UserService class works, I will start by searching for it using semantic search. Then I can examine its implementation details.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "4.2",
+        "name": "Bug Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 50,
+        "latency": 7021,
+        "details": "Mentioned security but missed specific issue",
+        "expectedBehavior": "Should identify jwt.decode vs jwt.verify issue",
+        "variants": [
+          {
+            "id": "4.2a",
+            "prompt": "Is the refresh token validation secure?",
+            "passed": false,
+            "score": 0,
+            "response": "This is a good question! To determine whether the refresh token validation is secure, I need to investigate how it's implemented. Let's start by searching the codebase using semantic search.\n\n\n"
+          },
+          {
+            "id": "4.2b",
+            "prompt": "Find security vulnerabilities in auth.ts",
+            "passed": true,
+            "score": 50,
+            "response": "Okay, let's start by searching for the `auth` file using semantic search to find potential vulnerabilities.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "4.3",
+        "name": "SQL Injection Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 7112,
+        "details": "Did not identify SQL injection",
+        "expectedBehavior": "Should identify string concatenation in SQL query",
+        "variants": [
+          {
+            "id": "4.3a",
+            "prompt": "Is the search query in UserService.java safe?",
+            "passed": false,
+            "score": 0,
+            "response": "To determine if the search query in UserService.java is safe, I need to examine the code using semantic search. Let's start by searching for UserService.java and then querying the code within it.\n\n\n"
+          },
+          {
+            "id": "4.3b",
+            "prompt": "Review database queries for injection vulnerabilities",
+            "passed": true,
+            "score": 50,
+            "response": "Okay, let's review database queries for potential injection vulnerabilities. I will start by searching for common database query functions using semantic search with `rag_query`. Then I can read files"
+          }
+        ]
+      },
+      {
+        "id": "4.4",
+        "name": "XSS Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 100,
+        "latency": 7131,
+        "details": "Correctly identified XSS vulnerability",
+        "expectedBehavior": "Should identify dangerouslySetInnerHTML vulnerability",
+        "variants": [
+          {
+            "id": "4.4a",
+            "prompt": "Is user input properly sanitized in LoginForm?",
+            "passed": true,
+            "score": 100,
+            "response": "To determine if user input is properly sanitized in LoginForm, I need to examine the LoginForm class. First, I'l use `rag_query` to search for where LoginForm is defined and how it handles user input "
+          },
+          {
+            "id": "4.4b",
+            "prompt": "Find XSS issues in the React components",
+            "passed": true,
+            "score": 100,
+            "response": "To find XSS issues in React components, I need to examine the codebase using semantic search. Let's start by searching for occurrences of \"XSS\" or \"cross script\" within the codebase.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "4.5",
+        "name": "Architecture Inference",
+        "category": "4.x",
+        "passed": false,
+        "score": 30,
+        "latency": 5767,
+        "details": "Did not identify patterns",
+        "expectedBehavior": "Should identify layered architecture, MVC/service pattern",
+        "variants": [
+          {
+            "id": "4.5a",
+            "prompt": "How is the code organized?",
+            "passed": false,
+            "score": 30,
+            "response": "The codebase organization depends on how many files there are, but generally it's pretty standard. The code is broken down into modules that each handle specific parts of the system. There's a lot of "
+          }
+        ]
+      },
+      {
+        "id": "4.6",
+        "name": "Language Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 4948,
+        "details": "Did not identify languages",
+        "expectedBehavior": "Should identify TypeScript, Java, JSX",
+        "variants": [
+          {
+            "id": "4.6a",
+            "prompt": "What tech stack is this project using?",
+            "passed": false,
+            "score": 0,
+            "response": "Okay, let's start by searching the codebase with `rag_query` to see if we can find clues about the tech stack used in the project.\n\n\n"
+          }
+        ]
+      }
+    ],
+    "navigationProbes": [
+      {
+        "id": "5.1",
+        "name": "Locate Implementation",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 6713,
+        "details": "Found password hashing",
+        "expectedBehavior": "Should locate bcrypt.hash usage",
+        "variants": [
+          {
+            "id": "5.1a",
+            "prompt": "Where is password hashing implemented?",
+            "passed": true,
+            "score": 100,
+            "response": "To find where password hashing is implemented, I's start with searching the codebase using semantic search.\n\n\n"
+          },
+          {
+            "id": "5.1b",
+            "prompt": "How is password security handled?",
+            "passed": true,
+            "score": 50,
+            "response": "To understand how password security is handled, I'd like to start with a semantic search of the codebase using `rag_query`. This will help me find where password security is implemented and what techn"
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "name": "Cross-Stack Navigation",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 4960,
+        "details": "Did not navigate cross-stack",
+        "expectedBehavior": "Should find both frontend and backend auth",
+        "variants": [
+          {
+            "id": "5.2a",
+            "prompt": "Show me auth across frontend and backend",
+            "passed": false,
+            "score": 0,
+            "response": "Okay, let's start by searching for files related to authentication. I will begin with `rag_query` to get a better understanding of how authentication is implemented in the codebase.\n\n[TOOL_RESULT]\n[EN"
+          }
+        ]
+      },
+      {
+        "id": "5.3",
+        "name": "Dependency Tracing",
+        "category": "5.x",
+        "passed": false,
+        "score": 20,
+        "latency": 5068,
+        "details": "Did not trace dependencies",
+        "expectedBehavior": "Should list services and middleware dependencies",
+        "variants": [
+          {
+            "id": "5.3a",
+            "prompt": "What does index.ts import?",
+            "passed": true,
+            "score": 100,
+            "response": "To understand what `index.ts` imports, I need to find its dependencies using semantic search. Let's start by searching for files that import from `index.ts`.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "5.4",
+        "name": "Entry Point Location",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 4409,
+        "details": "Found entry points",
+        "expectedBehavior": "Should find index.ts/App.tsx entry points",
+        "variants": [
+          {
+            "id": "5.4a",
+            "prompt": "What is the main entry file?",
+            "passed": true,
+            "score": 100,
+            "response": "rag_query can help find the main entry file, so let's start there.\n"
+          }
+        ]
+      },
+      {
+        "id": "5.5",
+        "name": "Shared Code Detection",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 4827,
+        "details": "Found shared code",
+        "expectedBehavior": "Should find shared-utils package",
+        "variants": [
+          {
+            "id": "5.5a",
+            "prompt": "Are there reusable utilities?",
+            "passed": true,
+            "score": 100,
+            "response": "This is an excellent question! To determine if there are reusable utilities, I'd like to start by searching the codebase using semantic search. This will help me find common patterns or implementation"
+          }
+        ]
+      }
+    ],
+    "helicopterProbes": [
+      {
+        "id": "6.1",
+        "name": "Project Overview",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 5385,
+        "details": "Good concise overview",
+        "expectedBehavior": "Should summarize project purpose and structure",
+        "variants": [
+          {
+            "id": "6.1a",
+            "prompt": "What is this codebase about?",
+            "passed": true,
+            "score": 100,
+            "response": "This codebase appears to be about managing user profiles, specifically focusing on their email addresses and associated metadata. It seems like it's designed to handle different types of users (e.g., "
+          }
+        ]
+      },
+      {
+        "id": "6.2",
+        "name": "Stack Enumeration",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 5074,
+        "details": "Found few stacks",
+        "expectedBehavior": "Should list Node, React, React Native, Java, Mendix",
+        "variants": [
+          {
+            "id": "6.2a",
+            "prompt": "List all the project folders and their purposes",
+            "passed": false,
+            "score": 20,
+            "response": "To list all project folders and their purposes, I need to understand what constitutes \"the codebase\". Let's start by searching for files with a common pattern.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "6.3",
+        "name": "Team Structure Inference",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 5161,
+        "details": "Suggested team structure",
+        "expectedBehavior": "Should suggest backend/frontend/mobile teams",
+        "variants": [
+          {
+            "id": "6.3a",
+            "prompt": "Who would work on what parts?",
+            "passed": false,
+            "score": 30,
+            "response": "Okay, let's figure out who works on what parts of the codebase. To start, I need to understand how things are organized. I will begin by using `rag_query` to search for common patterns in the codebase"
+          }
+        ]
+      },
+      {
+        "id": "6.4",
+        "name": "Risk Assessment",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 11419,
+        "details": "Identified risks",
+        "expectedBehavior": "Should mention security issues, coupling, etc",
+        "variants": [
+          {
+            "id": "6.4a",
+            "prompt": "Any red flags in this code?",
+            "passed": false,
+            "score": 20,
+            "response": "This looks like a pretty straightforward codebase, so I'd expect minimal red flags. Let's start with a semantic search to get a feel for things.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "6.5",
+        "name": "Improvement Suggestions",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 4867,
+        "details": "No improvement suggestions",
+        "expectedBehavior": "Should suggest specific improvements",
+        "variants": [
+          {
+            "id": "6.5a",
+            "prompt": "What would you refactor first?",
+            "passed": false,
+            "score": 20,
+            "response": "This is an open ended question, but I're going to start with rag_query to get some context. Let's see what we have in terms of codebase information.\n\n[TOOL_RESULT]\n[END_TOOL_RESULT]\n\n"
+          }
+        ]
+      }
+    ],
+    "proactiveProbes": [
+      {
+        "id": "7.1",
+        "name": "Proactive Security Findings",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 4508,
+        "details": "Did not proactively find issues",
+        "expectedBehavior": "Should proactively mention connection leak",
+        "variants": [
+          {
+            "id": "7.1a",
+            "prompt": "Review db.service.ts",
+            "passed": false,
+            "score": 20,
+            "response": "Okay, I'd like to review `db.service.ts`. Let's start with a semantic search query to get me started.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "7.2",
+        "name": "Improvement Suggestions",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2917,
+        "details": "No proactive suggestions",
+        "expectedBehavior": "Should suggest error handling, cancellation",
+        "variants": [
+          {
+            "id": "7.2a",
+            "prompt": "Can this hook be improved?",
+            "passed": true,
+            "score": 100,
+            "response": "To answer \"Can this hook be improved?\", I need to understand what 'this' refers to. Let's start by searching for files related to hooks, and then see if we can find the relevant hook implementation us"
+          }
+        ]
+      },
+      {
+        "id": "7.3",
+        "name": "Documentation Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 4291,
+        "details": "Did not mention docs but reviewed",
+        "expectedBehavior": "May note missing prop types or docs",
+        "variants": [
+          {
+            "id": "7.3a",
+            "prompt": "What do you think of ProductCard?",
+            "passed": true,
+            "score": 50,
+            "response": "ProductCard is likely related to product cards within the codebase. To understand how it works, I'd like to search the codebase using semantic search.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "7.4",
+        "name": "Best Practice Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 60,
+        "latency": 4833,
+        "details": "Reviewed but no best practices",
+        "expectedBehavior": "Should mention best practices for auth",
+        "variants": [
+          {
+            "id": "7.4a",
+            "prompt": "Is the auth middleware well-implemented?",
+            "passed": true,
+            "score": 60,
+            "response": "To determine if the auth middleware is well-implemented, I need to examine its implementation. First, let's find where it's defined and what files are involved.\n\n\n\nOnce I have the results from rag_que"
+          }
+        ]
+      },
+      {
+        "id": "7.5",
+        "name": "Testing Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2917,
+        "details": "Reviewed without test mentions",
+        "expectedBehavior": "May suggest adding tests",
+        "variants": [
+          {
+            "id": "7.5a",
+            "prompt": "Review shared-utils/validation.ts",
+            "passed": true,
+            "score": 50,
+            "response": "Okay, I'd like to review the file `shared-utils/validation.ts`. Let me start by reading it into my workspace.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "7.6",
+        "name": "Performance Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2695,
+        "details": "Reviewed without perf notes",
+        "expectedBehavior": "May note re-render or pagination concerns",
+        "variants": [
+          {
+            "id": "7.6a",
+            "prompt": "Any performance issues in UserList?",
+            "passed": true,
+            "score": 100,
+            "response": "Let's see what's happening with UserList. I will start by searching for files related to UserList, then reading them to understand any performance issues.\n\nFirst, let's find the files that contain \"Us"
+          }
+        ]
+      },
+      {
+        "id": "7.7",
+        "name": "Edge Case Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 100,
+        "latency": 4545,
+        "details": "Identified edge cases",
+        "expectedBehavior": "Should identify edge cases in error handling",
+        "variants": [
+          {
+            "id": "7.7a",
+            "prompt": "What if login fails?",
+            "passed": true,
+            "score": 50,
+            "response": "This question requires understanding how login failures are handled in the codebase. I'd start with semantic search to find where login failures are handled.\n\n\n"
+          }
+        ]
+      },
+      {
+        "id": "7.8",
+        "name": "Accessibility Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 4222,
+        "details": "Reviewed without a11y notes",
+        "expectedBehavior": "May note accessibility labels or concerns",
+        "variants": [
+          {
+            "id": "7.8a",
+            "prompt": "Is LoginScreen accessible?",
+            "passed": true,
+            "score": 100,
+            "response": "To determine accessibility, I need to find where LoginScreen is used in the codebase. I'l start with a semantic search using `rag_query`.\n\n\n"
+          }
+        ]
+      }
+    ],
+    "intentProbes": [
+      {
+        "id": "8.1a",
+        "name": "Implicit RAG - Question",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": true,
+        "score": 70,
+        "details": "Used search but not RAG",
+        "toolsInvoked": [
+          "search_files"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1b",
+        "name": "Implicit RAG - Bug Report",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not investigate bug",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1c",
+        "name": "Implicit File Read",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 80,
+        "details": "Searched for file via RAG",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "read_file",
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2a",
+        "name": "RAG vs File Read Decision",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly started with RAG for broad question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2b",
+        "name": "Specific vs Broad Query",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Did not read the requested file",
+        "toolsInvoked": [
+          "search_files"
+        ],
+        "expectedTools": [
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.3a",
+        "name": "Knowledge Question - No Tools",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Unnecessarily invoked tools for knowledge question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3b",
+        "name": "Clarification Request",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not seek clarification",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3c",
+        "name": "Follow-up Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for database context",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4a",
+        "name": "Code Question Without Context",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched before answering",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4b",
+        "name": "Specific Code Location",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Located and examined the code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.5a",
+        "name": "Ambiguous Reference",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 20,
+        "details": "Acted without clarification",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.5b",
+        "name": "Multiple Interpretations",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Made reasonable assumption",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6a",
+        "name": "Implicit Security Review",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Asked for more context",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6b",
+        "name": "Performance Concern Hint",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for user list implementation",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.7a",
+        "name": "Dual Request",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Addressed both auth and error logging",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8a",
+        "name": "Hypothetical Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched but did not modify",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8b",
+        "name": "Just Asking",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched without modifying",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      }
+    ],
+    "intentScores": {
+      "invokeCorrectness": 71,
+      "toolSelectionAccuracy": 67,
+      "actionCorrectness": 65,
+      "overInvocationRate": 80,
+      "underInvocationRate": 8,
+      "overallIntentScore": 66
+    },
+    "scoreBreakdown": {
+      "toolScore": 100,
+      "reasoningScore": 86,
+      "ragScore": 68,
+      "bugDetectionScore": 50,
+      "architecturalScore": 40,
+      "navigationScore": 64,
+      "helicopterScore": 68,
+      "proactiveScore": 50,
+      "intentScore": 66,
+      "overallScore": 68
+    }
   },
-  "role": "both",
+  "role": "executor",
   "contextLatency": {
     "testedContextSizes": [
       2048,
@@ -684,5 +1616,17 @@
   "unmappedNativeTools": [
     "get_weather",
     "send_email"
-  ]
+  ],
+  "scoreBreakdown": {
+    "toolScore": 100,
+    "reasoningScore": 86,
+    "ragScore": 68,
+    "bugDetectionScore": 50,
+    "architecturalScore": 40,
+    "navigationScore": 64,
+    "helicopterScore": 68,
+    "proactiveScore": 50,
+    "intentScore": 66,
+    "overallScore": 68
+  }
 }
