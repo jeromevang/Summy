@@ -139,6 +139,7 @@ class LMStudioModelManager {
           wsBroadcast.broadcastModelLoading(model.identifier, 'unloading', 'Unloading to prepare for new model');
           await client.llm.unload(model.identifier);
           console.log(`[ModelManager] Unloaded ${model.identifier}`);
+          wsBroadcast.broadcastModelLoading(model.identifier, 'unloaded', 'Model unloaded');
         } catch (error: any) {
           console.log(`[ModelManager] Could not unload ${model.identifier}: ${error.message}`);
         }
@@ -207,8 +208,10 @@ class LMStudioModelManager {
           wsBroadcast.broadcastModelLoading(model.identifier, 'unloading', 'Unloading');
           await client.llm.unload(model.identifier);
           console.log(`[ModelManager] Unloaded ${model.identifier}`);
+          wsBroadcast.broadcastModelLoading(model.identifier, 'unloaded', 'Model unloaded');
         } catch (error: any) {
           console.log(`[ModelManager] Could not unload ${model.identifier}: ${error.message}`);
+          wsBroadcast.broadcastModelLoading(model.identifier, 'failed', `Unload failed: ${error.message}`);
         }
       }
 
@@ -240,8 +243,10 @@ class LMStudioModelManager {
       }
       
       console.log(`[ModelManager] Unloaded ${modelId}`);
+      wsBroadcast.broadcastModelLoading(modelId, 'unloaded', 'Model unloaded');
     } catch (error: any) {
       console.log(`[ModelManager] Could not unload ${modelId}: ${error.message}`);
+      wsBroadcast.broadcastModelLoading(modelId, 'failed', `Unload failed: ${error.message}`);
     }
   }
 

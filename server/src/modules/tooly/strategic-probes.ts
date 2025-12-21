@@ -829,7 +829,8 @@ export const PROBE_CATEGORIES: ProbeCategory[] = [
 
 export async function runProbeCategory(
   categoryId: string,
-  executeChat: (prompt: string) => Promise<{ response: any; toolCalls: any[] }>
+  executeChat: (prompt: string) => Promise<{ response: any; toolCalls: any[] }>,
+  onProgress?: (probeName: string, probeIndex: number, totalProbes: number, score?: number) => void
 ): Promise<ProbeTestResult[]> {
   const category = PROBE_CATEGORIES.find(c => c.id === categoryId);
   if (!category) {
@@ -837,9 +838,16 @@ export async function runProbeCategory(
   }
 
   const results: ProbeTestResult[] = [];
+  const totalProbes = category.probes.length;
 
-  for (const probe of category.probes) {
+  for (let i = 0; i < category.probes.length; i++) {
+    const probe = category.probes[i];
     const startTime = Date.now();
+    
+    // Broadcast progress for this specific probe
+    if (onProgress) {
+      onProgress(`${category.icon} ${probe.name}`, i, totalProbes);
+    }
     
     try {
       const { response, toolCalls } = await executeChat(probe.prompt);
