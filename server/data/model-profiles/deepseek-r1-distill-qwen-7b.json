@@ -2,9 +2,9 @@
   "modelId": "deepseek-r1-distill-qwen-7b",
   "displayName": "deepseek-r1-distill-qwen-7b",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T16:55:41.802Z",
-  "testVersion": 4,
-  "score": 80,
+  "testedAt": "2025-12-20T23:28:20.803Z",
+  "testVersion": 5,
+  "score": 76,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -76,110 +76,321 @@
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3168,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 1904,
+      "lastTested": "2025-12-20T23:28:20.802Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1758,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 4485,
+      "lastTested": "2025-12-20T23:28:20.802Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 884,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 3264,
+      "lastTested": "2025-12-20T23:28:20.802Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2211,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 3024,
+      "lastTested": "2025-12-20T23:28:20.802Z"
     },
     "git_add": {
-      "supported": false,
-      "score": 50,
+      "supported": true,
+      "score": 100,
       "testsPassed": 1,
-      "testsFailed": 1,
-      "avgLatency": 3010.5,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "testsFailed": 0,
+      "avgLatency": 2514,
+      "lastTested": "2025-12-20T23:28:20.802Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2056,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 2664,
+      "lastTested": "2025-12-20T23:28:20.802Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1797,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 4722,
+      "lastTested": "2025-12-20T23:28:20.803Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1918,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 2672,
+      "lastTested": "2025-12-20T23:28:20.803Z"
     },
     "npm_install": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 2773,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3798,
+      "lastTested": "2025-12-20T23:28:20.803Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1247,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 4481,
+      "lastTested": "2025-12-20T23:28:20.803Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2406,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 3851,
+      "lastTested": "2025-12-20T23:28:20.803Z"
     },
     "browser_navigate": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 2890,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4337,
+      "lastTested": "2025-12-20T23:28:20.803Z"
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2321,
-      "lastTested": "2025-12-19T16:55:41.802Z"
+      "avgLatency": 3215,
+      "lastTested": "2025-12-20T23:28:20.803Z"
     },
     "mcp_rules": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 0
+    },
+    "read_file": {
+      "supported": false,
+      "score": 50,
+      "testsPassed": 1,
+      "testsFailed": 1,
+      "avgLatency": 3594.5,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "write_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3969,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "edit_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3707,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "list_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3888,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "search_files": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3889,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "create_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2907,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "delete_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2149,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "delete_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2205,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "get_file_info": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4304,
+      "lastTested": "2025-12-20T23:28:20.802Z"
+    },
+    "git_blame": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 4627,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "git_show": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3070,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "npm_test": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3689,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "web_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3621,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "browser_take_screenshot": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 2900,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "shell_exec": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4842,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "memory_store": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2940,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "memory_retrieve": {
+      "supported": false,
+      "score": 20,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3752,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "memory_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 2287,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "text_summarize": {
+      "supported": false,
+      "score": 20,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 4943,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "diff_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3674,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "process_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 3203,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "zip_create": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3912,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "zip_extract": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2098,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "rag_query": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 2605.5,
+      "lastTested": "2025-12-20T23:28:20.803Z"
+    },
+    "rag_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1697,
+      "lastTested": "2025-12-20T23:28:20.803Z",
+      "nativeAliases": [
+        "tool_name"
+      ]
+    },
+    "rag_index": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 4326,
+      "lastTested": "2025-12-20T23:28:20.803Z"
     }
   },
   "enabledTools": [
@@ -193,163 +404,287 @@
     "git_diff",
     "git_log",
     "git_commit",
+    "git_add",
     "git_branch_create",
     "npm_run",
+    "npm_install",
     "npm_uninstall",
     "http_request",
-    "run_python"
+    "browser_navigate",
+    "run_python",
+    "write_file",
+    "list_directory",
+    "create_directory",
+    "delete_file",
+    "delete_directory",
+    "get_file_info",
+    "shell_exec",
+    "memory_store",
+    "diff_files",
+    "zip_create",
+    "zip_extract",
+    "rag_query",
+    "rag_index"
   ],
   "testResults": [
     {
-      "testId": "file_read_basic",
+      "testId": "read_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-yj9nvfmtufl96es5q6wpf\",\"object\":\"chat.completion\",\"created\":1766273160,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to read the contents of the file called \\\"config.json\\\" using the available tools. Let me start by looking at what's provided.\\n\\nThe user mentioned that there's a function called \\\"read_file\\\" which can be used to read complete files from the filesystem. The parameter"
+    },
+    {
+      "testId": "read_file_nested",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-0ntfpqgakxlai4b473vv62\",\"object\":\"chat.completion\",\"created\":1766163287,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" \\n\\nOkay, so I need to figure out how to read the contents of a file called \\\"config.json\\\" using the provided tool. Let me break this down step by step.\\n\\nFirst, looking at the instructions, there's a function called file_read which can be used to read a file. The parameters for this function require an obj"
+      "response": "{\"id\":\"chatcmpl-c7koy2q8qq48axdvohztr9\",\"object\":\"chat.completion\",\"created\":1766273164,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I'm trying to figure out how to use the available tool to check what's in the file located at src/utils/helpers.ts. Let me break this down step by step.\\n\\nFirst, I know that the user wants to inspect a specific TypeScript file. The tools provided include a \\\"read_file\\\" function which can re"
     },
     {
-      "testId": "file_read_nested",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-ictkqw5jjpdeijkhuukbqf\",\"object\":\"chat.completion\",\"created\":1766163291,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" but I don't have access to that file yet. How can I proceed?\\n\\nOkay, so I'm trying to figure out how to check if there's an error in the file src/utils/helpers.ts without actually accessing it. Hmm, maybe I can use some of the tools available to me.\\n\\nWait, there's a function called file_read which can read"
-    },
-    {
-      "testId": "file_write_basic",
+      "testId": "write_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-0h3kkfda9hjqn178vxl3vjl\",\"object\":\"chat.completion\",\"created\":1766163294,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a new file called \\\"hello.js\\\" and have its content be \\\"console.log('Hello World');\\\". Let me think about how to do this using the tools available.\\n\\nFirst, looking at the tools provided, there's a function called file_write. It can write content to a file, creating it if "
+      "response": "{\"id\":\"chatcmpl-9ow2m68y2onv23b2o4tgxn\",\"object\":\"chat.completion\",\"created\":1766273168,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a new file called \\\"hello.js\\\" and have its content be \\\"console.log('Hello World')\\\". Let me think about how to do this using the tools available.\\n\\nFirst, looking at the tools provided, there's only one function available: write_file. This tool can create a new file or ove"
     },
     {
-      "testId": "file_patch_basic",
-      "passed": true,
-      "score": 99,
-      "response": "{\"id\":\"chatcmpl-l1ydqjrscgnf3ejvm7v7g\",\"object\":\"chat.completion\",\"created\":1766163297,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To address the request of changing the port number in app.js from 3000 to 8080, I need to use the available tool, which is the file_patch function. \\n\\nFirst, I'll identify the exact location where the port number is defined in app.js. Typically, this would be at the beginning of the server declaration, such a"
+      "testId": "edit_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-fuhgkwwccteur1j3zb79ie\",\"object\":\"chat.completion\",\"created\":1766273172,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to change the port number in app.js from 3000 to 8080 using the available tool. Let me think about this step by step.\\n\\nFirst, I remember that the tool is called \\\"edit_file\\\" and it's a function type. The parameters required are \\\"path\\\", which would be the path to "
     },
     {
-      "testId": "file_list_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-5qzkc9aasmctkll13emdpp\",\"object\":\"chat.completion\",\"created\":1766163300,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show me all files in the src directory, I need to use the \\\"file_list\\\" tool provided. \\n\\nFirst, I'll identify which parameters are required for this tool. The tool expects a \\\"folder\\\" parameter, which defaults to the current directory if not specified.\\n\\nSince the user specifically asked for files in t"
-    },
-    {
-      "testId": "file_search_basic",
+      "testId": "list_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-55rwz8y0uc26fw0bzdwsc6\",\"object\":\"chat.completion\",\"created\":1766163302,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to search through multiple project files for any occurrence of the text \\\"TODO\\\". \\n\\nFirst, I'll use the `file_search` tool by providing it with two parameters: the query set to \\\"TODO\\\" and the path where all the project files are located. This will allow me to scan each file t"
+      "response": "{\"id\":\"chatcmpl-50clqagn85fyqokkhtoyj\",\"object\":\"chat.completion\",\"created\":1766273175,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show me all the files in the src directory using the available tool. Let's see, from the user's message, they mentioned that there's a function called list_directory which can get a detailed listing of files and directories in a specified path.\\n\\nFirst, I should ch"
+    },
+    {
+      "testId": "search_files_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-6jl3liyo9fipx43fnad2f\",\"object\":\"chat.completion\",\"created\":1766273179,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to search for all TypeScript files in the project using the available tool. The user mentioned that they can use the \\\"search_files\\\" function, which is designed for recursive searching of files matching a pattern. \\n\\nFirst, I should recall what the parameters require"
+    },
+    {
+      "testId": "create_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-gfylv2yfafwrbqjd97fb6b\",\"object\":\"chat.completion\",\"created\":1766273183,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to create a new folder called \\\"components\\\". I remember that there's a tool available for creating directories. Let me check the tools provided. Yes, there's a function called create_directory which can be used for this purpose.\\n\\nI need to figure out how to use this tool "
+    },
+    {
+      "testId": "delete_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-jg7d213olki49rju74aqs7\",\"object\":\"chat.completion\",\"created\":1766273186,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to delete a file called \\\"old_config.json\\\". Let me think about how to do this using the available tool. The only tool provided is \\\"delete_file\\\", which takes a path as an argument. \\n\\nFirst, I should make sure that the file exists before trying to delete it. But since I don't have a"
+    },
+    {
+      "testId": "delete_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-j9h6whwt6dss4a19u6w1x\",\"object\":\"chat.completion\",\"created\":1766273188,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to delete the folder named \\\"temp\\\". Let me think about how to do this using the available tools. The user mentioned that there's a function called \\\"delete_directory\\\" which can be used by providing the path of the directory.\\n\\nFirst, I should figure out what exactly is needed for the"
+    },
+    {
+      "testId": "get_file_info_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-73vcz8bejq5qdy3p95vhd\",\"object\":\"chat.completion\",\"created\":1766273190,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to get the file size and modification date of package.json using the available tool. Let me think through this step by step.\\n\\nFirst, I know that the user is asking for specific details about a file: its size in bytes and its last modified date. The file they're inter"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-6y4nq21tdxftw34n4ohu9a\",\"object\":\"chat.completion\",\"created\":1766163304,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To check the current git status, I should use the \\\"git_status\\\" function provided by the toolset. The function requires parameters that define what kind of status report is needed. Typically, Git provides information about stages, commits, branches, and merged files. \\n\\nI need to specify which parts of the "
+      "response": "{\"id\":\"chatcmpl-f7e165xv5uszpe96j1gz7a\",\"object\":\"chat.completion\",\"created\":1766273195,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to check the current git status of my repository using the available tool. The tool is called \\\"git_status\\\" and it's a function type. Looking at its parameters, it requires an object with properties but no required ones. So I can call it without any arguments.\\n\\nI remember that when "
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-a2hs0dmdxr465gza1vftn\",\"object\":\"chat.completion\",\"created\":1766163307,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show the git diff for the file \\\"index.js\\\", I should use the `git_diff` tool. \\n\\nFirst, I need to call the tool with the appropriate parameters. The tool requires a `file` parameter set to \\\"index.js\\\". Since this is optional, but in this case, it's necessary because we're looking at a specific file.\\n\\nS"
+      "response": "{\"id\":\"chatcmpl-2d7vz85ayodjmjza9pclx\",\"object\":\"chat.completion\",\"created\":1766273196,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the git diff for the file \\\"index.js\\\". The user has provided some information about available tools and how to use them. Let me break this down step by step.\\n\\nFirst, looking at the tools listed, there's a function called \\\"git_diff\\\" which seems relevant her"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-jgowur947yofp15zqlspc6\",\"object\":\"chat.completion\",\"created\":1766163308,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show the last 5 commits, I can use the git_log tool by setting the count parameter to 5.\\n</think>\\n\\nTo display the last five commits in your repository using the git_log tool:\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"586082409\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":\\\"5\\\"}\"}}]},\"logprobs"
+      "response": "{\"id\":\"chatcmpl-4wzzs79zoybhdsyi1li18\",\"object\":\"chat.completion\",\"created\":1766273201,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the last five git commits using the available tool. The user asked for \\\"Show me the last 5 commits.\\\" Looking at the tools provided, there's a function called git_log which seems relevant.\\n\\nFirst, I should check what parameters are needed for git_log. From t"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-xs1pjqk6npm9pvanvw0c5f\",\"object\":\"chat.completion\",\"created\":1766163309,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to commit changes related to fixing a login bug. The user has provided a specific tool called `git_commit` which allows me to make commits with messages. \\n\\nFirst, I should check if there are any existing parameters required for the `git_commit` function. According to the descri"
+      "response": "{\"id\":\"chatcmpl-92hz1thgoo6s891qudyuz\",\"object\":\"chat.completion\",\"created\":1766273204,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to commit all my changes with the message \\\"Fix login bug.\\\" Let me think about how to do this using the available tool. \\n\\nFirst, looking at the tools provided, there's a function called git_commit which allows me to commit staged changes. The parameters required are just the message,"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-fkogy9b0ihwlop87gjnzxf\",\"object\":\"chat.completion\",\"created\":1766163312,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user wants to create a new branch named \\\"feature/user-auth\\\". Looking at the available tools, there's a \\\"git_branch_create\\\" function that can be used for this purpose. \\n\\nI need to structure the tool request correctly. According to the instructions, I should use the exact format with \\\"TOOL_REQUEST\\\" "
-    },
-    {
-      "testId": "npm_run_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-0aihnsipjqj1vi71u0uhi9\",\"object\":\"chat.completion\",\"created\":1766163314,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user has requested to run the \\\"build\\\" npm script using the provided tool, which is called \\\"npm_run\\\". To execute this, I need to structure the request correctly according to the specified format.\\n\\nFirst, identify the tool and its function. The tool is \\\"npm_run\\\", and it requires a parameter named \\\""
-    },
-    {
-      "testId": "npm_install_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-73rc7bh5dbesmohdn5cxvp\",\"object\":\"chat.completion\",\"created\":1766163316,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to figure out how to install the lodash package using the provided tools. The user has given me access to an npm_install tool which can be used to install any npm package by specifying its name as a parameter.\\n\\nFirst, I should identify if lodash is available on npm. From my kno"
-    },
-    {
-      "testId": "http_request_get",
-      "passed": true,
-      "score": 99,
-      "response": "{\"id\":\"chatcmpl-wg95amdhjorcvey2vnz77t\",\"object\":\"chat.completion\",\"created\":1766163318,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To fetch data from the provided URL, I need to use the `http_request` function. This function allows me to make an HTTP request by specifying the URL, method, and body. Since no body is required for fetching user data, I'll set it to an empty string.\\n\\nI should ensure that all required parameters are include"
-    },
-    {
-      "testId": "browser_navigate_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-j2bv0rd86z8kulxbeag2o9\",\"object\":\"chat.completion\",\"created\":1766163321,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To solve this problem, I need to open the GitHub homepage at https://github.com and retrieve its title using the provided tool.\\n\\nFirst, I'll identify which tool is suitable for this task. The available tool is \\\"browser_navigate,\\\" which allows navigating to a webpage and optionally clicking elements or ret"
-    },
-    {
-      "testId": "create_new_file_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-o62qcwinsa7hrgbt7r2go\",\"object\":\"chat.completion\",\"created\":1766163324,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To create a new empty file named \\\"README.md\\\", I should use the `create_new_file` function provided by the toolset. \\n\\nFirst, I need to identify the required parameters for this function. According to the description, the function requires a \\\"path\\\" parameter which specifies where the file will be created. "
-    },
-    {
-      "testId": "folder_create_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-7xiv1uinaeba7xi81qvqka\",\"object\":\"chat.completion\",\"created\":1766163325,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To create a new folder named \\\"components\\\", I will use the `folder_create` function provided in the available tools. \\n\\nThe required parameter for this function is the path where the new directory should be created. Since the user wants the folder to be named \\\"components\\\", I need to specify the correct pa"
-    },
-    {
-      "testId": "folder_delete_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-jg5w8tj81a90nhmoewrp11\",\"object\":\"chat.completion\",\"created\":1766163327,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To delete the folder named \\\"temp\\\", I should use the `folder_delete` tool provided in the available tools list. \\n\\nFirst, I need to identify which parameters are required for this tool. Looking at the description of the `folder_delete` function, it requires a single parameter called \\\"path\\\". This path shou"
+      "response": "{\"id\":\"chatcmpl-m1xauuq7nkfh81nmrk8yr\",\"object\":\"chat.completion\",\"created\":1766273207,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to create a new branch called \\\"feature/user-auth\\\". Let me think about how to approach this using the available tools. \\n\\nLooking at the tools provided, there's only one function: git_branch_create. This tool allows me to create and switch to a new branch. The parameters ne"
     },
     {
       "testId": "git_add_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-7p588w2uumdod5l5yypjsn\",\"object\":\"chat.completion\",\"created\":1766163330,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to stage the file \\\"index.js\\\" for a commit using the provided tool. Let me start by understanding what's being asked here. The user wants to use the git_add function to stage their JavaScript file so it can be included in the commit.\\n\\nFirst, I'll look at the tools "
-    },
-    {
-      "testId": "git_add_all",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-cp2n2gotgmjcp72155wn0k\",\"object\":\"chat.completion\",\"created\":1766163334,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To stage all changes for the current commit, I should use the `git_add` function provided by the toolset. This function allows me to specify which files or directories need to be added to the working directory so they can be included in the upcoming commit.\\n\\nI'll structure my request as follows:\\n\\n \\n\\nThi"
+      "response": "{\"id\":\"chatcmpl-fc3ayvztruly5dcda448ts\",\"object\":\"chat.completion\",\"created\":1766273210,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to stage the file \\\"index.js\\\" for a commit using the available tool. Let me see what's provided. There's only one tool called git_add, which is a function that stages files. The description says it's used to stage files for commit.\\n\\nLooking at the parameters, the function has a name"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-ywo2lotcbfsvvjmg71jud\",\"object\":\"chat.completion\",\"created\":1766163336,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To show me all the branches in this repository, I should use the `git_branch_list` function provided by the available tools. \\n\\nFirst, I need to call the tool using the correct format: \\n```\\n```\\n\\nAfter executing this command, it will return a list of all the branches in my current repository. I can then pr"
+      "response": "{\"id\":\"chatcmpl-aclxg4bnyvegrc77r3x1qf\",\"object\":\"chat.completion\",\"created\":1766273212,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show me all the branches in my repository using the available tools. Let's see what tools I have at my disposal here. There's only one tool listed: \\\"git_branch_list\\\". \\n\\nLooking at its description, it says this tool can list all branches. The parameters for it a"
+    },
+    {
+      "testId": "git_blame_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-acces04l8bph1atcrbo2bt\",\"object\":\"chat.completion\",\"created\":1766273217,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show what revision and author last modified each line in the file \\\"server.ts\\\". The user mentioned using the git_blame tool for this purpose. Let me think through the steps.\\n\\nFirst, I remember that git Blame can provide information about who last modified each l"
+    },
+    {
+      "testId": "git_show_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-nxq1bic7ya9wkw4nrt4m5\",\"object\":\"chat.completion\",\"created\":1766273222,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the details of the latest commit using the available tool. The user asked for \\\"the details of the latest commit,\\\" which makes me think they want more than just a summary—they probably want specific information like the commit message, author, date, and maybe "
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-wflrt6v1ww9ez2nn9d9iw\",\"object\":\"chat.completion\",\"created\":1766273225,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to run an npm script called \\\"build\\\". Let me think about how to do this using the provided tool. The tool is named \\\"npm_run\\\", and according to its description, it requires a \\\"script\\\" parameter of type string. \\n\\nFirst, I should make sure that the script name is correctly specified"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-1hu9lt79u6gwxi7iugn0dm\",\"object\":\"chat.completion\",\"created\":1766273228,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to install the lodash package using the available tools. Let me start by understanding what's required here.\\n\\nFirst, looking at the tools provided, there's only one function called \\\"npm_install\\\". This tool allows installing npm packages with specific parameters. T"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-7ztpmx9yczta5g9mggszz6\",\"object\":\"chat.completion\",\"created\":1766163338,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" To remove the axios package, I need to use the npm_uninstall tool. First, I'll identify the correct package name in npm. Since it's called axios, I'll provide \\\"axios\\\" as the argument. \\n\\nI should make sure that all required parameters are included and correctly formatted within the JSON structure. Once sub"
+      "response": "{\"id\":\"chatcmpl-7rysqcas68ylgml6fj1xq\",\"object\":\"chat.completion\",\"created\":1766273231,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to remove the axios package from my project using the available tools. Let me start by recalling what I know about npm packages and removal processes.\\n\\nFirst, I remember that npm has a set of uninstall commands for various packages. Since I'm dealing with axios, whic"
+    },
+    {
+      "testId": "npm_test_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-1468qk3tsqug3lwvkt0saar\",\"object\":\"chat.completion\",\"created\":1766273236,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to run the test suite for my project using the npm_test tool. Let me think about how to do this correctly.\\n\\nFirst, I remember that the npm_test function requires specific parameters. From the examples given, it looks like I can call it with an object containing a \\\"name\\\" and \\\"argu"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-crrraa65unv445hsclop9e\",\"object\":\"chat.completion\",\"created\":1766273239,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to fetch some data using the provided tool. The URL is given as \\\"https://api.example.com/users\\\". Let me think about how to approach this.\\n\\nFirst, I should use the \\\"http_request\\\" function because it's designed for making HTTP requests. I remember that this function requires a few "
+    },
+    {
+      "testId": "web_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-zw3bcdmszcavydn7pejllk\",\"object\":\"chat.completion\",\"created\":1766273243,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to search for information about TypeScript generics using the web_search tool. Let me think through how to do this step by step.\\n\\nFirst, I know that TypeScript is a superset of JavaScript and includes features like generics. But I'm not exactly sure what generics in TypeScript are al"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-r7r23qjuf76fvorabzfo9\",\"object\":\"chat.completion\",\"created\":1766273247,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to open the GitHub homepage using the available tool. The user mentioned that they want me to use the \\\"browser_navigate\\\" function. Let me recall what this function requires.\\n\\nFirst, looking at the tools provided, there's a function named \\\"browser_navigate\\\". Its d"
+    },
+    {
+      "testId": "browser_screenshot_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-bdeujjoxopjma01eb8gu\",\"object\":\"chat.completion\",\"created\":1766273251,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to take a screenshot of the current page using the available tool. Let me see what's provided. The only tool listed is \\\"browser_take_screenshot\\\". \\n\\nI remember that this tool has three parameters: path, fullPage, and selector. Path is where the image will be saved, which should be a s"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-chgjy8oczfgfpzfpih5j\",\"object\":\"chat.completion\",\"created\":1766163339,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\" The user has requested to run a Python script that prints \\\"Hello World\\\". To fulfill this, I should use the available tool which is the \\\"run_python\\\" function. \\n\\nFirst, I need to structure the request correctly according to the specified format. The tool requires a code parameter which contains the Python s"
+      "response": "{\"id\":\"chatcmpl-2c9aqjtraadftnibe7ypfe\",\"object\":\"chat.completion\",\"created\":1766273254,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to run a Python script that prints \\\"Hello World.\\\" Let me think about how to approach this using the available tools. \\n\\nFirst, I remember there's a tool called run_python which can execute Python code. That seems perfect for this task. The tool requires a parameter named "
+    },
+    {
+      "testId": "shell_exec_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-kgljv9lwkgdp1iuwh5kxl\",\"object\":\"chat.completion\",\"created\":1766273257,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to run the command \\\"echo Hello\\\" using the shell_exec tool provided. Let me break this down step by step.\\n\\nFirst, I remember that the shell_exec function allows executing a shell command with certain parameters. The required parameter is \\\"command,\\\" which in this c"
+    },
+    {
+      "testId": "memory_store_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-8b0mytd0yatt40wo91hsq\",\"object\":\"chat.completion\",\"created\":1766273262,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so Alice wants me to remember her name as \\\"Alice.\\\" That makes sense because she mentioned it at the beginning of our conversation. Now, looking at the tools available, there's only one: memory_store. It seems like this tool can store a value in persistent memory.\\n\\nHmm, but how does that help "
+    },
+    {
+      "testId": "memory_retrieve_basic",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-3wehyiyl9zkhxmt5nsqu9\",\"object\":\"chat.completion\",\"created\":1766273265,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user asked, \\\"What is the user's name that I stored earlier?\\\" Hmm, I need to figure out how to respond using the available tools. Let me see what tools are at my disposal.\\n\\nLooking through the tools provided, there's a function called memory_retrieve. Its description says it can retriev"
+    },
+    {
+      "testId": "memory_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-4qggeygjevi3ofoors2e53\",\"object\":\"chat.completion\",\"created\":1766273269,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user is asking me to show them everything stored in memory. Hmm, looking at the available tools, there's only one function called \\\"memory_list\\\" which lists all keys in memory. \\n\\nAlright, since they want to see all the stored items, I should use this tool. The tool requires no paramete"
+    },
+    {
+      "testId": "text_summarize_basic",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-d9p566ae8qv4e2zryx3ksi\",\"object\":\"chat.completion\",\"created\":1766273271,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user has asked me to summarize a long article using the text_summarize tool. Let me break this down.\\n\\nFirst, I need to understand what exactly the user is looking for. They provided an article with some Lorem ipsum text, which isn't meaningful but serves as an example. My task is to use"
+    },
+    {
+      "testId": "diff_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-ofedu4p52eioczxlpx6yo\",\"object\":\"chat.completion\",\"created\":1766273276,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to compare two files: old.txt and new.txt. The user wants to see the differences between them. Let me think about how to approach this.\\n\\nFirst, I remember that there's a tool called diff_files which is designed exactly for comparing two files and showing their differences. That seems "
+    },
+    {
+      "testId": "process_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-pyiz3lj0u4l17ipayx73\",\"object\":\"chat.completion\",\"created\":1766273280,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants to see all running processes that include \\\"node\\\". I remember there's a tool called process_list which can list running processes. Let me check its parameters.\\n\\nThe process_list function requires a filter object with a name property. The user is looking for any process where t"
+    },
+    {
+      "testId": "zip_create_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-e5k5yn3j7vbp54b6m5x4zh\",\"object\":\"chat.completion\",\"created\":1766273283,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a zip file named \\\"backup.zip\\\" that includes all the files in the \\\"src\\\" folder. Let me think about how to approach this.\\n\\nFirst, I remember that there's a tool available called \\\"zip_create\\\". This tool creates a zip archive. The parameters required are \\\"output\\\" and \\\""
+    },
+    {
+      "testId": "zip_extract_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ncmyfp7j2ds02cmf8uu3uq4\",\"object\":\"chat.completion\",\"created\":1766273287,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to extract the zip file called data.zip into the current directory. Let me think about how to do this using the available tool, which is zip_extract.\\n\\nFirst, I should check if the zip file exists and if there are any necessary permissions, but since the user didn't mention any issue"
+    },
+    {
+      "testId": "rag_query_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-x44ipy7yccddzo6d3l61er\",\"object\":\"chat.completion\",\"created\":1766273289,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out where user authentication is handled in the codebase using the available tool. The user mentioned they want me to use the \\\"rag_query\\\" function because it's preferred for code search tasks like this.\\n\\nFirst, I'll set up the parameters for the rag_query. The query shoul"
+    },
+    {
+      "testId": "rag_query_with_filter",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-1ypj1jt0j4342fz2q4j2y9\",\"object\":\"chat.completion\",\"created\":1766273292,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to find all TypeScript files that handle database connections. Let me think about how I can approach this using the available tools.\\n\\nFirst, I remember there's a tool called rag_query which is good for semantic search in code. That seems perfect because it can look through"
+    },
+    {
+      "testId": "rag_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-4e03t0kcm2mukiine4c0rn\",\"object\":\"chat.completion\",\"created\":1766273294,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to check the status of the RAG indexing system. The user has provided some tools and asked me to use them appropriately. Let me see what's available.\\n\\nThere's a tool called \\\"rag_status\\\" which is a function that returns information about the RAG indexing system. It gives details lik"
+    },
+    {
+      "testId": "rag_index_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-wn6tgl111xd7ptw1oxowip\",\"object\":\"chat.completion\",\"created\":1766273296,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to index my project directory using the rag_index tool. Let me think about how to do this step by step. \\n\\nFirst, I remember that the rag_index function is used for indexing a project directory to enable semantic code search. The user provided an example where they called get_weather "
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T16:54:44.575Z",
+    "testedAt": "2025-12-20T23:32:11.887Z",
     "emitTest": {
-      "passed": false,
-      "score": 40,
-      "details": "Wrong tool called: get_weather"
+      "passed": true,
+      "score": 75,
+      "details": "XML format succeeded (OpenAI format failed: Wrong tool called: tool_name)"
     },
     "schemaTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect schema adherence - read schema and used correct field names and values"
+      "passed": false,
+      "score": 40,
+      "details": "Missing \"message\" field"
     },
     "selectionTest": {
       "passed": true,
@@ -357,9 +692,9 @@
       "details": "Correct tool selected with correct file path"
     },
     "suppressionTest": {
-      "passed": true,
-      "score": 85,
-      "details": "No tool called, but response was: \"\""
+      "passed": false,
+      "score": 0,
+      "details": "Model called a tool when explicitly forbidden - uncontrollable"
     },
     "nearIdenticalSelectionTest": {
       "passed": true,
@@ -372,55 +707,18 @@
       "details": "Perfect: emitted 2 read_file calls with correct paths"
     },
     "argumentValidationTest": {
-      "passed": false,
-      "score": 0,
-      "details": "No tool calls emitted"
-    },
-    "schemaReorderTest": {
       "passed": true,
       "score": 100,
-      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+      "details": "Perfect: all types and nested structures correct"
     },
-    "toolScore": 79,
-    "reasoningScore": 72,
-    "overallScore": 76,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": true,
-        "score": 80,
-        "details": "Valid intent JSON with reasoning"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": true,
-        "score": 80,
-        "details": "Identified conflict in text response"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 25,
-        "details": "Invalid JSON"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 100,
-        "details": "Properly handles edge case with fallback"
-      }
-    }
+    "schemaReorderTest": {
+      "passed": false,
+      "score": 30,
+      "details": "Wrong tool called: tool_name"
+    },
+    "toolScore": 67,
+    "reasoningScore": 0,
+    "overallScore": 67
   },
   "role": "none",
   "contextLatency": {
@@ -449,5 +747,15 @@
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },
-  "contextLength": 131072
+  "contextLength": 131072,
+  "discoveredNativeTools": [
+    "tool1",
+    "tool2",
+    "tool3"
+  ],
+  "unmappedNativeTools": [
+    "tool1",
+    "tool2",
+    "tool3"
+  ]
 }

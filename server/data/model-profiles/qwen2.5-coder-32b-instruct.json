@@ -344,21 +344,21 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T18:01:55.378Z",
+    "testedAt": "2025-12-20T23:58:47.366Z",
     "emitTest": {
       "passed": true,
       "score": 100,
       "details": "Valid tool call with correct parameters (OpenAI format)"
     },
     "schemaTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect schema adherence - read schema and used correct field names and values"
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
     },
     "selectionTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Correct tool selected with correct file path"
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
     },
     "suppressionTest": {
       "passed": true,
@@ -366,67 +366,30 @@
       "details": "Perfect suppression - responded with \"OK\" and no tool calls"
     },
     "nearIdenticalSelectionTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Correct: chose search_web for real-time data with appropriate query"
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
     },
     "multiToolEmitTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect: emitted 2 read_file calls with correct paths"
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
     },
     "argumentValidationTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect: all types and nested structures correct"
+      "passed": false,
+      "score": 0,
+      "details": "Test failed"
     },
     "schemaReorderTest": {
       "passed": true,
       "score": 100,
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
-    "toolScore": 100,
-    "reasoningScore": 97,
-    "overallScore": 99,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": true,
-        "score": 80,
-        "details": "Valid intent JSON with reasoning"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": true,
-        "score": 100,
-        "details": "Correctly chose read based on condition"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": true,
-        "score": 100,
-        "details": "Correctly identified conflict in structured format"
-      },
-      "explanation": {
-        "passed": true,
-        "score": 100,
-        "details": "Provided reasoning before action"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 100,
-        "details": "Properly handles edge case with fallback"
-      }
-    }
+    "toolScore": 38,
+    "reasoningScore": 0,
+    "overallScore": 38
   },
-  "role": "both",
+  "role": "none",
   "contextLatency": {
     "testedContextSizes": [
       2048,

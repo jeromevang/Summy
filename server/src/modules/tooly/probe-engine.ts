@@ -30,6 +30,26 @@ import { notifications } from '../../services/notifications.js';
 import { wsBroadcast } from '../../services/ws-broadcast.js';
 import { modelManager } from '../../services/lmstudio-model-manager.js';
 
+// Import strategic and intent probes
+import {
+  PROBE_CATEGORIES,
+  STRATEGIC_PROBES,
+  ARCHITECTURAL_PROBES,
+  NAVIGATION_PROBES,
+  HELICOPTER_PROBES,
+  PROACTIVE_PROBES,
+  runProbeCategory,
+  ProbeTestResult as StrategicProbeResult,
+  ProbeCategory,
+} from './strategic-probes.js';
+
+import {
+  INTENT_PROBES,
+  runIntentProbes,
+  calculateIntentScores,
+  IntentProbeResult,
+} from './intent-probes.js';
+
 // ============================================================
 // TYPES
 // ============================================================
@@ -76,11 +96,43 @@ export interface ProbeRunResult {
   // Reasoning probe results (2.x)
   reasoningProbes?: ReasoningProbeResults;
   
+  // Strategic probe results (3.x - 7.x)
+  strategicRAGProbes?: StrategicProbeResult[];  // 3.x Strategic RAG
+  architecturalProbes?: StrategicProbeResult[]; // 4.x Domain/Bug Detection
+  navigationProbes?: StrategicProbeResult[];    // 5.x Navigation
+  helicopterProbes?: StrategicProbeResult[];    // 6.x Helicopter View
+  proactiveProbes?: StrategicProbeResult[];     // 7.x Proactive Helpfulness
+  
+  // Intent probe results (8.x)
+  intentProbes?: IntentProbeResult[];
+  intentScores?: {
+    invokeCorrectness: number;
+    toolSelectionAccuracy: number;
+    actionCorrectness: number;
+    overInvocationRate: number;
+    underInvocationRate: number;
+    overallIntentScore: number;
+  };
+  
   // Aggregated results
   toolScore: number;      // Score from tool behavior probes
   reasoningScore: number; // Score from reasoning probes
   overallScore: number;   // Combined score
   role: 'main' | 'executor' | 'both' | 'none';
+  
+  // Score breakdown for all categories
+  scoreBreakdown?: {
+    toolScore: number;
+    reasoningScore: number;
+    ragScore: number;
+    bugDetectionScore: number;
+    architecturalScore: number;
+    navigationScore: number;
+    helicopterScore: number;
+    proactiveScore: number;
+    intentScore: number;
+    overallScore: number;
+  };
   
   // Context latency profiling
   contextLatency?: ContextLatencyResult;
@@ -102,6 +154,18 @@ export interface ProbeOptions {
   timeout?: number;              // Default 30000ms
   runLatencyProfile?: boolean;   // Run context latency profiling
   runReasoningProbes?: boolean;  // Run reasoning probes (default: true)
+  
+  // Category selection for targeted testing
+  categories?: string[];         // Specific categories to run: '1.x', '2.x', '3.x', etc.
+  runStrategicProbes?: boolean;  // Run 3.x Strategic RAG probes
+  runArchitecturalProbes?: boolean; // Run 4.x Architectural/Bug probes
+  runNavigationProbes?: boolean; // Run 5.x Navigation probes
+  runHelicopterProbes?: boolean; // Run 6.x Helicopter View probes
+  runProactiveProbes?: boolean;  // Run 7.x Proactive probes
+  runIntentProbes?: boolean;     // Run 8.x Intent Recognition probes
+  
+  // Quick mode: only run essential probes
+  quickMode?: boolean;
 }
 
 export type ToolFormat = 'openai' | 'xml' | 'none';
@@ -557,10 +621,199 @@ class ProbeEngine {
       );
     }
 
-    // Calculate overall score (50% tool, 50% reasoning if available)
-    const overallScore = runReasoningProbes
-      ? Math.round((toolScore + reasoningScore) / 2)
-      : toolScore;
+    // Determine which extended categories to run
+    const shouldRunCategory = (categoryId: string): boolean => {
+      if (options.quickMode) return false;
+      if (options.categories && options.categories.length > 0) {
+        return options.categories.includes(categoryId);
+      }
+      // Check specific flags
+      switch (categoryId) {
+        case '3.x': return options.runStrategicProbes !== false;
+        case '4.x': return options.runArchitecturalProbes !== false;
+        case '5.x': return options.runNavigationProbes !== false;
+        case '6.x': return options.runHelicopterProbes !== false;
+        case '7.x': return options.runProactiveProbes !== false;
+        case '8.x': return options.runIntentProbes !== false;
+        default: return true;
+      }
+    };
+
+    // Create chat executor for strategic probes
+    const createChatExecutor = () => async (prompt: string): Promise<{ response: any; toolCalls: any[] }> => {
+      try {
+        const result = await this.runChatCompletion(modelId, provider, settings, prompt, timeout);
+        const message = result?.choices?.[0]?.message;
+        return {
+          response: message?.content || '',
+          toolCalls: message?.tool_calls || [],
+        };
+      } catch (error: any) {
+        return { response: `Error: ${error.message}`, toolCalls: [] };
+      }
+    };
+
+    const chatExecutor = createChatExecutor();
+
+    // Run Strategic RAG Probes (3.x)
+    let strategicRAGProbes: StrategicProbeResult[] | undefined;
+    let ragScore = 0;
+    if (shouldRunCategory('3.x') && !options.quickMode) {
+      console.log(`[ProbeEngine] Running Strategic RAG probes (3.x) for ${modelId}`);
+      try {
+        strategicRAGProbes = await runProbeCategory('3.x', chatExecutor);
+        ragScore = Math.round(strategicRAGProbes.reduce((sum, p) => sum + p.score, 0) / strategicRAGProbes.length);
+        wsBroadcast.broadcastProgress('probe', modelId, {
+          current: completedTests + 1,
+          total: totalTests + 30, // Approximate additional tests
+          currentTest: '🔍 Strategic RAG probes',
+          score: ragScore,
+          status: 'running'
+        });
+      } catch (error: any) {
+        console.log(`[ProbeEngine] Strategic RAG probes failed: ${error.message}`);
+      }
+    }
+
+    // Run Architectural/Bug Detection Probes (4.x)
+    let architecturalProbes: StrategicProbeResult[] | undefined;
+    let bugDetectionScore = 0;
+    let architecturalScore = 0;
+    if (shouldRunCategory('4.x') && !options.quickMode) {
+      console.log(`[ProbeEngine] Running Architectural probes (4.x) for ${modelId}`);
+      try {
+        architecturalProbes = await runProbeCategory('4.x', chatExecutor);
+        architecturalScore = Math.round(architecturalProbes.reduce((sum, p) => sum + p.score, 0) / architecturalProbes.length);
+        // Bug detection score from specific probes (4.2, 4.3, 4.4)
+        const bugProbes = architecturalProbes.filter(p => ['4.2', '4.3', '4.4'].includes(p.id));
+        bugDetectionScore = bugProbes.length > 0 
+          ? Math.round(bugProbes.reduce((sum, p) => sum + p.score, 0) / bugProbes.length)
+          : architecturalScore;
+        wsBroadcast.broadcastProgress('probe', modelId, {
+          current: completedTests + 2,
+          total: totalTests + 30,
+          currentTest: '🏗️ Architectural probes',
+          score: architecturalScore,
+          status: 'running'
+        });
+      } catch (error: any) {
+        console.log(`[ProbeEngine] Architectural probes failed: ${error.message}`);
+      }
+    }
+
+    // Run Navigation Probes (5.x)
+    let navigationProbes: StrategicProbeResult[] | undefined;
+    let navigationScore = 0;
+    if (shouldRunCategory('5.x') && !options.quickMode) {
+      console.log(`[ProbeEngine] Running Navigation probes (5.x) for ${modelId}`);
+      try {
+        navigationProbes = await runProbeCategory('5.x', chatExecutor);
+        navigationScore = Math.round(navigationProbes.reduce((sum, p) => sum + p.score, 0) / navigationProbes.length);
+        wsBroadcast.broadcastProgress('probe', modelId, {
+          current: completedTests + 3,
+          total: totalTests + 30,
+          currentTest: '🧭 Navigation probes',
+          score: navigationScore,
+          status: 'running'
+        });
+      } catch (error: any) {
+        console.log(`[ProbeEngine] Navigation probes failed: ${error.message}`);
+      }
+    }
+
+    // Run Helicopter View Probes (6.x)
+    let helicopterProbes: StrategicProbeResult[] | undefined;
+    let helicopterScore = 0;
+    if (shouldRunCategory('6.x') && !options.quickMode) {
+      console.log(`[ProbeEngine] Running Helicopter probes (6.x) for ${modelId}`);
+      try {
+        helicopterProbes = await runProbeCategory('6.x', chatExecutor);
+        helicopterScore = Math.round(helicopterProbes.reduce((sum, p) => sum + p.score, 0) / helicopterProbes.length);
+        wsBroadcast.broadcastProgress('probe', modelId, {
+          current: completedTests + 4,
+          total: totalTests + 30,
+          currentTest: '🚁 Helicopter probes',
+          score: helicopterScore,
+          status: 'running'
+        });
+      } catch (error: any) {
+        console.log(`[ProbeEngine] Helicopter probes failed: ${error.message}`);
+      }
+    }
+
+    // Run Proactive Helpfulness Probes (7.x)
+    let proactiveProbes: StrategicProbeResult[] | undefined;
+    let proactiveScore = 0;
+    if (shouldRunCategory('7.x') && !options.quickMode) {
+      console.log(`[ProbeEngine] Running Proactive probes (7.x) for ${modelId}`);
+      try {
+        proactiveProbes = await runProbeCategory('7.x', chatExecutor);
+        proactiveScore = Math.round(proactiveProbes.reduce((sum, p) => sum + p.score, 0) / proactiveProbes.length);
+        wsBroadcast.broadcastProgress('probe', modelId, {
+          current: completedTests + 5,
+          total: totalTests + 30,
+          currentTest: '💡 Proactive probes',
+          score: proactiveScore,
+          status: 'running'
+        });
+      } catch (error: any) {
+        console.log(`[ProbeEngine] Proactive probes failed: ${error.message}`);
+      }
+    }
+
+    // Run Intent Recognition Probes (8.x)
+    let intentProbeResults: IntentProbeResult[] | undefined;
+    let intentScores: ReturnType<typeof calculateIntentScores> | undefined;
+    let intentScore = 0;
+    if (shouldRunCategory('8.x') && !options.quickMode) {
+      console.log(`[ProbeEngine] Running Intent probes (8.x) for ${modelId}`);
+      try {
+        const intentResult = await runIntentProbes(chatExecutor);
+        intentProbeResults = intentResult.results;
+        intentScores = intentResult.scores;
+        intentScore = intentScores.overallIntentScore;
+        wsBroadcast.broadcastProgress('probe', modelId, {
+          current: completedTests + 6,
+          total: totalTests + 30,
+          currentTest: '🎯 Intent probes',
+          score: intentScore,
+          status: 'running'
+        });
+      } catch (error: any) {
+        console.log(`[ProbeEngine] Intent probes failed: ${error.message}`);
+      }
+    }
+
+    // Calculate overall score with all categories
+    let overallScore = toolScore;
+    let scoreCount = 1;
+    
+    if (runReasoningProbes && reasoningScore > 0) {
+      overallScore += reasoningScore;
+      scoreCount++;
+    }
+    if (ragScore > 0) { overallScore += ragScore; scoreCount++; }
+    if (architecturalScore > 0) { overallScore += architecturalScore; scoreCount++; }
+    if (navigationScore > 0) { overallScore += navigationScore; scoreCount++; }
+    if (helicopterScore > 0) { overallScore += helicopterScore; scoreCount++; }
+    if (proactiveScore > 0) { overallScore += proactiveScore; scoreCount++; }
+    if (intentScore > 0) { overallScore += intentScore; scoreCount++; }
+    
+    overallScore = Math.round(overallScore / scoreCount);
+
+    // Build score breakdown
+    const scoreBreakdown = {
+      toolScore,
+      reasoningScore,
+      ragScore,
+      bugDetectionScore,
+      architecturalScore,
+      navigationScore,
+      helicopterScore,
+      proactiveScore,
+      intentScore,
+      overallScore,
+    };
 
     // Determine role based on probe results
     const role = this.determineRole(emitTest, schemaTest, selectionTest, suppressionTest, reasoningProbes);
@@ -588,10 +841,20 @@ class ProbeEngine {
       schemaReorderTest,
       // Reasoning probes
       reasoningProbes,
+      // Strategic probes (3.x - 7.x)
+      strategicRAGProbes,
+      architecturalProbes,
+      navigationProbes,
+      helicopterProbes,
+      proactiveProbes,
+      // Intent probes (8.x)
+      intentProbes: intentProbeResults,
+      intentScores,
       // Scores
       toolScore,
       reasoningScore,
       overallScore,
+      scoreBreakdown,
       role,
       contextLatency
     };
@@ -3036,8 +3299,91 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
 
     return response.data;
   }
+
+  /**
+   * Run a chat completion with RAG tools for strategic/intent probes
+   * This wraps callLLM and provides the standard tool set
+   */
+  private async runChatCompletion(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any,
+    prompt: string,
+    timeout: number
+  ): Promise<any> {
+    // Define RAG and file tools for strategic probes
+    const ragTools = [
+      {
+        type: 'function',
+        function: {
+          name: 'rag_query',
+          description: 'Search the codebase using semantic search. Use this to find code, understand how things work, or locate implementations.',
+          parameters: {
+            type: 'object',
+            properties: {
+              query: {
+                type: 'string',
+                description: 'The search query describing what you want to find'
+              }
+            },
+            required: ['query']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'read_file',
+          description: 'Read the contents of a file',
+          parameters: {
+            type: 'object',
+            properties: {
+              path: {
+                type: 'string',
+                description: 'The path to the file to read'
+              }
+            },
+            required: ['path']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'search_files',
+          description: 'Search for files matching a pattern',
+          parameters: {
+            type: 'object',
+            properties: {
+              pattern: {
+                type: 'string',
+                description: 'The search pattern (supports glob)'
+              }
+            },
+            required: ['pattern']
+          }
+        }
+      }
+    ];
+
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are a helpful coding assistant. Use the available tools to search and read code when answering questions about the codebase. Always use rag_query first for code-related questions.'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ];
+
+    return this.callLLM(modelId, provider, messages, ragTools, settings, timeout);
+  }
 }
 
 // Export singleton
 export const probeEngine = new ProbeEngine();
+
+// Re-export probe categories for use in routes
+export { PROBE_CATEGORIES } from './strategic-probes.js';
 

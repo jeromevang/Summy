@@ -19,10 +19,33 @@ interface RAGConfig {
   watcher: {
     enabled: boolean;
     debounceMs: number;
+    paths?: string[];
   };
   project: {
     path: string | null;
     autoDetect: boolean;
+  };
+  // Hierarchical RAG Options
+  summarization?: {
+    enabled: boolean;
+    chunkSummaries: boolean;
+    fileSummaries: boolean;
+    asyncGeneration: boolean;
+    model?: string;
+    maxTokens?: number;
+  };
+  dependencyGraph?: {
+    enabled: boolean;
+  };
+  queryEnhancement?: {
+    enableHyde: boolean;
+    enableQueryExpansion: boolean;
+    enableContextualChunks: boolean;
+    enableMultiVector: boolean;
+  };
+  queryRouting?: {
+    enabled: boolean;
+    defaultStrategy?: string;
   };
 }
 
@@ -318,7 +341,12 @@ const RAG: React.FC = () => {
         project: {
           ...config.project,
           path: projectPath
-        }
+        },
+        // Include hierarchical RAG settings
+        summarization: config.summarization,
+        dependencyGraph: config.dependencyGraph,
+        queryEnhancement: config.queryEnhancement,
+        queryRouting: config.queryRouting
       });
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
@@ -692,6 +720,143 @@ const RAG: React.FC = () => {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Hierarchical RAG Options */}
+            <div className="bg-[#1a1a1a] rounded-lg p-6 border border-gray-800">
+              <h3 className="text-lg font-semibold mb-2">Hierarchical RAG Options</h3>
+              <p className="text-sm text-gray-500 mb-4">Advanced features for enhanced code understanding and retrieval.</p>
+              
+              {/* Summarization */}
+              <div className="mb-6">
+                <h4 className="text-md font-medium text-purple-400 mb-3">📝 Summarization</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config?.summarization?.enabled ?? false}
+                      onChange={(e) => setConfig(c => c ? { ...c, summarization: { ...c.summarization, enabled: e.target.checked, chunkSummaries: c.summarization?.chunkSummaries ?? false, fileSummaries: c.summarization?.fileSummaries ?? false, asyncGeneration: c.summarization?.asyncGeneration ?? true } } : c)}
+                      className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500"
+                    />
+                    <span className="text-sm text-gray-300">Enable Summarization</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config?.summarization?.chunkSummaries ?? false}
+                      onChange={(e) => setConfig(c => c ? { ...c, summarization: { ...c.summarization, enabled: c.summarization?.enabled ?? true, chunkSummaries: e.target.checked, fileSummaries: c.summarization?.fileSummaries ?? false, asyncGeneration: c.summarization?.asyncGeneration ?? true } } : c)}
+                      disabled={!config?.summarization?.enabled}
+                      className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500 disabled:opacity-50"
+                    />
+                    <span className={`text-sm ${config?.summarization?.enabled ? 'text-gray-300' : 'text-gray-500'}`}>Chunk Summaries</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config?.summarization?.fileSummaries ?? false}
+                      onChange={(e) => setConfig(c => c ? { ...c, summarization: { ...c.summarization, enabled: c.summarization?.enabled ?? true, chunkSummaries: c.summarization?.chunkSummaries ?? false, fileSummaries: e.target.checked, asyncGeneration: c.summarization?.asyncGeneration ?? true } } : c)}
+                      disabled={!config?.summarization?.enabled}
+                      className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500 disabled:opacity-50"
+                    />
+                    <span className={`text-sm ${config?.summarization?.enabled ? 'text-gray-300' : 'text-gray-500'}`}>File Summaries</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config?.summarization?.asyncGeneration ?? true}
+                      onChange={(e) => setConfig(c => c ? { ...c, summarization: { ...c.summarization, enabled: c.summarization?.enabled ?? true, chunkSummaries: c.summarization?.chunkSummaries ?? false, fileSummaries: c.summarization?.fileSummaries ?? false, asyncGeneration: e.target.checked } } : c)}
+                      disabled={!config?.summarization?.enabled}
+                      className="w-4 h-4 rounded border-gray-600 text-purple-600 focus:ring-purple-500 disabled:opacity-50"
+                    />
+                    <span className={`text-sm ${config?.summarization?.enabled ? 'text-gray-300' : 'text-gray-500'}`}>Async Generation</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Dependency Graph */}
+              <div className="mb-6">
+                <h4 className="text-md font-medium text-blue-400 mb-3">🔗 Dependency Graph</h4>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={config?.dependencyGraph?.enabled ?? false}
+                    onChange={(e) => setConfig(c => c ? { ...c, dependencyGraph: { enabled: e.target.checked } } : c)}
+                    className="w-4 h-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-300">Enable Dependency Graph</span>
+                </label>
+                <p className="text-xs text-gray-500 mt-1 ml-6">Track imports/exports and code relationships between files.</p>
+              </div>
+
+              {/* Query Enhancement */}
+              <div className="mb-6">
+                <h4 className="text-md font-medium text-green-400 mb-3">🚀 Query Enhancement</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config?.queryEnhancement?.enableHyde ?? false}
+                      onChange={(e) => setConfig(c => c ? { ...c, queryEnhancement: { ...c.queryEnhancement, enableHyde: e.target.checked, enableQueryExpansion: c.queryEnhancement?.enableQueryExpansion ?? false, enableContextualChunks: c.queryEnhancement?.enableContextualChunks ?? false, enableMultiVector: c.queryEnhancement?.enableMultiVector ?? false } } : c)}
+                      className="w-4 h-4 rounded border-gray-600 text-green-600 focus:ring-green-500"
+                    />
+                    <div>
+                      <span className="text-sm text-gray-300">HyDE</span>
+                      <p className="text-xs text-gray-500">Hypothetical Document Embedding</p>
+                    </div>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config?.queryEnhancement?.enableQueryExpansion ?? false}
+                      onChange={(e) => setConfig(c => c ? { ...c, queryEnhancement: { ...c.queryEnhancement, enableHyde: c.queryEnhancement?.enableHyde ?? false, enableQueryExpansion: e.target.checked, enableContextualChunks: c.queryEnhancement?.enableContextualChunks ?? false, enableMultiVector: c.queryEnhancement?.enableMultiVector ?? false } } : c)}
+                      className="w-4 h-4 rounded border-gray-600 text-green-600 focus:ring-green-500"
+                    />
+                    <div>
+                      <span className="text-sm text-gray-300">Query Expansion</span>
+                      <p className="text-xs text-gray-500">Expand with synonyms/terms</p>
+                    </div>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config?.queryEnhancement?.enableContextualChunks ?? false}
+                      onChange={(e) => setConfig(c => c ? { ...c, queryEnhancement: { ...c.queryEnhancement, enableHyde: c.queryEnhancement?.enableHyde ?? false, enableQueryExpansion: c.queryEnhancement?.enableQueryExpansion ?? false, enableContextualChunks: e.target.checked, enableMultiVector: c.queryEnhancement?.enableMultiVector ?? false } } : c)}
+                      className="w-4 h-4 rounded border-gray-600 text-green-600 focus:ring-green-500"
+                    />
+                    <div>
+                      <span className="text-sm text-gray-300">Contextual Chunks</span>
+                      <p className="text-xs text-gray-500">Include metadata in embeddings</p>
+                    </div>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config?.queryEnhancement?.enableMultiVector ?? false}
+                      onChange={(e) => setConfig(c => c ? { ...c, queryEnhancement: { ...c.queryEnhancement, enableHyde: c.queryEnhancement?.enableHyde ?? false, enableQueryExpansion: c.queryEnhancement?.enableQueryExpansion ?? false, enableContextualChunks: c.queryEnhancement?.enableContextualChunks ?? false, enableMultiVector: e.target.checked } } : c)}
+                      className="w-4 h-4 rounded border-gray-600 text-green-600 focus:ring-green-500"
+                    />
+                    <div>
+                      <span className="text-sm text-gray-300">Multi-Vector</span>
+                      <p className="text-xs text-gray-500">Multiple embeddings per chunk</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Query Routing */}
+              <div>
+                <h4 className="text-md font-medium text-orange-400 mb-3">🎯 Query Routing</h4>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={config?.queryRouting?.enabled ?? false}
+                    onChange={(e) => setConfig(c => c ? { ...c, queryRouting: { enabled: e.target.checked, defaultStrategy: c.queryRouting?.defaultStrategy ?? 'auto' } } : c)}
+                    className="w-4 h-4 rounded border-gray-600 text-orange-600 focus:ring-orange-500"
+                  />
+                  <span className="text-sm text-gray-300">Enable Query Routing</span>
+                </label>
+                <p className="text-xs text-gray-500 mt-1 ml-6">Automatically route queries to best retrieval strategy.</p>
               </div>
             </div>
 

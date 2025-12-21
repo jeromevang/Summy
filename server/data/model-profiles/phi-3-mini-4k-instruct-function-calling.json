@@ -324,11 +324,11 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T17:54:44.725Z",
+    "testedAt": "2025-12-20T23:51:15.268Z",
     "emitTest": {
-      "passed": true,
-      "score": 75,
-      "details": "XML format succeeded (OpenAI format failed: Model described the tool instead of calling it)"
+      "passed": false,
+      "score": 10,
+      "details": "Model described the tool instead of calling it"
     },
     "schemaTest": {
       "passed": false,
@@ -348,12 +348,12 @@
     "nearIdenticalSelectionTest": {
       "passed": false,
       "score": 0,
-      "details": "No tool calls emitted"
+      "details": "Leaked tokens: <|user|>"
     },
     "multiToolEmitTest": {
       "passed": false,
       "score": 0,
-      "details": "Leaked tokens: <|user|>"
+      "details": "No tool calls emitted"
     },
     "argumentValidationTest": {
       "passed": false,
@@ -365,46 +365,9 @@
       "score": 0,
       "details": "No tool calls emitted with reordered schema"
     },
-    "toolScore": 26,
-    "reasoningScore": 61,
-    "overallScore": 44,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": false,
-        "score": 30,
-        "details": "Response contains invalid JSON"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 40,
-        "details": "Chose create when file exists - failed conditional logic"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": false,
-        "score": 30,
-        "details": "Failed to identify logical conflict"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 25,
-        "details": "Invalid JSON"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 100,
-        "details": "Properly handles edge case with fallback"
-      }
-    }
+    "toolScore": 17,
+    "reasoningScore": 0,
+    "overallScore": 17
   },
   "role": "none",
   "contextLatency": {

@@ -1,0 +1,17 @@
+{
+  "name": "test-mendix-widget",
+  "version": "1.0.0",
+  "description": "Test Mendix widget for model capability probing",
+  "widgetName": "TestWidget",
+  "dependencies": {},
+  "devDependencies": {
+    "@mendix/pluggable-widgets-tools": "^9.24.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "pluggable-widgets-tools build:web",
+    "dev": "pluggable-widgets-tools start:web",
+    "lint": "pluggable-widgets-tools lint"
+  }
+}
+

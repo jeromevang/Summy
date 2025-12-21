@@ -324,7 +324,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T17:37:29.532Z",
+    "testedAt": "2025-12-20T23:48:08.552Z",
     "emitTest": {
       "passed": false,
       "score": 15,
@@ -366,45 +366,8 @@
       "details": "No tool calls emitted with reordered schema"
     },
     "toolScore": 17,
-    "reasoningScore": 97,
-    "overallScore": 57,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": true,
-        "score": 80,
-        "details": "Valid intent JSON with reasoning"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": true,
-        "score": 100,
-        "details": "Correctly chose read based on condition"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": true,
-        "score": 100,
-        "details": "Correctly identified conflict in structured format"
-      },
-      "explanation": {
-        "passed": true,
-        "score": 100,
-        "details": "Provided reasoning before action"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 100,
-        "details": "Properly handles edge case with fallback"
-      }
-    }
+    "reasoningScore": 0,
+    "overallScore": 17
   },
   "role": "none",
   "contextLatency": {

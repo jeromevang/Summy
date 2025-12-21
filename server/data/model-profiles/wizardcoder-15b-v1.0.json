@@ -324,7 +324,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T18:28:38.646Z",
+    "testedAt": "2025-12-21T00:02:02.683Z",
     "emitTest": {
       "passed": false,
       "score": 15,
@@ -366,45 +366,8 @@
       "details": "No tool calls emitted with reordered schema"
     },
     "toolScore": 15,
-    "reasoningScore": 29,
-    "overallScore": 22,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found in response"
-      },
-      "multiStepPlanning": {
-        "passed": false,
-        "score": 25,
-        "details": "Invalid JSON array"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found"
-      },
-      "contextContinuity": {
-        "passed": false,
-        "score": 20,
-        "details": "No context retention"
-      },
-      "logicalConsistency": {
-        "passed": false,
-        "score": 30,
-        "details": "Failed to identify logical conflict"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 20,
-        "details": "No JSON found"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 70,
-        "details": "Mentions edge case in text response"
-      }
-    }
+    "reasoningScore": 0,
+    "overallScore": 15
   },
   "role": "none",
   "contextLatency": {

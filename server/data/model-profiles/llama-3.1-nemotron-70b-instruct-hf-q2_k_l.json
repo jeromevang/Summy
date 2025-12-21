@@ -324,21 +324,21 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-19T16:19:51.381Z",
+    "testedAt": "2025-12-20T23:38:43.791Z",
     "emitTest": {
-      "passed": true,
-      "score": 95,
-      "details": "XML format succeeded (OpenAI format failed: Model described the tool instead of calling it)"
+      "passed": false,
+      "score": 0,
+      "details": "OpenAI format test failed"
     },
     "schemaTest": {
       "passed": false,
       "score": 0,
-      "details": "No tool calls emitted"
+      "details": "Test failed"
     },
     "selectionTest": {
       "passed": false,
       "score": 0,
-      "details": "No tool calls emitted"
+      "details": "Test failed"
     },
     "suppressionTest": {
       "passed": true,
@@ -348,63 +348,26 @@
     "nearIdenticalSelectionTest": {
       "passed": false,
       "score": 0,
-      "details": "No tool calls emitted"
+      "details": "Test failed"
     },
     "multiToolEmitTest": {
       "passed": false,
       "score": 0,
-      "details": "No tool calls emitted"
+      "details": "Test failed"
     },
     "argumentValidationTest": {
       "passed": false,
       "score": 0,
-      "details": "No tool calls emitted"
+      "details": "Test failed"
     },
     "schemaReorderTest": {
       "passed": false,
       "score": 0,
-      "details": "No tool calls emitted with reordered schema"
+      "details": "Test failed"
     },
-    "toolScore": 29,
-    "reasoningScore": 69,
-    "overallScore": 49,
-    "reasoningProbes": {
-      "intentExtraction": {
-        "passed": false,
-        "score": 30,
-        "details": "Response contains invalid JSON"
-      },
-      "multiStepPlanning": {
-        "passed": true,
-        "score": 100,
-        "details": "3 steps planned with correct order"
-      },
-      "conditionalReasoning": {
-        "passed": false,
-        "score": 50,
-        "details": "Unclear action: fs"
-      },
-      "contextContinuity": {
-        "passed": true,
-        "score": 100,
-        "details": "Perfect context retention with correct endpoint and method"
-      },
-      "logicalConsistency": {
-        "passed": true,
-        "score": 100,
-        "details": "Correctly identified conflict in structured format"
-      },
-      "explanation": {
-        "passed": false,
-        "score": 0,
-        "details": "Test failed"
-      },
-      "edgeCaseHandling": {
-        "passed": true,
-        "score": 100,
-        "details": "Properly handles edge case with fallback"
-      }
-    }
+    "toolScore": 15,
+    "reasoningScore": 0,
+    "overallScore": 15
   },
   "role": "none",
   "contextLatency": {
