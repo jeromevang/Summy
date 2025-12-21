@@ -2,9 +2,9 @@
   "modelId": "qwen/qwen3-coder-30b",
   "displayName": "qwen/qwen3-coder-30b",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T18:21:47.175Z",
-  "testVersion": 2,
-  "score": 95,
+  "testedAt": "2025-12-21T19:43:37.175Z",
+  "testVersion": 3,
+  "score": 89,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -76,110 +76,324 @@
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 721,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 755,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 941,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 994,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 961,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1371,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1017,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1100,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "git_add": {
       "supported": true,
       "score": 100,
-      "testsPassed": 2,
+      "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 800,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1077,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 996,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1139,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 741,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 991,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 990,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1056,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 933,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1055,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1013,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1617,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1317,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 2210,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1829,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1657,
+      "lastTested": "2025-12-21T19:43:37.175Z",
+      "nativeAliases": [
+        "search_web"
+      ]
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1045,
-      "lastTested": "2025-12-19T18:21:47.175Z"
+      "avgLatency": 1125,
+      "lastTested": "2025-12-21T19:43:37.175Z",
+      "nativeAliases": [
+        "execute_code"
+      ]
     },
     "mcp_rules": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 0
+    },
+    "read_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 1137,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "write_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1518,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "edit_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3506,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "list_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1516,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "search_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2605,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "create_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 944,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "delete_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1142,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "delete_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1032,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "get_file_info": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 3538,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "git_blame": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1053,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "git_show": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 999,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "npm_test": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 769,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "web_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1311,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "browser_take_screenshot": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1707,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "shell_exec": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1100,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "memory_store": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1312,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "memory_retrieve": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 789,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "memory_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1372,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "text_summarize": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2311,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "diff_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1825,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "process_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1034,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "zip_create": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1349,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "zip_extract": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1096,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "rag_query": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 1859.5,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "rag_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1092,
+      "lastTested": "2025-12-21T19:43:37.175Z"
+    },
+    "rag_index": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1162,
+      "lastTested": "2025-12-21T19:43:37.175Z"
     }
   },
   "enabledTools": [
@@ -201,150 +415,278 @@
     "npm_uninstall",
     "http_request",
     "browser_navigate",
-    "run_python"
+    "run_python",
+    "read_file",
+    "write_file",
+    "edit_file",
+    "list_directory",
+    "search_files",
+    "create_directory",
+    "delete_file",
+    "delete_directory",
+    "get_file_info",
+    "git_blame",
+    "web_search",
+    "shell_exec",
+    "memory_store",
+    "text_summarize",
+    "diff_files",
+    "process_list",
+    "zip_create",
+    "zip_extract",
+    "rag_query",
+    "rag_index"
   ],
   "testResults": [
     {
-      "testId": "file_read_basic",
+      "testId": "read_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-71uts7lxguwywv05z758z8\",\"object\":\"chat.completion\",\"created\":1766168480,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"768513716\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":296,\"completion_tokens\":21,\"total_tokens\":317},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-n2vxsvnfcenl1mnm4os36j\",\"object\":\"chat.completion\",\"created\":1766346158,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"186509626\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":303,\"completion_tokens\":21,\"total_tokens\":324},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     },
     {
-      "testId": "file_read_nested",
+      "testId": "read_file_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-s76yg56z0ep6hqhxeembfw\",\"object\":\"chat.completion\",\"created\":1766168481,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll help you view the contents of the file located at src/utils/helpers.ts.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"452029580\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":295,\"completion_tokens\":38,\"t"
+      "response": "{\"id\":\"chatcmpl-45381hc33vvcg9cwntnz5t\",\"object\":\"chat.completion\",\"created\":1766346159,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll help you view the contents of the file located at src/utils/helpers.ts.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"372688606\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":302,\"completion_tokens\":38,\"t"
     },
     {
-      "testId": "file_write_basic",
+      "testId": "write_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-zlbi3112atvyj424yefd\",\"object\":\"chat.completion\",\"created\":1766168482,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll create a new file called \\\"hello.js\\\" with the specified content.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"718668535\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\""
+      "response": "{\"id\":\"chatcmpl-zku77x0vqlljjoo61571\",\"object\":\"chat.completion\",\"created\":1766346161,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"503643820\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":345,\"completion_tokens\":36,\"total_tokens\":381},\"stats\":{},\"system_fingerp"
     },
     {
-      "testId": "file_patch_basic",
+      "testId": "edit_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-c3imffv556pq8hbmlfyxgg\",\"object\":\"chat.completion\",\"created\":1766168484,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll help you change the port number in the \\\"app.js\\\" file from 3000 to 8080.\\n\\nFirst, I need to find where the port number is defined in the file. Let me look for the line containing \\\"3000\\\" and replace it with \\\"8080\\\".\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"811505953\",\"function\":{\"name\":\"file_patch\",\"argumen"
+      "response": "{\"id\":\"chatcmpl-dlg5r07odrpenj47al0skn\",\"object\":\"chat.completion\",\"created\":1766346162,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll help you change the port number in the app.js file from 3000 to 8080. I need to locate the port number and replace it with 8080.\\n\\nLet me make that edit for you:\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"493076272\",\"function\":{\"name\":\"edit_file\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"edits\\\":[{\\\"oldText\\\":\\\"port: "
     },
     {
-      "testId": "file_list_basic",
+      "testId": "list_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-fv0m9ss5t99trwzbyr7ov\",\"object\":\"chat.completion\",\"created\":1766168487,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"782995598\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":280,\"completion_tokens\":21,\"total_tokens\":301},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-pwnsuhtqq8ui1vv6glac\",\"object\":\"chat.completion\",\"created\":1766346166,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll show you all files in the src directory. Let me list them for you.\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"920359692\",\"function\":{\"name\":\"list_directory\",\"arguments\":\"{\\\"path\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":296,\"completion_tokens\":38,\"total_tokens\":334},\"st"
     },
     {
-      "testId": "file_search_basic",
+      "testId": "search_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-qo42c0jmqp96mm4aaynhqw\",\"object\":\"chat.completion\",\"created\":1766346167,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To search for all TypeScript files in the project, I will use the `search_files` tool with a pattern that matches `.ts` files. The directory will be set to the root of the project, which I'll assume is the current directory.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"556691583\",\"function\":{\"name\":\"search_files\",\"arg"
+    },
+    {
+      "testId": "create_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-elydp1kkwxiuon96wwt06m\",\"object\":\"chat.completion\",\"created\":1766168488,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll search for all occurrences of \\\"TODO\\\" in the project files. Let me do that for you.\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"141236465\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":321,\"completion_"
+      "response": "{\"id\":\"chatcmpl-95x8n8whr06zjrwqb0sbum\",\"object\":\"chat.completion\",\"created\":1766346170,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"138009231\",\"function\":{\"name\":\"create_directory\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":292,\"completion_tokens\":18,\"total_tokens\":310},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "delete_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-64a0cy8rgbs2c0f8oqfaat\",\"object\":\"chat.completion\",\"created\":1766346171,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"285381848\",\"function\":{\"name\":\"delete_file\",\"arguments\":\"{\\\"path\\\":\\\"old_config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":291,\"completion_tokens\":23,\"total_tokens\":314},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "delete_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-p85tsy7wln5dmaqu4aw1e\",\"object\":\"chat.completion\",\"created\":1766346172,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"174290698\",\"function\":{\"name\":\"delete_directory\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":289,\"completion_tokens\":21,\"total_tokens\":310},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "get_file_info_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-4rshq6idx8swc92l0eoln\",\"object\":\"chat.completion\",\"created\":1766346173,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To get the file size and modification date of `package.json`, I will use the `get_file_info` tool which retrieves detailed metadata about a file.\\n\\n1. I will prepare a tool call to `get_file_info` with the path set to `package.json`.\\n2. Once I execute this tool call, I will receive the metadata including the file si"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-wa8fiet256gjydugi8tf\",\"object\":\"chat.completion\",\"created\":1766168490,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"923182979\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":247,\"completion_tokens\":12,\"total_tokens\":259},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-k3yr33t7z7gedlhj46im2k\",\"object\":\"chat.completion\",\"created\":1766346177,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"546339706\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":247,\"completion_tokens\":12,\"total_tokens\":259},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-mnp6zavwjzgs5zrvwa91wo\",\"object\":\"chat.completion\",\"created\":1766168490,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"741304252\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":282,\"completion_tokens\":20,\"total_tokens\":302},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-ijowqbhtj0h6m1s19fru7l\",\"object\":\"chat.completion\",\"created\":1766346177,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"491390274\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":309,\"completion_tokens\":20,\"total_tokens\":329},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-o0imutrl3sl4y6zir9ewxd\",\"object\":\"chat.completion\",\"created\":1766168491,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"776908798\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":276,\"completion_tokens\":21,\"total_tokens\":297},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-h5elq2tyzdl6ftv49ammw4\",\"object\":\"chat.completion\",\"created\":1766346178,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"573594944\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5,\\\"format\\\":\\\"oneline\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":323,\"completion_tokens\":29,\"total_tokens\":352},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ds3bur3hoituzi7nx52kd\",\"object\":\"chat.completion\",\"created\":1766168492,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"262994041\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":288,\"completion_tokens\":23,\"total_tokens\":311},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-p862440vt4roakwdpcw5b\",\"object\":\"chat.completion\",\"created\":1766346180,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"284415738\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":286,\"completion_tokens\":23,\"total_tokens\":309},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2p9kpnw7u1glen5tkb7o7\",\"object\":\"chat.completion\",\"created\":1766168493,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"165264539\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":289,\"completion_tokens\":22,\"total_tokens\":311},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
-    },
-    {
-      "testId": "npm_run_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-2hodekdz4x9p8hf3ed9yt\",\"object\":\"chat.completion\",\"created\":1766168494,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"849213018\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":285,\"completion_tokens\":22,\"total_tokens\":307},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
-    },
-    {
-      "testId": "npm_install_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-0ts40c2cx3ajhesjjluk09\",\"object\":\"chat.completion\",\"created\":1766168495,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"880449150\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":280,\"completion_tokens\":20,\"total_tokens\":300},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
-    },
-    {
-      "testId": "http_request_get",
-      "passed": true,
-      "score": 99,
-      "response": "{\"id\":\"chatcmpl-kcohc2jw47ktrxhsmpico\",\"object\":\"chat.completion\",\"created\":1766168496,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"509301792\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":350,\"completion_tokens\":35,\"total_tokens\":385},\"stats\":{},\"system_fingerprint\":\""
-    },
-    {
-      "testId": "browser_navigate_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-zsj6crkfi9rf3bajx7neho\",\"object\":\"chat.completion\",\"created\":1766168498,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll help you navigate to GitHub and get the page title. Let me do that for you.\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"921359936\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":\\\"True\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\""
-    },
-    {
-      "testId": "create_new_file_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-j0m84nfcdmig1h6jc8iicu\",\"object\":\"chat.completion\",\"created\":1766168499,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"218673461\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":318,\"completion_tokens\":20,\"total_tokens\":338},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
-    },
-    {
-      "testId": "folder_create_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-q6jyxwmc7dpccsp4rb4nxu\",\"object\":\"chat.completion\",\"created\":1766168500,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"853935397\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":285,\"completion_tokens\":19,\"total_tokens\":304},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
-    },
-    {
-      "testId": "folder_delete_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-puf024i260n4zd8fsw2swp\",\"object\":\"chat.completion\",\"created\":1766168501,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"892270304\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":286,\"completion_tokens\":21,\"total_tokens\":307},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-3tgyj270yv9htoef7esb04\",\"object\":\"chat.completion\",\"created\":1766346181,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"294922386\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":289,\"completion_tokens\":22,\"total_tokens\":311},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     },
     {
       "testId": "git_add_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-4q23cu8bg28x48t66nt7ue\",\"object\":\"chat.completion\",\"created\":1766168502,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"393899898\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":292,\"completion_tokens\":22,\"total_tokens\":314},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
-    },
-    {
-      "testId": "git_add_all",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-ug1sehjjr2pax3jrb6j1pb\",\"object\":\"chat.completion\",\"created\":1766168503,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"533031050\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":288,\"completion_tokens\":20,\"total_tokens\":308},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-zfizew9h9ih88du0x3zdad\",\"object\":\"chat.completion\",\"created\":1766346182,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"449127336\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":281,\"completion_tokens\":22,\"total_tokens\":303},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-pnjva6gautekkb9t7h0mw\",\"object\":\"chat.completion\",\"created\":1766168504,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"616233794\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":246,\"completion_tokens\":13,\"total_tokens\":259},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-gruaadlol79zfmkt31pcp\",\"object\":\"chat.completion\",\"created\":1766346183,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"988846885\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{\\\"all\\\":\\\"True\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":275,\"completion_tokens\":20,\"total_tokens\":295},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "git_blame_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-oeadyaabages8qvq6qrqoe\",\"object\":\"chat.completion\",\"created\":1766346184,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"315281535\",\"function\":{\"name\":\"git_blame\",\"arguments\":\"{\\\"file\\\":\\\"server.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":356,\"completion_tokens\":21,\"total_tokens\":377},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "git_show_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-hi2vih1tj5osf86e079bbe\",\"object\":\"chat.completion\",\"created\":1766346185,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"472568796\",\"function\":{\"name\":\"git_show\",\"arguments\":\"{\\\"ref\\\":\\\"HEAD\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":309,\"completion_tokens\":20,\"total_tokens\":329},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-a3g81ljky3kt5klxe370o\",\"object\":\"chat.completion\",\"created\":1766346186,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"880911104\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":285,\"completion_tokens\":22,\"total_tokens\":307},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-1w2rcypg5t2ky38bw6u4ub\",\"object\":\"chat.completion\",\"created\":1766346187,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"478808587\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":304,\"completion_tokens\":22,\"total_tokens\":326},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-eug0w99jh0cpkkavj3cz0i\",\"object\":\"chat.completion\",\"created\":1766168505,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"949161429\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":286,\"completion_tokens\":23,\"total_tokens\":309},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-qjw1i5rau3bt6hsr925q1l\",\"object\":\"chat.completion\",\"created\":1766346188,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll help you remove the axios package from your project. I'll use the npm_uninstall command for this.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"808757717\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":287,\"comple"
+    },
+    {
+      "testId": "npm_test_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-l5tkw0d0zj8k21d6qerjtg\",\"object\":\"chat.completion\",\"created\":1766346190,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"665502327\",\"function\":{\"name\":\"npm_test\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":245,\"completion_tokens\":12,\"total_tokens\":257},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-yezxne9vl0p5x09gh25ki\",\"object\":\"chat.completion\",\"created\":1766346190,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I need to fetch data from the provided URL. Let me make an HTTP GET request to https://api.example.com/users.\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"263586741\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_cal"
+    },
+    {
+      "testId": "web_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-9ig40r66sv67cnvja58wgj\",\"object\":\"chat.completion\",\"created\":1766346193,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"739419720\",\"function\":{\"name\":\"web_search\",\"arguments\":\"{\\\"query\\\":\\\"TypeScript generics\\\",\\\"maxResults\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":317,\"completion_tokens\":33,\"total_tokens\":350},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-0rikxamrruwr3ze2j7frd1a\",\"object\":\"chat.completion\",\"created\":1766346194,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll help you navigate to GitHub and get the page title. Let me open the website first.\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"548779530\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":294,\"completion"
+    },
+    {
+      "testId": "browser_screenshot_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-ojx4etddtsi1reu2bjqe9p\",\"object\":\"chat.completion\",\"created\":1766346196,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll take a screenshot of the current page for you.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"623794781\",\"function\":{\"name\":\"browser_take_screenshot\",\"arguments\":\"{\\\"path\\\":\\\"current_page.png\\\",\\\"fullPage\\\":\\\"True\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":342,\"completion_tokens"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-8lzzfh9fvzoeiigazvmrem\",\"object\":\"chat.completion\",\"created\":1766168506,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"279862865\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":287,\"completion_tokens\":25,\"total_tokens\":312},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+      "response": "{\"id\":\"chatcmpl-2c20knvjwoo22jph5o2px1\",\"object\":\"chat.completion\",\"created\":1766346197,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"372541975\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":287,\"completion_tokens\":25,\"total_tokens\":312},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "shell_exec_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-7bcd12fa9r3kx53o9ipbgh\",\"object\":\"chat.completion\",\"created\":1766346199,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"413375029\",\"function\":{\"name\":\"shell_exec\",\"arguments\":\"{\\\"command\\\":\\\"echo Hello\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":344,\"completion_tokens\":23,\"total_tokens\":367},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "memory_store_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-in0npc6sd3p876dulz83dd\",\"object\":\"chat.completion\",\"created\":1766346200,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"512363435\",\"function\":{\"name\":\"memory_store\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\",\\\"value\\\":\\\"Alice\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":316,\"completion_tokens\":31,\"total_tokens\":347},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-3"
+    },
+    {
+      "testId": "memory_retrieve_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-j97r1r40hxflety36c30v\",\"object\":\"chat.completion\",\"created\":1766346201,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The user's name that was stored earlier is \\\"Alex\\\".\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":290,\"completion_tokens\":12,\"total_tokens\":302},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "memory_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-s3fu2rh1inqh82py3jlyd\",\"object\":\"chat.completion\",\"created\":1766346202,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll show you everything you have stored in memory. Let me list all the keys that are currently saved.\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"287225542\",\"function\":{\"name\":\"memory_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":249,\"completion_tokens\":34,\"total_tok"
+    },
+    {
+      "testId": "text_summarize_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-jr9m8clzphe392p2fs5oft\",\"object\":\"chat.completion\",\"created\":1766346203,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"278628964\",\"function\":{\"name\":\"text_summarize\",\"arguments\":\"{\\\"text\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.\\\",\\\"maxSenten"
+    },
+    {
+      "testId": "diff_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-pimswdra0bif2j4m9anmv6\",\"object\":\"chat.completion\",\"created\":1766346205,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll compare the two files \\\"old.txt\\\" and \\\"new.txt\\\" for you.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"997986211\",\"function\":{\"name\":\"diff_files\",\"arguments\":\"{\\\"file1\\\":\\\"old.txt\\\",\\\"file2\\\":\\\"new.txt\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":50,\"tot"
+    },
+    {
+      "testId": "process_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ngsiane8kxr9lboldhah4f\",\"object\":\"chat.completion\",\"created\":1766346207,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"924800411\",\"function\":{\"name\":\"process_list\",\"arguments\":\"{\\\"filter\\\":\\\"node\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":276,\"completion_tokens\":22,\"total_tokens\":298},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "zip_create_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-9olojmc57hmyczmevcvukl\",\"object\":\"chat.completion\",\"created\":1766346208,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"319313025\",\"function\":{\"name\":\"zip_create\",\"arguments\":\"{\\\"output\\\":\\\"backup.zip\\\",\\\"sources\\\":[\\\"src\\\"]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":335,\"completion_tokens\":33,\"total_tokens\":368},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-cod"
+    },
+    {
+      "testId": "zip_extract_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-6873hu1kjdvcg3hurkh82\",\"object\":\"chat.completion\",\"created\":1766346210,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"917440169\",\"function\":{\"name\":\"zip_extract\",\"arguments\":\"{\\\"archive\\\":\\\"data.zip\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":317,\"completion_tokens\":23,\"total_tokens\":340},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
+    },
+    {
+      "testId": "rag_query_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ic78o9pa4d1y2vinu578qh\",\"object\":\"chat.completion\",\"created\":1766346211,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll search for where user authentication is handled in the codebase. Let me use the rag_query tool to find relevant code.\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"826909033\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"user authentication handling\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\""
+    },
+    {
+      "testId": "rag_query_with_filter",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-f0acopd4l2gf00qq3o0obr\",\"object\":\"chat.completion\",\"created\":1766346213,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll search for TypeScript files that handle database connections. Let me use the rag_query tool to find relevant code.\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"957215864\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"database connection handling in TypeScript files\\\",\\\"fileTypes\\\":[\\\"ts\\\"]}\"}}]},\"logprob"
+    },
+    {
+      "testId": "rag_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-qvrquiuugha5j2rvpf1f7y\",\"object\":\"chat.completion\",\"created\":1766346214,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll check the status of the RAG indexing system for you.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"332282289\",\"function\":{\"name\":\"rag_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":266,\"completion_tokens\":24,\"total_tokens\":290},\"stats\":{},\"system_fingerprint\":\""
+    },
+    {
+      "testId": "rag_index_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-imbxm9kafjon7p5bnx6kd\",\"object\":\"chat.completion\",\"created\":1766346216,\"model\":\"qwen/qwen3-coder-30b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"909576919\",\"function\":{\"name\":\"rag_index\",\"arguments\":\"{\\\"projectPath\\\":\\\"/home/user/myproject\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":303,\"completion_tokens\":26,\"total_tokens\":329},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-coder-30b\"}"
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-21T00:00:59.932Z",
+    "testedAt": "2025-12-21T19:42:27.394Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -386,10 +728,940 @@
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 95,
-    "reasoningScore": 0,
-    "overallScore": 95
+    "reasoningScore": 87,
+    "overallScore": 76,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": true,
+        "score": 80,
+        "details": "Valid intent JSON with reasoning"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly chose read based on condition"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 30,
+        "details": "Failed to identify logical conflict"
+      },
+      "explanation": {
+        "passed": true,
+        "score": 100,
+        "details": "Provided reasoning before action"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 100,
+        "details": "Properly handles edge case with fallback"
+      }
+    },
+    "strategicRAGProbes": [
+      {
+        "id": "3.1",
+        "name": "RAG Priority",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 4851,
+        "details": "Correctly used RAG as first tool",
+        "expectedBehavior": "Model should call rag_query BEFORE file reads",
+        "variants": [
+          {
+            "id": "3.1a",
+            "prompt": "Explain the login flow",
+            "passed": true,
+            "score": 100,
+            "response": "I'll help you understand the login flow by examining the codebase. Let me search for relevant files that handle authentication and login functionality.\n"
+          },
+          {
+            "id": "3.1b",
+            "prompt": "Where is user authentication handled?",
+            "passed": true,
+            "score": 100,
+            "response": "I'll search for where user authentication is handled in the codebase. This is an important aspect of any application's security.\n"
+          }
+        ]
+      },
+      {
+        "id": "3.2",
+        "name": "Hierarchical Search",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 5346,
+        "details": "Used RAG but query could be broader",
+        "expectedBehavior": "Should use broader query to get architectural overview",
+        "variants": [
+          {
+            "id": "3.2a",
+            "prompt": "How are the different parts of this codebase connected?",
+            "passed": false,
+            "score": 0,
+            "response": "I'll help you understand how the different parts of this codebase are connected. Let me explore the structure and find key files that show how components interact with each other.\n\nFirst, let's look f"
+          },
+          {
+            "id": "3.2b",
+            "prompt": "Give me a high-level overview of the project structure",
+            "passed": false,
+            "score": 0,
+            "response": "I'll help you get a high-level overview of the project structure. Let me search for information about the project layout.\n"
+          }
+        ]
+      },
+      {
+        "id": "3.3",
+        "name": "Tool Chaining",
+        "category": "3.x",
+        "passed": true,
+        "score": 70,
+        "latency": 2482,
+        "details": "Used RAG but no follow-up read",
+        "expectedBehavior": "Should RAG first, then read_file for details",
+        "variants": [
+          {
+            "id": "3.3a",
+            "prompt": "Find the JWT validation logic and explain how it works",
+            "passed": true,
+            "score": 70,
+            "response": "I'll search for JWT validation logic in the codebase to explain how it works.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "3.4",
+        "name": "Error Recovery",
+        "category": "3.x",
+        "passed": false,
+        "score": 30,
+        "latency": 3276,
+        "details": "Did not acknowledge search failure",
+        "expectedBehavior": "Should acknowledge not found and offer alternatives",
+        "variants": [
+          {
+            "id": "3.4a",
+            "prompt": "Where is the blockchain integration?",
+            "passed": false,
+            "score": 30,
+            "response": "I'll help you find information about blockchain integration in this codebase. Let me search for relevant files and code.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "3.5",
+        "name": "Result Synthesis",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 3687,
+        "details": "Good synthesis of flow",
+        "expectedBehavior": "Should search, then synthesize coherent explanation",
+        "variants": [
+          {
+            "id": "3.5a",
+            "prompt": "Trace a user login request from frontend to backend",
+            "passed": true,
+            "score": 60,
+            "response": "I'll trace a user login request from frontend to backend. Let me search for relevant code to understand how this works in the system.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "3.6",
+        "name": "Self-Correction",
+        "category": "3.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2702,
+        "details": "Only one RAG query, could refine",
+        "expectedBehavior": "Should try different queries if first doesnt find it",
+        "variants": [
+          {
+            "id": "3.6a",
+            "prompt": "Find how roles are enforced in the API",
+            "passed": true,
+            "score": 50,
+            "response": "I'll search for how roles are enforced in the API. Let me look for relevant code that handles role-based access control.\n"
+          }
+        ]
+      }
+    ],
+    "architecturalProbes": [
+      {
+        "id": "4.1",
+        "name": "Code Comprehension",
+        "category": "4.x",
+        "passed": true,
+        "score": 60,
+        "latency": 3723,
+        "details": "Partial understanding",
+        "expectedBehavior": "Should explain JWT validation and user attachment",
+        "variants": [
+          {
+            "id": "4.1a",
+            "prompt": "Explain what db.service does",
+            "passed": false,
+            "score": 20,
+            "response": "I'll explain what db.service does by searching for information about it in the codebase.\n\n"
+          },
+          {
+            "id": "4.1b",
+            "prompt": "How does the UserService class work?",
+            "passed": true,
+            "score": 60,
+            "response": "I'll search for information about the UserService class to understand how it works.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "4.2",
+        "name": "Bug Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 50,
+        "latency": 4533,
+        "details": "Mentioned security but missed specific issue",
+        "expectedBehavior": "Should identify jwt.decode vs jwt.verify issue",
+        "variants": [
+          {
+            "id": "4.2a",
+            "prompt": "Is the refresh token validation secure?",
+            "passed": false,
+            "score": 0,
+            "response": "To determine if refresh token validation is secure, I'll need to examine how refresh tokens are handled in the codebase. Let me search for relevant code related to refresh token validation.\n\n"
+          },
+          {
+            "id": "4.2b",
+            "prompt": "Find security vulnerabilities in auth.ts",
+            "passed": true,
+            "score": 50,
+            "response": "I'll search for security vulnerabilities in the auth.ts file. Let me first locate this file and then examine it for potential security issues.\n"
+          }
+        ]
+      },
+      {
+        "id": "4.3",
+        "name": "SQL Injection Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 100,
+        "latency": 4621,
+        "details": "Correctly identified SQL injection",
+        "expectedBehavior": "Should identify string concatenation in SQL query",
+        "variants": [
+          {
+            "id": "4.3a",
+            "prompt": "Is the search query in UserService.java safe?",
+            "passed": false,
+            "score": 0,
+            "response": "I'll help you analyze whether the search query in UserService.java is safe. First, let me locate and examine this file to understand how search functionality is implemented.\n\n"
+          },
+          {
+            "id": "4.3b",
+            "prompt": "Review database queries for injection vulnerabilities",
+            "passed": true,
+            "score": 100,
+            "response": "I'll help you review database queries for injection vulnerabilities. Let me search for relevant code patterns and implementations that might be susceptible to SQL injection attacks.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "4.4",
+        "name": "XSS Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 100,
+        "latency": 4709,
+        "details": "Correctly identified XSS vulnerability",
+        "expectedBehavior": "Should identify dangerouslySetInnerHTML vulnerability",
+        "variants": [
+          {
+            "id": "4.4a",
+            "prompt": "Is user input properly sanitized in LoginForm?",
+            "passed": true,
+            "score": 100,
+            "response": "I'll check if user input is properly sanitized in the LoginForm. Let me search for this component to examine how it handles user input.\n"
+          },
+          {
+            "id": "4.4b",
+            "prompt": "Find XSS issues in the React components",
+            "passed": true,
+            "score": 100,
+            "response": "I'll help you find potential XSS issues in React components. Let me search for relevant code patterns that could lead to XSS vulnerabilities.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "4.5",
+        "name": "Architecture Inference",
+        "category": "4.x",
+        "passed": false,
+        "score": 30,
+        "latency": 2809,
+        "details": "Did not identify patterns",
+        "expectedBehavior": "Should identify layered architecture, MVC/service pattern",
+        "variants": [
+          {
+            "id": "4.5a",
+            "prompt": "How is the code organized?",
+            "passed": false,
+            "score": 30,
+            "response": "I'll help you understand how the code is organized. Let me search for information about the project structure and organization.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "4.6",
+        "name": "Language Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 3462,
+        "details": "Did not identify languages",
+        "expectedBehavior": "Should identify TypeScript, Java, JSX",
+        "variants": [
+          {
+            "id": "4.6a",
+            "prompt": "What tech stack is this project using?",
+            "passed": false,
+            "score": 0,
+            "response": "I'll help you identify the tech stack of this project. Let me search for information about the technologies being used.\n\nFirst, let's look for any configuration files or documentation that might indic"
+          }
+        ]
+      }
+    ],
+    "navigationProbes": [
+      {
+        "id": "5.1",
+        "name": "Locate Implementation",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 4387,
+        "details": "Found password hashing",
+        "expectedBehavior": "Should locate bcrypt.hash usage",
+        "variants": [
+          {
+            "id": "5.1a",
+            "prompt": "Where is password hashing implemented?",
+            "passed": true,
+            "score": 100,
+            "response": "I'll search for where password hashing is implemented in the codebase. Let me look for relevant files and implementations.\n"
+          },
+          {
+            "id": "5.1b",
+            "prompt": "How is password security handled?",
+            "passed": true,
+            "score": 50,
+            "response": "I'll search for information about password security handling in the codebase.\n"
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "name": "Cross-Stack Navigation",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 3004,
+        "details": "Found auth in both stacks",
+        "expectedBehavior": "Should find both frontend and backend auth",
+        "variants": [
+          {
+            "id": "5.2a",
+            "prompt": "Show me auth across frontend and backend",
+            "passed": false,
+            "score": 0,
+            "response": "I'll help you understand authentication across both frontend and backend. Let me search for relevant code to show how authentication is implemented in this system.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "5.3",
+        "name": "Dependency Tracing",
+        "category": "5.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2620,
+        "details": "Did not trace dependencies",
+        "expectedBehavior": "Should list services and middleware dependencies",
+        "variants": [
+          {
+            "id": "5.3a",
+            "prompt": "What does index.ts import?",
+            "passed": true,
+            "score": 100,
+            "response": "I'll search for the index.ts file to see what it imports. Let me look for this file in the codebase.\n"
+          }
+        ]
+      },
+      {
+        "id": "5.4",
+        "name": "Entry Point Location",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 3040,
+        "details": "Found entry points",
+        "expectedBehavior": "Should find index.ts/App.tsx entry points",
+        "variants": [
+          {
+            "id": "5.4a",
+            "prompt": "What is the main entry file?",
+            "passed": true,
+            "score": 100,
+            "response": "To find the main entry file of this project, I'll search for files that are commonly used as entry points in Python projects.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "5.5",
+        "name": "Shared Code Detection",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 2878,
+        "details": "Found shared code",
+        "expectedBehavior": "Should find shared-utils package",
+        "variants": [
+          {
+            "id": "5.5a",
+            "prompt": "Are there reusable utilities?",
+            "passed": false,
+            "score": 0,
+            "response": "Let me search for reusable utilities in the codebase to understand what's available.\n"
+          }
+        ]
+      }
+    ],
+    "helicopterProbes": [
+      {
+        "id": "6.1",
+        "name": "Project Overview",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 3057,
+        "details": "Good concise overview",
+        "expectedBehavior": "Should summarize project purpose and structure",
+        "variants": [
+          {
+            "id": "6.1a",
+            "prompt": "What is this codebase about?",
+            "passed": true,
+            "score": 100,
+            "response": "I'll help you understand what this codebase is about. Let me search for information about the project structure and main components.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "6.2",
+        "name": "Stack Enumeration",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 3225,
+        "details": "Found few stacks",
+        "expectedBehavior": "Should list Node, React, React Native, Java, Mendix",
+        "variants": [
+          {
+            "id": "6.2a",
+            "prompt": "List all the project folders and their purposes",
+            "passed": false,
+            "score": 20,
+            "response": "I'll help you list the project folders and their purposes. Let me search for the project structure first.\n"
+          }
+        ]
+      },
+      {
+        "id": "6.3",
+        "name": "Team Structure Inference",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 3926,
+        "details": "Suggested team structure",
+        "expectedBehavior": "Should suggest backend/frontend/mobile teams",
+        "variants": [
+          {
+            "id": "6.3a",
+            "prompt": "Who would work on what parts?",
+            "passed": false,
+            "score": 30,
+            "response": "I need more context to answer your question properly. Are you asking about who would work on specific parts of a codebase, project, or system? \n\nLet me search for some information that might help clar"
+          }
+        ]
+      },
+      {
+        "id": "6.4",
+        "name": "Risk Assessment",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 4364,
+        "details": "Identified risks",
+        "expectedBehavior": "Should mention security issues, coupling, etc",
+        "variants": [
+          {
+            "id": "6.4a",
+            "prompt": "Any red flags in this code?",
+            "passed": true,
+            "score": 100,
+            "response": "I'd be happy to help you identify any potential red flags in code, but I don't see any code provided in your message. Could you please share the code you'd like me to review? Once you provide it, I ca"
+          }
+        ]
+      },
+      {
+        "id": "6.5",
+        "name": "Improvement Suggestions",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 3814,
+        "details": "Provided improvements",
+        "expectedBehavior": "Should suggest specific improvements",
+        "variants": [
+          {
+            "id": "6.5a",
+            "prompt": "What would you refactor first?",
+            "passed": false,
+            "score": 20,
+            "response": "To determine what to refactor first, I need to understand the codebase better. Let me search for information about refactoring opportunities or existing code issues.\n"
+          }
+        ]
+      }
+    ],
+    "proactiveProbes": [
+      {
+        "id": "7.1",
+        "name": "Proactive Security Findings",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2814,
+        "details": "Did not proactively find issues",
+        "expectedBehavior": "Should proactively mention connection leak",
+        "variants": [
+          {
+            "id": "7.1a",
+            "prompt": "Review db.service.ts",
+            "passed": false,
+            "score": 20,
+            "response": "I'll review the db.service.ts file for you. Let me first locate this file in the codebase.\n"
+          }
+        ]
+      },
+      {
+        "id": "7.2",
+        "name": "Improvement Suggestions",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 4349,
+        "details": "No proactive suggestions",
+        "expectedBehavior": "Should suggest error handling, cancellation",
+        "variants": [
+          {
+            "id": "7.2a",
+            "prompt": "Can this hook be improved?",
+            "passed": true,
+            "score": 100,
+            "response": "I'd be happy to help improve a hook, but I don't see any specific hook code in your message. Could you please share the hook you're referring to? Once you provide the code, I can analyze it and sugges"
+          }
+        ]
+      },
+      {
+        "id": "7.3",
+        "name": "Documentation Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 3443,
+        "details": "Did not mention docs but reviewed",
+        "expectedBehavior": "May note missing prop types or docs",
+        "variants": [
+          {
+            "id": "7.3a",
+            "prompt": "What do you think of ProductCard?",
+            "passed": true,
+            "score": 50,
+            "response": "I'd be happy to help you understand or evaluate ProductCard, but I don't have enough context about what specifically you're referring to. Let me search for information about ProductCard in the codebas"
+          }
+        ]
+      },
+      {
+        "id": "7.4",
+        "name": "Best Practice Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 60,
+        "latency": 3000,
+        "details": "Reviewed but no best practices",
+        "expectedBehavior": "Should mention best practices for auth",
+        "variants": [
+          {
+            "id": "7.4a",
+            "prompt": "Is the auth middleware well-implemented?",
+            "passed": true,
+            "score": 60,
+            "response": "To evaluate whether the auth middleware is well-implemented, I'll need to examine the implementation. Let me search for authentication middleware code in the codebase.\n"
+          }
+        ]
+      },
+      {
+        "id": "7.5",
+        "name": "Testing Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2724,
+        "details": "Reviewed without test mentions",
+        "expectedBehavior": "May suggest adding tests",
+        "variants": [
+          {
+            "id": "7.5a",
+            "prompt": "Review shared-utils/validation.ts",
+            "passed": true,
+            "score": 50,
+            "response": "I'll review the shared-utils/validation.ts file for you. Let me first locate and read this file.\n"
+          }
+        ]
+      },
+      {
+        "id": "7.6",
+        "name": "Performance Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2692,
+        "details": "Reviewed without perf notes",
+        "expectedBehavior": "May note re-render or pagination concerns",
+        "variants": [
+          {
+            "id": "7.6a",
+            "prompt": "Any performance issues in UserList?",
+            "passed": true,
+            "score": 100,
+            "response": "I'll search for information about UserList to check for any potential performance issues.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "7.7",
+        "name": "Edge Case Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 100,
+        "latency": 2985,
+        "details": "Identified edge cases",
+        "expectedBehavior": "Should identify edge cases in error handling",
+        "variants": [
+          {
+            "id": "7.7a",
+            "prompt": "What if login fails?",
+            "passed": true,
+            "score": 50,
+            "response": "I'll help you understand what happens when login fails in the system. Let me search for login-related code to see how failures are handled.\n\n"
+          }
+        ]
+      },
+      {
+        "id": "7.8",
+        "name": "Accessibility Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2822,
+        "details": "Reviewed without a11y notes",
+        "expectedBehavior": "May note accessibility labels or concerns",
+        "variants": [
+          {
+            "id": "7.8a",
+            "prompt": "Is LoginScreen accessible?",
+            "passed": true,
+            "score": 100,
+            "response": "I'll check if LoginScreen is accessible by searching for it in the codebase and examining its implementation.\n\n"
+          }
+        ]
+      }
+    ],
+    "intentProbes": [
+      {
+        "id": "8.1a",
+        "name": "Implicit RAG - Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly invoked RAG from natural question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1b",
+        "name": "Implicit RAG - Bug Report",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for relevant auth/token code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1c",
+        "name": "Implicit File Read",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not look at file",
+        "toolsInvoked": [
+          "search_files"
+        ],
+        "expectedTools": [
+          "read_file",
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2a",
+        "name": "RAG vs File Read Decision",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly started with RAG for broad question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2b",
+        "name": "Specific vs Broad Query",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Did not read the requested file",
+        "toolsInvoked": [
+          "search_files"
+        ],
+        "expectedTools": [
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.3a",
+        "name": "Knowledge Question - No Tools",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Unnecessarily invoked tools for knowledge question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3b",
+        "name": "Clarification Request",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly asked for clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3c",
+        "name": "Follow-up Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for database context",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4a",
+        "name": "Code Question Without Context",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched before answering",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4b",
+        "name": "Specific Code Location",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Located and examined the code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.5a",
+        "name": "Ambiguous Reference",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly asked for clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.5b",
+        "name": "Multiple Interpretations",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Asked which service",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6a",
+        "name": "Implicit Security Review",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Proceeded without knowing which endpoint",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6b",
+        "name": "Performance Concern Hint",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for user list implementation",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.7a",
+        "name": "Dual Request",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 60,
+        "details": "Only partially addressed request",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8a",
+        "name": "Hypothetical Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched but did not modify",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8b",
+        "name": "Just Asking",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched without modifying",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      }
+    ],
+    "intentScores": {
+      "invokeCorrectness": 88,
+      "toolSelectionAccuracy": 79,
+      "actionCorrectness": 71,
+      "overInvocationRate": 40,
+      "underInvocationRate": 0,
+      "overallIntentScore": 80
+    },
+    "scoreBreakdown": {
+      "toolScore": 95,
+      "reasoningScore": 87,
+      "ragScore": 68,
+      "bugDetectionScore": 83,
+      "architecturalScore": 57,
+      "navigationScore": 84,
+      "helicopterScore": 84,
+      "proactiveScore": 50,
+      "intentScore": 80,
+      "overallScore": 76
+    }
   },
-  "role": "both",
+  "role": "executor",
   "contextLatency": {
     "testedContextSizes": [
       2048,
@@ -418,5 +1690,38 @@
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },
-  "contextLength": 262144
+  "contextLength": 262144,
+  "scoreBreakdown": {
+    "toolScore": 95,
+    "reasoningScore": 87,
+    "ragScore": 68,
+    "bugDetectionScore": 83,
+    "architecturalScore": 57,
+    "navigationScore": 84,
+    "helicopterScore": 84,
+    "proactiveScore": 50,
+    "intentScore": 80,
+    "overallScore": 76
+  },
+  "discoveredNativeTools": [
+    "read_file",
+    "search_web",
+    "execute_code",
+    "generate_text",
+    "analyze_data",
+    "create_visualization",
+    "translate_text",
+    "calculate",
+    "format_text",
+    "extract_information"
+  ],
+  "unmappedNativeTools": [
+    "generate_text",
+    "analyze_data",
+    "create_visualization",
+    "translate_text",
+    "calculate",
+    "format_text",
+    "extract_information"
+  ]
 }

@@ -1,6 +1,6 @@
 {
   "lmstudioUrl": "http://localhost:1234",
-  "lmstudioModel": "qwen/qwen3-4b-2507",
+  "lmstudioModel": "qwen/qwen3-coder-30b",
   "defaultCompressionMode": 0,
   "defaultKeepRecent": 5,
   "openaiModel": "gpt-4o",
@@ -15,6 +15,6 @@
   },
   "proxyMode": "tooly",
   "enableDualModel": false,
-  "mainModelId": "qwen/qwen3-4b-2507",
+  "mainModelId": "qwen/qwen3-coder-30b",
   "executorModelId": ""
 }
