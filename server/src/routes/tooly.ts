@@ -1534,5 +1534,403 @@ router.post('/probe/:modelId', async (req, res) => {
   }
 });
 
+// ============================================================
+// TEST HISTORY (NEW)
+// ============================================================
+
+/**
+ * GET /api/tooly/models/:modelId/test/history
+ * Get test history for a model
+ */
+router.get('/models/:modelId/test/history', async (req, res) => {
+  try {
+    const modelId = decodeURIComponent(req.params.modelId);
+    
+    // Query test history from database
+    const history = db.query(
+      `SELECT * FROM test_history WHERE model_id = ? ORDER BY timestamp DESC LIMIT 50`,
+      [modelId]
+    );
+    
+    // Parse JSON fields
+    const parsedHistory = history.map((entry: any) => ({
+      id: entry.id,
+      testMode: entry.test_mode,
+      scores: entry.scores ? JSON.parse(entry.scores) : {},
+      durationMs: entry.duration_ms,
+      testCount: entry.test_count,
+      passedCount: entry.passed_count,
+      failedCount: entry.failed_count,
+      timestamp: entry.timestamp
+    }));
+    
+    res.json({ history: parsedHistory });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get test history:', error);
+    res.status(500).json({ error: error.message, history: [] });
+  }
+});
+
+// ============================================================
+// MODEL CONFIGURATION (NEW)
+// ============================================================
+
+/**
+ * GET /api/tooly/models/:modelId/config
+ * Get model configuration
+ */
+router.get('/models/:modelId/config', async (req, res) => {
+  try {
+    const modelId = decodeURIComponent(req.params.modelId);
+    
+    // Query config from database
+    const config = db.query(
+      `SELECT * FROM mcp_model_configs WHERE model_id = ?`,
+      [modelId]
+    )[0];
+    
+    if (config) {
+      res.json({
+        modelId: config.model_id,
+        toolFormat: config.tool_format,
+        enabledTools: config.enabled_tools ? JSON.parse(config.enabled_tools) : [],
+        disabledTools: config.disabled_tools ? JSON.parse(config.disabled_tools) : [],
+        toolOverrides: config.tool_overrides ? JSON.parse(config.tool_overrides) : {},
+        systemPromptAdditions: config.system_prompt_additions ? JSON.parse(config.system_prompt_additions) : [],
+        contextBudget: config.context_budget ? JSON.parse(config.context_budget) : {},
+        optimalSettings: config.optimal_settings ? JSON.parse(config.optimal_settings) : {}
+      });
+    } else {
+      // Return default config
+      res.json({
+        modelId,
+        toolFormat: 'openai',
+        enabledTools: [],
+        disabledTools: [],
+        toolOverrides: {},
+        systemPromptAdditions: [],
+        contextBudget: {
+          total: 32000,
+          systemPrompt: 2000,
+          toolSchemas: 4000,
+          memory: 1000,
+          ragResults: 8000,
+          history: 12000,
+          reserve: 5000
+        },
+        optimalSettings: {
+          maxToolsPerCall: 10,
+          ragChunkSize: 1000,
+          ragResultCount: 5
+        }
+      });
+    }
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get config:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/tooly/models/:modelId/config
+ * Update model configuration
+ */
+router.put('/models/:modelId/config', async (req, res) => {
+  try {
+    const modelId = decodeURIComponent(req.params.modelId);
+    const config = req.body;
+    
+    // Upsert config
+    db.run(
+      `INSERT OR REPLACE INTO mcp_model_configs 
+       (model_id, tool_format, enabled_tools, disabled_tools, tool_overrides, 
+        system_prompt_additions, context_budget, optimal_settings, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      [
+        modelId,
+        config.toolFormat || 'openai',
+        JSON.stringify(config.enabledTools || []),
+        JSON.stringify(config.disabledTools || []),
+        JSON.stringify(config.toolOverrides || {}),
+        JSON.stringify(config.systemPromptAdditions || []),
+        JSON.stringify(config.contextBudget || {}),
+        JSON.stringify(config.optimalSettings || {})
+      ]
+    );
+    
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to save config:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/models/:modelId/config/generate
+ * Generate optimal configuration from test results
+ */
+router.post('/models/:modelId/config/generate', async (req, res) => {
+  try {
+    const modelId = decodeURIComponent(req.params.modelId);
+    
+    // Get model profile
+    const profile = await capabilities.getProfile(modelId);
+    
+    if (!profile) {
+      return res.status(404).json({ error: 'Model not found' });
+    }
+    
+    // Generate optimal config based on profile
+    // This is a simplified version - the full implementation would use mcpOrchestrator
+    const optimalConfig = {
+      modelId,
+      toolFormat: 'openai' as const,
+      enabledTools: profile.enabledTools || [],
+      disabledTools: [],
+      toolOverrides: {},
+      systemPromptAdditions: [],
+      contextBudget: {
+        total: profile.contextLength || 32000,
+        systemPrompt: 2000,
+        toolSchemas: 4000,
+        memory: 1000,
+        ragResults: 8000,
+        history: 12000,
+        reserve: 5000
+      },
+      optimalSettings: {
+        maxToolsPerCall: 10,
+        ragChunkSize: 1000,
+        ragResultCount: 5
+      }
+    };
+    
+    // Save config
+    db.run(
+      `INSERT OR REPLACE INTO mcp_model_configs 
+       (model_id, tool_format, enabled_tools, disabled_tools, tool_overrides, 
+        system_prompt_additions, context_budget, optimal_settings, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+      [
+        modelId,
+        optimalConfig.toolFormat,
+        JSON.stringify(optimalConfig.enabledTools),
+        JSON.stringify(optimalConfig.disabledTools),
+        JSON.stringify(optimalConfig.toolOverrides),
+        JSON.stringify(optimalConfig.systemPromptAdditions),
+        JSON.stringify(optimalConfig.contextBudget),
+        JSON.stringify(optimalConfig.optimalSettings)
+      ]
+    );
+    
+    res.json({ success: true, config: optimalConfig });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to generate config:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// ACTIVE MODEL MANAGEMENT (NEW)
+// ============================================================
+
+/**
+ * POST /api/tooly/active-model
+ * Set a model as main or executor
+ */
+router.post('/active-model', async (req, res) => {
+  try {
+    const { modelId, role } = req.body;
+    
+    if (!modelId || !role) {
+      return res.status(400).json({ error: 'modelId and role are required' });
+    }
+    
+    if (!['main', 'executor'].includes(role)) {
+      return res.status(400).json({ error: 'role must be "main" or "executor"' });
+    }
+    
+    // Update model profile with new role
+    const profile = await capabilities.getProfile(modelId);
+    if (profile) {
+      const newRole = role === 'main' 
+        ? (profile.role === 'executor' ? 'both' : 'main')
+        : (profile.role === 'main' ? 'both' : 'executor');
+      
+      await capabilities.saveProfile({
+        ...profile,
+        role: newRole
+      });
+    }
+    
+    // Also save to settings
+    try {
+      let settings: any = {};
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+      
+      if (role === 'main') {
+        settings.mainModelId = modelId;
+      } else {
+        settings.executorModelId = modelId;
+      }
+      
+      await fs.writeJson(SETTINGS_FILE, settings, { spaces: 2 });
+    } catch (err) {
+      console.error('[Tooly] Failed to save active model to settings:', err);
+    }
+    
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to set active model:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// SMALL MODEL / CONTEXT INTELLIGENCE (Phase 4)
+// ============================================================
+
+/**
+ * GET /api/tooly/context/config
+ * Get current small model configuration for context intelligence
+ */
+router.get('/context/config', async (req, res) => {
+  try {
+    const { contextManager, contextAnalyzer } = await import('../modules/tooly/index.js');
+    
+    res.json({
+      contextManager: {
+        defaultBudget: contextManager.calculateBudgetForModel(32000)
+      },
+      smallModel: contextAnalyzer.getConfig()
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get context config:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/tooly/context/config
+ * Update small model configuration
+ */
+router.put('/context/config', async (req, res) => {
+  try {
+    const { enabled, modelId, lmstudioUrl, maxTokens, temperature, timeout, cacheEnabled, cacheTTL } = req.body;
+    const { contextManager } = await import('../modules/tooly/index.js');
+    
+    const config: any = {};
+    if (enabled !== undefined) config.enabled = enabled;
+    if (modelId) config.modelId = modelId;
+    if (lmstudioUrl) config.lmstudioUrl = lmstudioUrl;
+    if (maxTokens) config.maxTokens = maxTokens;
+    if (temperature !== undefined) config.temperature = temperature;
+    if (timeout) config.timeout = timeout;
+    if (cacheEnabled !== undefined) config.cacheEnabled = cacheEnabled;
+    if (cacheTTL) config.cacheTTL = cacheTTL;
+    
+    contextManager.configureSmallModel(config);
+    
+    // Also save to settings file
+    try {
+      let settings: any = {};
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+      
+      settings.smallModel = {
+        ...(settings.smallModel || {}),
+        ...config
+      };
+      
+      await fs.writeJson(SETTINGS_FILE, settings, { spaces: 2 });
+    } catch (err) {
+      console.error('[Tooly] Failed to save small model config:', err);
+    }
+    
+    res.json({ success: true, config });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to update context config:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/context/analyze
+ * Analyze a query using the small model
+ */
+router.post('/context/analyze', async (req, res) => {
+  try {
+    const { query } = req.body;
+    
+    if (!query) {
+      return res.status(400).json({ error: 'query is required' });
+    }
+    
+    const { contextManager } = await import('../modules/tooly/index.js');
+    const analysis = await contextManager.analyzeQueryEnhanced(query);
+    
+    res.json({
+      success: true,
+      analysis
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to analyze query:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/context/summarize
+ * Summarize content using the small model
+ */
+router.post('/context/summarize', async (req, res) => {
+  try {
+    const { content, targetTokens = 200 } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ error: 'content is required' });
+    }
+    
+    const { summarizer } = await import('../modules/tooly/index.js');
+    const result = await summarizer.summarizeContent(content, targetTokens);
+    
+    res.json({
+      success: true,
+      result
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to summarize:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/context/rank
+ * Rank items by relevance to a query
+ */
+router.post('/context/rank', async (req, res) => {
+  try {
+    const { query, items, maxItems = 10 } = req.body;
+    
+    if (!query || !items || !Array.isArray(items)) {
+      return res.status(400).json({ error: 'query and items array are required' });
+    }
+    
+    const { contextAnalyzer } = await import('../modules/tooly/index.js');
+    const ranking = await contextAnalyzer.rankByRelevance(query, items, maxItems);
+    
+    res.json({
+      success: true,
+      ranking
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to rank items:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;
 

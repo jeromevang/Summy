@@ -2,9 +2,10 @@
   "port": 3002,
   "wsPort": 3003,
   "lmstudio": {
-    "model": "text-embedding-nomic-embed-text-v1.5@q8_0",
+    "model": "nomic-ai/nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.Q8_0.gguf",
     "chatModel": "qwen/qwen3-4b-2507",
-    "loadOnDemand": false
+    "loadOnDemand": true,
+    "keepLoaded": true
   },
   "storage": {
     "dataPath": "./data/indices"

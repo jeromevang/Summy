@@ -11,7 +11,8 @@ export interface RAGConfig {
   lmstudio: {
     model: string;           // Embedding model (e.g., nomic-embed-text-v1.5)
     chatModel?: string;      // Chat model for summaries (e.g., qwen/qwen3-4b)
-    loadOnDemand: boolean;   // default: false - keep loaded for performance
+    loadOnDemand: boolean;   // default: true - load only when needed (don't pre-load on startup)
+    keepLoaded: boolean;     // default: true - keep loaded after use (don't unload from LM Studio)
   };
   
   // HNSWLib storage config
@@ -78,7 +79,8 @@ export const defaultConfig: RAGConfig = {
   lmstudio: {
     model: '',
     chatModel: '',
-    loadOnDemand: false  // Keep loaded for performance
+    loadOnDemand: true,   // Load only when needed
+    keepLoaded: true      // Keep loaded after use (don't unload from LM Studio)
   },
   
   storage: {

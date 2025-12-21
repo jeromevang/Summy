@@ -647,8 +647,9 @@ export class Indexer {
       const duration = Date.now() - startTime;
       console.log(`[Indexer] Completed in ${duration}ms: ${this.progress.processedFiles} files, ${this.progress.chunksCreated} chunks`);
       
-      // Unload embedder if configured
-      if (this.config.lmstudio.loadOnDemand) {
+      // Only clear embedder reference if NOT keeping loaded
+      // (Model stays loaded in LM Studio for quick reuse)
+      if (!this.config.lmstudio.keepLoaded) {
         await this.embedder.unload();
       }
       
@@ -850,8 +851,9 @@ export class Indexer {
       });
     }
     
-    // Unload embedder if configured
-    if (this.config.lmstudio.loadOnDemand) {
+    // Only clear embedder reference if NOT keeping loaded
+    // (Model stays loaded in LM Studio for quick reuse)
+    if (!this.config.lmstudio.keepLoaded) {
       await this.embedder.unload();
     }
     
