@@ -655,21 +655,29 @@ class ProbeEngine {
 
     const chatExecutor = createChatExecutor();
 
+    // Helper to create progress callback for strategic probes
+    let strategicProbeCounter = completedTests;
+    const createProbeProgressCallback = (categoryEmoji: string) => {
+      return (probeName: string, probeIndex: number, totalProbesInCategory: number, score?: number) => {
+        strategicProbeCounter++;
+        wsBroadcast.broadcastProgress('probe', modelId, {
+          current: strategicProbeCounter,
+          total: totalTests + 30,
+          currentTest: probeName,
+          score: score ?? 0,
+          status: 'running'
+        });
+      };
+    };
+
     // Run Strategic RAG Probes (3.x)
     let strategicRAGProbes: StrategicProbeResult[] | undefined;
     let ragScore = 0;
     if (shouldRunCategory('3.x') && !options.quickMode) {
       console.log(`[ProbeEngine] Running Strategic RAG probes (3.x) for ${modelId}`);
       try {
-        strategicRAGProbes = await runProbeCategory('3.x', chatExecutor);
+        strategicRAGProbes = await runProbeCategory('3.x', chatExecutor, createProbeProgressCallback('🔍'));
         ragScore = Math.round(strategicRAGProbes.reduce((sum, p) => sum + p.score, 0) / strategicRAGProbes.length);
-        wsBroadcast.broadcastProgress('probe', modelId, {
-          current: completedTests + 1,
-          total: totalTests + 30, // Approximate additional tests
-          currentTest: '🔍 Strategic RAG probes',
-          score: ragScore,
-          status: 'running'
-        });
       } catch (error: any) {
         console.log(`[ProbeEngine] Strategic RAG probes failed: ${error.message}`);
       }
@@ -682,20 +690,13 @@ class ProbeEngine {
     if (shouldRunCategory('4.x') && !options.quickMode) {
       console.log(`[ProbeEngine] Running Architectural probes (4.x) for ${modelId}`);
       try {
-        architecturalProbes = await runProbeCategory('4.x', chatExecutor);
+        architecturalProbes = await runProbeCategory('4.x', chatExecutor, createProbeProgressCallback('🏗️'));
         architecturalScore = Math.round(architecturalProbes.reduce((sum, p) => sum + p.score, 0) / architecturalProbes.length);
         // Bug detection score from specific probes (4.2, 4.3, 4.4)
         const bugProbes = architecturalProbes.filter(p => ['4.2', '4.3', '4.4'].includes(p.id));
         bugDetectionScore = bugProbes.length > 0 
           ? Math.round(bugProbes.reduce((sum, p) => sum + p.score, 0) / bugProbes.length)
           : architecturalScore;
-        wsBroadcast.broadcastProgress('probe', modelId, {
-          current: completedTests + 2,
-          total: totalTests + 30,
-          currentTest: '🏗️ Architectural probes',
-          score: architecturalScore,
-          status: 'running'
-        });
       } catch (error: any) {
         console.log(`[ProbeEngine] Architectural probes failed: ${error.message}`);
       }
@@ -707,15 +708,8 @@ class ProbeEngine {
     if (shouldRunCategory('5.x') && !options.quickMode) {
       console.log(`[ProbeEngine] Running Navigation probes (5.x) for ${modelId}`);
       try {
-        navigationProbes = await runProbeCategory('5.x', chatExecutor);
+        navigationProbes = await runProbeCategory('5.x', chatExecutor, createProbeProgressCallback('🧭'));
         navigationScore = Math.round(navigationProbes.reduce((sum, p) => sum + p.score, 0) / navigationProbes.length);
-        wsBroadcast.broadcastProgress('probe', modelId, {
-          current: completedTests + 3,
-          total: totalTests + 30,
-          currentTest: '🧭 Navigation probes',
-          score: navigationScore,
-          status: 'running'
-        });
       } catch (error: any) {
         console.log(`[ProbeEngine] Navigation probes failed: ${error.message}`);
       }
@@ -727,15 +721,8 @@ class ProbeEngine {
     if (shouldRunCategory('6.x') && !options.quickMode) {
       console.log(`[ProbeEngine] Running Helicopter probes (6.x) for ${modelId}`);
       try {
-        helicopterProbes = await runProbeCategory('6.x', chatExecutor);
+        helicopterProbes = await runProbeCategory('6.x', chatExecutor, createProbeProgressCallback('🚁'));
         helicopterScore = Math.round(helicopterProbes.reduce((sum, p) => sum + p.score, 0) / helicopterProbes.length);
-        wsBroadcast.broadcastProgress('probe', modelId, {
-          current: completedTests + 4,
-          total: totalTests + 30,
-          currentTest: '🚁 Helicopter probes',
-          score: helicopterScore,
-          status: 'running'
-        });
       } catch (error: any) {
         console.log(`[ProbeEngine] Helicopter probes failed: ${error.message}`);
       }
@@ -747,15 +734,8 @@ class ProbeEngine {
     if (shouldRunCategory('7.x') && !options.quickMode) {
       console.log(`[ProbeEngine] Running Proactive probes (7.x) for ${modelId}`);
       try {
-        proactiveProbes = await runProbeCategory('7.x', chatExecutor);
+        proactiveProbes = await runProbeCategory('7.x', chatExecutor, createProbeProgressCallback('💡'));
         proactiveScore = Math.round(proactiveProbes.reduce((sum, p) => sum + p.score, 0) / proactiveProbes.length);
-        wsBroadcast.broadcastProgress('probe', modelId, {
-          current: completedTests + 5,
-          total: totalTests + 30,
-          currentTest: '💡 Proactive probes',
-          score: proactiveScore,
-          status: 'running'
-        });
       } catch (error: any) {
         console.log(`[ProbeEngine] Proactive probes failed: ${error.message}`);
       }

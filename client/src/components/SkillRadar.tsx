@@ -27,20 +27,21 @@ export const SkillRadar: React.FC<SkillRadarProps> = ({ data, size = 200 }) => {
     fullMark: d.fullMark || 100,
   }));
 
-  // Calculate font size based on chart size
-  const fontSize = size < 150 ? 8 : size < 200 ? 9 : 10;
-  // Calculate margins to ensure labels are visible (need more space for longer labels)
-  const margin = size < 150 ? 35 : size < 200 ? 40 : 45;
+  // Optimized sizing for minimal wasted space while keeping labels readable
+  // Smaller margins, larger outerRadius = more chart, less whitespace
+  const fontSize = Math.max(9, Math.min(11, size / 20));
+  const margin = Math.max(20, size * 0.12); // Tighter margins
+  const outerRadius = '75%'; // Larger chart area
 
   return (
     <div style={{ width: size, height: size }}>
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart 
           data={chartData} 
-          margin={{ top: margin, right: margin, bottom: margin, left: margin }}
+          margin={{ top: margin, right: margin + 10, bottom: margin, left: margin + 10 }}
           cx="50%"
           cy="50%"
-          outerRadius={size < 150 ? '55%' : '60%'}
+          outerRadius={outerRadius}
         >
           <PolarGrid 
             stroke="#334155" 

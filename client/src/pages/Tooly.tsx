@@ -153,6 +153,52 @@ interface ExecutionLog {
 
 type TabId = 'models' | 'tests' | 'logs';
 
+// Tool categories - mirrors server/src/modules/tooly/capabilities.ts
+const TOOL_CATEGORIES: Record<string, string[]> = {
+  'RAG - Semantic Search': ['rag_query', 'rag_status', 'rag_index'],
+  'File Operations': ['read_file', 'read_multiple_files', 'write_file', 'edit_file', 'delete_file', 'copy_file', 'move_file', 'get_file_info', 'list_directory', 'search_files', 'create_directory', 'delete_directory', 'list_allowed_directories'],
+  'Git Operations': ['git_status', 'git_diff', 'git_log', 'git_init', 'git_add', 'git_commit', 'git_push', 'git_pull', 'git_checkout', 'git_stash', 'git_stash_pop', 'git_reset', 'git_clone', 'git_branch_create', 'git_branch_list', 'git_blame', 'git_show'],
+  'NPM Operations': ['npm_run', 'npm_install', 'npm_uninstall', 'npm_init', 'npm_test', 'npm_build', 'npm_list'],
+  'Browser': ['browser_navigate', 'browser_go_back', 'browser_go_forward', 'browser_click', 'browser_type', 'browser_hover', 'browser_select_option', 'browser_press_key', 'browser_snapshot', 'browser_fetch_content', 'browser_take_screenshot', 'browser_wait', 'browser_resize', 'browser_handle_dialog', 'browser_drag', 'browser_tabs', 'browser_evaluate', 'browser_console_messages', 'browser_network_requests'],
+  'HTTP/Search': ['http_request', 'url_fetch_content', 'web_search'],
+  'Code Execution': ['shell_exec', 'run_python', 'run_node', 'run_typescript'],
+  'Memory': ['memory_store', 'memory_retrieve', 'memory_list', 'memory_delete'],
+  'Text': ['text_summarize', 'diff_files'],
+  'Process': ['process_list', 'process_kill'],
+  'Archive': ['zip_create', 'zip_extract'],
+  'Utility': ['mcp_rules', 'env_get', 'env_set', 'json_parse', 'base64_encode', 'base64_decode']
+};
+
+// Helper to extract category from test name (e.g., "1.1 Emit Test" -> "Tool Probes", "3.x RAG" -> "RAG Probes")
+const extractCategoryFromTest = (testName: string, testType?: 'probe' | 'tools' | 'latency'): string => {
+  if (!testName) return 'Running Tests';
+  const lower = testName.toLowerCase();
+  
+  // Check for tool capability tests (tools test type or known tool names)
+  if (testType === 'tools') {
+    // Find which category this tool belongs to
+    for (const [catName, tools] of Object.entries(TOOL_CATEGORIES)) {
+      if (tools.some(tool => lower.includes(tool.replace(/_/g, ' ')) || lower === tool)) {
+        return `🔧 ${catName}`;
+      }
+    }
+    return '🔧 Tool Tests';
+  }
+  
+  // Probe tests
+  if (lower.includes('emit') || lower.includes('schema') || lower.includes('selection') || lower.includes('suppression') || lower.includes('1.')) return 'Tool Behavior (1.x)';
+  if (lower.includes('reasoning') || lower.includes('intent extraction') || lower.includes('planning') || lower.includes('2.')) return 'Reasoning (2.x)';
+  if (lower.includes('rag') || lower.includes('3.')) return '🔍 Strategic RAG';
+  if (lower.includes('architecture') || lower.includes('4.')) return '🏗️ Architecture';
+  if (lower.includes('navigation') || lower.includes('5.')) return '🧭 Navigation';
+  if (lower.includes('helicopter') || lower.includes('6.')) return '🐛 Bug Detection';
+  if (lower.includes('proactive') || lower.includes('7.')) return '💡 Proactive';
+  if (lower.includes('intent') || lower.includes('8.')) return '🎯 Intent';
+  if (lower.includes('tool')) return 'Tool Tests';
+  if (lower.includes('latency') || lower.includes('context')) return 'Latency Profile';
+  return 'Running Tests';
+};
+
 // ============================================================
 // TOOLY PAGE
 // ============================================================
@@ -239,7 +285,31 @@ const Tooly: React.FC = () => {
     toolsProgress?: { current: number; total: number; currentTest: string; score: number; status: string };
     latencyProgress?: { current: number; total: number; currentTest: string; status: string };
     modelId?: string;
+    startTime?: number;
   }>({});
+  
+  // Helper to calculate ETA
+  const calculateETA = () => {
+    if (!testProgress.startTime) return null;
+    const elapsed = Date.now() - testProgress.startTime;
+    const probeP = testProgress.probeProgress;
+    const toolsP = testProgress.toolsProgress;
+    const latencyP = testProgress.latencyProgress;
+    
+    const current = (probeP?.current ?? 0) + (toolsP?.current ?? 0) + (latencyP?.current ?? 0);
+    const total = (probeP?.total ?? 0) + (toolsP?.total ?? 0) + (latencyP?.total ?? 0);
+    
+    if (current === 0 || total === 0) return null;
+    
+    const avgTimePerTest = elapsed / current;
+    const remaining = (total - current) * avgTimePerTest;
+    
+    if (remaining < 1000) return '< 1s';
+    if (remaining < 60000) return `~${Math.ceil(remaining / 1000)}s`;
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.ceil((remaining % 60000) / 1000);
+    return `~${mins}m ${secs}s`;
+  };
 
   // Model loading state
   const [modelLoading, setModelLoading] = useState<{
@@ -1201,9 +1271,9 @@ const Tooly: React.FC = () => {
       <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-6">
         {/* Models Tab */}
         {activeTab === 'models' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Model List */}
-            <div className="flex flex-col">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" style={{ height: 'calc(100vh - 440px)', minHeight: '450px' }}>
+            {/* Model List - scrollable */}
+            <div className="flex flex-col h-full overflow-hidden">
               <div className="flex flex-col gap-3 mb-4">
                 {/* Header row */}
                 <div className="flex items-center justify-between">
@@ -1488,7 +1558,7 @@ const Tooly: React.FC = () => {
                   No models discovered. Check your LLM provider settings.
                 </p>
               ) : (
-                <div className="space-y-2 flex-1 max-h-[calc(100vh-340px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
+                <div className="space-y-2 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
                   {models.map((model) => (
                     <div
                       key={model.id}
@@ -1547,14 +1617,48 @@ const Tooly: React.FC = () => {
                           )}
                         </div>
                       </div>
+                      {/* Mini Progress Bar on Model Card */}
+                      {testProgress.modelId === model.id && (testProgress.probeProgress?.status === 'running' || testProgress.toolsProgress?.status === 'running' || testProgress.latencyProgress?.status === 'running') && (
+                        <div className="mt-3 pt-3 border-t border-[#2d2d2d]">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-2">
+                              <span className="animate-pulse text-purple-400 text-xs">●</span>
+                              <span className="text-xs text-gray-400 truncate max-w-[180px]">
+                                {testProgress.probeProgress?.currentTest || testProgress.toolsProgress?.currentTest || testProgress.latencyProgress?.currentTest || 'Testing...'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {calculateETA() && (
+                                <span className="text-xs text-gray-500">{calculateETA()}</span>
+                              )}
+                              <span className="text-xs text-gray-500">
+                                {((testProgress.probeProgress?.current ?? 0) + (testProgress.toolsProgress?.current ?? 0) + (testProgress.latencyProgress?.current ?? 0))}/
+                                {((testProgress.probeProgress?.total ?? 0) + (testProgress.toolsProgress?.total ?? 0) + (testProgress.latencyProgress?.total ?? 0))}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="w-full bg-[#1a1a1a] rounded-full h-1.5">
+                            <div 
+                              className="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
+                              style={{ 
+                                width: `${(() => {
+                                  const current = (testProgress.probeProgress?.current ?? 0) + (testProgress.toolsProgress?.current ?? 0) + (testProgress.latencyProgress?.current ?? 0);
+                                  const total = (testProgress.probeProgress?.total ?? 0) + (testProgress.toolsProgress?.total ?? 0) + (testProgress.latencyProgress?.total ?? 0);
+                                  return total > 0 ? (current / total) * 100 : 0;
+                                })()}%` 
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Model Details */}
-            <div className={`flex flex-col ${detailPaneVersion === 'v2' ? 'flex-1 overflow-hidden' : 'max-h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent'}`}>
+            {/* Model Details - scrollable within fixed height */}
+            <div className={`flex flex-col h-full ${detailPaneVersion === 'v2' ? 'overflow-y-auto overflow-x-hidden' : 'overflow-y-auto overflow-x-hidden'} scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent`}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-semibold text-white">
@@ -1657,7 +1761,23 @@ const Tooly: React.FC = () => {
                         };
                       }),
                       modelInfo: selectedModel.modelInfo,
-                      toolCategories: undefined,
+                      toolCategories: (() => {
+                        // Build toolCategories from model capabilities
+                        const result: Record<string, { tools: Array<{ name: string; score: number; testsPassed: number; enabled: boolean }> }> = {};
+                        for (const [catName, tools] of Object.entries(TOOL_CATEGORIES)) {
+                          const toolsWithData = tools.map(toolName => ({
+                            name: toolName,
+                            score: selectedModel.capabilities?.[toolName]?.score || 0,
+                            testsPassed: selectedModel.capabilities?.[toolName]?.testsPassed || 0,
+                            enabled: selectedModel.enabledTools?.includes(toolName) || false,
+                          }));
+                          // Only include categories that have at least one tested tool
+                          if (toolsWithData.some(t => t.score > 0)) {
+                            result[catName] = { tools: toolsWithData };
+                          }
+                        }
+                        return Object.keys(result).length > 0 ? result : undefined;
+                      })(),
                       probeResults: selectedModel.probeResults ? {
                         coreProbes: [
                           { name: 'Emit Test', passed: selectedModel.probeResults.emitTest?.passed || false },
@@ -1678,15 +1798,24 @@ const Tooly: React.FC = () => {
                       const isThisModel = testProgress.modelId === selectedModel.modelId;
                       const probeP = isThisModel ? testProgress.probeProgress : undefined;
                       const toolsP = isThisModel ? testProgress.toolsProgress : undefined;
+                      const latencyP = isThisModel ? testProgress.latencyProgress : undefined;
                       
-                      if (!probeP && !toolsP) return undefined;
+                      if (!probeP && !toolsP && !latencyP) return undefined;
                       
-                      const isRunning = probeP?.status === 'running' || toolsP?.status === 'running';
-                      const current = (probeP?.current ?? 0) + (toolsP?.current ?? 0);
-                      const total = (probeP?.total ?? 0) + (toolsP?.total ?? 0);
+                      const isRunning = probeP?.status === 'running' || toolsP?.status === 'running' || latencyP?.status === 'running';
+                      const current = (probeP?.current ?? 0) + (toolsP?.current ?? 0) + (latencyP?.current ?? 0);
+                      const total = (probeP?.total ?? 0) + (toolsP?.total ?? 0) + (latencyP?.total ?? 0);
                       const percent = total > 0 ? Math.round((current / total) * 100) : 0;
-                      const currentCategory = probeP?.status === 'running' ? 'Probe Tests' : 'Tool Tests';
-                      const currentTest = probeP?.currentTest || toolsP?.currentTest;
+                      const currentTest = probeP?.currentTest || toolsP?.currentTest || latencyP?.currentTest || '';
+                      // Determine test type for category extraction
+                      const testType: 'probe' | 'tools' | 'latency' | undefined = 
+                        toolsP?.status === 'running' ? 'tools' :
+                        probeP?.status === 'running' ? 'probe' :
+                        latencyP?.status === 'running' ? 'latency' : undefined;
+                      // Extract detailed category from the current test name
+                      const currentCategory = extractCategoryFromTest(currentTest, testType);
+                      // Calculate ETA
+                      const eta = calculateETA();
                       
                       return {
                         isRunning,
@@ -1695,6 +1824,8 @@ const Tooly: React.FC = () => {
                         currentCategory,
                         currentTest,
                         percent,
+                        eta: eta || undefined,
+                        testType, // Pass test type for tab switching
                       };
                     })()}
                     modelLoading={{
@@ -1937,7 +2068,8 @@ const Tooly: React.FC = () => {
                       setTestProgress(prev => ({
                         ...prev,
                         latencyProgress: undefined,
-                        probeProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                        probeProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' },
+                        startTime: Date.now(),
                       }));
                       await runProbeTests(selectedModel.modelId, selectedModel.provider, false);
                       
@@ -1945,7 +2077,8 @@ const Tooly: React.FC = () => {
                       setTestProgress(prev => ({
                         ...prev,
                         probeProgress: undefined,
-                        toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                        toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' },
+                        startTime: prev.startTime || Date.now(),
                       }));
                       await runModelTests(selectedModel.modelId, selectedModel.provider);
                       
@@ -2459,7 +2592,8 @@ const Tooly: React.FC = () => {
                           onClick={() => {
                             setTestProgress({
                               modelId: selectedModel.modelId,
-                              toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                              toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' },
+                              startTime: Date.now(),
                             });
                             runModelTests(selectedModel.modelId, selectedModel.provider);
                           }}
@@ -2563,7 +2697,8 @@ const Tooly: React.FC = () => {
                         // Initialize - server will send actual totals via WebSocket
                         setTestProgress({
                           modelId: selectedModel.modelId,
-                          probeProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                          probeProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' },
+                          startTime: Date.now(),
                         });
                         runProbeTests(selectedModel.modelId, selectedModel.provider, true);
                       }}
@@ -2577,7 +2712,8 @@ const Tooly: React.FC = () => {
                         // Initialize - server will send actual totals via WebSocket
                         setTestProgress({
                           modelId: selectedModel.modelId,
-                          toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' }
+                          toolsProgress: { current: 0, total: 1, currentTest: 'Initializing...', score: 0, status: 'running' },
+                          startTime: Date.now(),
                         });
                         runModelTests(selectedModel.modelId, selectedModel.provider);
                       }}
