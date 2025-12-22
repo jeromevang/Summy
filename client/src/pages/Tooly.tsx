@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
+// recharts imports removed - full charts are on Model Detail Page now
 import TestEditor from '../components/TestEditor';
 import type { CustomTest } from '../components/TestEditor';
 import { Recommendations } from '../components/Recommendations';
@@ -975,6 +975,12 @@ const Tooly: React.FC = () => {
             </select>
           </div>
           <button
+            onClick={() => navigate('/tooly/optimal-setup')}
+            className="px-3 py-1.5 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all font-medium flex items-center gap-1.5"
+          >
+            <span>🎯</span> Find Optimal Setup
+          </button>
+          <button
             onClick={() => {
               fetchModels();
               fetchTests();
@@ -1110,70 +1116,47 @@ const Tooly: React.FC = () => {
         )}
       </div>
 
-      {/* System Metrics Charts */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[#2d2d2d]">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-gray-400">🖥️ CPU Usage</span>
-            <span className="text-lg font-bold text-purple-400">
-              {systemMetrics[systemMetrics.length - 1]?.cpu ?? 0}%
-            </span>
-          </div>
-          <div className="h-16">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={systemMetrics}>
-                <YAxis domain={[0, 100]} hide />
-                <Line 
-                  type="monotone" 
-                  dataKey="cpu" 
-                  stroke="#8b5cf6" 
-                  strokeWidth={2} 
-                  dot={false}
-                  isAnimationActive={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Compact System Metrics Bar - Full charts are on Model Detail Page */}
+      <div className="flex items-center gap-4 mb-4 px-3 py-2 bg-[#1a1a1a] rounded-lg border border-[#2d2d2d]">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">🖥️ CPU</span>
+          <span className="text-sm font-semibold text-purple-400">
+            {systemMetrics[systemMetrics.length - 1]?.cpu ?? 0}%
+          </span>
         </div>
-        <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[#2d2d2d]">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-400">🎮 GPU Usage</span>
-              {systemMetrics[systemMetrics.length - 1]?.gpuTemp > 0 && (
-                <span className={`text-xs ${
-                  systemMetrics[systemMetrics.length - 1]?.gpuTemp > 80 ? 'text-red-400' :
-                  systemMetrics[systemMetrics.length - 1]?.gpuTemp > 60 ? 'text-yellow-400' :
-                  'text-gray-500'
-                }`}>
-                  🌡️ {systemMetrics[systemMetrics.length - 1]?.gpuTemp}°C
-                </span>
-              )}
-            </div>
-            <span className="text-lg font-bold text-green-400">
-              {systemMetrics[systemMetrics.length - 1]?.gpu ?? 0}%
+        <div className="w-px h-4 bg-[#2d2d2d]" />
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">🎮 GPU</span>
+          <span className="text-sm font-semibold text-green-400">
+            {systemMetrics[systemMetrics.length - 1]?.gpu ?? 0}%
+          </span>
+          {systemMetrics[systemMetrics.length - 1]?.gpuTemp > 0 && (
+            <span className={`text-xs ${
+              systemMetrics[systemMetrics.length - 1]?.gpuTemp > 80 ? 'text-red-400' :
+              systemMetrics[systemMetrics.length - 1]?.gpuTemp > 60 ? 'text-yellow-400' :
+              'text-gray-500'
+            }`}>
+              🌡️ {systemMetrics[systemMetrics.length - 1]?.gpuTemp}°C
             </span>
-          </div>
-          <div className="h-16">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={systemMetrics}>
-                <YAxis domain={[0, 100]} hide />
-                <Line 
-                  type="monotone" 
-                  dataKey="gpu" 
-                  stroke="#10b981" 
-                  strokeWidth={2} 
-                  dot={false}
-                  isAnimationActive={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          {systemMetrics[systemMetrics.length - 1]?.gpuName && (
-            <p className="text-xs text-gray-600 mt-1 truncate">
-              {systemMetrics[systemMetrics.length - 1]?.gpuName}
-            </p>
           )}
         </div>
+        <div className="w-px h-4 bg-[#2d2d2d]" />
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">💾 VRAM</span>
+          <span className="text-sm font-semibold text-amber-400">
+            {systemMetrics[systemMetrics.length - 1]?.gpuMemory 
+              ? `${(systemMetrics[systemMetrics.length - 1].gpuMemory / 1024).toFixed(1)}GB`
+              : 'N/A'}
+          </span>
+        </div>
+        {systemMetrics[systemMetrics.length - 1]?.gpuName && (
+          <>
+            <div className="w-px h-4 bg-[#2d2d2d]" />
+            <span className="text-xs text-gray-600 truncate max-w-[200px]">
+              {systemMetrics[systemMetrics.length - 1]?.gpuName}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Slow Model Prompt Modal */}

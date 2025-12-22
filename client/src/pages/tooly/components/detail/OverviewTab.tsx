@@ -50,7 +50,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             <span>📊</span> Raw Capabilities
           </h3>
           <div className="space-y-3">
-            {profile.scoreBreakdown && Object.entries(profile.scoreBreakdown).map(([key, value]) => (
+            {profile.scoreBreakdown && Object.entries(profile.scoreBreakdown)
+              .filter(([key]) => !['avgLatencyMs', 'latencyScore', 'complianceScore', 'failureModesScore'].includes(key))
+              .map(([key, value]) => (
               <ScoreBar 
                 key={key} 
                 label={formatLabel(key)} 
@@ -59,6 +61,29 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               />
             ))}
           </div>
+          {/* Latency Metrics */}
+          {profile.scoreBreakdown?.avgLatencyMs !== undefined && (
+            <div className="mt-4 pt-3 border-t border-[#2d2d2d]">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">⚡ Avg Response Time</span>
+                <span className={`font-mono ${
+                  profile.scoreBreakdown.avgLatencyMs < 2000 ? 'text-green-400' :
+                  profile.scoreBreakdown.avgLatencyMs < 5000 ? 'text-amber-400' :
+                  'text-red-400'
+                }`}>
+                  {profile.scoreBreakdown.avgLatencyMs < 1000 
+                    ? `${profile.scoreBreakdown.avgLatencyMs}ms` 
+                    : `${(profile.scoreBreakdown.avgLatencyMs / 1000).toFixed(1)}s`}
+                </span>
+              </div>
+              {profile.scoreBreakdown?.latencyScore !== undefined && (
+                <div className="flex items-center justify-between text-sm mt-1">
+                  <span className="text-gray-400">Latency Score</span>
+                  <span className="text-gray-300 font-mono">{profile.scoreBreakdown.latencyScore}%</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Trainability */}

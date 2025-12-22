@@ -14,6 +14,13 @@ interface TestProgress {
   eta?: number;
 }
 
+interface PreflightError {
+  aborted: boolean;
+  abortReason?: 'MODEL_TOO_SLOW' | 'USER_CANCELLED' | 'ERROR';
+  preflightLatency?: number;
+  preflightMessage?: string;
+}
+
 interface ModelProfile {
   modelId: string;
   probeResults?: Record<string, any>;
@@ -23,9 +30,12 @@ interface ModelProfile {
 interface TestingTabProps {
   profile: ModelProfile;
   testProgress: TestProgress;
-  onRunTests: (mode: string) => void;
+  onRunTests: (mode: string, skipPreflight?: boolean) => void;
   onCancelTests: () => void;
+  onClearResults?: () => void;
   isTestRunning: boolean;
+  preflightError?: PreflightError | null;
+  onDismissPreflightError?: () => void;
 }
 
 type TestMode = 'quick' | 'standard' | 'deep' | 'optimization';
@@ -77,10 +87,16 @@ export const TestingTab: React.FC<TestingTabProps> = ({
   testProgress,
   onRunTests,
   onCancelTests,
-  isTestRunning
+  onClearResults,
+  isTestRunning,
+  preflightError,
+  onDismissPreflightError
 }) => {
   const [selectedMode, setSelectedMode] = useState<TestMode>('standard');
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  
+  // Check if currently in pre-flight check
+  const isPreflightCheck = isTestRunning && testProgress.currentCategory === 'Pre-flight Check';
 
   // Get category status from results
   const getCategoryStatus = (categoryId: string): 'passed' | 'failed' | 'partial' | 'untested' => {
@@ -97,8 +113,61 @@ export const TestingTab: React.FC<TestingTabProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Pre-flight Error Message */}
+      {preflightError && preflightError.abortReason === 'MODEL_TOO_SLOW' && (
+        <div className="bg-red-900/20 border-2 border-red-500/50 rounded-lg p-6">
+          <div className="flex items-start gap-4">
+            <div className="text-4xl">🐢</div>
+            <div className="flex-1">
+              <h3 className="text-red-400 font-semibold text-lg mb-2">Model Too Slow</h3>
+              <p className="text-gray-300 mb-2">{preflightError.preflightMessage}</p>
+              <p className="text-gray-500 text-sm mb-4">
+                Response time of {((preflightError.preflightLatency || 0) / 1000).toFixed(1)}s at 2K context 
+                exceeds the 5s threshold. Full tests would take too long.
+              </p>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => onRunTests(selectedMode, true)}
+                  className="px-4 py-2 bg-amber-600/20 text-amber-400 hover:bg-amber-600/30 
+                             rounded-lg text-sm font-medium transition-colors border border-amber-600/50"
+                >
+                  ⚠️ Force Run Anyway
+                </button>
+                {onDismissPreflightError && (
+                  <button
+                    onClick={onDismissPreflightError}
+                    className="px-4 py-2 bg-gray-700 text-gray-300 hover:bg-gray-600 
+                               rounded-lg text-sm transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pre-flight Check In Progress */}
+      {isPreflightCheck && (
+        <div className="bg-gradient-to-r from-amber-900/20 to-amber-800/10 rounded-lg p-6 
+                        border-2 border-amber-500/50">
+          <div className="flex items-center gap-4">
+            <div className="animate-pulse">
+              <span className="text-4xl">⏱️</span>
+            </div>
+            <div>
+              <h3 className="text-amber-400 font-semibold text-lg">Checking Model Speed...</h3>
+              <p className="text-gray-400 text-sm">
+                Testing response time at 2K context. Models responding over 5s will be flagged.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Test Mode Selection */}
-      {!isTestRunning && (
+      {!isTestRunning && !preflightError && (
         <div className="grid grid-cols-4 gap-4">
           {(Object.entries(TEST_MODES) as [TestMode, typeof TEST_MODES[TestMode]][]).map(([mode, config]) => (
             <button
@@ -121,8 +190,8 @@ export const TestingTab: React.FC<TestingTabProps> = ({
         </div>
       )}
 
-      {/* Run/Cancel Button */}
-      <div className="flex justify-center">
+      {/* Run/Cancel/Clear Buttons */}
+      <div className="flex justify-center gap-4">
         {isTestRunning ? (
           <button
             onClick={onCancelTests}
@@ -132,49 +201,90 @@ export const TestingTab: React.FC<TestingTabProps> = ({
             ⏹ Cancel Testing
           </button>
         ) : (
-          <button
-            onClick={() => onRunTests(selectedMode)}
-            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-500 
-                       hover:from-purple-500 hover:to-purple-400 
-                       text-white font-medium rounded-lg text-lg shadow-lg 
-                       shadow-purple-500/20 transition-all"
-          >
-            🚀 Start {TEST_MODES[selectedMode].name} Test
-          </button>
+          <>
+            <button
+              onClick={() => onRunTests(selectedMode)}
+              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-500 
+                         hover:from-purple-500 hover:to-purple-400 
+                         text-white font-medium rounded-lg text-lg shadow-lg 
+                         shadow-purple-500/20 transition-all"
+            >
+              🚀 Start {TEST_MODES[selectedMode].name} Test
+            </button>
+            {onClearResults && (
+              <button
+                onClick={onClearResults}
+                className="px-6 py-3 bg-gray-700/50 text-gray-400 hover:bg-gray-600/50 
+                           hover:text-gray-300 rounded-lg text-lg font-medium transition-colors"
+                title="Clear all test results for this model"
+              >
+                🗑️ Clear Results
+              </button>
+            )}
+          </>
         )}
       </div>
 
-      {/* Live Progress */}
-      {isTestRunning && testProgress.progress && (
-        <div className="bg-[#161616] rounded-lg p-6 border border-purple-500/30">
+      {/* Live Progress - Enhanced */}
+      {isTestRunning && (
+        <div className="bg-gradient-to-r from-purple-900/20 to-purple-800/10 rounded-lg p-6 
+                        border-2 border-purple-500/50 shadow-lg shadow-purple-500/10
+                        animate-pulse-slow">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-white font-medium">Testing in Progress</h3>
-              <p className="text-gray-400 text-sm">
-                {testProgress.currentCategory}: {testProgress.currentTest}
-              </p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-block w-3 h-3 bg-purple-500 rounded-full animate-ping" />
+                <h3 className="text-white font-semibold text-lg">Testing in Progress</h3>
+              </div>
+              
+              {/* Current Category - Large */}
+              <div className="bg-purple-500/20 rounded-lg px-4 py-2 mb-2 border border-purple-500/30">
+                <span className="text-purple-300 text-xs uppercase tracking-wide">Category</span>
+                <p className="text-purple-100 font-medium text-lg">
+                  {testProgress.currentCategory || 'Initializing...'}
+                </p>
+              </div>
+              
+              {/* Current Test Name - Prominent */}
+              <div className="bg-[#1a1a1a] rounded-lg px-4 py-2 border border-[#2d2d2d]">
+                <span className="text-gray-500 text-xs uppercase tracking-wide">Current Test</span>
+                <p className="text-white font-mono text-sm truncate">
+                  {testProgress.currentTest || 'Starting...'}
+                </p>
+              </div>
             </div>
-            <div className="text-right">
-              <span className="text-purple-400 text-lg font-mono">
-                {testProgress.progress.current}/{testProgress.progress.total}
-              </span>
-              <p className="text-gray-500 text-xs">tests completed</p>
+            
+            <div className="text-right ml-6">
+              <div className="bg-[#1a1a1a] rounded-lg px-4 py-3 border border-[#2d2d2d]">
+                <span className="text-purple-400 text-3xl font-bold font-mono">
+                  {testProgress.progress?.current || 0}
+                </span>
+                <span className="text-gray-500 text-xl">/{testProgress.progress?.total || '?'}</span>
+                <p className="text-gray-500 text-xs mt-1">tests completed</p>
+              </div>
             </div>
           </div>
           
-          <div className="h-3 bg-[#2d2d2d] rounded-full overflow-hidden">
+          {/* Progress Bar */}
+          <div className="h-4 bg-[#2d2d2d] rounded-full overflow-hidden shadow-inner">
             <div 
-              className="h-full bg-gradient-to-r from-purple-600 to-purple-400 
-                         transition-all duration-300 relative"
-              style={{ width: `${(testProgress.progress.current / testProgress.progress.total) * 100}%` }}
+              className="h-full bg-gradient-to-r from-purple-600 via-purple-500 to-pink-500 
+                         transition-all duration-500 ease-out relative"
+              style={{ width: `${testProgress.progress ? (testProgress.progress.current / testProgress.progress.total) * 100 : 0}%` }}
             >
-              <div className="absolute inset-0 bg-white/20 animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent 
+                              animate-shimmer" />
             </div>
           </div>
           
-          <p className="text-gray-500 text-xs mt-2 text-center">
-            {testProgress.status || 'Running tests...'}
-          </p>
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-gray-400 text-sm">
+              {testProgress.status || 'Running tests...'}
+            </p>
+            <p className="text-purple-400 text-sm font-mono">
+              {testProgress.progress ? Math.round((testProgress.progress.current / testProgress.progress.total) * 100) : 0}%
+            </p>
+          </div>
         </div>
       )}
 
@@ -185,20 +295,47 @@ export const TestingTab: React.FC<TestingTabProps> = ({
         {TEST_CATEGORIES.map(category => {
           const status = getCategoryStatus(category.id);
           const isExpanded = expandedCategory === category.id;
+          // Check if this category is currently being tested
+          const isActiveCategory = isTestRunning && 
+            testProgress.currentCategory?.toLowerCase().includes(category.name.toLowerCase());
           
           return (
             <div 
               key={category.id}
-              className="bg-[#161616] rounded-lg border border-[#2d2d2d] overflow-hidden"
+              className={`rounded-lg border overflow-hidden transition-all duration-300 ${
+                isActiveCategory 
+                  ? 'bg-gradient-to-r from-purple-900/30 to-purple-800/20 border-purple-500 ring-2 ring-purple-500/50 shadow-lg shadow-purple-500/20 scale-[1.02]' 
+                  : 'bg-[#161616] border-[#2d2d2d]'
+              }`}
             >
               <button
                 onClick={() => setExpandedCategory(isExpanded ? null : category.id)}
-                className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#1a1a1a] transition-colors"
+                className={`w-full px-4 py-3 flex items-center justify-between transition-colors ${
+                  isActiveCategory 
+                    ? 'bg-purple-500/10' 
+                    : 'hover:bg-[#1a1a1a]'
+                }`}
               >
                 <div className="flex items-center gap-3">
-                  <StatusIcon status={status} />
-                  <span className="text-white font-mono text-sm">{category.id}</span>
-                  <span className="text-gray-400">{category.name}</span>
+                  {isActiveCategory ? (
+                    <span className="relative">
+                      <span className="absolute inset-0 bg-purple-500 rounded-full animate-ping opacity-50" />
+                      <span className="relative text-purple-400 text-lg">▶</span>
+                    </span>
+                  ) : (
+                    <StatusIcon status={status} />
+                  )}
+                  <span className={`font-mono text-sm ${isActiveCategory ? 'text-purple-300' : 'text-white'}`}>
+                    {category.id}
+                  </span>
+                  <span className={isActiveCategory ? 'text-purple-100 font-semibold' : 'text-gray-400'}>
+                    {category.name}
+                  </span>
+                  {isActiveCategory && (
+                    <span className="ml-2 px-2 py-0.5 bg-purple-500/30 text-purple-300 text-xs rounded-full animate-pulse font-medium">
+                      ● TESTING
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   {status !== 'untested' && (

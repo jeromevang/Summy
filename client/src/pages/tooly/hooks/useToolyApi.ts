@@ -7,6 +7,10 @@ import type {
   ProxyMode,
 } from '../types';
 
+// Re-export new hooks for convenience
+export { useTestRunner } from './useTestRunner';
+export { useOptimalSetup } from './useOptimalSetup';
+
 interface UseToolyApiParams {
   // State setters
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;

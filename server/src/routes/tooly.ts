@@ -170,7 +170,8 @@ router.post('/models/:modelId/test', async (req, res) => {
     const body = req.body || {};
     const provider = body.provider || 'lmstudio';
     const tools = body.tools;
-    const testMode = body.testMode || 'manual';  // 'quick' | 'keep_on_success' | 'manual'
+    // Check both query param and body for mode (client sends via query string)
+    const testMode = (req.query.mode as string) || body.testMode || 'manual';  // 'quick' | 'standard' | 'deep' | 'manual'
     
     // Load settings
     let settings: any = {};
@@ -195,13 +196,17 @@ router.post('/models/:modelId/test', async (req, res) => {
       azureApiVersion: settings.azureApiVersion
     };
 
+    // Check for force/skip preflight option (allows running tests even if model is slow)
+    const skipPreflight = body.skipPreflight === true || req.query.skipPreflight === 'true';
+
     // Build test options based on mode
     const testOptions = {
       mode: testMode,
-      unloadOthersBefore: testMode !== 'manual',
-      unloadAfterTest: testMode === 'quick',
-      unloadOnlyOnFail: testMode === 'keep_on_success',
-      contextLength: 4096 // Minimal context for tool capability testing
+      // POLICY: Models stay loaded - no auto-unload
+      unloadAfterTest: false,
+      unloadOnlyOnFail: false,
+      contextLength: 4096, // Minimal context for tool capability testing
+      skipPreflight
     };
 
     console.log(`[Tooly] Running tests for ${modelId} with mode: ${testMode}`);
@@ -216,6 +221,70 @@ router.post('/models/:modelId/test', async (req, res) => {
     res.json(result);
   } catch (error: any) {
     console.error('[Tooly] Failed to run tests:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/tooly/models/:modelId/test
+ * Cancel a running test for a model
+ */
+router.delete('/models/:modelId/test', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+    
+    const wasRunning = testEngine.isTestRunning(decodedModelId);
+    const aborted = testEngine.abortTest(decodedModelId);
+    
+    if (aborted) {
+      console.log(`[Tooly] Cancelled test for ${decodedModelId}`);
+      res.json({ success: true, message: 'Test cancelled' });
+    } else if (!wasRunning) {
+      res.json({ success: true, message: 'No test was running' });
+    } else {
+      res.status(500).json({ error: 'Failed to cancel test' });
+    }
+  } catch (error: any) {
+    console.error('[Tooly] Failed to cancel test:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/tooly/models/:modelId/results
+ * Clear all test results for a model (reset profile to untested state)
+ */
+router.delete('/models/:modelId/results', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+    
+    // Get existing profile
+    let profile = await capabilities.getProfile(decodedModelId);
+    
+    if (!profile) {
+      res.status(404).json({ error: 'Model profile not found' });
+      return;
+    }
+    
+    // Reset test-related fields
+    profile.score = 0;
+    profile.testVersion = 0;
+    profile.testedAt = '';
+    profile.capabilities = {};
+    profile.role = 'none';
+    (profile as any).scoreBreakdown = undefined;
+    (profile as any).probeResults = undefined;
+    (profile as any).discoveredNativeTools = undefined;
+    (profile as any).unmappedNativeTools = undefined;
+    
+    await capabilities.saveProfile(profile);
+    
+    console.log(`[Tooly] Cleared test results for ${decodedModelId}`);
+    res.json({ success: true, message: 'Test results cleared' });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to clear test results:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -1928,6 +1997,92 @@ router.post('/context/rank', async (req, res) => {
     });
   } catch (error: any) {
     console.error('[Tooly] Failed to rank items:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// OPTIMAL SETUP ENDPOINTS
+// ============================================================
+
+/**
+ * GET /api/tooly/optimal-setup/hardware
+ * Detect hardware profile
+ */
+router.get('/optimal-setup/hardware', async (req, res) => {
+  try {
+    const { hardwareDetector } = await import('../modules/tooly/optimal-setup/hardware-detector.js');
+    const hardware = await hardwareDetector.detect(true);
+    res.json(hardware);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to detect hardware:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/optimal-setup/scan
+ * Scan for available models
+ */
+router.post('/optimal-setup/scan', async (req, res) => {
+  try {
+    const { modelScanner } = await import('../modules/tooly/optimal-setup/model-scanner.js');
+    
+    // Get LM Studio URL from settings
+    let lmstudioUrl = 'http://localhost:1234';
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        const settings = await fs.readJson(SETTINGS_FILE);
+        lmstudioUrl = settings.lmstudioUrl || lmstudioUrl;
+      }
+    } catch {}
+    
+    modelScanner.setUrl(lmstudioUrl);
+    const scanResult = await modelScanner.scan();
+    res.json(scanResult);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to scan models:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/optimal-setup/find-pair
+ * Find optimal model pairing
+ */
+router.post('/optimal-setup/find-pair', async (req, res) => {
+  try {
+    const { modelScanner } = await import('../modules/tooly/optimal-setup/model-scanner.js');
+    const result = await modelScanner.findOptimalPairs();
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to find optimal pair:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/optimal-setup/status
+ * Get current optimal setup status
+ */
+router.get('/optimal-setup/status', async (req, res) => {
+  try {
+    const { hardwareDetector } = await import('../modules/tooly/optimal-setup/hardware-detector.js');
+    const { modelScanner } = await import('../modules/tooly/optimal-setup/model-scanner.js');
+    
+    const hardware = await hardwareDetector.detect();
+    const recommendations = await hardwareDetector.getRecommendedModelSizes();
+    
+    res.json({
+      hardware: {
+        gpuName: hardware.primaryGpu?.name || 'None',
+        totalVramGB: hardware.totalVramGB,
+        availableVramGB: hardware.availableVramGB
+      },
+      recommendations
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get setup status:', error);
     res.status(500).json({ error: error.message });
   }
 });

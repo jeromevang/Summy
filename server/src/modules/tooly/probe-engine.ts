@@ -513,7 +513,7 @@ class ProbeEngine {
     let completedTests = 0;
     let runningScore = 0;
 
-    const broadcastProgress = (testName: string, score?: number) => {
+    const broadcastProgress = (testName: string, category: string, score?: number) => {
       completedTests++;
       if (score !== undefined) {
         runningScore = Math.round((runningScore * (completedTests - 1) + score) / completedTests);
@@ -522,37 +522,38 @@ class ProbeEngine {
         current: completedTests,
         total: totalTests,
         currentTest: testName,
+        currentCategory: category,
         score: runningScore,
         status: 'running'
       });
     };
 
     // Run tool behavior probes (1.x)
-    wsBroadcast.broadcastProgress('probe', modelId, { current: 0, total: totalTests, currentTest: '🔬 Probe: Emit Test', status: 'running' });
+    wsBroadcast.broadcastProgress('probe', modelId, { current: 0, total: totalTests, currentTest: '🔬 Probe: Emit Test', currentCategory: 'Tool Behavior', status: 'running' });
     const emitTest = await this.runEmitTest(modelId, provider, settings, timeout);
-    broadcastProgress('🔬 Probe: Emit Test', emitTest.score);
+    broadcastProgress('🔬 Probe: Emit Test', 'Tool Behavior', emitTest.score);
     
     const schemaTest = await this.runSchemaAdherenceTest(modelId, provider, settings, timeout);
-    broadcastProgress('🔬 Probe: Schema Adherence', schemaTest.score);
+    broadcastProgress('🔬 Probe: Schema Adherence', 'Tool Behavior', schemaTest.score);
     
     const selectionTest = await this.runSelectionLogicTest(modelId, provider, settings, timeout);
-    broadcastProgress('🔬 Probe: Selection Logic', selectionTest.score);
+    broadcastProgress('🔬 Probe: Selection Logic', 'Tool Behavior', selectionTest.score);
     
     const suppressionTest = await this.runSuppressionTest(modelId, provider, settings, timeout);
-    broadcastProgress('🔬 Probe: Suppression', suppressionTest.score);
+    broadcastProgress('🔬 Probe: Suppression', 'Tool Behavior', suppressionTest.score);
 
     // Run enhanced tool probes (1.5 - 1.8)
     const nearIdenticalSelectionTest = await this.runNearIdenticalSelectionTest(modelId, provider, settings, timeout);
-    broadcastProgress('🔬 Probe: Near-Identical Selection', nearIdenticalSelectionTest.score);
+    broadcastProgress('🔬 Probe: Near-Identical Selection', 'Tool Behavior', nearIdenticalSelectionTest.score);
     
     const multiToolEmitTest = await this.runMultiToolEmitTest(modelId, provider, settings, timeout);
-    broadcastProgress('🔬 Probe: Multi-Tool Emit', multiToolEmitTest.score);
+    broadcastProgress('🔬 Probe: Multi-Tool Emit', 'Tool Behavior', multiToolEmitTest.score);
     
     const argumentValidationTest = await this.runArgumentValidationTest(modelId, provider, settings, timeout);
-    broadcastProgress('🔬 Probe: Argument Validation', argumentValidationTest.score);
+    broadcastProgress('🔬 Probe: Argument Validation', 'Tool Behavior', argumentValidationTest.score);
     
     const schemaReorderTest = await this.runSchemaReorderTest(modelId, provider, settings, timeout);
-    broadcastProgress('🔬 Probe: Schema Reorder', schemaReorderTest.score);
+    broadcastProgress('🔬 Probe: Schema Reorder', 'Tool Behavior', schemaReorderTest.score);
 
     // Calculate tool score (core: 60%, enhanced: 40%)
     const coreToolScore = (
@@ -579,25 +580,25 @@ class ProbeEngine {
       console.log(`[ProbeEngine] Running reasoning probes for ${modelId}`);
       
       const intentExtraction = await this.runIntentExtractionTest(modelId, provider, settings, timeout);
-      broadcastProgress('🧠 Reasoning: Intent Extraction', intentExtraction.score);
+      broadcastProgress('🧠 Reasoning: Intent Extraction', 'Reasoning', intentExtraction.score);
       
       const multiStepPlanning = await this.runMultiStepPlanningTest(modelId, provider, settings, timeout);
-      broadcastProgress('🧠 Reasoning: Multi-step Planning', multiStepPlanning.score);
+      broadcastProgress('🧠 Reasoning: Multi-step Planning', 'Reasoning', multiStepPlanning.score);
       
       const conditionalReasoning = await this.runConditionalReasoningTest(modelId, provider, settings, timeout);
-      broadcastProgress('🧠 Reasoning: Conditional', conditionalReasoning.score);
+      broadcastProgress('🧠 Reasoning: Conditional', 'Reasoning', conditionalReasoning.score);
       
       const contextContinuity = await this.runContextContinuityTest(modelId, provider, settings, timeout);
-      broadcastProgress('🧠 Reasoning: Context Continuity', contextContinuity.score);
+      broadcastProgress('🧠 Reasoning: Context Continuity', 'Reasoning', contextContinuity.score);
       
       const logicalConsistency = await this.runLogicalConsistencyTest(modelId, provider, settings, timeout);
-      broadcastProgress('🧠 Reasoning: Logical Consistency', logicalConsistency.score);
+      broadcastProgress('🧠 Reasoning: Logical Consistency', 'Reasoning', logicalConsistency.score);
       
       const explanation = await this.runExplanationTest(modelId, provider, settings, timeout);
-      broadcastProgress('🧠 Reasoning: Explanation', explanation.score);
+      broadcastProgress('🧠 Reasoning: Explanation', 'Reasoning', explanation.score);
       
       const edgeCaseHandling = await this.runEdgeCaseHandlingTest(modelId, provider, settings, timeout);
-      broadcastProgress('🧠 Reasoning: Edge Case', edgeCaseHandling.score);
+      broadcastProgress('🧠 Reasoning: Edge Case', 'Reasoning', edgeCaseHandling.score);
 
       reasoningProbes = {
         intentExtraction,
@@ -3163,11 +3164,24 @@ Output: { "action": "...", "parameters": { ... }, "fallback": "what to do if it 
           status: 'running'
         });
 
+        // Early exit thresholds:
+        // - 8 seconds: Stop testing larger contexts (optimization purposes)
+        // - 30 seconds: Mark as max usable (for the max threshold)
+        const OPTIMIZATION_EARLY_EXIT_MS = 8000; // 8 seconds - don't bother testing larger
+        
         if (latency < maxLatencyThreshold) {
           maxUsableContext = contextSize;
-        } else {
-          // Early exit - larger contexts will only be slower
-          console.log(`[ProbeEngine] Latency exceeded threshold at ${contextSize}, stopping`);
+        }
+        
+        if (latency >= OPTIMIZATION_EARLY_EXIT_MS) {
+          // Early exit - larger contexts will only be slower, no point testing
+          console.log(`[ProbeEngine] Latency ${latency}ms >= 8s at ${contextSize}, stopping sweep (larger contexts would be slower)`);
+          break;
+        }
+        
+        if (latency >= maxLatencyThreshold) {
+          // Exceeded absolute max threshold
+          console.log(`[ProbeEngine] Latency exceeded ${maxLatencyThreshold}ms threshold at ${contextSize}, stopping`);
           break;
         }
 

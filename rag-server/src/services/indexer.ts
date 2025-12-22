@@ -727,6 +727,26 @@ export class Indexer {
         console.log(`[Indexer] Re-indexing ${changes.length} changed files:`);
         changes.forEach(f => console.log(`  - ${path.relative(projectPath, f).replace(/\\/g, '/')}`))
         
+        // Ensure vector store is initialized before re-indexing
+        if (!this.vectorStore.isReady) {
+          console.log(`[Indexer] Initializing vector store for re-indexing...`);
+          try {
+            // Initialize embedder if needed
+            if (this.config.lmstudio.model) {
+              await this.embedder.setModel(this.config.lmstudio.model);
+              const healthy = await this.embedder.healthCheck();
+              if (!healthy) {
+                console.error(`[Indexer] LM Studio not available, skipping re-index`);
+                return;
+              }
+            }
+            await this.vectorStore.initialize(this.embedder.dimensions, 100000);
+          } catch (initError) {
+            console.error(`[Indexer] Failed to initialize vector store:`, initError);
+            return;
+          }
+        }
+        
         for (const file of changes) {
           try {
             await this.indexFile(file, projectPath);

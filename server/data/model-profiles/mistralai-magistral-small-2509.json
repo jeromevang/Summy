@@ -2,394 +2,68 @@
   "modelId": "mistralai/magistral-small-2509",
   "displayName": "mistralai/magistral-small-2509",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T17:12:32.548Z",
-  "testVersion": 3,
-  "score": 95,
+  "testedAt": "2025-12-22T01:30:53.518Z",
+  "testVersion": 1,
+  "score": 99,
   "toolFormat": "openai_tools",
   "capabilities": {
-    "file_read": {
+    "read_file": {
       "supported": true,
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 5098,
-      "lastTested": "2025-12-19T17:12:32.548Z"
+      "avgLatency": 1490.5,
+      "lastTested": "2025-12-22T01:30:53.517Z"
     },
-    "file_write": {
+    "write_file": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2356,
-      "lastTested": "2025-12-19T17:12:32.548Z"
+      "avgLatency": 2620,
+      "lastTested": "2025-12-22T01:30:53.517Z"
     },
-    "file_patch": {
+    "edit_file": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3136,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "file_list": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1242,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "file_search": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1211,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "create_new_file": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1875,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "folder_create": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1238,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "folder_delete": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1256,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "git_status": {
-      "supported": false,
-      "score": 45,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 766,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "git_diff": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1313,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "git_log": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1221,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "git_commit": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1467,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "git_add": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 2,
-      "testsFailed": 0,
-      "avgLatency": 1171.5,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "git_branch_create": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1529,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "git_branch_list": {
-      "supported": false,
-      "score": 45,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 825,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "npm_run": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1224,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "npm_install": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1231,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "npm_uninstall": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1252,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "http_request": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 2193,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "browser_navigate": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 2152,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "run_python": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1791,
-      "lastTested": "2025-12-19T17:12:32.548Z"
-    },
-    "mcp_rules": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 0
+      "avgLatency": 3788,
+      "lastTested": "2025-12-22T01:30:53.518Z"
     }
   },
   "enabledTools": [
-    "file_read",
-    "file_write",
-    "file_patch",
-    "file_list",
-    "file_search",
-    "create_new_file",
-    "folder_create",
-    "folder_delete",
-    "git_diff",
-    "git_log",
-    "git_commit",
-    "git_add",
-    "git_branch_create",
-    "npm_run",
-    "npm_install",
-    "npm_uninstall",
-    "http_request",
-    "browser_navigate",
-    "run_python"
+    "read_file",
+    "write_file",
+    "edit_file"
   ],
   "testResults": [
     {
-      "testId": "file_read_basic",
+      "testId": "read_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-k0uzpn5qmcesppixnlv1g\",\"object\":\"chat.completion\",\"created\":1766164317,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"152058127\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":159,\"completion_tokens\":11,\"total_tokens\":170},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-250"
+      "response": "{\"id\":\"chatcmpl-022nyk15zj388xzgdidaq0t\",\"object\":\"chat.completion\",\"created\":1766367044,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"525451809\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":165,\"completion_tokens\":11,\"total_tokens\":176},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2"
     },
     {
-      "testId": "file_read_nested",
+      "testId": "read_file_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-9qk691m2qih7x6hcgku9lh\",\"object\":\"chat.completion\",\"created\":1766164319,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"404212624\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":158,\"completion_tokens\":13,\"total_tokens\":171},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral"
+      "response": "{\"id\":\"chatcmpl-561c7nfk8uw10cjlomy11ef\",\"object\":\"chat.completion\",\"created\":1766367045,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"979890497\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":164,\"completion_tokens\":13,\"total_tokens\":177},\"stats\":{},\"system_fingerprint\":\"mistralai/magistra"
     },
     {
-      "testId": "file_write_basic",
+      "testId": "write_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-xgqgapkx5scbppkoqbytw\",\"object\":\"chat.completion\",\"created\":1766164320,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"239645094\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":188,\"completion_tokens\":24,\"total_tokens\":212},\"stats\":{},\"sys"
+      "response": "{\"id\":\"chatcmpl-265zg390tlvdzjprmez7qp\",\"object\":\"chat.completion\",\"created\":1766367047,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"222841665\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":197,\"completion_tokens\":24,\"total_tokens\":221},\"stats\":{},\"sy"
     },
     {
-      "testId": "file_patch_basic",
+      "testId": "edit_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-3ef8txcgyxkmlbcyy6rpum\",\"object\":\"chat.completion\",\"created\":1766164323,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"259050122\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":210,\"completion_tokens\":30,\"total_tokens\":240},\"stats\":{},\"system_fingerp"
-    },
-    {
-      "testId": "file_list_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-ida2mfo0h9vriayk24dze\",\"object\":\"chat.completion\",\"created\":1766164326,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"250974173\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":151,\"completion_tokens\":10,\"total_tokens\":161},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "file_search_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-yjoed91t2ta9u0431rw4\",\"object\":\"chat.completion\",\"created\":1766164327,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"860107607\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":173,\"completion_tokens\":10,\"total_tokens\":183},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "git_status_basic",
-      "passed": false,
-      "score": 45,
-      "response": "{\"id\":\"chatcmpl-irg8xx7lmvo85k8l4i10k\",\"object\":\"chat.completion\",\"created\":1766164328,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"870485826\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":128,\"completion_tokens\":5,\"total_tokens\":133},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "git_diff_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-dklyx0veydrj1n3gw4491j\",\"object\":\"chat.completion\",\"created\":1766164329,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"739664720\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":151,\"completion_tokens\":11,\"total_tokens\":162},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "git_log_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-hyywcqr3m4mbowvs3snqsf\",\"object\":\"chat.completion\",\"created\":1766164330,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"494633665\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":145,\"completion_tokens\":10,\"total_tokens\":155},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "git_commit_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-najx8qh5j7cybg2pp26vuh\",\"object\":\"chat.completion\",\"created\":1766164332,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"372667908\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":152,\"completion_tokens\":13,\"total_tokens\":165},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-sm"
-    },
-    {
-      "testId": "git_branch_create_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-vyl44660uthbhohorh7od7\",\"object\":\"chat.completion\",\"created\":1766164333,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"342928954\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":153,\"completion_tokens\":13,\"total_tokens\":166},\"stats\":{},\"system_fingerprint\":\"mistralai/magi"
-    },
-    {
-      "testId": "npm_run_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-j5qojbdb9tg6bwyhx97da\",\"object\":\"chat.completion\",\"created\":1766164335,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"659183222\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":148,\"completion_tokens\":10,\"total_tokens\":158},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "npm_install_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-etxcyk8onbi46cv5yyn4rz\",\"object\":\"chat.completion\",\"created\":1766164336,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"934596865\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":144,\"completion_tokens\":10,\"total_tokens\":154},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-25"
-    },
-    {
-      "testId": "http_request_get",
-      "passed": true,
-      "score": 99,
-      "response": "{\"id\":\"chatcmpl-osovbl8lant198e9ebwtf\",\"object\":\"chat.completion\",\"created\":1766164337,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"759183418\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":189,\"completion_tokens\":21,\"total_tokens\":210},\"stats\":{},\"system_fing"
-    },
-    {
-      "testId": "browser_navigate_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-dta3b2ba5n5rrpho5ofsk\",\"object\":\"chat.completion\",\"created\":1766164339,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"117216489\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":191,\"completion_tokens\":20,\"total_tokens\":211},\"stats\":{},\"system_fingerprin"
-    },
-    {
-      "testId": "create_new_file_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-dzrg0wfmjot3m707huvkfz\",\"object\":\"chat.completion\",\"created\":1766164341,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"955804012\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\",\\\"content\\\":\\\"\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":170,\"completion_tokens\":17,\"total_tokens\":187},\"stats\":{},\"system_fingerprint\":\"mistral"
-    },
-    {
-      "testId": "folder_create_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-0xmpjkvmi1zsozccukbsjg\",\"object\":\"chat.completion\",\"created\":1766164343,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"864564262\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":149,\"completion_tokens\":10,\"total_tokens\":159},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small"
-    },
-    {
-      "testId": "folder_delete_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-b3jaucrmjb0442j3g2kj9\",\"object\":\"chat.completion\",\"created\":1766164345,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"707961606\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":150,\"completion_tokens\":10,\"total_tokens\":160},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "git_add_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-oiftw0abiamlfzczi9apj\",\"object\":\"chat.completion\",\"created\":1766164346,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"938961492\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":157,\"completion_tokens\":11,\"total_tokens\":168},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "git_add_all",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-mr4d60rdcub8fyz38gd1l\",\"object\":\"chat.completion\",\"created\":1766164347,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"562177167\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":153,\"completion_tokens\":9,\"total_tokens\":162},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "git_branch_list_basic",
-      "passed": false,
-      "score": 45,
-      "response": "{\"id\":\"chatcmpl-ansc3jcn029oibyt6r491h\",\"object\":\"chat.completion\",\"created\":1766164348,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"693884774\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":128,\"completion_tokens\":6,\"total_tokens\":134},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
-    },
-    {
-      "testId": "npm_uninstall_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-w56i26cn11g7np1ac7k7or\",\"object\":\"chat.completion\",\"created\":1766164349,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"625448101\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":149,\"completion_tokens\":11,\"total_tokens\":160},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2"
-    },
-    {
-      "testId": "run_python_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-bcthkmjafjb2kc3oj096s\",\"object\":\"chat.completion\",\"created\":1766164350,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"304301944\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":151,\"completion_tokens\":17,\"total_tokens\":168},\"stats\":{},\"system_fingerprint\":\"mistralai/mag"
+      "response": "{\"id\":\"chatcmpl-mcgegxa4pdhlhctv60ny5\",\"object\":\"chat.completion\",\"created\":1766367049,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"898288369\",\"function\":{\"name\":\"edit_file\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"edits\\\":[{\\\"oldText\\\":\\\"3000\\\",\\\"newText\\\":\\\"8080\\\"}]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":282,\"completion_tokens\":37,\"total_tokens\":319},\"stats\":{},"
     }
   ],
-  "probeResults": {
-    "testedAt": "2025-12-20T23:44:24.039Z",
-    "emitTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Valid tool call with correct parameters (OpenAI format)"
-    },
-    "schemaTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect schema adherence - read schema and used correct field names and values"
-    },
-    "selectionTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Correct tool selected with correct file path"
-    },
-    "suppressionTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
-    },
-    "nearIdenticalSelectionTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Correct: chose search_web for real-time data with appropriate query"
-    },
-    "multiToolEmitTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect: emitted 2 read_file calls with correct paths"
-    },
-    "argumentValidationTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Perfect: all types and nested structures correct"
-    },
-    "schemaReorderTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Schema reordering handled correctly - model reads semantics, not positions"
-    },
-    "toolScore": 100,
-    "reasoningScore": 0,
-    "overallScore": 100
-  },
-  "role": "both",
+  "role": "none",
   "contextLatency": {
     "testedContextSizes": [
       2048,
@@ -416,5 +90,32 @@
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },
-  "contextLength": 32768
+  "contextLength": 32768,
+  "discoveredNativeTools": [
+    "read_file",
+    "search_web",
+    "calculate",
+    "translate_text",
+    "get_weather",
+    "send_email",
+    "set_reminder",
+    "play_music",
+    "tell_joke",
+    "provide_news"
+  ],
+  "unmappedNativeTools": [
+    "calculate",
+    "translate_text",
+    "get_weather",
+    "send_email",
+    "set_reminder",
+    "play_music",
+    "tell_joke",
+    "provide_news"
+  ],
+  "scoreBreakdown": {
+    "toolScore": 100,
+    "avgLatencyMs": 2347,
+    "latencyScore": 64
+  }
 }

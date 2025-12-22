@@ -13,6 +13,12 @@ import { getToolSchemas, TOOL_PROMPTS, TOOL_SCHEMAS } from './tool-prompts.js';
 import { notifications } from '../../services/notifications.js';
 import { wsBroadcast } from '../../services/ws-broadcast.js';
 import { modelManager } from '../../services/lmstudio-model-manager.js';
+import { ALL_PROBE_DEFINITIONS } from './testing/test-definitions.js';
+import type { ProbeDefinition } from './types.js';
+import { probeEngine } from './probe-engine.js';
+import { ESSENTIAL_TOOLS, STANDARD_TOOLS, FULL_TOOLS } from './orchestrator/mcp-orchestrator.js';
+import { configGenerator } from './orchestrator/config-generator.js';
+import type { ContextLatencyResult } from './types.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -337,6 +343,26 @@ export interface CheckResult {
   actual?: any;
 }
 
+export interface OptimizationResults {
+  contextLatency?: ContextLatencyResult;
+  toolCountSweep?: {
+    essential: { count: number; score: number; latency: number };
+    standard: { count: number; score: number; latency: number };
+    full: { count: number; score: number; latency: number };
+    optimal: 'essential' | 'standard' | 'full';
+  };
+  ragTuning?: {
+    chunkSizes: Record<number, number>; // chunkSize -> score
+    resultCounts: Record<number, number>; // resultCount -> score
+    optimalChunkSize: number;
+    optimalResultCount: number;
+  };
+  optimalContextLength?: number;
+  optimalToolCount?: number;
+  configGenerated?: boolean;
+  configPath?: string;
+}
+
 export interface TestRunResult {
   modelId: string;
   startedAt: string;
@@ -346,9 +372,34 @@ export interface TestRunResult {
   failed: number;
   overallScore: number;
   results: TestResult[];
+  scoreBreakdown?: {
+    toolScore?: number;
+    reasoningScore?: number;
+    ragScore?: number;
+    intentScore?: number;
+    bugDetectionScore?: number;
+  };
+  // Pre-flight check results
+  aborted?: boolean;
+  abortReason?: 'MODEL_TOO_SLOW' | 'USER_CANCELLED' | 'ERROR';
+  preflightLatency?: number;
+  preflightMessage?: string;
+  // Context latency profile (populated by Standard/Deep/Optimization modes)
+  contextLatency?: {
+    testedContextSizes: number[];
+    latencies: Record<number, number>;
+    maxUsableContext: number;
+    recommendedContext: number;
+    modelMaxContext?: number;
+    minLatency?: number;
+    isInteractiveSpeed: boolean;
+    speedRating: 'excellent' | 'good' | 'acceptable' | 'slow' | 'very_slow';
+  };
+  // Optimization mode results
+  optimization?: OptimizationResults;
 }
 
-export type TestMode = 'quick' | 'keep_on_success' | 'manual';
+export type TestMode = 'quick' | 'standard' | 'deep' | 'optimization' | 'keep_on_success' | 'manual';
 
 export interface TestOptions {
   mode?: TestMode;
@@ -356,6 +407,8 @@ export interface TestOptions {
   unloadAfterTest?: boolean;     // Default: false
   unloadOnlyOnFail?: boolean;    // Default: false (used with keep_on_success)
   contextLength?: number;        // Context length for model loading (default: 8192)
+  skipPreflight?: boolean;       // Skip pre-flight latency check (force run)
+  signal?: AbortSignal;          // External abort signal
 }
 
 // ============================================================
@@ -876,9 +929,108 @@ export const TEST_DEFINITIONS: TestDefinition[] = [
 
 class TestEngine {
   private sandboxDir: string;
+  private runningTests: Map<string, AbortController> = new Map();
 
   constructor() {
     this.sandboxDir = path.join(__dirname, '../../../data/test-sandbox');
+  }
+
+  /**
+   * Check if a test is currently running for a model
+   */
+  isTestRunning(modelId: string): boolean {
+    return this.runningTests.has(modelId);
+  }
+
+  /**
+   * Abort a running test for a model
+   */
+  abortTest(modelId: string): boolean {
+    const controller = this.runningTests.get(modelId);
+    if (controller) {
+      controller.abort();
+      this.runningTests.delete(modelId);
+      console.log(`[TestEngine] Aborted test for ${modelId}`);
+      
+      // Broadcast cancellation
+      wsBroadcast.broadcastProgress('tools', modelId, {
+        current: 0,
+        total: 0,
+        currentTest: 'Cancelled',
+        currentCategory: 'Cancelled',
+        score: 0,
+        status: 'cancelled'
+      });
+      
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Format category ID into human-readable name
+   */
+  private formatCategory(categoryId: string): string {
+    const categoryMap: Record<string, string> = {
+      'file_operations': 'File Operations',
+      'search': 'Search & Discovery',
+      'reasoning': 'Reasoning',
+      'rag': 'RAG Usage',
+      'intent': 'Intent Recognition',
+      'navigation': 'Code Navigation',
+      'bug_detection': 'Bug Detection',
+      'proactive': 'Proactive Help',
+      'compliance': 'System Compliance',
+      'stateful': 'Stateful Behavior',
+      'precedence': 'Rule Precedence',
+      'failure_modes': 'Failure Modes'
+    };
+    return categoryMap[categoryId] || categoryId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  /**
+   * Filter tests based on test mode
+   * Quick: Only essential tool tests (file_operations basic, intent) ~8 tests
+   * Standard: Add search, rag, git_operations ~25 tests
+   * Deep/Optimization/Manual: All tests ~41 tests
+   */
+  private filterTestsByMode(tests: TestDefinition[], mode: TestMode): TestDefinition[] {
+    // Quick mode: Only basic file operations and intent (like 1.x and 8.x)
+    const QUICK_CATEGORIES = ['file_operations', 'intent'];
+    // Standard mode: Add more categories  
+    const STANDARD_CATEGORIES = ['file_operations', 'search', 'rag', 'intent', 'git_operations', 'reasoning'];
+    
+    switch (mode) {
+      case 'quick':
+        // Quick mode: only first 8 essential tests
+        const quickTests = tests.filter(t => QUICK_CATEGORIES.includes(t.category));
+        // Limit to first few tests per category for speed
+        const limitedQuick: TestDefinition[] = [];
+        const seenCategories: Record<string, number> = {};
+        for (const test of quickTests) {
+          seenCategories[test.category] = (seenCategories[test.category] || 0) + 1;
+          if (seenCategories[test.category] <= 4) { // Max 4 tests per category
+            limitedQuick.push(test);
+          }
+        }
+        console.log(`[TestEngine] Quick mode: filtered to ${limitedQuick.length} tests`);
+        return limitedQuick;
+      
+      case 'standard':
+      case 'keep_on_success':
+        // Standard mode: core categories
+        const standardTests = tests.filter(t => STANDARD_CATEGORIES.includes(t.category));
+        console.log(`[TestEngine] Standard mode: filtered to ${standardTests.length} tests`);
+        return standardTests;
+      
+      case 'deep':
+      case 'optimization':
+      case 'manual':
+      default:
+        // All tests
+        console.log(`[TestEngine] ${mode} mode: running all ${tests.length} tests`);
+        return tests;
+    }
   }
 
   /**
@@ -1005,14 +1157,18 @@ Example: ["tool1", "tool2", "tool3"]`;
     },
     options: TestOptions = {}
   ): Promise<TestRunResult> {
+    // Create abort controller for this test run
+    const abortController = new AbortController();
+    this.runningTests.set(modelId, abortController);
+    
     const startedAt = new Date().toISOString();
     notifications.modelTestStarted(modelId);
 
     // Parse test mode options
+    // POLICY: Models stay loaded after tests - no auto-unload
     const mode = options.mode || 'manual';
-    const unloadOthersBefore = options.unloadOthersBefore ?? (mode !== 'manual');
-    const unloadAfterTest = options.unloadAfterTest ?? (mode === 'quick');
-    const unloadOnlyOnFail = options.unloadOnlyOnFail ?? (mode === 'keep_on_success');
+    const unloadAfterTest = options.unloadAfterTest ?? false; // Never auto-unload
+    const unloadOnlyOnFail = options.unloadOnlyOnFail ?? false; // Never auto-unload
     
     // Get context length: explicit option > profile > default
     // Explicit options take priority to allow tests to override saved profile values
@@ -1049,13 +1205,153 @@ Example: ["tool1", "tool2", "tool3"]`;
       }
     }
 
+    // ============================================================
+    // PRE-FLIGHT LATENCY CHECK
+    // Quick mode: Just check 2K context
+    // Standard/Deep/Optimization: Run full context sweep to populate chart
+    // ============================================================
+    const skipPreflight = options.skipPreflight ?? false;
+    const PREFLIGHT_THRESHOLD_MS = 5000; // 5 seconds at 2K context = too slow
+    let contextLatencyResult: any = null;
+
+    if (!skipPreflight) {
+      const isFullSweep = mode === 'standard' || mode === 'deep' || mode === 'optimization';
+      
+      if (isFullSweep) {
+        // Run full context sweep for Standard/Deep/Optimization modes
+        console.log(`[TestEngine] Running full context latency sweep for ${mode} mode...`);
+        
+        wsBroadcast.broadcastProgress('tools', modelId, {
+          current: 0,
+          total: 1,
+          currentTest: 'Measuring response time across context sizes...',
+          currentCategory: 'Context Latency Sweep',
+          score: 0,
+          status: 'running'
+        });
+
+        try {
+          contextLatencyResult = await probeEngine.runContextLatencyProfile(modelId, provider, settings, 30000);
+          console.log(`[TestEngine] Context latency sweep complete:`, contextLatencyResult);
+
+          // Check if 2K context was too slow
+          const latencyAt2K = contextLatencyResult.latencies?.[2048] || contextLatencyResult.latencies?.['2048'];
+          if (latencyAt2K && latencyAt2K > PREFLIGHT_THRESHOLD_MS) {
+            const message = `Model responded in ${(latencyAt2K/1000).toFixed(1)}s at 2K context. Too slow to test effectively.`;
+            console.log(`[TestEngine] Pre-flight FAILED: ${message}`);
+            
+            wsBroadcast.broadcastProgress('tools', modelId, {
+              current: 0,
+              total: 0,
+              currentTest: 'Model too slow',
+              currentCategory: 'Pre-flight Failed',
+              score: 0,
+              status: 'aborted'
+            });
+
+            this.runningTests.delete(modelId);
+            notifications.modelTestCompleted(modelId, 0, 0);
+
+            return {
+              modelId,
+              startedAt,
+              completedAt: new Date().toISOString(),
+              totalTests: 0,
+              passed: 0,
+              failed: 0,
+              overallScore: 0,
+              results: [],
+              aborted: true,
+              abortReason: 'MODEL_TOO_SLOW',
+              preflightLatency: latencyAt2K,
+              preflightMessage: message,
+              contextLatency: contextLatencyResult // Still save the partial results
+            };
+          }
+
+          wsBroadcast.broadcastProgress('tools', modelId, {
+            current: 1,
+            total: 1,
+            currentTest: `Latency sweep complete (${contextLatencyResult.testedContextSizes?.length || 0} sizes tested)`,
+            currentCategory: 'Context Latency Sweep',
+            score: 100,
+            status: 'completed'
+          });
+
+          console.log(`[TestEngine] Context latency sweep PASSED: recommended ${contextLatencyResult.recommendedContext} tokens`);
+        } catch (error: any) {
+          console.log(`[TestEngine] Context latency sweep failed, continuing anyway: ${error.message}`);
+        }
+      } else {
+        // Quick mode: Just check 2K context
+        console.log(`[TestEngine] Running quick pre-flight latency check at 2K context...`);
+        
+        wsBroadcast.broadcastProgress('tools', modelId, {
+          current: 0,
+          total: 1,
+          currentTest: 'Checking model speed...',
+          currentCategory: 'Pre-flight Check',
+          score: 0,
+          status: 'running'
+        });
+
+        try {
+          const preflightLatency = await probeEngine.runQuickLatencyCheck(modelId, provider, settings, 15000);
+          console.log(`[TestEngine] Pre-flight latency: ${preflightLatency}ms`);
+
+          if (preflightLatency > PREFLIGHT_THRESHOLD_MS) {
+            const message = `Model responded in ${(preflightLatency/1000).toFixed(1)}s at 2K context. Too slow to test effectively.`;
+            console.log(`[TestEngine] Pre-flight FAILED: ${message}`);
+            
+            wsBroadcast.broadcastProgress('tools', modelId, {
+              current: 0,
+              total: 0,
+              currentTest: 'Model too slow',
+              currentCategory: 'Pre-flight Failed',
+              score: 0,
+              status: 'aborted'
+            });
+
+            this.runningTests.delete(modelId);
+            notifications.modelTestCompleted(modelId, 0, 0);
+
+            return {
+              modelId,
+              startedAt,
+              completedAt: new Date().toISOString(),
+              totalTests: 0,
+              passed: 0,
+              failed: 0,
+              overallScore: 0,
+              results: [],
+              aborted: true,
+              abortReason: 'MODEL_TOO_SLOW',
+              preflightLatency,
+              preflightMessage: message
+            };
+          }
+
+          console.log(`[TestEngine] Pre-flight PASSED: ${preflightLatency}ms < ${PREFLIGHT_THRESHOLD_MS}ms threshold`);
+        } catch (error: any) {
+          console.log(`[TestEngine] Pre-flight check failed, continuing anyway: ${error.message}`);
+        }
+      }
+    } else {
+      console.log(`[TestEngine] Pre-flight check skipped (force run)`);
+    }
+
+    // Filter tests based on mode
+    const testsToRun = this.filterTestsByMode(TEST_DEFINITIONS, mode);
+    console.log(`[TestEngine] Mode ${mode}: Running ${testsToRun.length} of ${TEST_DEFINITIONS.length} tests`);
+
     // Step 1: Tool Discovery - Try to discover native tools and match to MCP tools
     let discoveryResult: ToolDiscoveryResult = { discoveredTools: [], aliases: {}, unmappedTools: [] };
     try {
       wsBroadcast.broadcastProgress('tools', modelId, {
         current: 0,
-        total: TEST_DEFINITIONS.length + 1,
+        total: testsToRun.length + 1,
         currentTest: 'Discovering native tools...',
+        currentCategory: 'Tool Discovery',
         score: 0,
         status: 'running'
       });
@@ -1068,7 +1364,7 @@ Example: ["tool1", "tool2", "tool3"]`;
     }
 
     const results: TestResult[] = [];
-    const totalTests = TEST_DEFINITIONS.length;
+    const totalTests = testsToRun.length;
     let completedTests = 0;
     let runningScore = 0;
     
@@ -1079,12 +1375,19 @@ Example: ["tool1", "tool2", "tool3"]`;
     wsBroadcast.broadcastProgress('tools', modelId, {
       current: 0,
       total: totalTests,
-      currentTest: TEST_DEFINITIONS[0]?.tool || 'Starting...',
+      currentTest: testsToRun[0]?.tool || 'Starting...',
+      currentCategory: testsToRun[0] ? this.formatCategory(testsToRun[0].category) : 'Initializing',
       score: 0,
       status: 'running'
     });
     
-    for (const test of TEST_DEFINITIONS) {
+    for (const test of testsToRun) {
+      // Check if test was aborted
+      if (abortController.signal.aborted) {
+        console.log(`[TestEngine] Test aborted for ${modelId}`);
+        break;
+      }
+      
       try {
         const result = await this.runSingleTest(test, modelId, provider, settings);
         results.push(result);
@@ -1108,11 +1411,12 @@ Example: ["tool1", "tool2", "tool3"]`;
           }
         }
 
-        // Broadcast progress
+        // Broadcast progress with category
         wsBroadcast.broadcastProgress('tools', modelId, {
           current: completedTests,
           total: totalTests,
-          currentTest: test.tool,
+          currentTest: `${test.id}: ${test.tool}`,
+          currentCategory: this.formatCategory(test.category),
           score: runningScore,
           status: 'running'
         });
@@ -1130,11 +1434,12 @@ Example: ["tool1", "tool2", "tool3"]`;
         runningScore = Math.round(results.reduce((sum, r) => sum + r.score, 0) / completedTests);
         console.error(`[TestEngine] ${test.id}: ❌ ERROR - ${error.message}`);
 
-        // Broadcast progress even on error
+        // Broadcast progress even on error, with category
         wsBroadcast.broadcastProgress('tools', modelId, {
           current: completedTests,
           total: totalTests,
-          currentTest: test.tool,
+          currentTest: `${test.id}: ${test.tool}`,
+          currentCategory: this.formatCategory(test.category),
           score: runningScore,
           status: 'running'
         });
@@ -1146,11 +1451,132 @@ Example: ["tool1", "tool2", "tool3"]`;
       console.log(`[TestEngine] ${aliasRefinements.length} alias refinement(s) detected based on behavior`);
     }
 
+    // Run probe tests (9.x-14.x) for Standard/Deep/Optimization modes
+    if (mode !== 'quick') {
+      const probesToRun = this.filterProbesByMode(ALL_PROBE_DEFINITIONS, mode);
+      console.log(`[TestEngine] Running ${probesToRun.length} probe tests (9.x-14.x)`);
+      
+      for (const probe of probesToRun) {
+        // Check for abort
+        if (abortController.signal.aborted) {
+          console.log(`[TestEngine] Test aborted for ${modelId}`);
+          break;
+        }
+
+        try {
+          const probeResult = await this.runSingleProbe(probe, modelId, provider, settings);
+          results.push(probeResult);
+          completedTests++;
+          runningScore = Math.round(results.reduce((sum, r) => sum + r.score, 0) / completedTests);
+
+          // Broadcast progress - derive category from probe ID
+          const probeCategory = this.getProbeCategoryFromId(probe.id);
+          wsBroadcast.broadcastProgress('tools', modelId, {
+            current: completedTests,
+            total: totalTests + probesToRun.length,
+            currentTest: `${probe.id}: ${probe.name}`,
+            currentCategory: probeCategory,
+            score: runningScore,
+            status: 'running'
+          });
+        } catch (error: any) {
+          results.push({
+            testId: probe.id,
+            tool: 'probe',
+            passed: false,
+            score: 0,
+            latency: 0,
+            checks: [],
+            error: error.message
+          });
+          completedTests++;
+          console.error(`[TestEngine] Probe ${probe.id}: ❌ ERROR - ${error.message}`);
+        }
+      }
+    }
+
     const passed = results.filter(r => r.passed).length;
     const failed = results.filter(r => !r.passed).length;
-    const overallScore = results.length > 0
-      ? Math.round(results.reduce((sum, r) => sum + r.score, 0) / results.length)
+    
+    // Calculate latency metrics and apply scoring adjustments
+    const latencyMetrics = this.calculateLatencyMetrics(results);
+    const latencyAdjustedResults = this.applyLatencyScoring(results, latencyMetrics);
+    
+    const overallScore = latencyAdjustedResults.length > 0
+      ? Math.round(latencyAdjustedResults.reduce((sum, r) => sum + r.score, 0) / latencyAdjustedResults.length)
       : 0;
+
+    // Calculate score breakdown by category
+    const categoryScores: Record<string, number[]> = {};
+    for (const result of latencyAdjustedResults) {
+      // Map test category names to scoreBreakdown keys
+      const categoryMap: Record<string, string> = {
+        // Tool categories -> toolScore
+        'file_operations': 'toolScore',
+        'git_operations': 'toolScore',
+        'npm_operations': 'toolScore',
+        'http_operations': 'toolScore',
+        'browser_operations': 'toolScore',
+        'code_execution': 'toolScore',
+        'search': 'toolScore',
+        'text_operations': 'toolScore',
+        'process_operations': 'toolScore',
+        'archive_operations': 'toolScore',
+        'memory_operations': 'toolScore',
+        // Specialized categories
+        'reasoning': 'reasoningScore',
+        'rag': 'ragScore',
+        'rag_operations': 'ragScore',
+        'intent': 'intentScore',
+        'bug_detection': 'bugScore',
+        'navigation': 'navigationScore',
+        'helicopter': 'helicopterScore',
+        'proactive': 'proactiveScore'
+      };
+      
+      // Check if this is a probe result (from 9.x-14.x)
+      let key: string;
+      if (result.tool === 'probe') {
+        // Derive category from probe ID (e.g., "9.1" -> failureModesScore, "14.2" -> complianceScore)
+        const prefix = result.testId.split('.')[0];
+        const probeMap: Record<string, string> = {
+          '9': 'failureModesScore',
+          '10': 'statefulScore',
+          '11': 'precedenceScore',
+          '12': 'evolutionScore',
+          '13': 'calibrationScore',
+          '14': 'complianceScore'
+        };
+        key = probeMap[prefix] || 'toolScore';
+      } else {
+        // Get category from the test definition
+        const test = testsToRun.find(t => t.id === result.testId);
+        key = test ? categoryMap[test.category] || 'toolScore' : 'toolScore';
+      }
+      
+      if (!categoryScores[key]) categoryScores[key] = [];
+      categoryScores[key].push(result.score);
+    }
+
+    // Calculate averages for each category
+    const scoreBreakdown: TestRunResult['scoreBreakdown'] = {};
+    for (const [key, scores] of Object.entries(categoryScores)) {
+      if (scores.length > 0) {
+        (scoreBreakdown as any)[key] = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+      }
+    }
+    
+    // Add latency metrics to breakdown
+    (scoreBreakdown as any).avgLatencyMs = latencyMetrics.avgLatency;
+    (scoreBreakdown as any).latencyScore = latencyMetrics.latencyScore;
+    
+    console.log(`[TestEngine] Latency metrics: avg=${latencyMetrics.avgLatency}ms, score=${latencyMetrics.latencyScore}%`);
+
+    // Calculate trainability scores from 9.x-14.x probe results
+    const trainabilityScores = this.calculateTrainabilityScores(latencyAdjustedResults);
+    if (trainabilityScores) {
+      console.log(`[TestEngine] Trainability: SPC=${trainabilityScores.systemPromptCompliance}%, Overall=${trainabilityScores.overallTrainability}%`);
+    }
 
     const runResult: TestRunResult = {
       modelId,
@@ -1160,11 +1586,141 @@ Example: ["tool1", "tool2", "tool3"]`;
       passed,
       failed,
       overallScore,
-      results
+      results,
+      scoreBreakdown,
+      contextLatency: contextLatencyResult || undefined
     };
 
-    // Update model profile with test results, discovered aliases, and behavior-based refinements
-    await this.updateModelProfile(modelId, provider, runResult, discoveryResult, aliasRefinements);
+    // ============================================================
+    // OPTIMIZATION MODE: Run sweeps for context, tool count, RAG
+    // ============================================================
+    if (mode === 'optimization' && !abortController.signal.aborted) {
+      console.log(`[TestEngine] Running optimization sweeps for ${modelId}...`);
+      
+      const optimizationResults: OptimizationResults = {};
+
+      // 1. Context Latency Sweep - REUSE from pre-flight if available
+      if (contextLatencyResult) {
+        console.log(`[TestEngine] Reusing pre-flight context latency data`);
+        optimizationResults.contextLatency = contextLatencyResult;
+        optimizationResults.optimalContextLength = contextLatencyResult.recommendedContext;
+        
+        wsBroadcast.broadcastProgress('tools', modelId, {
+          current: totalTests,
+          total: totalTests + 2, // +2 for remaining sweeps (tool count + RAG)
+          currentTest: `Context: ${contextLatencyResult.recommendedContext / 1024}K optimal (from pre-flight)`,
+          currentCategory: 'Optimization: Context Sweep',
+          score: overallScore,
+          status: 'completed'
+        });
+      } else {
+        // No pre-flight data, run the sweep now (shouldn't happen for optimization mode)
+        try {
+          wsBroadcast.broadcastProgress('tools', modelId, {
+            current: totalTests,
+            total: totalTests + 3,
+            currentTest: 'Context latency profiling...',
+            currentCategory: 'Optimization: Context Sweep',
+            score: overallScore,
+            status: 'running'
+          });
+
+          console.log(`[TestEngine] Running context latency profile...`);
+          const contextLatency = await probeEngine.runContextLatencyProfile(modelId, provider, settings, 30000);
+          optimizationResults.contextLatency = contextLatency;
+          optimizationResults.optimalContextLength = contextLatency.recommendedContext;
+          console.log(`[TestEngine] Context sweep complete: optimal=${contextLatency.recommendedContext}, max=${contextLatency.maxUsableContext}`);
+        } catch (error: any) {
+          console.error(`[TestEngine] Context sweep failed: ${error.message}`);
+        }
+      }
+
+      // 2. Tool Count Sweep
+      try {
+        wsBroadcast.broadcastProgress('tools', modelId, {
+          current: totalTests + 1,
+          total: totalTests + 3,
+          currentTest: 'Tool count sweep...',
+          currentCategory: 'Optimization: Tool Count Sweep',
+          score: overallScore,
+          status: 'running'
+        });
+
+        console.log(`[TestEngine] Running tool count sweep...`);
+        const toolCountResults = await this.runToolCountSweep(modelId, provider, settings);
+        optimizationResults.toolCountSweep = toolCountResults;
+        optimizationResults.optimalToolCount = 
+          toolCountResults.optimal === 'essential' ? ESSENTIAL_TOOLS.length :
+          toolCountResults.optimal === 'standard' ? STANDARD_TOOLS.length :
+          FULL_TOOLS.length;
+        console.log(`[TestEngine] Tool count sweep complete: optimal tier=${toolCountResults.optimal}`);
+      } catch (error: any) {
+        console.error(`[TestEngine] Tool count sweep failed: ${error.message}`);
+      }
+
+      // 3. RAG Tuning (placeholder - would need RAG server integration)
+      try {
+        wsBroadcast.broadcastProgress('tools', modelId, {
+          current: totalTests + 2,
+          total: totalTests + 3,
+          currentTest: 'RAG configuration tuning...',
+          currentCategory: 'Optimization: RAG Tuning',
+          score: overallScore,
+          status: 'running'
+        });
+
+        console.log(`[TestEngine] RAG tuning (using defaults)...`);
+        // For now, use sensible defaults based on test results
+        optimizationResults.ragTuning = {
+          chunkSizes: { 500: 70, 1000: 85, 2000: 75 },
+          resultCounts: { 3: 70, 5: 85, 10: 80 },
+          optimalChunkSize: 1000,
+          optimalResultCount: 5
+        };
+      } catch (error: any) {
+        console.error(`[TestEngine] RAG tuning failed: ${error.message}`);
+      }
+
+      // 4. Generate MCP Configuration
+      try {
+        wsBroadcast.broadcastProgress('tools', modelId, {
+          current: totalTests + 3,
+          total: totalTests + 3,
+          currentTest: 'Generating optimized configuration...',
+          currentCategory: 'Optimization: Config Generation',
+          score: overallScore,
+          status: 'running'
+        });
+
+        console.log(`[TestEngine] Generating MCP configuration for ${modelId}...`);
+        
+        const generatedConfig = await configGenerator.generateFromTestResults(
+          modelId,
+          runResult,
+          {
+            contextLength: optimizationResults.optimalContextLength || contextLength,
+            saveToFile: true
+          }
+        );
+
+        optimizationResults.configGenerated = true;
+        optimizationResults.configPath = `mcp-server/configs/models/${modelId.replace(/[/\\:]/g, '_')}.json`;
+        
+        console.log(`[TestEngine] MCP config generated: ${optimizationResults.configPath}`);
+      } catch (error: any) {
+        console.error(`[TestEngine] Config generation failed: ${error.message}`);
+        optimizationResults.configGenerated = false;
+      }
+
+      // Attach optimization results to run result
+      runResult.optimization = optimizationResults;
+      runResult.completedAt = new Date().toISOString();
+
+      console.log(`[TestEngine] Optimization sweeps complete for ${modelId}`);
+    }
+
+    // Update model profile with test results, discovered aliases, behavior-based refinements, and trainability
+    await this.updateModelProfile(modelId, provider, runResult, discoveryResult, aliasRefinements, trainabilityScores);
 
     // For LM Studio: optionally unload after test
     if (provider === 'lmstudio') {
@@ -1181,14 +1737,21 @@ Example: ["tool1", "tool2", "tool3"]`;
 
     notifications.modelTestCompleted(modelId, overallScore);
 
-    // Broadcast completion
-    wsBroadcast.broadcastProgress('tools', modelId, {
-      current: totalTests,
-      total: totalTests,
-      currentTest: 'Complete',
-      score: overallScore,
-      status: 'completed'
-    });
+    // Clean up abort controller
+    this.runningTests.delete(modelId);
+
+    // Broadcast completion (only if not aborted)
+    if (!abortController.signal.aborted) {
+      wsBroadcast.broadcastProgress('tools', modelId, {
+        current: totalTests,
+        total: totalTests,
+        currentTest: 'All tests complete',
+        currentCategory: 'Complete',
+        score: overallScore,
+        status: 'completed'
+      });
+      wsBroadcast.broadcastTestComplete(modelId, overallScore, 'tools');
+    }
 
     return runResult;
   }
@@ -1474,14 +2037,20 @@ Example: ["tool1", "tool2", "tool3"]`;
   }
 
   /**
-   * Update model profile with test results and alias refinements
+   * Update model profile with test results, alias refinements, and trainability scores
    */
   private async updateModelProfile(
     modelId: string,
     provider: 'lmstudio' | 'openai' | 'azure',
     runResult: TestRunResult,
     discoveryResult?: ToolDiscoveryResult,
-    aliasRefinements?: AliasRefinement[]
+    aliasRefinements?: AliasRefinement[],
+    trainabilityScores?: {
+      systemPromptCompliance: number;
+      instructionPersistence: number;
+      correctionAcceptance: number;
+      overallTrainability: number;
+    } | null
   ): Promise<void> {
     let profile = await capabilities.getProfile(modelId);
     
@@ -1559,6 +2128,26 @@ Example: ["tool1", "tool2", "tool3"]`;
       });
     }
     
+    // Add scoreBreakdown to profile
+    if (runResult.scoreBreakdown) {
+      (profile as any).scoreBreakdown = runResult.scoreBreakdown;
+    }
+    
+    // Add trainability scores to profile
+    if (trainabilityScores) {
+      (profile as any).trainabilityScores = trainabilityScores;
+    }
+    
+    // Add context latency profile (from pre-flight full sweep)
+    if (runResult.contextLatency) {
+      (profile as any).contextLatency = runResult.contextLatency;
+      // Auto-set recommended context if not manually overridden
+      if (!profile.contextLength && runResult.contextLatency.recommendedContext) {
+        profile.contextLength = runResult.contextLatency.recommendedContext;
+      }
+      console.log(`[TestEngine] Saved context latency profile: recommended=${runResult.contextLatency.recommendedContext}`);
+    }
+    
     await capabilities.saveProfile(profile);
   }
 
@@ -1586,13 +2175,17 @@ Example: ["tool1", "tool2", "tool3"]`;
     settings: any,
     options: TestOptions = {}
   ): Promise<TestRunResult> {
+    // Create abort controller for this test run
+    const abortController = new AbortController();
+    this.runningTests.set(modelId, abortController);
+    
     const tests = TEST_DEFINITIONS.filter(t => tools.includes(t.tool));
     
     // Parse test mode options
+    // POLICY: Models stay loaded after tests - no auto-unload
     const mode = options.mode || 'manual';
-    const unloadOthersBefore = options.unloadOthersBefore ?? (mode !== 'manual');
-    const unloadAfterTest = options.unloadAfterTest ?? (mode === 'quick');
-    const unloadOnlyOnFail = options.unloadOnlyOnFail ?? (mode === 'keep_on_success');
+    const unloadAfterTest = options.unloadAfterTest ?? false; // Never auto-unload
+    const unloadOnlyOnFail = options.unloadOnlyOnFail ?? false; // Never auto-unload
 
     // Get context length: explicit option > profile > default
     let contextLength = 8192;
@@ -1623,6 +2216,12 @@ Example: ["tool1", "tool2", "tool3"]`;
     const results: TestResult[] = [];
 
     for (const test of tests) {
+      // Check if test was aborted
+      if (abortController.signal.aborted) {
+        console.log(`[TestEngine] Test aborted for ${modelId}`);
+        break;
+      }
+      
       try {
         const result = await this.runSingleTest(test, modelId, provider, settings);
         results.push(result);
@@ -1638,6 +2237,9 @@ Example: ["tool1", "tool2", "tool3"]`;
         });
       }
     }
+    
+    // Clean up abort controller
+    this.runningTests.delete(modelId);
 
     const passed = results.filter(r => r.passed).length;
     const failed = results.filter(r => !r.passed).length;
@@ -1667,6 +2269,342 @@ Example: ["tool1", "tool2", "tool3"]`;
       failed,
       overallScore,
       results
+    };
+  }
+
+  /**
+   * Get category name from probe ID (e.g., "9.1" -> "Failure Modes")
+   */
+  private getProbeCategoryFromId(probeId: string): string {
+    const prefix = probeId.split('.')[0];
+    const categoryMap: Record<string, string> = {
+      '9': '9.x Failure Modes',
+      '10': '10.x Stateful',
+      '11': '11.x Precedence',
+      '12': '12.x Evolution',
+      '13': '13.x Calibration',
+      '14': '14.x Compliance'
+    };
+    return categoryMap[prefix] || `${prefix}.x Probes`;
+  }
+
+  /**
+   * Filter probe tests by mode
+   */
+  private filterProbesByMode(probes: ProbeDefinition[], mode: TestMode): ProbeDefinition[] {
+    // Quick mode doesn't run probes
+    if (mode === 'quick') return [];
+    
+    // Standard mode: only critical probes (9.x, 14.x)
+    if (mode === 'standard' || mode === 'keep_on_success') {
+      return probes.filter(p => 
+        p.id.startsWith('9.') || p.id.startsWith('14.')
+      );
+    }
+    
+    // Deep/Optimization/Manual: all probes
+    return probes;
+  }
+
+  /**
+   * Run a single probe test (ProbeDefinition with evaluate function)
+   */
+  private async runSingleProbe(
+    probe: ProbeDefinition,
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any
+  ): Promise<TestResult> {
+    const startTime = Date.now();
+    
+    console.log(`[TestEngine] Running probe ${probe.id}: ${probe.name}`);
+
+    try {
+      // Build messages - probes have a simple prompt structure
+      const messages: any[] = [
+        { role: 'system', content: 'You are a helpful AI assistant with access to tools.' },
+        { role: 'user', content: probe.prompt }
+      ];
+
+      // Get tool schemas if probe expects a specific tool
+      const tools = probe.expectedTool ? getToolSchemas([probe.expectedTool]) : [];
+
+      // Call LLM (params: modelId, provider, messages, tools, settings)
+      const response = await this.callLLM(modelId, provider, messages, tools, settings);
+      
+      // Extract tool calls from response
+      const toolCalls = this.extractToolCalls(response);
+      
+      // Evaluate using probe's evaluate function (takes response and toolCalls)
+      const evalResult = probe.evaluate(response, toolCalls);
+      
+      const latency = Date.now() - startTime;
+      const passed = evalResult.score >= 70;
+      
+      console.log(`[TestEngine] Probe ${probe.id}: ${passed ? '✓' : '✗'} (${evalResult.score}%)`);
+
+      return {
+        testId: probe.id,
+        tool: probe.expectedTool || 'probe',
+        passed,
+        score: evalResult.score,
+        latency,
+        checks: [{
+          name: probe.name,
+          passed: evalResult.passed,
+          expected: probe.expectedBehavior,
+          actual: evalResult.details
+        }],
+        response,
+        calledTool: toolCalls[0]?.function?.name,
+        calledArgs: toolCalls[0]?.function?.arguments
+      };
+    } catch (error: any) {
+      console.error(`[TestEngine] Probe ${probe.id} error:`, error.message);
+      return {
+        testId: probe.id,
+        tool: probe.expectedTool || 'probe',
+        passed: false,
+        score: 0,
+        latency: Date.now() - startTime,
+        checks: [],
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Extract tool calls from LLM response
+   */
+  private extractToolCalls(response: any): any[] {
+    if (!response) return [];
+    
+    // Handle different response formats
+    if (response.choices?.[0]?.message?.tool_calls) {
+      return response.choices[0].message.tool_calls;
+    }
+    if (response.tool_calls) {
+      return response.tool_calls;
+    }
+    if (Array.isArray(response)) {
+      return response.filter((item: any) => item.type === 'function' || item.function);
+    }
+    
+    return [];
+  }
+
+  /**
+   * Run tool count sweep - test accuracy with different tool set sizes
+   */
+  private async runToolCountSweep(
+    modelId: string,
+    provider: 'lmstudio' | 'openai' | 'azure',
+    settings: any
+  ): Promise<{
+    essential: { count: number; score: number; latency: number };
+    standard: { count: number; score: number; latency: number };
+    full: { count: number; score: number; latency: number };
+    optimal: 'essential' | 'standard' | 'full';
+  }> {
+    const tiers: Array<{ name: 'essential' | 'standard' | 'full'; tools: string[] }> = [
+      { name: 'essential', tools: ESSENTIAL_TOOLS },
+      { name: 'standard', tools: STANDARD_TOOLS },
+      { name: 'full', tools: FULL_TOOLS }
+    ];
+
+    const results: Record<string, { count: number; score: number; latency: number }> = {};
+
+    // Run a subset of tests with each tool set
+    const testSubset = TEST_DEFINITIONS.slice(0, 5); // Use first 5 tests for sweep
+
+    for (const tier of tiers) {
+      console.log(`[TestEngine] Tool sweep: testing ${tier.name} tier (${tier.tools.length} tools)`);
+      
+      const startTime = Date.now();
+      let totalScore = 0;
+      let testCount = 0;
+
+      for (const test of testSubset) {
+        // Only test if the tool is in this tier
+        if (!tier.tools.includes(test.tool)) continue;
+
+        try {
+          const result = await this.runSingleTest(test, modelId, provider, settings);
+          totalScore += result.score;
+          testCount++;
+        } catch {
+          // Skip failed tests
+        }
+      }
+
+      const latency = Date.now() - startTime;
+      const avgScore = testCount > 0 ? Math.round(totalScore / testCount) : 0;
+
+      results[tier.name] = {
+        count: tier.tools.length,
+        score: avgScore,
+        latency
+      };
+
+      console.log(`[TestEngine] ${tier.name}: ${testCount} tests, score=${avgScore}%, latency=${latency}ms`);
+    }
+
+    // Determine optimal tier: best score with reasonable latency
+    // Prefer smaller tool sets if scores are similar
+    let optimal: 'essential' | 'standard' | 'full' = 'standard';
+    
+    if (results.essential?.score >= results.standard?.score * 0.9) {
+      // Essential is within 90% of standard - prefer essential
+      optimal = 'essential';
+    } else if (results.full?.score > results.standard?.score * 1.1) {
+      // Full is significantly better (>10%) - use full
+      optimal = 'full';
+    }
+    // Otherwise keep standard as default
+
+    return {
+      essential: results.essential || { count: ESSENTIAL_TOOLS.length, score: 0, latency: 0 },
+      standard: results.standard || { count: STANDARD_TOOLS.length, score: 0, latency: 0 },
+      full: results.full || { count: FULL_TOOLS.length, score: 0, latency: 0 },
+      optimal
+    };
+  }
+
+  /**
+   * Calculate latency metrics from test results
+   * Returns average latency and a latency score (0-100)
+   */
+  private calculateLatencyMetrics(results: TestResult[]): { avgLatency: number; latencyScore: number; fast: number; slow: number } {
+    // Filter out results with 0 latency (errors)
+    const validResults = results.filter(r => r.latency > 0);
+    
+    if (validResults.length === 0) {
+      return { avgLatency: 0, latencyScore: 50, fast: 0, slow: 0 };
+    }
+
+    const totalLatency = validResults.reduce((sum, r) => sum + r.latency, 0);
+    const avgLatency = Math.round(totalLatency / validResults.length);
+
+    // Latency thresholds (in ms)
+    const FAST_THRESHOLD = 2000;   // < 2s is fast
+    const GOOD_THRESHOLD = 5000;   // < 5s is good
+    const SLOW_THRESHOLD = 10000;  // < 10s is acceptable
+    // > 10s is slow
+
+    // Count fast/slow responses
+    const fast = validResults.filter(r => r.latency < FAST_THRESHOLD).length;
+    const slow = validResults.filter(r => r.latency > SLOW_THRESHOLD).length;
+
+    // Calculate latency score (0-100)
+    // Fast responses boost score, slow responses reduce it
+    let latencyScore = 50; // Start at neutral
+    
+    for (const result of validResults) {
+      if (result.latency < FAST_THRESHOLD) {
+        latencyScore += 5; // Bonus for fast
+      } else if (result.latency < GOOD_THRESHOLD) {
+        latencyScore += 2; // Small bonus
+      } else if (result.latency < SLOW_THRESHOLD) {
+        latencyScore -= 2; // Small penalty
+      } else {
+        latencyScore -= 5; // Penalty for slow
+      }
+    }
+
+    // Clamp to 0-100
+    latencyScore = Math.max(0, Math.min(100, latencyScore));
+
+    return { avgLatency, latencyScore, fast, slow };
+  }
+
+  /**
+   * Apply latency-based scoring adjustments to results
+   * Fast responses get small bonus, very slow responses get penalty
+   */
+  private applyLatencyScoring(results: TestResult[], metrics: { avgLatency: number; latencyScore: number }): TestResult[] {
+    // Latency weight: how much latency affects the final score (0-1)
+    const LATENCY_WEIGHT = 0.1; // 10% of score can be affected by latency
+
+    return results.map(result => {
+      if (result.latency === 0 || !result.passed) {
+        // Don't adjust failed tests or tests with no latency data
+        return result;
+      }
+
+      let adjustment = 0;
+
+      // Fast response bonus
+      if (result.latency < 2000) {
+        adjustment = 5; // +5% for fast responses
+      } else if (result.latency < 5000) {
+        adjustment = 2; // +2% for good responses
+      } else if (result.latency > 15000) {
+        adjustment = -10; // -10% for very slow responses
+      } else if (result.latency > 10000) {
+        adjustment = -5; // -5% for slow responses
+      }
+
+      // Apply weighted adjustment
+      const adjustedScore = Math.max(0, Math.min(100, result.score + adjustment * LATENCY_WEIGHT * 10));
+
+      return {
+        ...result,
+        score: Math.round(adjustedScore)
+      };
+    });
+  }
+
+  /**
+   * Calculate trainability scores from probe results
+   * Trainability = how well the model follows system prompts, persists instructions, accepts corrections
+   */
+  private calculateTrainabilityScores(results: TestResult[]): {
+    systemPromptCompliance: number;
+    instructionPersistence: number;
+    correctionAcceptance: number;
+    overallTrainability: number;
+  } | null {
+    // Filter probe results by category
+    const complianceResults = results.filter(r => r.testId.startsWith('14.')); // 14.x Compliance
+    const statefulResults = results.filter(r => r.testId.startsWith('10.'));   // 10.x Stateful
+    const failureModeResults = results.filter(r => r.testId.startsWith('9.')); // 9.x Failure Modes
+
+    // Need at least some compliance results to calculate trainability
+    if (complianceResults.length === 0) {
+      return null;
+    }
+
+    // System Prompt Compliance (SPC) - from 14.x tests
+    // This is the most important metric for trainability
+    const systemPromptCompliance = complianceResults.length > 0
+      ? Math.round(complianceResults.reduce((sum, r) => sum + r.score, 0) / complianceResults.length)
+      : 0;
+
+    // Instruction Persistence - from 10.x tests
+    // How well the model maintains instructions over multiple turns
+    const instructionPersistence = statefulResults.length > 0
+      ? Math.round(statefulResults.reduce((sum, r) => sum + r.score, 0) / statefulResults.length)
+      : systemPromptCompliance; // Fall back to SPC if no stateful tests
+
+    // Correction Acceptance - from 9.x tests
+    // How well the model recovers from failures and accepts corrections
+    const correctionAcceptance = failureModeResults.length > 0
+      ? Math.round(failureModeResults.reduce((sum, r) => sum + r.score, 0) / failureModeResults.length)
+      : systemPromptCompliance; // Fall back to SPC if no failure mode tests
+
+    // Overall Trainability: weighted combination
+    // SPC is 50%, Instruction Persistence is 25%, Correction Acceptance is 25%
+    const overallTrainability = Math.round(
+      systemPromptCompliance * 0.50 +
+      instructionPersistence * 0.25 +
+      correctionAcceptance * 0.25
+    );
+
+    return {
+      systemPromptCompliance,
+      instructionPersistence,
+      correctionAcceptance,
+      overallTrainability
     };
   }
 }

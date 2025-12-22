@@ -1,0 +1,59 @@
+{
+  "modelId": "deepseek-coder-6.7b-base",
+  "version": 1,
+  "generatedAt": "2025-12-22T02:38:58.799Z",
+  "toolFormat": "openai",
+  "enabledTools": [
+    "rag_query",
+    "rag_status",
+    "read_file",
+    "read_multiple_files",
+    "write_file",
+    "edit_file",
+    "list_directory",
+    "search_files",
+    "get_file_info",
+    "git_status",
+    "git_diff",
+    "git_add",
+    "git_commit",
+    "shell_exec",
+    "memory_store"
+  ],
+  "disabledTools": [
+    "probe"
+  ],
+  "toolOverrides": {
+    "read_file": {
+      "priority": 1,
+      "notes": "High success rate (100%)"
+    }
+  },
+  "systemPromptAdditions": [
+    "You are an expert coding assistant with access to tools",
+    "Use RAG/search to understand codebase before making changes",
+    "Make precise, minimal changes when editing code",
+    "Explain your reasoning before taking actions",
+    "Be extra careful with tool parameters - verify before calling"
+  ],
+  "contextBudget": {
+    "total": 16384,
+    "systemPrompt": 1048,
+    "toolSchemas": 1572,
+    "memory": 655,
+    "ragResults": 3276,
+    "history": 4587,
+    "reserve": 1966
+  },
+  "optimalSettings": {
+    "maxToolsPerCall": 5,
+    "ragChunkSize": 1000,
+    "ragResultCount": 3,
+    "descriptionStyle": "detailed"
+  },
+  "metadata": {
+    "basedOnTestScore": 47,
+    "recommendationCount": 2,
+    "tierLevel": "essential"
+  }
+}

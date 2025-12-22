@@ -1,12 +1,13 @@
 /**
  * LM Studio Model Manager
- * Centralized singleton service for managing LM Studio model loading/unloading
+ * Centralized singleton service for managing LM Studio chat/LLM model loading
  * 
- * This service:
- * - Tracks which model is currently loaded and with what context size
- * - Prevents duplicate load/unload operations
- * - Provides a unified API for all components
- * - Uses mutex to prevent race conditions during load operations
+ * POLICY:
+ * - Load on demand (only when needed)
+ * - Keep loaded (never auto-unload)
+ * - Reuse existing (if model is already loaded, use it even if context differs)
+ * - NEVER unload embedding models (they use a separate namespace: client.embedding)
+ * - Only unload when explicitly requested (e.g., to free VRAM)
  */
 
 import { LMStudioClient } from '@lmstudio/sdk';
@@ -21,7 +22,7 @@ export interface LoadedModelState {
 class LMStudioModelManager {
   private static instance: LMStudioModelManager;
   
-  // Current state
+  // Current state (tracked internally, synced with LM Studio)
   private loadedModel: LoadedModelState | null = null;
   
   // Mutex to prevent concurrent load operations
@@ -50,8 +51,28 @@ class LMStudioModelManager {
   }
 
   /**
+   * Check if a model is loaded in LM Studio (by path or identifier)
+   */
+  private async getLoadedLLMModel(modelId: string): Promise<{ identifier: string; path: string } | null> {
+    try {
+      const client = this.createClient();
+      const loadedModels = await client.llm.listLoaded();
+      
+      // Find the model by path or identifier
+      const found = loadedModels.find(m => 
+        m.path === modelId || 
+        m.identifier === modelId ||
+        m.path?.endsWith(modelId.split('/').pop() || '')
+      );
+      
+      return found ? { identifier: found.identifier, path: found.path } : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
    * Sync internal state with LM Studio's actual loaded models
-   * Call this to refresh state if uncertain
    */
   async syncState(): Promise<void> {
     try {
@@ -60,26 +81,16 @@ class LMStudioModelManager {
       
       if (loadedModels.length === 0) {
         this.loadedModel = null;
-        console.log('[ModelManager] Synced: No models loaded');
-      } else if (loadedModels.length === 1) {
-        // If one model is loaded but we don't have state, update it
-        // Note: We can't know the context size from the API, so we use a placeholder
-        if (!this.loadedModel || this.loadedModel.modelId !== loadedModels[0].identifier) {
-          this.loadedModel = {
-            modelId: loadedModels[0].identifier,
-            contextSize: 0, // Unknown - will be updated on next ensureLoaded
-            loadedAt: new Date()
-          };
-          console.log(`[ModelManager] Synced: Found loaded model ${loadedModels[0].identifier} (context unknown)`);
-        }
+        console.log('[ModelManager] Synced: No LLM models loaded');
       } else {
-        // Multiple models loaded - unusual state, keep first one
-        console.log(`[ModelManager] Synced: ${loadedModels.length} models loaded, tracking first`);
+        // Track the first loaded model (we support one at a time for now)
+        const first = loadedModels[0];
         this.loadedModel = {
-          modelId: loadedModels[0].identifier,
-          contextSize: 0,
+          modelId: first.path || first.identifier,
+          contextSize: 0, // Unknown from API
           loadedAt: new Date()
         };
+        console.log(`[ModelManager] Synced: Found ${loadedModels.length} LLM model(s), tracking ${first.identifier}`);
       }
     } catch (error: any) {
       console.log(`[ModelManager] Could not sync state: ${error.message}`);
@@ -87,11 +98,15 @@ class LMStudioModelManager {
   }
 
   /**
-   * Ensure a model is loaded with the specified context size
-   * This is the main API - it will:
-   * - Skip if same model with same context is already loaded
-   * - Unload and reload if context differs
-   * - Unload other models and load the requested one
+   * Ensure a model is loaded with the specified context size.
+   * 
+   * BEHAVIOR:
+   * - Unloads ALL other LLM models first (clean slate, no stale models)
+   * - Loads the requested model fresh
+   * - Embedding models are NEVER touched (separate API)
+   * 
+   * @param modelId Model path or identifier
+   * @param contextSize Context size for the model
    */
   async ensureLoaded(modelId: string, contextSize: number): Promise<void> {
     // Wait for any pending load operation
@@ -100,18 +115,17 @@ class LMStudioModelManager {
       await this.loadPromise;
     }
 
-    // Check if already loaded with correct context
+    // Check if the exact model with exact context is already loaded
     if (this.loadedModel?.modelId === modelId && this.loadedModel?.contextSize === contextSize) {
-      console.log(`[ModelManager] Model ${modelId} already loaded with context ${contextSize}, skipping`);
-      return;
+      // Verify it's actually loaded in LM Studio
+      const existing = await this.getLoadedLLMModel(modelId);
+      if (existing) {
+        console.log(`[ModelManager] Model ${modelId} already loaded with context ${contextSize}, skipping`);
+        return;
+      }
     }
 
-    // Check if same model but different context - need to reload
-    if (this.loadedModel?.modelId === modelId && this.loadedModel?.contextSize !== contextSize) {
-      console.log(`[ModelManager] Model ${modelId} loaded with different context (${this.loadedModel.contextSize} vs ${contextSize}), reloading...`);
-    }
-
-    // Start loading
+    // Load the model (this will unload all other LLMs first)
     this.isLoading = true;
     this.loadPromise = this.doLoad(modelId, contextSize);
     
@@ -125,21 +139,27 @@ class LMStudioModelManager {
 
   /**
    * Internal method to perform the actual load
+   * Unloads ALL LLM models first (to avoid OOM and stale models)
+   * Embedding models use a separate API (client.embedding) and are NEVER touched
    */
-  private async doLoad(modelId: string, contextSize: number): Promise<void> {
+  private async doLoad(modelId: string, contextSize: number, _unloadFirst?: string): Promise<void> {
     const client = this.createClient();
 
-    // Step 1: Unload all currently loaded models
+    // Unload ALL LLM models to free VRAM and remove stale models
+    // Note: client.llm only manages chat/LLM models, NOT embedding models
     try {
       const loadedModels = await client.llm.listLoaded();
       
+      if (loadedModels.length > 0) {
+        console.log(`[ModelManager] Unloading ${loadedModels.length} LLM model(s) before loading new one...`);
+      }
+      
       for (const model of loadedModels) {
         try {
-          console.log(`[ModelManager] Unloading ${model.identifier}...`);
-          wsBroadcast.broadcastModelLoading(model.identifier, 'unloading', 'Unloading to prepare for new model');
+          console.log(`[ModelManager] Unloading LLM: ${model.identifier}`);
+          wsBroadcast.broadcastModelLoading(model.identifier, 'unloading', 'Switching models...');
           await client.llm.unload(model.identifier);
-          console.log(`[ModelManager] Unloaded ${model.identifier}`);
-          wsBroadcast.broadcastModelLoading(model.identifier, 'unloaded', 'Model unloaded');
+          wsBroadcast.broadcastModelLoading(model.identifier, 'unloaded', 'Unloaded');
         } catch (error: any) {
           console.log(`[ModelManager] Could not unload ${model.identifier}: ${error.message}`);
         }
@@ -148,10 +168,10 @@ class LMStudioModelManager {
       console.log(`[ModelManager] Could not list loaded models: ${error.message}`);
     }
 
-    // Clear our state since we unloaded
+    // Clear state
     this.loadedModel = null;
 
-    // Step 2: Load the requested model
+    // Load the requested model
     try {
       console.log(`[ModelManager] Loading ${modelId} with context ${contextSize}...`);
       wsBroadcast.broadcastModelLoading(modelId, 'loading', `Loading with ${contextSize} context...`);
@@ -169,19 +189,28 @@ class LMStudioModelManager {
 
       console.log(`[ModelManager] Loaded ${modelId} with context ${contextSize}`);
       wsBroadcast.broadcastModelLoading(modelId, 'loaded', `Loaded with ${contextSize} context`);
+      
     } catch (error: any) {
       console.error(`[ModelManager] Failed to load ${modelId}: ${error.message}`);
       wsBroadcast.broadcastModelLoading(modelId, 'failed', error.message);
       
-      // Don't throw if model is already loaded (race condition with LM Studio UI)
+      // Check if model is already loaded (race condition with LM Studio UI)
       if (error.message?.includes('already loaded')) {
-        this.loadedModel = {
-          modelId,
-          contextSize: 0, // Unknown context since loaded externally
-          loadedAt: new Date()
-        };
-        console.log(`[ModelManager] Model was already loaded (possibly from LM Studio UI)`);
-        return;
+        const existing = await this.getLoadedLLMModel(modelId);
+        if (existing) {
+          this.loadedModel = {
+            modelId: existing.path || existing.identifier,
+            contextSize: 0, // Unknown
+            loadedAt: new Date()
+          };
+          console.log(`[ModelManager] Model was already loaded (possibly from LM Studio UI)`);
+          return;
+        }
+      }
+      
+      // Check if VRAM is full
+      if (error.message?.includes('VRAM') || error.message?.includes('memory') || error.message?.includes('OOM')) {
+        console.error(`[ModelManager] VRAM insufficient - user should manually unload models in LM Studio`);
       }
       
       throw error;
@@ -189,10 +218,10 @@ class LMStudioModelManager {
   }
 
   /**
-   * Unload all models
+   * Unload all LLM models (explicit user action)
+   * NOTE: This does NOT unload embedding models
    */
-  async unloadAll(): Promise<void> {
-    // Wait for any pending load operation
+  async unloadAllLLM(): Promise<void> {
     if (this.loadPromise) {
       await this.loadPromise;
     }
@@ -204,29 +233,27 @@ class LMStudioModelManager {
       
       for (const model of loadedModels) {
         try {
-          console.log(`[ModelManager] Unloading ${model.identifier}...`);
+          console.log(`[ModelManager] Unloading LLM ${model.identifier}...`);
           wsBroadcast.broadcastModelLoading(model.identifier, 'unloading', 'Unloading');
           await client.llm.unload(model.identifier);
-          console.log(`[ModelManager] Unloaded ${model.identifier}`);
+          console.log(`[ModelManager] Unloaded LLM ${model.identifier}`);
           wsBroadcast.broadcastModelLoading(model.identifier, 'unloaded', 'Model unloaded');
         } catch (error: any) {
           console.log(`[ModelManager] Could not unload ${model.identifier}: ${error.message}`);
-          wsBroadcast.broadcastModelLoading(model.identifier, 'failed', `Unload failed: ${error.message}`);
         }
       }
 
       this.loadedModel = null;
-      console.log(`[ModelManager] All models unloaded`);
+      console.log(`[ModelManager] All LLM models unloaded`);
     } catch (error: any) {
       console.log(`[ModelManager] Could not unload models: ${error.message}`);
     }
   }
 
   /**
-   * Unload a specific model
+   * Unload a specific model (explicit user action)
    */
   async unloadModel(modelId: string): Promise<void> {
-    // Wait for any pending load operation
     if (this.loadPromise) {
       await this.loadPromise;
     }
@@ -234,34 +261,46 @@ class LMStudioModelManager {
     const client = this.createClient();
 
     try {
-      console.log(`[ModelManager] Unloading ${modelId}...`);
-      wsBroadcast.broadcastModelLoading(modelId, 'unloading', 'Unloading');
-      await client.llm.unload(modelId);
+      // Find the model
+      const existing = await this.getLoadedLLMModel(modelId);
+      if (!existing) {
+        console.log(`[ModelManager] Model ${modelId} not loaded, nothing to unload`);
+        return;
+      }
+
+      console.log(`[ModelManager] Unloading ${existing.identifier}...`);
+      wsBroadcast.broadcastModelLoading(existing.identifier, 'unloading', 'Unloading');
+      await client.llm.unload(existing.identifier);
       
-      if (this.loadedModel?.modelId === modelId) {
+      if (this.loadedModel?.modelId === modelId || this.loadedModel?.modelId === existing.identifier) {
         this.loadedModel = null;
       }
       
-      console.log(`[ModelManager] Unloaded ${modelId}`);
-      wsBroadcast.broadcastModelLoading(modelId, 'unloaded', 'Model unloaded');
+      console.log(`[ModelManager] Unloaded ${existing.identifier}`);
+      wsBroadcast.broadcastModelLoading(existing.identifier, 'unloaded', 'Model unloaded');
     } catch (error: any) {
       console.log(`[ModelManager] Could not unload ${modelId}: ${error.message}`);
-      wsBroadcast.broadcastModelLoading(modelId, 'failed', `Unload failed: ${error.message}`);
     }
+  }
+
+  // Legacy alias for backwards compatibility
+  async unloadAll(): Promise<void> {
+    return this.unloadAllLLM();
   }
 
   /**
    * Check if a specific model is loaded
    */
-  isModelLoaded(modelId: string): boolean {
-    return this.loadedModel?.modelId === modelId;
+  async isModelLoaded(modelId: string): Promise<boolean> {
+    const existing = await this.getLoadedLLMModel(modelId);
+    return existing !== null;
   }
 
   /**
-   * Check if a specific model is loaded with a specific context size
+   * Check if any model is loaded (based on our state)
    */
-  isModelLoadedWithContext(modelId: string, contextSize: number): boolean {
-    return this.loadedModel?.modelId === modelId && this.loadedModel?.contextSize === contextSize;
+  isAnyModelLoaded(): boolean {
+    return this.loadedModel !== null;
   }
 
   /**
@@ -284,6 +323,48 @@ class LMStudioModelManager {
   clearState(): void {
     this.loadedModel = null;
     console.log(`[ModelManager] State cleared`);
+  }
+
+  /**
+   * Cleanup on server startup - unload all stale LLM models
+   * This ensures a clean slate when the server restarts
+   * NOTE: Does NOT touch embedding models (separate API)
+   */
+  async cleanupOnStartup(): Promise<void> {
+    console.log(`[ModelManager] Startup cleanup - checking for stale LLM models...`);
+    
+    try {
+      const client = this.createClient();
+      const loadedModels = await client.llm.listLoaded();
+      
+      if (loadedModels.length === 0) {
+        console.log(`[ModelManager] Startup: No stale LLM models found`);
+        return;
+      }
+      
+      console.log(`[ModelManager] Startup: Found ${loadedModels.length} stale LLM model(s), unloading...`);
+      
+      for (const model of loadedModels) {
+        try {
+          console.log(`[ModelManager] Startup: Unloading stale LLM: ${model.identifier}`);
+          await client.llm.unload(model.identifier);
+          console.log(`[ModelManager] Startup: Unloaded ${model.identifier}`);
+        } catch (error: any) {
+          console.log(`[ModelManager] Startup: Could not unload ${model.identifier}: ${error.message}`);
+        }
+      }
+      
+      this.loadedModel = null;
+      console.log(`[ModelManager] Startup cleanup complete - LLM models cleared`);
+      
+    } catch (error: any) {
+      // LM Studio might not be running at startup - that's OK
+      if (error.message?.includes('ECONNREFUSED') || error.message?.includes('connect')) {
+        console.log(`[ModelManager] Startup: LM Studio not running (will connect when needed)`);
+      } else {
+        console.log(`[ModelManager] Startup: Could not check for stale models: ${error.message}`);
+      }
+    }
   }
 }
 
