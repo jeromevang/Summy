@@ -2892,7 +2892,7 @@ app.post('/debug/clear', (req, res) => {
 });
 
 // Start server
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`🚀 Summy proxy server running on port ${PORT}`);
   console.log(`📁 Sessions stored in: ${SESSIONS_DIR}`);
   console.log(`🔌 WebSocket server ready for real-time updates`);
@@ -2904,8 +2904,50 @@ server.listen(PORT, () => {
   console.log('  🔔 Notifications: /api/notifications/*');
   console.log('  📈 Analytics: /api/analytics/*');
   
+  // Startup cleanup: Unload any stale LLM models from LM Studio
+  // (Embedding models are NOT touched - they use a separate API)
+  try {
+    const { modelManager } = await import('./services/lmstudio-model-manager.js');
+    await modelManager.cleanupOnStartup();
+  } catch (error) {
+    console.log('  ⚠️ LM Studio cleanup skipped (not available)');
+  }
+  
   // Start system metrics collection
   systemMetrics.start(1000); // Collect every 1 second
   console.log('  📊 System metrics: ACTIVE (CPU/GPU monitoring)');
   console.log('  🔌 WebSocket: Ready for real-time updates');
 });
+
+// Graceful shutdown handling - prevents EADDRINUSE on nodemon restarts
+const gracefulShutdown = (signal: string) => {
+  console.log(`\n⚡ Received ${signal}, shutting down gracefully...`);
+  
+  // Stop accepting new connections
+  server.close(() => {
+    console.log('✅ HTTP server closed');
+    
+    // Close WebSocket connections
+    wss.clients.forEach(client => {
+      client.close();
+    });
+    wss.close(() => {
+      console.log('✅ WebSocket server closed');
+      
+      // Stop metrics collection
+      systemMetrics.stop();
+      console.log('✅ System metrics stopped');
+      
+      process.exit(0);
+    });
+  });
+
+  // Force exit after 5 seconds if graceful shutdown fails
+  setTimeout(() => {
+    console.error('⚠️ Forced shutdown after timeout');
+    process.exit(1);
+  }, 5000);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

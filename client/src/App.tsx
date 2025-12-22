@@ -7,6 +7,7 @@ import ContextEditor from './pages/ContextEditor';
 import Tooly from './pages/tooly';
 import ModelDetail from './pages/ModelDetail';
 import { ModelDetailPage } from './pages/tooly/ModelDetailPage';
+import { OptimalSetup } from './pages/tooly/OptimalSetup';
 import Debug from './pages/Debug';
 import RAG from './pages/RAG';
 import Layout from './components/Layout';
@@ -54,6 +55,7 @@ function App() {
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/tooly" element={<Tooly />} />
             <Route path="/tooly/model/:modelId" element={<ModelDetailPage />} />
+            <Route path="/tooly/optimal-setup" element={<OptimalSetup />} />
             <Route path="/rag" element={<RAG />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/debug" element={<Debug />} />

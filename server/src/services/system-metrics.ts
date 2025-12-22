@@ -17,10 +17,14 @@ interface MetricsData {
   gpuMemory: number;
   gpuTemp: number;
   gpuName: string;
-  // VRAM details (new)
+  // VRAM details
   vramUsedMB: number;
   vramTotalMB: number;
   vramPercent: number;
+  // System RAM
+  ramUsedGB: number;
+  ramTotalGB: number;
+  ramPercent: number;
 }
 
 interface NvidiaSmiData {
@@ -121,8 +125,15 @@ class SystemMetricsService {
   }
 
   async collectMetrics(): Promise<MetricsData> {
-    // Get CPU load
-    const cpuLoad = await si.currentLoad();
+    // Get CPU load and memory
+    const [cpuLoad, memData] = await Promise.all([
+      si.currentLoad(),
+      si.mem()
+    ]);
+    
+    const ramUsedGB = Math.round((memData.used / 1024 / 1024 / 1024) * 10) / 10;
+    const ramTotalGB = Math.round((memData.total / 1024 / 1024 / 1024) * 10) / 10;
+    const ramPercent = Math.round((memData.used / memData.total) * 100);
     
     // Try nvidia-smi first if available
     if (this.useNvidiaSmi) {
@@ -137,7 +148,10 @@ class SystemMetricsService {
           gpuName: nvData.name,
           vramUsedMB: nvData.vramUsedMB,
           vramTotalMB: nvData.vramTotalMB,
-          vramPercent: nvData.memory
+          vramPercent: nvData.memory,
+          ramUsedGB,
+          ramTotalGB,
+          ramPercent
         };
       }
     }
@@ -159,7 +173,10 @@ class SystemMetricsService {
       gpuName: this.gpuName,
       vramUsedMB,
       vramTotalMB,
-      vramPercent
+      vramPercent,
+      ramUsedGB,
+      ramTotalGB,
+      ramPercent
     };
   }
 

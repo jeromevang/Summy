@@ -52,15 +52,34 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
   }
   
   /**
-   * Check if embedding model is actually loaded in LM Studio
+   * Check if embedding model is already loaded in LM Studio
+   * Returns the identifier of the loaded model if found, or null if not loaded
    */
-  private async isModelLoadedInLMStudio(): Promise<boolean> {
+  private async getLoadedModelIdentifier(): Promise<string | null> {
     try {
       const client = this.getClient();
       const loadedEmbeddings = await client.embedding.listLoaded();
-      return loadedEmbeddings.some(m => m.path === this.model || m.identifier === this.model);
+      
+      // Check if our dedicated RAG embedder is loaded
+      const ragEmbedder = loadedEmbeddings.find(m => m.identifier === RAG_EMBEDDER_IDENTIFIER);
+      if (ragEmbedder) {
+        return RAG_EMBEDDER_IDENTIFIER;
+      }
+      
+      // Check if the model is loaded (with any identifier or by path)
+      const modelLoaded = loadedEmbeddings.find(m => 
+        m.path === this.model || 
+        m.identifier === this.model ||
+        m.path?.includes(this.model.split('/').pop() || '')
+      );
+      
+      if (modelLoaded) {
+        return modelLoaded.identifier || modelLoaded.path;
+      }
+      
+      return null;
     } catch {
-      return false;
+      return null;
     }
   }
   
@@ -171,15 +190,15 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
     try {
       console.log(`[LMStudioEmbedder] Loading model: ${this.model}`);
       
-      // Check if embedding model is already loaded in LM Studio
-      const alreadyLoaded = await this.isModelLoadedInLMStudio();
+      // Check if embedding model is already loaded in LM Studio (by any identifier)
+      const existingIdentifier = await this.getLoadedModelIdentifier();
       
-      if (alreadyLoaded) {
-        console.log(`[LMStudioEmbedder] Model already loaded in LM Studio, getting reference...`);
-        // Just get a reference to the already-loaded model
-        this.embeddingModel = await client.embedding.model(this.model);
+      if (existingIdentifier) {
+        console.log(`[LMStudioEmbedder] Model already loaded (identifier: ${existingIdentifier}), reusing...`);
+        // Reuse the already-loaded model - don't load a second instance!
+        this.embeddingModel = await client.embedding.model(existingIdentifier);
       } else {
-        console.log(`[LMStudioEmbedder] Model not loaded, loading now (will keep loaded)...`);
+        console.log(`[LMStudioEmbedder] Model not loaded, loading now...`);
         
         // Load the embedding model explicitly - this will NOT unload other models
         // The embedding.load() method loads the model alongside any existing chat models

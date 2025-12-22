@@ -8,10 +8,11 @@
 import { LMStudioClient } from '@lmstudio/sdk';
 import { CodeChunk, EnrichedChunk, FileSummary, ImportInfo } from '../config.js';
 
-// Singleton client
+// Singleton client and state
 let client: LMStudioClient | null = null;
 let chatModel: any = null;
 let currentModelId: string = '';
+let configuredModelId: string = '';  // Stored for lazy loading
 
 function getClient(): LMStudioClient {
   if (!client) {
@@ -21,7 +22,8 @@ function getClient(): LMStudioClient {
 }
 
 /**
- * Initialize the summarizer with a chat model
+ * Configure the summarizer with a chat model (does NOT load the model yet)
+ * Model will be loaded on-demand when actually needed
  */
 export async function initializeSummarizer(modelId: string): Promise<boolean> {
   if (!modelId) {
@@ -29,18 +31,31 @@ export async function initializeSummarizer(modelId: string): Promise<boolean> {
     return false;
   }
   
+  // Just store the model ID for lazy loading
+  configuredModelId = modelId;
+  console.log(`[Summarizer] Configured for model: ${modelId} (will load on demand)`);
+  return true;
+}
+
+/**
+ * Ensure the chat model is loaded (lazy loading)
+ */
+async function ensureModelLoaded(): Promise<boolean> {
+  if (chatModel && currentModelId === configuredModelId) {
+    return true;
+  }
+  
+  if (!configuredModelId) {
+    return false;
+  }
+  
   try {
     const c = getClient();
     
-    // Check if model is already loaded
-    if (chatModel && currentModelId === modelId) {
-      return true;
-    }
-    
-    console.log(`[Summarizer] Loading chat model: ${modelId}`);
-    chatModel = await c.llm.model(modelId);
-    currentModelId = modelId;
-    console.log(`[Summarizer] Chat model loaded: ${modelId}`);
+    console.log(`[Summarizer] Loading chat model on demand: ${configuredModelId}`);
+    chatModel = await c.llm.model(configuredModelId);
+    currentModelId = configuredModelId;
+    console.log(`[Summarizer] Chat model ready: ${configuredModelId}`);
     return true;
   } catch (error) {
     console.error('[Summarizer] Failed to load chat model:', error);
@@ -49,9 +64,16 @@ export async function initializeSummarizer(modelId: string): Promise<boolean> {
 }
 
 /**
- * Check if summarizer is ready
+ * Check if summarizer is configured (not necessarily loaded)
  */
 export function isSummarizerReady(): boolean {
+  return !!configuredModelId;
+}
+
+/**
+ * Check if summarizer model is actually loaded
+ */
+export function isSummarizerLoaded(): boolean {
   return chatModel !== null;
 }
 
@@ -59,7 +81,9 @@ export function isSummarizerReady(): boolean {
  * Generate a summary for a single code chunk
  */
 export async function summarizeChunk(chunk: CodeChunk): Promise<EnrichedChunk> {
-  if (!chatModel) {
+  // Load model on demand
+  const loaded = await ensureModelLoaded();
+  if (!loaded) {
     return { ...chunk };
   }
   
@@ -129,8 +153,9 @@ export async function summarizeFile(
     .filter(c => c.type === 'function' || c.type === 'class')
     .map(c => c.name);
   
-  // Default summary if no chat model
-  if (!chatModel) {
+  // Load model on demand
+  const loaded = await ensureModelLoaded();
+  if (!loaded) {
     return {
       filePath,
       summary: `Contains ${chunks.length} code chunks`,
@@ -267,7 +292,8 @@ export function buildContextualContent(chunk: CodeChunk): string {
  * Generate hypothetical code for HyDE
  */
 export async function generateHypotheticalCode(query: string): Promise<string | null> {
-  if (!chatModel) {
+  const loaded = await ensureModelLoaded();
+  if (!loaded) {
     return null;
   }
   
@@ -298,7 +324,8 @@ Query: "${query}"
  * Expand query with related terms
  */
 export async function expandQuery(query: string): Promise<string[]> {
-  if (!chatModel) {
+  const loaded = await ensureModelLoaded();
+  if (!loaded) {
     return [query];
   }
   
