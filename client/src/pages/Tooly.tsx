@@ -332,6 +332,17 @@ const Tooly: React.FC = () => {
     completed: string[];
   } | null>(null);
   const cancelTestAllRef = useRef(false);
+  
+  // Test mode selection dialog
+  const [showModeDialog, setShowModeDialog] = useState(false);
+  type TestAllMode = 'quick' | 'standard' | 'deep' | 'optimization';
+  const [selectedTestMode, setSelectedTestMode] = useState<TestAllMode>('standard');
+  const TEST_MODE_OPTIONS: { mode: TestAllMode; label: string; icon: string; desc: string; time: string }[] = [
+    { mode: 'quick', label: 'Quick', icon: '⚡', desc: 'Basic capability check', time: '~30s/model' },
+    { mode: 'standard', label: 'Standard', icon: '🧪', desc: 'Full tests + probes', time: '~3min/model' },
+    { mode: 'deep', label: 'Deep', icon: '🔬', desc: 'All probes + strategic tests', time: '~10min/model' },
+    { mode: 'optimization', label: 'Optimize', icon: '⚙️', desc: 'Sweeps + config generation', time: '~15min/model' },
+  ];
 
   // Test intents state
   const [testingIntents, setTestingIntents] = useState(false);
@@ -714,6 +725,163 @@ const Tooly: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch custom tests:', error);
     }
+  };
+
+  const handleTestAllModels = async (mode: TestAllMode = 'standard') => {
+    const modelsToTest = models.filter(m => m.provider === 'lmstudio');
+    if (modelsToTest.length === 0) return;
+    
+    setSelectedTestMode(mode);
+    setTestingAllModels(true);
+    cancelTestAllRef.current = false;
+    setTestAllProgress({
+      current: 0,
+      total: modelsToTest.length,
+      currentModelName: '',
+      skipped: [],
+      completed: []
+    });
+    
+    for (let i = 0; i < modelsToTest.length; i++) {
+      if (cancelTestAllRef.current) break;
+      
+      const model = modelsToTest[i];
+      setTestAllProgress(prev => prev ? {
+        ...prev,
+        current: i + 1,
+        currentModelName: model.displayName
+      } : null);
+      
+      // Quick latency check (skip for quick mode)
+      if (mode !== 'quick') {
+        try {
+          const quickLatencyRes = await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/quick-latency`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider })
+          });
+          
+          if (quickLatencyRes.ok) {
+            const { latency } = await quickLatencyRes.json();
+            
+            // Skip if too slow (> 10 seconds for standard, > 15 for deep)
+            const threshold = mode === 'deep' || mode === 'optimization' ? 15000 : 10000;
+            if (latency > threshold) {
+              setTestAllProgress(prev => prev ? {
+                ...prev,
+                skipped: [...prev.skipped, model.displayName]
+              } : null);
+              continue;
+            }
+          } else {
+            setTestAllProgress(prev => prev ? {
+              ...prev,
+              skipped: [...prev.skipped, model.displayName]
+            } : null);
+            continue;
+          }
+        } catch {
+          setTestAllProgress(prev => prev ? {
+            ...prev,
+            skipped: [...prev.skipped, model.displayName]
+          } : null);
+          continue;
+        }
+      }
+      
+      if (cancelTestAllRef.current) break;
+      
+      // Run tests based on mode
+      try {
+        if (mode === 'quick') {
+          // Quick mode: just probe
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/probe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider, runLatencyProfile: false })
+          });
+        } else if (mode === 'standard') {
+          // Standard mode: probe + test + latency profile
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/probe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider, runLatencyProfile: false })
+          });
+          
+          if (cancelTestAllRef.current) break;
+          
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/test`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider })
+          });
+          
+          if (cancelTestAllRef.current) break;
+          
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/latency-profile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider })
+          });
+        } else if (mode === 'deep') {
+          // Deep mode: all probes including strategic
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/probe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider, runLatencyProfile: true, includeStrategicProbes: true })
+          });
+          
+          if (cancelTestAllRef.current) break;
+          
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/test`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider })
+          });
+        } else if (mode === 'optimization') {
+          // Optimization mode: full probe + sweeps
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/probe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider, runLatencyProfile: true, includeStrategicProbes: true })
+          });
+          
+          if (cancelTestAllRef.current) break;
+          
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/test`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider })
+          });
+          
+          if (cancelTestAllRef.current) break;
+          
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/latency-profile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider })
+          });
+        }
+        
+        setTestAllProgress(prev => prev ? {
+          ...prev,
+          completed: [...prev.completed, model.displayName]
+        } : null);
+      } catch (error) {
+        console.error(`Failed to test ${model.id}:`, error);
+        setTestAllProgress(prev => prev ? {
+          ...prev,
+          skipped: [...prev.skipped, model.displayName]
+        } : null);
+      }
+    }
+    
+    // Refresh model list
+    await fetchModels();
+    setTestingAllModels(false);
+    
+    // Keep progress visible for a moment
+    setTimeout(() => setTestAllProgress(null), 5000);
   };
 
   const handleSaveTest = async (test: CustomTest) => {
@@ -1294,117 +1462,14 @@ const Tooly: React.FC = () => {
                 <div className="flex items-center gap-2">
                   {/* Test All Models Button */}
                   <button
-                    onClick={async () => {
+                    onClick={() => {
                       if (testingAllModels) {
                         // Cancel
                         cancelTestAllRef.current = true;
                         return;
                       }
-                      
-                      const modelsToTest = models.filter(m => m.provider === 'lmstudio');
-                      if (modelsToTest.length === 0) return;
-                      
-                      setTestingAllModels(true);
-                      cancelTestAllRef.current = false;
-                      setTestAllProgress({
-                        current: 0,
-                        total: modelsToTest.length,
-                        currentModelName: '',
-                        skipped: [],
-                        completed: []
-                      });
-                      
-                      for (let i = 0; i < modelsToTest.length; i++) {
-                        if (cancelTestAllRef.current) break;
-                        
-                        const model = modelsToTest[i];
-                        setTestAllProgress(prev => prev ? {
-                          ...prev,
-                          current: i + 1,
-                          currentModelName: model.displayName
-                        } : null);
-                        
-                        // Quick latency check
-                        try {
-                          const quickLatencyRes = await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/quick-latency`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ provider: model.provider })
-                          });
-                          
-                          if (quickLatencyRes.ok) {
-                            const { latency } = await quickLatencyRes.json();
-                            
-                            // Skip if too slow (> 10 seconds)
-                            if (latency > 10000) {
-                              setTestAllProgress(prev => prev ? {
-                                ...prev,
-                                skipped: [...prev.skipped, model.displayName]
-                              } : null);
-                              continue;
-                            }
-                          } else {
-                            // Timeout or error - skip
-                            setTestAllProgress(prev => prev ? {
-                              ...prev,
-                              skipped: [...prev.skipped, model.displayName]
-                            } : null);
-                            continue;
-                          }
-                        } catch {
-                          // Skip on error
-                          setTestAllProgress(prev => prev ? {
-                            ...prev,
-                            skipped: [...prev.skipped, model.displayName]
-                          } : null);
-                          continue;
-                        }
-                        
-                        if (cancelTestAllRef.current) break;
-                        
-                        // Run full tests
-                        try {
-                          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/probe`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ provider: model.provider, runLatencyProfile: false })
-                          });
-                          
-                          if (cancelTestAllRef.current) break;
-                          
-                          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/test`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ provider: model.provider })
-                          });
-                          
-                          if (cancelTestAllRef.current) break;
-                          
-                          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/latency-profile`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ provider: model.provider })
-                          });
-                          
-                          setTestAllProgress(prev => prev ? {
-                            ...prev,
-                            completed: [...prev.completed, model.displayName]
-                          } : null);
-                        } catch (error) {
-                          console.error(`Failed to test ${model.id}:`, error);
-                          setTestAllProgress(prev => prev ? {
-                            ...prev,
-                            skipped: [...prev.skipped, model.displayName]
-                          } : null);
-                        }
-                      }
-                      
-                      // Refresh model list
-                      await fetchModels();
-                      setTestingAllModels(false);
-                      
-                      // Keep progress visible for a moment
-                      setTimeout(() => setTestAllProgress(null), 5000);
+                      // Show mode selection dialog
+                      setShowModeDialog(true);
                     }}
                     disabled={models.filter(m => m.provider === 'lmstudio').length === 0}
                     className={`px-3 py-1 text-xs rounded transition-colors ${
@@ -1470,12 +1535,51 @@ const Tooly: React.FC = () => {
                 </div>
               </div>
               
+              {/* Test Mode Selection Dialog */}
+              {showModeDialog && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-sm">
+                  <div className="bg-[#1e1e1e] p-5 rounded-xl border border-gray-700 max-w-sm w-full mx-4 shadow-2xl">
+                    <h3 className="text-lg font-semibold text-white mb-1">Select Test Mode</h3>
+                    <p className="text-xs text-gray-400 mb-4">
+                      Testing {models.filter(m => m.provider === 'lmstudio').length} model{models.filter(m => m.provider === 'lmstudio').length !== 1 ? 's' : ''}
+                    </p>
+                    <div className="space-y-2">
+                      {TEST_MODE_OPTIONS.map(({ mode, label, icon, desc, time }) => (
+                        <button
+                          key={mode}
+                          onClick={() => {
+                            setShowModeDialog(false);
+                            handleTestAllModels(mode);
+                          }}
+                          className="w-full p-3 text-left rounded-lg border border-gray-600 hover:border-purple-500 hover:bg-purple-500/10 transition-all group"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">{icon}</span>
+                              <span className="text-white font-medium">{label}</span>
+                            </div>
+                            <span className="text-xs text-gray-500">{time}</span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 ml-7">{desc}</p>
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setShowModeDialog(false)}
+                      className="mt-4 w-full px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+              
               {/* Test All Progress */}
               {testAllProgress && (
                 <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-purple-400">
-                      Testing All Models ({testAllProgress.current}/{testAllProgress.total})
+                      {TEST_MODE_OPTIONS.find(o => o.mode === selectedTestMode)?.icon} Testing All Models - {selectedTestMode.charAt(0).toUpperCase() + selectedTestMode.slice(1)} ({testAllProgress.current}/{testAllProgress.total})
                     </span>
                     <span className="text-xs text-gray-400">
                       ✅ {testAllProgress.completed.length} | ⏭️ {testAllProgress.skipped.length} skipped

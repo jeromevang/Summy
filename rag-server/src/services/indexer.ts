@@ -35,6 +35,7 @@ import {
   buildContextualContent 
 } from './summarizer.js';
 import { analyzeFile as analyzeFileDeps, serializeGraph, loadGraph } from './graph-builder.js';
+import { getRAGDatabase, RAGDatabase, StoredChunk as DBStoredChunk, FileSummary as DBFileSummary } from './database.js';
 
 // Progress callback type
 export type ProgressCallback = (progress: IndexProgress) => void;
@@ -71,14 +72,8 @@ export class Indexer {
   private debounceTimer: NodeJS.Timeout | null = null;
   private pendingChanges: Set<string> = new Set();
 
-  // Database reference (will be injected or imported)
-  private db: any = null;
-  
-  // In-memory chunk storage for browser
-  private storedChunks: Map<string, StoredChunk> = new Map();
-  
-  // File summaries storage
-  private fileSummaries: Map<string, FileSummary> = new Map();
+  // SQLite database for persistent storage
+  private ragDb: RAGDatabase;
   
   // Pending summary generation (async mode)
   private pendingSummaries: Set<string> = new Set();
@@ -92,6 +87,9 @@ export class Indexer {
     this.embedder = getLMStudioEmbedder();
     this.vectorStore = getHNSWLibStore(this.config.storage.dataPath);
     
+    // Initialize SQLite database for persistent storage
+    this.ragDb = getRAGDatabase(this.config.storage.dataPath);
+    
     this.progress = {
       status: 'idle',
       totalFiles: 0,
@@ -104,10 +102,12 @@ export class Indexer {
   }
   
   /**
-   * Set database reference (for metadata storage)
+   * Set database reference (legacy - no longer used, kept for API compatibility)
+   * @deprecated Use the internal SQLite database instead
    */
-  setDatabase(db: any): void {
-    this.db = db;
+  setDatabase(_db: any): void {
+    // No longer used - RAG server now has its own SQLite database
+    console.log('[Indexer] setDatabase() is deprecated - RAG server uses internal SQLite');
   }
 
   /**
@@ -154,14 +154,33 @@ export class Indexer {
   }
 
   /**
-   * Store a chunk for browser access
+   * Store a chunk to SQLite database
    */
   private storeChunk(chunk: StoredChunk): void {
-    this.storedChunks.set(chunk.id, chunk);
+    // Convert to database format
+    const dbChunk: DBStoredChunk = {
+      id: chunk.id,
+      filePath: chunk.filePath,
+      vectorId: 0, // Will be set later when embedding is stored
+      content: chunk.content,
+      contentHash: this.hashContent(chunk.content),
+      tokens: chunk.tokens,
+      startLine: chunk.startLine,
+      endLine: chunk.endLine,
+      symbolName: chunk.symbolName,
+      symbolType: chunk.symbolType,
+      language: chunk.language,
+      imports: [],
+      signature: chunk.signature,
+      summary: chunk.summary || null,
+      purpose: chunk.purpose || null,
+      createdAt: chunk.createdAt
+    };
+    this.ragDb.addChunk(dbChunk);
   }
 
   /**
-   * Get all stored chunks with pagination and filters
+   * Get all stored chunks with pagination and filters (from SQLite)
    */
   getChunks(options: {
     page?: number;
@@ -170,88 +189,82 @@ export class Indexer {
     symbolType?: string;
     search?: string;
   } = {}): { chunks: StoredChunk[]; total: number } {
-    const page = options.page || 1;
-    const limit = options.limit || 50;
-    
-    let chunks = Array.from(this.storedChunks.values());
-    
-    // Apply filters
-    if (options.fileType) {
-      chunks = chunks.filter(c => c.language.toLowerCase() === options.fileType?.toLowerCase());
-    }
-    if (options.symbolType) {
-      chunks = chunks.filter(c => c.symbolType?.toLowerCase() === options.symbolType?.toLowerCase());
-    }
-    if (options.search) {
-      const search = options.search.toLowerCase();
-      chunks = chunks.filter(c => 
-        c.content.toLowerCase().includes(search) ||
-        c.filePath.toLowerCase().includes(search) ||
-        (c.symbolName?.toLowerCase().includes(search) ?? false)
-      );
-    }
-    
-    // Sort by file path and line number
-    chunks.sort((a, b) => {
-      const pathCompare = a.filePath.localeCompare(b.filePath);
-      if (pathCompare !== 0) return pathCompare;
-      return a.startLine - b.startLine;
-    });
-    
-    const total = chunks.length;
-    const offset = (page - 1) * limit;
-    const paginatedChunks = chunks.slice(offset, offset + limit);
-    
-    return { chunks: paginatedChunks, total };
+    const result = this.ragDb.getChunks(options);
+    // Convert from DB format to StoredChunk format
+    const chunks: StoredChunk[] = result.chunks.map(c => ({
+      id: c.id,
+      filePath: c.filePath,
+      startLine: c.startLine,
+      endLine: c.endLine,
+      symbolName: c.symbolName,
+      symbolType: c.symbolType,
+      language: c.language,
+      tokens: c.tokens,
+      content: c.content,
+      signature: c.signature,
+      createdAt: c.createdAt,
+      summary: c.summary || undefined,
+      purpose: c.purpose || undefined
+    }));
+    return { chunks, total: result.total };
   }
 
   /**
-   * Get a single chunk by ID
+   * Get a single chunk by ID (from SQLite)
    */
   getChunk(id: string): StoredChunk | null {
-    return this.storedChunks.get(id) || null;
+    const c = this.ragDb.getChunk(id);
+    if (!c) return null;
+    return {
+      id: c.id,
+      filePath: c.filePath,
+      startLine: c.startLine,
+      endLine: c.endLine,
+      symbolName: c.symbolName,
+      symbolType: c.symbolType,
+      language: c.language,
+      tokens: c.tokens,
+      content: c.content,
+      signature: c.signature,
+      createdAt: c.createdAt,
+      summary: c.summary || undefined,
+      purpose: c.purpose || undefined
+    };
   }
 
   /**
-   * Clear all stored chunks
+   * Clear all stored chunks (in SQLite)
    */
   clearStoredChunks(): void {
-    this.storedChunks.clear();
+    this.ragDb.clearAllChunks();
   }
 
   /**
-   * Get total stored chunk count
+   * Get total stored chunk count (from SQLite)
    */
   getStoredChunkCount(): number {
-    return this.storedChunks.size;
+    return this.ragDb.getChunkCount();
   }
 
   /**
-   * Get all file summaries
+   * Get all file summaries (from SQLite)
    */
   getFileSummaries(): FileSummary[] {
-    return Array.from(this.fileSummaries.values());
+    return this.ragDb.getAllFileSummaries();
   }
 
   /**
-   * Get a single file summary
+   * Get a single file summary (from SQLite)
    */
   getFileSummary(filePath: string): FileSummary | null {
-    return this.fileSummaries.get(filePath) || null;
+    return this.ragDb.getFileSummary(filePath);
   }
 
   /**
-   * Search file summaries by keyword
+   * Search file summaries by keyword (from SQLite)
    */
   searchFileSummaries(query: string, limit: number = 5): FileSummary[] {
-    const lower = query.toLowerCase();
-    return Array.from(this.fileSummaries.values())
-      .filter(f => 
-        f.summary.toLowerCase().includes(lower) ||
-        f.responsibility.toLowerCase().includes(lower) ||
-        f.filePath.toLowerCase().includes(lower)
-      )
-      .slice(0, limit);
+    return this.ragDb.searchFileSummaries(query).slice(0, limit);
   }
 
   /**
@@ -332,18 +345,13 @@ export class Indexer {
     const fileHash = this.hashContent(content);
     const language = detectLanguage(filePath);
     
-    // Check if file has changed (if we have DB)
-    if (this.db) {
-      const existingFile = this.db.getRAGFile(relativePath);
-      if (existingFile && existingFile.fileHash === fileHash) {
-        // File hasn't changed, skip
-        return [];
-      }
-      
-      // Remove old chunks for this file
-      if (existingFile) {
-        this.db.deleteRAGFile(relativePath);
-      }
+    // Check if file has changed by comparing existing chunks' hashes
+    const existingChunks = this.ragDb.getChunksByFile(relativePath);
+    if (existingChunks.length > 0) {
+      // If the first chunk's content hash matches, file probably hasn't changed much
+      // For a proper check, we'd need file-level hash tracking
+      // For now, always re-index (can be optimized later)
+      this.ragDb.deleteChunksByFile(relativePath);
     }
     
     // Chunk the file
@@ -357,59 +365,77 @@ export class Indexer {
       imports = analysis.imports;
     }
     
-    // Generate embeddings (with optional contextual augmentation)
-    const embeddings: number[][] = [];
-    const summaryEmbeddings: number[][] = [];
+    // === BATCH EMBEDDING FOR SPEED ===
+    // Collect all content to embed first, then batch embed
+    const textsToEmbed: string[] = [];
     const enrichedChunks: EnrichedChunk[] = [];
     
+    // Phase 1: Prepare content and summaries (no embedding yet)
     for (const chunk of chunks) {
       if (this.isCancelled) break;
       
-      try {
-        // === CONTEXTUAL CHUNK AUGMENTATION ===
-        // Embed metadata + code instead of just code
-        let contentToEmbed = chunk.content;
-        if (this.config.queryEnhancement?.enableContextualChunks) {
-          contentToEmbed = buildContextualContent(chunk);
-        }
-        
-        const embedding = await this.embedder.embedSingle(contentToEmbed);
-        embeddings.push(embedding);
-        this.progress.embeddingsGenerated++;
-        this.emitProgress();
-        
-        // === SUMMARY GENERATION ===
-        let enrichedChunk: EnrichedChunk = { ...chunk };
-        if (this.config.summarization?.enabled && this.config.summarization?.chunkSummaries) {
-          if (this.config.summarization.asyncGeneration) {
-            // Queue for async generation
-            this.pendingSummaries.add(chunk.id);
-            enrichedChunk = { ...chunk };
-          } else if (isSummarizerReady()) {
-            // Generate summary synchronously
-            enrichedChunk = await summarizeChunk(chunk);
-          }
-        }
-        enrichedChunks.push(enrichedChunk);
-        
-        // === MULTI-VECTOR: Generate summary embedding ===
-        if (this.config.queryEnhancement?.enableMultiVector && enrichedChunk.summary) {
-          try {
-            const summaryEmb = await this.embedder.embedSingle(enrichedChunk.summary);
-            summaryEmbeddings.push(summaryEmb);
-          } catch {
-            summaryEmbeddings.push([]);
-          }
-        } else {
-          summaryEmbeddings.push([]);
-        }
-        
-      } catch (error) {
-        console.error(`[Indexer] Failed to embed chunk in ${relativePath}:`, error);
-        embeddings.push([]); // Empty embedding as placeholder
-        summaryEmbeddings.push([]);
-        enrichedChunks.push({ ...chunk });
+      // === CONTEXTUAL CHUNK AUGMENTATION ===
+      let contentToEmbed = chunk.content;
+      if (this.config.queryEnhancement?.enableContextualChunks) {
+        contentToEmbed = buildContextualContent(chunk);
       }
+      textsToEmbed.push(contentToEmbed);
+      
+      // === SUMMARY GENERATION ===
+      let enrichedChunk: EnrichedChunk = { ...chunk };
+      if (this.config.summarization?.enabled && this.config.summarization?.chunkSummaries) {
+        if (this.config.summarization.asyncGeneration) {
+          // Queue for async generation (non-blocking)
+          this.pendingSummaries.add(chunk.id);
+        } else if (isSummarizerReady()) {
+          // Generate summary synchronously (blocking - avoid if possible)
+          enrichedChunk = await summarizeChunk(chunk);
+        }
+      }
+      enrichedChunks.push(enrichedChunk);
+    }
+    
+    if (this.isCancelled) {
+      return chunks;
+    }
+    
+    // Phase 2: Batch embed all chunks at once (parallel processing inside)
+    let embeddings: number[][] = [];
+    try {
+      embeddings = await this.embedder.embed(textsToEmbed);
+      this.progress.embeddingsGenerated += embeddings.length;
+      this.emitProgress();
+    } catch (error) {
+      console.error(`[Indexer] Failed to batch embed chunks in ${relativePath}:`, error);
+      embeddings = textsToEmbed.map(() => []); // Empty embeddings as fallback
+    }
+    
+    // Phase 3: Batch embed summaries if multi-vector is enabled
+    let summaryEmbeddings: number[][] = [];
+    if (this.config.queryEnhancement?.enableMultiVector) {
+      const summaryTexts = enrichedChunks
+        .map(c => c.summary || '')
+        .filter(s => s.length > 0);
+      
+      if (summaryTexts.length > 0) {
+        try {
+          const summaryEmbs = await this.embedder.embed(summaryTexts);
+          // Map back to full array with empty arrays for chunks without summaries
+          let summaryIdx = 0;
+          summaryEmbeddings = enrichedChunks.map(c => {
+            if (c.summary && c.summary.length > 0) {
+              return summaryEmbs[summaryIdx++] || [];
+            }
+            return [];
+          });
+        } catch {
+          summaryEmbeddings = enrichedChunks.map(() => []);
+        }
+      } else {
+        summaryEmbeddings = enrichedChunks.map(() => []);
+      }
+    } else {
+      summaryEmbeddings = enrichedChunks.map(() => []);
     }
     
     // Store in vector store
@@ -468,47 +494,34 @@ export class Indexer {
         purpose: enriched.purpose
       });
       
-      // Save metadata to DB (optional, for richer querying)
-      if (this.db) {
-        this.db.addRAGChunk({
-          id: chunk.id,
-          fileId,
-          vectorId,
-          content: chunk.content,
-          contentHash: this.hashContent(chunk.content),
-          tokens: chunk.tokens,
-          startLine: chunk.startLine,
-          endLine: chunk.endLine,
-          symbolName: chunk.name,
-          symbolType: chunk.type,
-          language: chunk.language,
-          imports: chunk.imports,
-          signature: chunk.signature,
-          summary: enriched.summary,
-          purpose: enriched.purpose
-        });
-      }
+      // Save metadata to SQLite database
+      this.ragDb.addChunk({
+        id: chunk.id,
+        filePath: relativePath,
+        vectorId,
+        content: chunk.content,
+        contentHash: this.hashContent(chunk.content),
+        tokens: chunk.tokens,
+        startLine: chunk.startLine,
+        endLine: chunk.endLine,
+        symbolName: chunk.name,
+        symbolType: chunk.type,
+        language: chunk.language,
+        imports: chunk.imports || [],
+        signature: chunk.signature || null,
+        summary: enriched.summary || null,
+        purpose: enriched.purpose || null,
+        createdAt: new Date().toISOString()
+      });
       
       this.progress.chunksCreated++;
-    }
-    
-    // Save file metadata to DB
-    if (this.db) {
-      this.db.upsertRAGFile({
-        id: fileId,
-        filePath: relativePath,
-        fileHash,
-        fileSize: content.length,
-        chunkCount: chunks.length,
-        language
-      });
     }
     
     // === FILE SUMMARY ===
     if (this.config.summarization?.enabled && this.config.summarization?.fileSummaries) {
       if (!this.config.summarization.asyncGeneration && isSummarizerReady()) {
         const fileSummary = await summarizeFile(relativePath, enrichedChunks, imports);
-        this.fileSummaries.set(relativePath, fileSummary);
+        this.ragDb.addFileSummary(fileSummary);
       }
     }
     
@@ -572,17 +585,14 @@ export class Indexer {
       
       console.log(`[Indexer] Found ${files.length} files to index`);
       
-      // Update DB with project info
-      if (this.db) {
-        this.db.upsertRAGIndex({
-          name: path.basename(projectPath),
-          projectPath,
-          projectHash: this.hashContent(projectPath),
-          embeddingModel: this.config.lmstudio.model,
-          embeddingDimensions: this.embedder.dimensions,
-          status: 'indexing'
-        });
-      }
+      // Update index status in SQLite
+      this.ragDb.upsertIndexStatus({
+        projectPath,
+        projectHash: this.hashContent(projectPath),
+        embeddingModel: this.config.lmstudio.model,
+        embeddingDimensions: this.embedder.dimensions,
+        status: 'indexing'
+      });
       
       // Process files
       for (let i = 0; i < files.length; i++) {
@@ -618,24 +628,36 @@ export class Indexer {
       
       await this.vectorStore.save();
       
-      // Update DB status
-      if (this.db) {
-        const diskUsage = await this.vectorStore.getDiskUsage();
-        this.db.updateRAGIndexStatus('ready', {
-          totalFiles: this.progress.processedFiles,
-          totalChunks: this.progress.chunksCreated,
-          totalVectors: this.vectorStore.size,
-          storageSize: diskUsage
-        });
-        
-        // Record metric
-        this.db.addRAGMetric({
-          type: 'indexing',
-          filesProcessed: this.progress.processedFiles,
-          chunksCreated: this.progress.chunksCreated,
-          embeddingsGenerated: this.progress.embeddingsGenerated,
-          durationMs: Date.now() - startTime
-        });
+      // Update index status in SQLite
+      const diskUsage = await this.vectorStore.getDiskUsage();
+      this.ragDb.upsertIndexStatus({
+        status: 'ready',
+        totalFiles: this.progress.processedFiles,
+        totalChunks: this.progress.chunksCreated,
+        totalVectors: this.vectorStore.size,
+        storageSize: diskUsage,
+        lastIndexed: new Date().toISOString()
+      });
+      
+      // Record metric
+      this.ragDb.addMetric({
+        type: 'indexing',
+        filesProcessed: this.progress.processedFiles,
+        chunksCreated: this.progress.chunksCreated,
+        embeddingsGenerated: this.progress.embeddingsGenerated,
+        durationMs: Date.now() - startTime
+      });
+      
+      // Save dependency graph to JSON file
+      if (this.config.dependencyGraph?.enabled) {
+        try {
+          const graphJson = serializeGraph();
+          const graphPath = path.join(this.config.storage.dataPath, 'dependency-graph.json');
+          await fs.writeFile(graphPath, graphJson, 'utf-8');
+          console.log(`[Indexer] Saved dependency graph to ${graphPath}`);
+        } catch (graphError) {
+          console.error('[Indexer] Failed to save dependency graph:', graphError);
+        }
       }
       
       // Done
@@ -666,9 +688,7 @@ export class Indexer {
       this.progress.error = error.message;
       this.emitProgress();
       
-      if (this.db) {
-        this.db.updateRAGIndexStatus('error');
-      }
+      this.ragDb.upsertIndexStatus({ status: 'error' });
       
       throw error;
     }
@@ -766,9 +786,8 @@ export class Indexer {
     this.fileWatcher.on('unlink', async (filePath) => {
       // Remove from index
       const relativePath = path.relative(projectPath, filePath).replace(/\\/g, '/');
-      if (this.db) {
-        this.db.deleteRAGFile(relativePath);
-      }
+      this.ragDb.deleteChunksByFile(relativePath);
+      this.ragDb.deleteFileSummary(relativePath);
     });
   }
   
@@ -813,31 +832,29 @@ export class Indexer {
     // Search
     const results = await this.vectorStore.search(queryVector, limit);
     
-    // Get chunk metadata from DB or from vector store metadata
+    // Get chunk metadata from SQLite or vector store metadata
     const response = results.map(result => {
       let chunk: CodeChunk | null = null;
       
-      // Try database first (has more complete metadata)
-      if (this.db) {
-        const dbChunk = this.db.getRAGChunk(result.chunkId);
-        if (dbChunk) {
-          chunk = {
-            id: dbChunk.id,
-            content: dbChunk.content,
-            type: dbChunk.symbolType as CodeChunk['type'],
-            name: dbChunk.symbolName || 'unknown',
-            filePath: dbChunk.filePath || '',
-            startLine: dbChunk.startLine,
-            endLine: dbChunk.endLine,
-            language: dbChunk.language,
-            imports: dbChunk.imports || [],
-            signature: dbChunk.signature,
-            tokens: dbChunk.tokens
-          };
-        }
+      // Try SQLite database first (has more complete metadata)
+      const dbChunk = this.ragDb.getChunk(result.chunkId);
+      if (dbChunk) {
+        chunk = {
+          id: dbChunk.id,
+          content: dbChunk.content,
+          type: dbChunk.symbolType as CodeChunk['type'],
+          name: dbChunk.symbolName || 'unknown',
+          filePath: dbChunk.filePath || '',
+          startLine: dbChunk.startLine,
+          endLine: dbChunk.endLine,
+          language: dbChunk.language,
+          imports: dbChunk.imports || [],
+          signature: dbChunk.signature || undefined,
+          tokens: dbChunk.tokens
+        };
       }
       
-      // Fall back to vector store metadata if DB not available
+      // Fall back to vector store metadata if DB entry not found
       if (!chunk && result.metadata) {
         chunk = {
           id: result.chunkId,
@@ -860,16 +877,14 @@ export class Indexer {
       };
     });
     
-    // Record metric
-    if (this.db) {
-      this.db.addRAGMetric({
-        type: 'query',
-        query: queryText,
-        resultsCount: results.length,
-        topScore: results[0]?.score || 0,
-        latencyMs: Date.now() - startTime
-      });
-    }
+    // Record query metric
+    this.ragDb.addMetric({
+      type: 'query',
+      filesProcessed: 0,
+      chunksCreated: 0,
+      embeddingsGenerated: 0,
+      durationMs: Date.now() - startTime
+    });
     
     // Only clear embedder reference if NOT keeping loaded
     // (Model stays loaded in LM Studio for quick reuse)
@@ -886,10 +901,9 @@ export class Indexer {
   async clear(): Promise<void> {
     await this.vectorStore.clear();
     this.clearStoredChunks();
-
-    if (this.db) {
-      this.db.clearAllRAGData();
-    }
+    this.ragDb.clearAllFileSummaries();
+    this.ragDb.clearProjections();
+    this.ragDb.upsertIndexStatus({ status: 'idle', totalFiles: 0, totalChunks: 0, totalVectors: 0 });
 
     this.progress = {
       status: 'idle',

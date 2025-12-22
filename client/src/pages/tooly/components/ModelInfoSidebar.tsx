@@ -57,6 +57,9 @@ interface ScoreBreakdown {
   ragScore?: number;
   intentScore?: number;
   bugDetectionScore?: number;
+  architecturalScore?: number;
+  navigationScore?: number;
+  proactiveScore?: number;
   overallScore?: number;
 }
 
@@ -180,14 +183,14 @@ export const ModelInfoSidebar: React.FC<ModelInfoSidebarProps> = ({
 
   const info: ExtendedModelInfo = { ...profile.modelInfo, ...extendedInfo };
 
-  // Radar data - use actual scores from scoreBreakdown
+  // Radar data - use actual scores from scoreBreakdown (matching API response)
   const radarData = [
     { skill: 'Tools', score: profile.scoreBreakdown?.toolScore ?? 0 },
     { skill: 'RAG', score: profile.scoreBreakdown?.ragScore ?? 0 },
-    { skill: 'Failures', score: profile.scoreBreakdown?.failureModesScore ?? 0 },
-    { skill: 'Stateful', score: profile.scoreBreakdown?.statefulScore ?? 0 },
-    { skill: 'Precedence', score: profile.scoreBreakdown?.precedenceScore ?? 0 },
-    { skill: 'Compliance', score: profile.scoreBreakdown?.complianceScore ?? 0 },
+    { skill: 'Bugs', score: profile.scoreBreakdown?.bugDetectionScore ?? 0 },
+    { skill: 'Arch', score: profile.scoreBreakdown?.architecturalScore ?? 0 },
+    { skill: 'Reason', score: profile.scoreBreakdown?.reasoningScore ?? 0 },
+    { skill: 'Intent', score: profile.scoreBreakdown?.intentScore ?? 0 },
   ];
 
   const handleViewDetails = () => {

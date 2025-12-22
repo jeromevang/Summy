@@ -1,3 +1,12 @@
+// Crash visibility - catch unhandled errors
+process.on("uncaughtException", err => {
+  console.error("UNCAUGHT EXCEPTION:", err);
+});
+
+process.on("unhandledRejection", err => {
+  console.error("UNHANDLED REJECTION:", err);
+});
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';

@@ -426,6 +426,191 @@ class RAGClient {
       wsUrl: this.wsUrl
     };
   }
+  
+  /**
+   * Run RAG tuning - test different result counts and measure quality/latency
+   * Returns optimal settings based on actual query performance
+   */
+  async runTuning(testQueries?: string[]): Promise<RAGTuningResult | null> {
+    try {
+      // Check if RAG is available
+      if (!await this.healthCheck()) {
+        console.log('[RAG Client] RAG server not available for tuning');
+        return null;
+      }
+      
+      // Get current config and stats
+      const config = await this.getConfig();
+      const stats = await this.getStats();
+      
+      if (!config || !stats) {
+        console.log('[RAG Client] Could not get RAG config/stats');
+        return null;
+      }
+      
+      // Default test queries if none provided
+      const queries = testQueries || [
+        'How does user authentication work?',
+        'Where is the database connection configured?',
+        'What functions handle file operations?',
+        'How are API routes structured?',
+        'Where is error handling implemented?'
+      ];
+      
+      console.log(`[RAG Tuning] Starting with ${queries.length} test queries...`);
+      
+      // Test different result counts
+      const resultCountsToTest = [3, 5, 10, 15];
+      const resultCountScores: Record<number, { avgLatency: number; avgScore: number; successRate: number }> = {};
+      
+      for (const limit of resultCountsToTest) {
+        console.log(`[RAG Tuning] Testing result count: ${limit}`);
+        
+        let totalLatency = 0;
+        let totalScore = 0;
+        let successCount = 0;
+        
+        for (const query of queries) {
+          try {
+            const startTime = Date.now();
+            const result = await this.query(query, { limit });
+            const latency = Date.now() - startTime;
+            
+            if (result && result.results.length > 0) {
+              totalLatency += latency;
+              // Score based on: having results, relevance (top result score), and reasonable latency
+              const topScore = result.results[0]?.score || 0;
+              const resultQuality = Math.min(result.results.length / limit, 1) * 50; // Up to 50 points for having results
+              const relevanceScore = topScore * 30; // Up to 30 points for relevance (score 0-1)
+              const latencyScore = Math.max(0, 20 - (latency / 100)); // Up to 20 points for low latency
+              totalScore += resultQuality + relevanceScore + latencyScore;
+              successCount++;
+            }
+          } catch (error) {
+            console.log(`[RAG Tuning] Query failed: ${query}`);
+          }
+        }
+        
+        resultCountScores[limit] = {
+          avgLatency: successCount > 0 ? totalLatency / successCount : 999999,
+          avgScore: successCount > 0 ? totalScore / successCount : 0,
+          successRate: successCount / queries.length
+        };
+        
+        console.log(`[RAG Tuning] Result count ${limit}: avgLatency=${resultCountScores[limit].avgLatency}ms, avgScore=${resultCountScores[limit].avgScore.toFixed(1)}, successRate=${(resultCountScores[limit].successRate * 100).toFixed(0)}%`);
+      }
+      
+      // Determine optimal result count (highest score with good success rate)
+      let optimalResultCount = 5; // Default
+      let bestScore = 0;
+      for (const [countStr, scores] of Object.entries(resultCountScores)) {
+        const count = parseInt(countStr);
+        if (scores.successRate >= 0.6 && scores.avgScore > bestScore) {
+          bestScore = scores.avgScore;
+          optimalResultCount = count;
+        }
+      }
+      
+      // Determine optimal chunk size based on embedding model
+      // For now, infer from model name or use safe defaults
+      const embeddingModel = stats.embeddingModel || '';
+      let embeddingContextLimit = 2048; // Default for most models
+      let optimalChunkSize = 1500; // Safe default
+      
+      // Check for known embedding model context sizes
+      if (embeddingModel.toLowerCase().includes('nomic')) {
+        // nomic-embed-text-v1.5 has 2048 token context (8192 for long version)
+        if (embeddingModel.toLowerCase().includes('long') || embeddingModel.toLowerCase().includes('8k')) {
+          embeddingContextLimit = 8192;
+          optimalChunkSize = 6000;
+        } else {
+          embeddingContextLimit = 2048;
+          optimalChunkSize = 1500;
+        }
+      } else if (embeddingModel.toLowerCase().includes('bge')) {
+        embeddingContextLimit = 512;
+        optimalChunkSize = 400;
+      } else if (embeddingModel.toLowerCase().includes('e5')) {
+        embeddingContextLimit = 512;
+        optimalChunkSize = 400;
+      } else if (embeddingModel.toLowerCase().includes('gte')) {
+        embeddingContextLimit = 8192;
+        optimalChunkSize = 6000;
+      }
+      
+      // Check if current chunk size exceeds the limit
+      const currentChunkSize = config.indexing?.chunkSize || 1500;
+      const chunkSizeNeedsAdjustment = currentChunkSize > embeddingContextLimit - 500; // Leave 500 token buffer
+      
+      // Build chunk size recommendations
+      const chunkSizes: Record<number, number> = {};
+      const testChunkSizes = [500, 1000, 1500, 2000, 3000];
+      for (const size of testChunkSizes) {
+        if (size <= embeddingContextLimit - 500) {
+          // Higher score for sizes that use more context (better semantic understanding)
+          // but penalize if too close to limit
+          const utilizationScore = (size / embeddingContextLimit) * 80;
+          const safetyScore = size < embeddingContextLimit - 300 ? 20 : 0;
+          chunkSizes[size] = Math.round(utilizationScore + safetyScore);
+        } else {
+          chunkSizes[size] = 0; // Not usable
+        }
+      }
+      
+      const result: RAGTuningResult = {
+        resultCounts: Object.fromEntries(
+          Object.entries(resultCountScores).map(([k, v]) => [parseInt(k), Math.round(v.avgScore)])
+        ),
+        chunkSizes,
+        optimalResultCount,
+        optimalChunkSize,
+        embeddingModel,
+        embeddingContextLimit,
+        currentChunkSize,
+        chunkSizeNeedsAdjustment,
+        testedAt: new Date().toISOString()
+      };
+      
+      console.log(`[RAG Tuning] Complete: optimalResultCount=${optimalResultCount}, optimalChunkSize=${optimalChunkSize}, needsAdjustment=${chunkSizeNeedsAdjustment}`);
+      
+      return result;
+      
+    } catch (error: any) {
+      console.error('[RAG Client] Tuning failed:', error.message);
+      return null;
+    }
+  }
+  
+  /**
+   * Update chunk size in RAG config (requires re-index to take effect)
+   */
+  async updateChunkSize(chunkSize: number): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.httpUrl}/api/rag/config`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          indexing: { chunkSize }
+        })
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
+// RAG Tuning Result Type
+export interface RAGTuningResult {
+  resultCounts: Record<number, number>; // resultCount -> score
+  chunkSizes: Record<number, number>; // chunkSize -> score
+  optimalResultCount: number;
+  optimalChunkSize: number;
+  embeddingModel: string;
+  embeddingContextLimit: number;
+  currentChunkSize: number;
+  chunkSizeNeedsAdjustment: boolean;
+  testedAt: string;
 }
 
 // Export singleton instance
