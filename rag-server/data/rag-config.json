@@ -4,14 +4,14 @@
   "lmstudio": {
     "model": "nomic-ai/nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.Q8_0.gguf",
     "chatModel": "qwen/qwen3-4b-2507",
-    "loadOnDemand": true,
+    "loadOnDemand": false,
     "keepLoaded": true
   },
   "storage": {
     "dataPath": "./data/indices"
   },
   "indexing": {
-    "chunkSize": 1800,
+    "chunkSize": 1500,
     "chunkOverlap": 50,
     "includePatterns": [
       "**/*.ts",

@@ -20,31 +20,32 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2",
-    "ws": "^8.18.0",
-    "vectra": "^0.9.0",
     "@lmstudio/sdk": "^1.5.0",
-    "glob": "^11.0.0",
+    "better-sqlite3": "^11.10.0",
     "chokidar": "^4.0.3",
-    "umap-js": "^1.4.0",
     "cors": "^2.8.5",
-    "uuid": "^11.0.3"
+    "express": "^4.21.2",
+    "glob": "^11.0.0",
+    "umap-js": "^1.4.0",
+    "uuid": "^11.0.3",
+    "vectra": "^0.9.0",
+    "ws": "^8.18.0"
   },
   "optionalDependencies": {
     "hnswlib-node": "^3.0.0",
     "tree-sitter": "^0.22.4",
-    "tree-sitter-typescript": "^0.23.2",
     "tree-sitter-javascript": "^0.23.1",
-    "tree-sitter-python": "^0.23.6"
+    "tree-sitter-python": "^0.23.6",
+    "tree-sitter-typescript": "^0.23.2"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/express": "^5.0.0",
-    "@types/ws": "^8.5.13",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
     "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.13",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
 }
- 

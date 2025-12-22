@@ -23,6 +23,7 @@ import { initializeTokenizer } from './services/tokenizer.js';
 import { initializeSummarizer, isSummarizerReady } from './services/summarizer.js';
 import { getDependencyGraph, getGraphStats, serializeGraph, loadGraph } from './services/graph-builder.js';
 import { createQueryPlan, buildQueryText, mergeAndRankResults, getContextExpansion, formatSearchResults } from './services/query-router.js';
+import { getRAGDatabase } from './services/database.js';
 
 const app = express();
 
@@ -524,10 +525,19 @@ app.post('/api/rag/query', async (req: Request, res: Response) => {
 // Get visualization data (2D projections)
 app.get('/api/rag/visualization', async (req: Request, res: Response) => {
   try {
-    // TODO: Implement UMAP projection
-    // For now, return empty array
-    const visualizations: any[] = [];
-    res.json(visualizations);
+    const ragDb = getRAGDatabase(config.storage.dataPath);
+    const projections = ragDb.getProjections();
+    
+    // Return in the format expected by the client
+    res.json(projections.map(p => ({
+      id: p.chunkId,
+      x: p.x,
+      y: p.y,
+      filePath: p.filePath,
+      symbolName: p.symbolName,
+      symbolType: p.symbolType,
+      language: p.language
+    })));
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

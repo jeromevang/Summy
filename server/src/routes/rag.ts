@@ -204,26 +204,11 @@ router.put('/config', async (req: Request, res: Response) => {
   }
 });
 
-// Get statistics
+// Get statistics - pure proxy to RAG server
 router.get('/stats', async (req: Request, res: Response) => {
   try {
     const stats = await ragClient.getStats();
     if (!stats) {
-      // Return stats from local database if server not available
-      const dbIndex = db.getRAGIndex();
-      if (dbIndex) {
-        return res.json({
-          projectPath: dbIndex.projectPath,
-          status: dbIndex.status,
-          totalFiles: dbIndex.totalFiles,
-          totalChunks: dbIndex.totalChunks,
-          totalVectors: dbIndex.totalVectors,
-          storageSize: dbIndex.storageSize,
-          embeddingModel: dbIndex.embeddingModel,
-          embeddingModelLoaded: false,
-          fileWatcherActive: false
-        });
-      }
       return res.status(503).json({ error: 'RAG server not available' });
     }
     res.json(stats);
@@ -390,31 +375,10 @@ router.post('/query', async (req: Request, res: Response) => {
   }
 });
 
-// Get metrics
+// Get metrics - pure proxy to RAG server
 router.get('/metrics', async (req: Request, res: Response) => {
   try {
     const metrics = await ragClient.getMetrics();
-    
-    // Augment with database metrics if available
-    if (metrics) {
-      const dbMetrics = db.getRAGMetrics('query', 50);
-      metrics.queryHistory = dbMetrics.filter(m => m.type === 'query').map(m => ({
-        timestamp: new Date(m.timestamp),
-        query: m.query || '',
-        latency: m.latencyMs,
-        resultsCount: m.resultsCount,
-        topScore: m.topScore
-      }));
-      
-      const indexMetrics = db.getRAGMetrics('indexing', 20);
-      metrics.indexingHistory = indexMetrics.filter(m => m.type === 'indexing').map(m => ({
-        timestamp: new Date(m.timestamp),
-        filesProcessed: m.filesProcessed,
-        chunksCreated: m.chunksCreated,
-        duration: m.durationMs
-      }));
-    }
-    
     res.json(metrics || {
       indexingHistory: [],
       queryHistory: [],
@@ -425,24 +389,9 @@ router.get('/metrics', async (req: Request, res: Response) => {
   }
 });
 
-// Get visualization data
+// Get visualization data - pure proxy to RAG server
 router.get('/visualization', async (req: Request, res: Response) => {
   try {
-    // Try to get from database first (faster)
-    const dbProjections = db.getRAGProjections();
-    if (dbProjections.length > 0) {
-      return res.json(dbProjections.map(p => ({
-        id: p.chunkId,
-        x: p.x,
-        y: p.y,
-        filePath: p.filePath,
-        symbolName: p.symbolName,
-        symbolType: p.symbolType,
-        language: p.language
-      })));
-    }
-    
-    // Fall back to RAG server
     const visualization = await ragClient.getVisualization();
     res.json(visualization);
   } catch (error: any) {
@@ -450,52 +399,24 @@ router.get('/visualization', async (req: Request, res: Response) => {
   }
 });
 
-// Get chunks with pagination - proxy to RAG server
+// Get chunks with pagination - pure proxy to RAG server
 router.get('/chunks', async (req: Request, res: Response) => {
   try {
-    // Forward to RAG server which has the chunks in memory
     const chunks = await ragClient.getChunks(req.query as any);
     res.json(chunks);
   } catch (error: any) {
-    // Fall back to database if RAG server not available
-    try {
-      const { page, limit, fileType, symbolType, search } = req.query;
-      const result = db.getRAGChunks({
-        page: page ? Number(page) : 1,
-        limit: limit ? Number(limit) : 50,
-        fileType: fileType as string,
-        symbolType: symbolType as string,
-        search: search as string
-      });
-      res.json({
-        chunks: result.chunks,
-        pagination: {
-          page: page ? Number(page) : 1,
-          limit: limit ? Number(limit) : 50,
-          total: result.total,
-          pages: Math.ceil(result.total / (limit ? Number(limit) : 50))
-        }
-      });
-    } catch (dbError: any) {
-      res.status(500).json({ error: error.message });
-    }
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Get single chunk - proxy to RAG server
+// Get single chunk - pure proxy to RAG server
 router.get('/chunks/:id', async (req: Request, res: Response) => {
   try {
-    // Try RAG server first
     const chunk = await ragClient.getChunk(req.params.id);
-    if (chunk) {
-      return res.json(chunk);
-    }
-    // Fall back to database
-    const dbChunk = db.getRAGChunk(req.params.id);
-    if (!dbChunk) {
+    if (!chunk) {
       return res.status(404).json({ error: 'Chunk not found' });
     }
-    res.json(dbChunk);
+    res.json(chunk);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

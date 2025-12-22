@@ -289,7 +289,8 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
   }
   
   /**
-   * Embed multiple texts
+   * Embed multiple texts with parallel processing for speed
+   * Uses concurrent batches to maximize throughput while avoiding overwhelming LM Studio
    */
   async embed(texts: string[]): Promise<number[][]> {
     if (!this.model) {
@@ -301,37 +302,67 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
       await this.load();
     }
     
+    if (texts.length === 0) {
+      return [];
+    }
+    
+    // For single text, just embed directly
+    if (texts.length === 1) {
+      try {
+        const result = await this.embeddingModel.embed(texts[0]);
+        return [result.embedding];
+      } catch (error: any) {
+        return this.handleEmbedError(error, texts);
+      }
+    }
+    
     try {
-      // Embed all texts
-      const results: number[][] = [];
+      // Process in parallel batches for speed
+      // Concurrency of 8 balances throughput vs overwhelming LM Studio
+      const CONCURRENCY = 8;
+      const results: number[][] = new Array(texts.length);
       
-      for (const text of texts) {
-        const result = await this.embeddingModel.embed(text);
-        results.push(result.embedding);
+      // Process in concurrent batches
+      for (let i = 0; i < texts.length; i += CONCURRENCY) {
+        const batch = texts.slice(i, Math.min(i + CONCURRENCY, texts.length));
+        const batchPromises = batch.map((text, batchIdx) => 
+          this.embeddingModel.embed(text).then((result: any) => {
+            results[i + batchIdx] = result.embedding;
+          })
+        );
+        
+        await Promise.all(batchPromises);
       }
       
       return results;
       
     } catch (error: any) {
-      console.error('[LMStudioEmbedder] Embedding failed:', error);
-      
-      // If model was unloaded externally (by LM Studio UI or VRAM pressure), reload it
-      const needsReload = 
-        error.message?.includes('not loaded') || 
-        error.message?.includes('not found') ||
-        error.message?.includes('unloaded') ||
-        error.message?.includes('Cannot find model');
-      
-      if (needsReload) {
-        console.log('[LMStudioEmbedder] Model was unloaded externally, reloading...');
-        this.isLoaded = false;
-        this.embeddingModel = null;
-        await this.load();
-        return this.embed(texts); // Retry once
-      }
-      
-      throw error;
+      return this.handleEmbedError(error, texts);
     }
+  }
+  
+  /**
+   * Handle embedding errors with retry logic
+   */
+  private async handleEmbedError(error: any, texts: string[]): Promise<number[][]> {
+    console.error('[LMStudioEmbedder] Embedding failed:', error);
+    
+    // If model was unloaded externally (by LM Studio UI or VRAM pressure), reload it
+    const needsReload = 
+      error.message?.includes('not loaded') || 
+      error.message?.includes('not found') ||
+      error.message?.includes('unloaded') ||
+      error.message?.includes('Cannot find model');
+    
+    if (needsReload) {
+      console.log('[LMStudioEmbedder] Model was unloaded externally, reloading...');
+      this.isLoaded = false;
+      this.embeddingModel = null;
+      await this.load();
+      return this.embed(texts); // Retry once
+    }
+    
+    throw error;
   }
 }
 

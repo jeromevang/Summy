@@ -2,9 +2,9 @@
   "modelId": "mistralai/ministral-3-3b",
   "displayName": "mistralai/ministral-3-3b",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T17:18:44.327Z",
-  "testVersion": 2,
-  "score": 95,
+  "testedAt": "2025-12-22T20:30:48.769Z",
+  "testVersion": 3,
+  "score": 88,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -76,110 +76,329 @@
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 253,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 233,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 530,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 432,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 502,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 626,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 614,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 522,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "git_add": {
       "supported": true,
       "score": 100,
-      "testsPassed": 2,
+      "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 478,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 469,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 631,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 494,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 320,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 387,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 495,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 432,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 505,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 400,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 507,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 454,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 898,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 567,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 805,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 527,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 693,
-      "lastTested": "2025-12-19T17:18:44.327Z"
+      "avgLatency": 631,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     },
     "mcp_rules": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 0
+    },
+    "read_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 520,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "write_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 910,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "edit_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1524,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "list_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 431,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "search_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 592,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "create_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 430,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "delete_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 452,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "delete_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 396,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "get_file_info": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 493,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "git_blame": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 487,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "git_show": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 401,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "npm_test": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 237,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "web_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 836,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "browser_take_screenshot": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 515,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "shell_exec": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 427,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "memory_store": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 637,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "memory_retrieve": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 449,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "memory_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 238,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "text_summarize": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 2063,
+      "lastTested": "2025-12-22T20:30:48.769Z",
+      "nativeAliases": [
+        "summarize_text"
+      ]
+    },
+    "diff_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 718,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "process_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 420,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "zip_create": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 696,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "zip_extract": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 606,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "rag_query": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 879.5,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "rag_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 229,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "rag_index": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 559,
+      "lastTested": "2025-12-22T20:30:48.769Z"
+    },
+    "probe": {
+      "supported": false,
+      "score": 29,
+      "testsPassed": 3,
+      "testsFailed": 19,
+      "avgLatency": 5516.318181818182,
+      "lastTested": "2025-12-22T20:30:48.769Z"
     }
   },
   "enabledTools": [
@@ -201,150 +420,410 @@
     "npm_uninstall",
     "http_request",
     "browser_navigate",
-    "run_python"
+    "run_python",
+    "read_file",
+    "write_file",
+    "edit_file",
+    "list_directory",
+    "search_files",
+    "create_directory",
+    "delete_file",
+    "delete_directory",
+    "git_blame",
+    "web_search",
+    "shell_exec",
+    "memory_store",
+    "memory_retrieve",
+    "text_summarize",
+    "diff_files",
+    "process_list",
+    "zip_create",
+    "zip_extract",
+    "rag_query",
+    "rag_index"
   ],
   "testResults": [
     {
-      "testId": "file_read_basic",
+      "testId": "read_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-anm7bj9ri6iy5vy6c08mab\",\"object\":\"chat.completion\",\"created\":1766164710,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"791308419\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":106,\"completion_tokens\":11,\"total_tokens\":117},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-yzc1h8h0jwdaxcazazcbc\",\"object\":\"chat.completion\",\"created\":1766435303,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"543032083\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":112,\"completion_tokens\":11,\"total_tokens\":123},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
-      "testId": "file_read_nested",
+      "testId": "read_file_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-p7giynm0mvjxu52trwmzo\",\"object\":\"chat.completion\",\"created\":1766164710,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"304746534\",\"function\":{\"name\":\"file_read\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":105,\"completion_tokens\":13,\"total_tokens\":118},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-18co9fsmx3et1salkcp7h\",\"object\":\"chat.completion\",\"created\":1766435304,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"643237915\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":111,\"completion_tokens\":13,\"total_tokens\":124},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
-      "testId": "file_write_basic",
+      "testId": "write_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-k5m53gvohkfl17juzkw27b\",\"object\":\"chat.completion\",\"created\":1766164711,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"273749655\",\"function\":{\"name\":\"file_write\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\");\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":135,\"completion_tokens\":24,\"total_tokens\":159},\"stats\":{},\"system_"
+      "response": "{\"id\":\"chatcmpl-2dokhxxrl0ceitrez2jpi6\",\"object\":\"chat.completion\",\"created\":1766435304,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"992801330\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":144,\"completion_tokens\":24,\"total_tokens\":168},\"stats\":{},\"system_f"
     },
     {
-      "testId": "file_patch_basic",
+      "testId": "edit_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-wl9g8rtzujdx0q08igm8vm\",\"object\":\"chat.completion\",\"created\":1766164712,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"990207140\",\"function\":{\"name\":\"file_patch\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"find\\\":\\\"3000\\\",\\\"replace\\\":\\\"8080\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":157,\"completion_tokens\":30,\"total_tokens\":187},\"stats\":{},\"system_fingerprint\":"
+      "response": "{\"id\":\"chatcmpl-hvfq3xn5368zxpejld1ygi\",\"object\":\"chat.completion\",\"created\":1766435305,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"986080138\",\"function\":{\"name\":\"edit_file\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"edits\\\":[{\\\"oldText\\\":\\\"3000\\\",\\\"newText\\\":\\\"8080\\\"}],\\\"dryRun\\\":false}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":229,\"completion_tokens\":44,\"total_tokens\":273}"
     },
     {
-      "testId": "file_list_basic",
+      "testId": "list_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2v6mmog8oc9f9qxabgig8o\",\"object\":\"chat.completion\",\"created\":1766164713,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"792706414\",\"function\":{\"name\":\"file_list\",\"arguments\":\"{\\\"folder\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":98,\"completion_tokens\":10,\"total_tokens\":108},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-6e4qmk5iprmprl3yj7bej\",\"object\":\"chat.completion\",\"created\":1766435307,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"103965228\",\"function\":{\"name\":\"list_directory\",\"arguments\":\"{\\\"path\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":105,\"completion_tokens\":10,\"total_tokens\":115},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
-      "testId": "file_search_basic",
+      "testId": "search_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-sfsmt2uepvqfrs9akkzh7\",\"object\":\"chat.completion\",\"created\":1766435307,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"934895957\",\"function\":{\"name\":\"search_files\",\"arguments\":\"{\\\"directory\\\":\\\".\\\",\\\"pattern\\\":\\\"**/*.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":151,\"completion_tokens\":16,\"total_tokens\":167},\"stats\":{},\"system_fingerprint\":\"mistralai/min"
+    },
+    {
+      "testId": "create_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-hnoydjw4mxer26ah1igryg\",\"object\":\"chat.completion\",\"created\":1766164714,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"717253013\",\"function\":{\"name\":\"file_search\",\"arguments\":\"{\\\"query\\\":\\\"TODO\\\",\\\"path\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":120,\"completion_tokens\":15,\"total_tokens\":135},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3"
+      "response": "{\"id\":\"chatcmpl-d52eufxgoevnl8u1o5hts\",\"object\":\"chat.completion\",\"created\":1766435308,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"664836645\",\"function\":{\"name\":\"create_directory\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":102,\"completion_tokens\":10,\"total_tokens\":112},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "delete_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-5n19v58fdxf50bzqce8n5s\",\"object\":\"chat.completion\",\"created\":1766435308,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"492447775\",\"function\":{\"name\":\"delete_file\",\"arguments\":\"{\\\"path\\\":\\\"old_config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":101,\"completion_tokens\":12,\"total_tokens\":113},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "delete_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-njkii0yppmgu1qmlf7uda\",\"object\":\"chat.completion\",\"created\":1766435309,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"661697301\",\"function\":{\"name\":\"delete_directory\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":99,\"completion_tokens\":10,\"total_tokens\":109},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "get_file_info_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-8f7mz8zcr0w210x9yo9ze7\",\"object\":\"chat.completion\",\"created\":1766435309,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Could you please provide the path to the `package.json` file? Once I have that, I can retrieve its size and modification date for you.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":105,\"completion_tokens\":30,\"total_tokens\":135},\"stats\":{},\"system_fingerprint\":\"mistralai/minis"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-rrtut8ilbm4fy9hx6149i\",\"object\":\"chat.completion\",\"created\":1766164714,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"325095122\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":75,\"completion_tokens\":5,\"total_tokens\":80},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-o3lewu5p759yhmvsoobvc\",\"object\":\"chat.completion\",\"created\":1766435309,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"163431056\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":75,\"completion_tokens\":5,\"total_tokens\":80},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2kw0n174wp8k5014l13ib\",\"object\":\"chat.completion\",\"created\":1766164715,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"407068384\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":98,\"completion_tokens\":11,\"total_tokens\":109},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-jfrijtxgkoqwpw0uby151i\",\"object\":\"chat.completion\",\"created\":1766435310,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"403425453\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":115,\"completion_tokens\":11,\"total_tokens\":126},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-hw5miftl0j1xbtyw5jpvv\",\"object\":\"chat.completion\",\"created\":1766164715,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"326130196\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":92,\"completion_tokens\":10,\"total_tokens\":102},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-6qkwwfeq4zwzgkp3yrr02h\",\"object\":\"chat.completion\",\"created\":1766435310,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"557428251\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5,\\\"format\\\":\\\"oneline\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":125,\"completion_tokens\":17,\"total_tokens\":142},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-crtr5qup3pcrx4xg43vaj\",\"object\":\"chat.completion\",\"created\":1766164716,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"381862542\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":99,\"completion_tokens\":13,\"total_tokens\":112},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-1c77cka4nrlw2tkho0leo\",\"object\":\"chat.completion\",\"created\":1766435311,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"860332257\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":96,\"completion_tokens\":13,\"total_tokens\":109},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-0hu3vnhs5b1aqijb9ctfj\",\"object\":\"chat.completion\",\"created\":1766164716,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"911899234\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":100,\"completion_tokens\":13,\"total_tokens\":113},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3"
-    },
-    {
-      "testId": "npm_run_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-7ija4wo9j74ihx62414ghm\",\"object\":\"chat.completion\",\"created\":1766164717,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"474065467\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":95,\"completion_tokens\":10,\"total_tokens\":105},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
-    },
-    {
-      "testId": "npm_install_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-qrbkkz9w16khpla5h9phwa\",\"object\":\"chat.completion\",\"created\":1766164717,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"286451003\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":91,\"completion_tokens\":10,\"total_tokens\":101},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
-    },
-    {
-      "testId": "http_request_get",
-      "passed": true,
-      "score": 99,
-      "response": "{\"id\":\"chatcmpl-ko9oovmqdgn8jqhjoxjgxl\",\"object\":\"chat.completion\",\"created\":1766164718,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"422945792\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\",\\\"method\\\":\\\"GET\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":136,\"completion_tokens\":21,\"total_tokens\":157},\"stats\":{},\"system_fingerpri"
-    },
-    {
-      "testId": "browser_navigate_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-7d4ptbr6utv76k3ewred5h\",\"object\":\"chat.completion\",\"created\":1766164719,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"481176600\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\",\\\"getContent\\\":false}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":138,\"completion_tokens\":20,\"total_tokens\":158},\"stats\":{},\"system_fingerprint\":\""
-    },
-    {
-      "testId": "create_new_file_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-lusou4993bvgxev56klhe\",\"object\":\"chat.completion\",\"created\":1766164720,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"853163709\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\",\\\"content\\\":\\\"\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":117,\"completion_tokens\":17,\"total_tokens\":134},\"stats\":{},\"system_fingerprint\":\"mistralai/mini"
-    },
-    {
-      "testId": "folder_create_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-lyav4gawpyklsvaffwqbhq\",\"object\":\"chat.completion\",\"created\":1766164720,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"714573764\",\"function\":{\"name\":\"folder_create\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":96,\"completion_tokens\":10,\"total_tokens\":106},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
-    },
-    {
-      "testId": "folder_delete_basic",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-6c2qlrmz1k6py40v3rpjr\",\"object\":\"chat.completion\",\"created\":1766164721,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"242643924\",\"function\":{\"name\":\"folder_delete\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":97,\"completion_tokens\":10,\"total_tokens\":107},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-fln4sy80dhhtq9yqepizep\",\"object\":\"chat.completion\",\"created\":1766435311,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"961460549\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":99,\"completion_tokens\":13,\"total_tokens\":112},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3"
     },
     {
       "testId": "git_add_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2r5s1quwdzj7qeukod0jqx\",\"object\":\"chat.completion\",\"created\":1766164721,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"457773021\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":104,\"completion_tokens\":11,\"total_tokens\":115},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
-    },
-    {
-      "testId": "git_add_all",
-      "passed": true,
-      "score": 100,
-      "response": "{\"id\":\"chatcmpl-njcvlinzxwxl61pk2ojk\",\"object\":\"chat.completion\",\"created\":1766164722,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"228055892\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":100,\"completion_tokens\":9,\"total_tokens\":109},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-vkqcjr4dyhk1t70x1027hk\",\"object\":\"chat.completion\",\"created\":1766435312,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"107011930\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":97,\"completion_tokens\":11,\"total_tokens\":108},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-84gfok5w58bb72384e9npu\",\"object\":\"chat.completion\",\"created\":1766164722,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"565202862\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":75,\"completion_tokens\":6,\"total_tokens\":81},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-u67dwpebuobl5o1lop2elh\",\"object\":\"chat.completion\",\"created\":1766435312,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"878487629\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{\\\"all\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":92,\"completion_tokens\":10,\"total_tokens\":102},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "git_blame_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-1gi4ea3ozre2giljio38bo\",\"object\":\"chat.completion\",\"created\":1766435313,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"318084207\",\"function\":{\"name\":\"git_blame\",\"arguments\":\"{\\\"file\\\":\\\"server.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":142,\"completion_tokens\":12,\"total_tokens\":154},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "git_show_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-9cvtpvpcwswfyzxau3zl85\",\"object\":\"chat.completion\",\"created\":1766435313,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"925704510\",\"function\":{\"name\":\"git_show\",\"arguments\":\"{\\\"ref\\\":\\\"HEAD\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":115,\"completion_tokens\":10,\"total_tokens\":125},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-3jf1jvm7ju6vukp70n5wes\",\"object\":\"chat.completion\",\"created\":1766435313,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"249179403\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":94,\"completion_tokens\":10,\"total_tokens\":104},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ispqmtzeg7i3s4vxns8vhp\",\"object\":\"chat.completion\",\"created\":1766435314,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"162539732\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":110,\"completion_tokens\":10,\"total_tokens\":120},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-qj1t4830ikmn17dskwkfi\",\"object\":\"chat.completion\",\"created\":1766164723,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"522519417\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":96,\"completion_tokens\":11,\"total_tokens\":107},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+      "response": "{\"id\":\"chatcmpl-03o468rqpi3soiprfu1bomf\",\"object\":\"chat.completion\",\"created\":1766435314,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"155092640\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":96,\"completion_tokens\":11,\"total_tokens\":107},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "npm_test_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-s1c0ti0xcrtjokob5ad6\",\"object\":\"chat.completion\",\"created\":1766435315,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"186579030\",\"function\":{\"name\":\"npm_test\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":73,\"completion_tokens\":5,\"total_tokens\":78},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-nxlqpfgpvqs4opyvf6wyf\",\"object\":\"chat.completion\",\"created\":1766435315,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"563682686\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":166,\"completion_tokens\":15,\"total_tokens\":181},\"stats\":{},\"system_fingerprint\":\"mistralai/minis"
+    },
+    {
+      "testId": "web_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-kr3w8kzp3mg82ufxc8cph\",\"object\":\"chat.completion\",\"created\":1766435316,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"545549423\",\"function\":{\"name\":\"web_search\",\"arguments\":\"{\\\"query\\\":\\\"TypeScript generics overview and examples\\\",\\\"maxResults\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":116,\"completion_tokens\":23,\"total_tokens\":139},\"stats\":{},\"system_"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-mae2e4uzsshzn4sva40g\",\"object\":\"chat.completion\",\"created\":1766435316,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"117552042\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":103,\"completion_tokens\":14,\"total_tokens\":117},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3"
+    },
+    {
+      "testId": "browser_screenshot_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-vnsvlnr8h29aixo8jk721s\",\"object\":\"chat.completion\",\"created\":1766435317,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"396652316\",\"function\":{\"name\":\"browser_take_screenshot\",\"arguments\":\"{\\\"fullPage\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":135,\"completion_tokens\":13,\"total_tokens\":148},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-wsqzdhrsnkierczo0dbf\",\"object\":\"chat.completion\",\"created\":1766164723,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"607895479\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":98,\"completion_tokens\":17,\"total_tokens\":115},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3"
+      "response": "{\"id\":\"chatcmpl-kcaxc8gedy9jg1gxigh59q\",\"object\":\"chat.completion\",\"created\":1766435317,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"888593373\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":97,\"completion_tokens\":17,\"total_tokens\":114},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral"
+    },
+    {
+      "testId": "shell_exec_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-lpjhzmbz3oqjaarv7flfdq\",\"object\":\"chat.completion\",\"created\":1766435318,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"770553721\",\"function\":{\"name\":\"shell_exec\",\"arguments\":\"{\\\"command\\\":\\\"echo Hello\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":130,\"completion_tokens\":11,\"total_tokens\":141},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "memory_store_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-zowcxivv6jzavz1chbhkc\",\"object\":\"chat.completion\",\"created\":1766435319,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"942255785\",\"function\":{\"name\":\"memory_store\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\",\\\"value\\\":\\\"Alice\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":114,\"completion_tokens\":17,\"total_tokens\":131},\"stats\":{},\"system_fingerprint\":\"mistralai/minis"
+    },
+    {
+      "testId": "memory_retrieve_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-x8xldvveesmu7hpl1f18x\",\"object\":\"chat.completion\",\"created\":1766435319,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"809340853\",\"function\":{\"name\":\"memory_retrieve\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":100,\"completion_tokens\":12,\"total_tokens\":112},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "memory_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-rxz619cs02k8aev1g96fur\",\"object\":\"chat.completion\",\"created\":1766435320,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"674303690\",\"function\":{\"name\":\"memory_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":78,\"completion_tokens\":5,\"total_tokens\":83},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "text_summarize_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-lhw2tibhpunvv6efjv7xoo\",\"object\":\"chat.completion\",\"created\":1766435320,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"987751802\",\"function\":{\"name\":\"text_summarize\",\"arguments\":\"{\\\"text\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.\\\",\\\"maxSe"
+    },
+    {
+      "testId": "diff_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-ci1fw3q0o2pq286207e8yh\",\"object\":\"chat.completion\",\"created\":1766435322,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"128299441\",\"function\":{\"name\":\"diff_files\",\"arguments\":\"{\\\"file1\\\":\\\"old.txt\\\",\\\"file2\\\":\\\"new.txt\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":131,\"completion_tokens\":20,\"total_tokens\":151},\"stats\":{},\"system_fingerprint\":\"mistralai/mini"
+    },
+    {
+      "testId": "process_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-rydoy4tlvtkjzkc0si3h\",\"object\":\"chat.completion\",\"created\":1766435323,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"659657373\",\"function\":{\"name\":\"process_list\",\"arguments\":\"{\\\"filter\\\":\\\"node\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":93,\"completion_tokens\":10,\"total_tokens\":103},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "zip_create_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-x4rphh1fn1loszb7dy01\",\"object\":\"chat.completion\",\"created\":1766435323,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"769972983\",\"function\":{\"name\":\"zip_create\",\"arguments\":\"{\\\"output\\\":\\\"backup.zip\\\",\\\"sources\\\":[\\\"src\\\"]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":133,\"completion_tokens\":19,\"total_tokens\":152},\"stats\":{},\"system_fingerprint\":\"mistralai/mi"
+    },
+    {
+      "testId": "zip_extract_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-bik8o32jay8s9uvv10c7vd\",\"object\":\"chat.completion\",\"created\":1766435324,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"635242641\",\"function\":{\"name\":\"zip_extract\",\"arguments\":\"{\\\"archive\\\":\\\"data.zip\\\",\\\"destination\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":115,\"completion_tokens\":17,\"total_tokens\":132},\"stats\":{},\"system_fingerprint\":\"mistralai/"
+    },
+    {
+      "testId": "rag_query_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-iytj9liskr0ev4r0dfymgr\",\"object\":\"chat.completion\",\"created\":1766435324,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"496250243\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"user authentication handling\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":299,\"completion_tokens\":18,\"total_tokens\":317},\"stats\":{},\"system_fingerprint\":\"mist"
+    },
+    {
+      "testId": "rag_query_with_filter",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-klw10ltutsazn1upod00w\",\"object\":\"chat.completion\",\"created\":1766435325,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"663995437\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"database connection handling in TypeScript files\\\",\\\"limit\\\":10,\\\"fileTypes\\\":[\\\"ts\\\"]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":298,\"completion_tokens\":31,\"total_tokens\""
+    },
+    {
+      "testId": "rag_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-cbg2558bg5qqks8tfw0dyl\",\"object\":\"chat.completion\",\"created\":1766435326,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"174729668\",\"function\":{\"name\":\"rag_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":94,\"completion_tokens\":5,\"total_tokens\":99},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral-3-3b\"}"
+    },
+    {
+      "testId": "rag_index_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-iald4a1qfinc0wxfhhcwi\",\"object\":\"chat.completion\",\"created\":1766435326,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"856561141\",\"function\":{\"name\":\"rag_index\",\"arguments\":\"{\\\"projectPath\\\":\\\"/home/user/myproject\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":112,\"completion_tokens\":14,\"total_tokens\":126},\"stats\":{},\"system_fingerprint\":\"mistralai/ministral"
+    },
+    {
+      "testId": "9.1",
+      "passed": false,
+      "score": 50,
+      "response": "{\"id\":\"chatcmpl-bdxg8cfen89csivc10aqh\",\"object\":\"chat.completion\",\"created\":1766435327,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Based on the **updated and accurate context** you provided (which explicitly states that the project uses **JWT tokens**, not OAuth2), here’s what we know:\\n\\n### **Authentication Method Used:**\\nThe project likely employs **JSON Web Tokens (JWT)** for authentication, though the exact implementation details aren’t"
+    },
+    {
+      "testId": "9.2",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-vuo2wemvr2pu1vvwpv9idl\",\"object\":\"chat.completion\",\"created\":1766435334,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To locate and analyze the **Quantum Flux Capacitor** implementation in a codebase, I’ll need to make some assumptions since you haven’t provided specific source files or project structure. Below is a structured approach based on typical *Back to the Future*-inspired time-travel mechanics (e.g., in games like *Deu"
+    },
+    {
+      "testId": "9.3",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-2cmjbx5hvr5189n2gfgtnf\",\"object\":\"chat.completion\",\"created\":1766435341,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To determine how authentication flows in your project (or a general context), I’ll use **RAG (Retrieval-Augmented Generation)** to analyze relevant documentation, architecture diagrams, or codebase references—if available. Since you haven’t provided specific files or context yet, here’s how we can proceed:\\n\\n---"
+    },
+    {
+      "testId": "9.4",
+      "passed": true,
+      "score": 70,
+      "response": "{\"id\":\"chatcmpl-fori83nugh66qzl2esuec\",\"object\":\"chat.completion\",\"created\":1766435348,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"It looks like you want me to update a file, but I don't have direct access to your local files or cloud storage systems (like GitHub, Dropbox, etc.). Here’s how you can proceed based on your needs:\\n\\n### **Option 1: Manual Update via Text Editor**\\nIf you're referring to an **editable text file** (e.g., `.txt`, `"
+    },
+    {
+      "testId": "10.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7xx0mktiehjhynsxa475lo\",\"object\":\"chat.completion\",\"created\":1766435352,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"A **function** in programming is a reusable block of code designed to perform a specific task or set of tasks. Functions help organize and modularize code by encapsulating logic into named units, making programs easier to read, maintain, and debug.\\n\\n### Key Characteristics:\\n1. **Reusability**: A function can b"
+    },
+    {
+      "testId": "10.2",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-bxyub79eak5ijrgf3ma2p\",\"object\":\"chat.completion\",\"created\":1766435355,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm unable to directly use external tools like `custom_analyze` in this context, but I can guide you on how to perform a code analysis manually or suggest alternative approaches if you have access to the necessary tools (e.g., TypeScript compiler, ESLint, or static analysis plugins).\\n\\n### Manual Approach for `ma"
+    },
+    {
+      "testId": "10.3",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-lkml2v29v0i9cu7u41p28m\",\"object\":\"chat.completion\",\"created\":1766435362,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"In most modern software projects, **authentication** (verifying user identity) and **authorization** (granting permissions) are handled separately but often together. Since you haven’t provided details about your specific project, I’ll outline common approaches used in web/mobile applications, frameworks like Dja"
+    },
+    {
+      "testId": "10.4",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-nfnm3dfuj8f7m362g73si\",\"object\":\"chat.completion\",\"created\":1766435369,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The `TypeError: undefined is not a function` occurs when you try to call a method or function that doesn't exist (i.e., it's `undefined`). Here’s how to diagnose and fix the issue:\\n\\n---\\n\\n### **Common Causes & Solutions**\\n1. **Missing Function/Method**\\n   - You're trying to call a function/method that hasn’t "
+    },
+    {
+      "testId": "10.5",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-uq8k8ce2h9bb70yid5u92s\",\"object\":\"chat.completion\",\"created\":1766435376,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Given our previous discussion about an **authentication bug**, here’s how I’d prioritize fixing it based on typical security patterns:\\n\\n### **Most Likely Culprit: Authentication Header/Token Validation**\\nThe most common place for such bugs is in:\\n1. **Authentication middleware** (e.g., JWT, OAuth2, session-ba"
+    },
+    {
+      "testId": "11.1",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-96o1413knp564gp1h6y9\",\"object\":\"chat.completion\",\"created\":1766435383,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"That’s great! Descriptive commit messages (also known as **conventional commits**) follow a structured format to clearly communicate the purpose of each change. Here’s how you can structure your commit message:\\n\\n### **General Format for Descriptive Commits:**\\n```\\n<type>: <brief description of changes>\\n```\\n\\n#"
+    },
+    {
+      "testId": "11.2",
+      "passed": false,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-s4ung68326j3og7ss8744\",\"object\":\"chat.completion\",\"created\":1766435390,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Understood! Since you're asking me to clean up the project by deleting test files, I’ll follow best practices by ensuring they’re removed **only after confirming their removal doesn’t break functionality**.\\n\\n### **How This Will Work:**\\n1. **Identify Test Files** – I’ll scan for common test-related files (e.g., "
+    },
+    {
+      "testId": "11.3",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-8egt3ujqy8bjmjtpum1w6\",\"object\":\"chat.completion\",\"created\":1766435394,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I’ll search for all occurrences of the `handleAuth` function using the **`find_code`** tool.\\n\\nWould you like me to proceed with the search now? If so, I'll retrieve and return all relevant usages in this codebase.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":53,\"completion_"
+    },
+    {
+      "testId": "11.4",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-tb8axoxu10i9usvuj3y88\",\"object\":\"chat.completion\",\"created\":1766435395,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm here to help, but **I cannot execute system commands** like `rm -rf /tmp/build` directly on your machine or any other system.\\n\\nHowever, I can guide you through the process securely:\\n\\n### **Important Security Note:**\\n- **`rm -rf /tmp/build` is destructive**—it permanently deletes all files in `/tmp/build`."
+    },
+    {
+      "testId": "11.5",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-qtney7xnc3gnwz0rtvclgi\",\"object\":\"chat.completion\",\"created\":1766435399,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Here's a simple `user.js` file that includes a function to store passwords directly in `localStorage`. **Please note:** This is purely for demonstration purposes and does not follow security best practices (e.g., hashing passwords or using secure storage). In production, you should use proper password hashing (li"
+    },
+    {
+      "testId": "14.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-lwqwg2dqe9jss309qvuzc9\",\"object\":\"chat.completion\",\"created\":1766435403,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The **`package.json`** file is a central configuration file for Node.js projects, used by npm (Node Package Manager) and other tools. Its primary purposes include:\\n\\n### **Key Functions of `package.json`:**\\n1. **Project Metadata**\\n   - Stores essential project information like:\\n     - Name (`name`)\\n     - Ve"
+    },
+    {
+      "testId": "14.2",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-sh8ixvpxqe32o2zeomy6j\",\"object\":\"chat.completion\",\"created\":1766435410,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"In software development, **error handling** is typically implemented using mechanisms that allow the system to detect, manage, and recover from errors gracefully. The way error handling works depends on the programming language, framework, or architecture of your project. Below are common approaches across differe"
+    },
+    {
+      "testId": "14.3",
+      "passed": true,
+      "score": 70,
+      "response": "{\"id\":\"chatcmpl-4itcshryn9e6bf11io401i\",\"object\":\"chat.completion\",\"created\":1766435417,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I can't directly run `npm install` commands or access your local filesystem, but I can guide you through the process and help you set up Lodash in your project.\\n\\n### Steps to Install Lodash:\\n\\n1. **Open your terminal/command prompt** (where your project is located).\\n2. Run:\\n   ```bash\\n   npm install lodash\\"
+    },
+    {
+      "testId": "14.4",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-88fqcp84khqsjz9ee406nq\",\"object\":\"chat.completion\",\"created\":1766435420,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Here's a simple Python function to validate an email address using basic regex (regular expression) rules:\\n\\n```python\\nimport re\\n\\ndef is_valid_email(email):\\n    \\\"\\\"\\\"\\n    Validates whether the provided email address follows common email format rules.\\n\\n    Args:\\n        email (str): The email address to "
+    },
+    {
+      "testId": "14.5",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-a5s80sf6ax551it289rola\",\"object\":\"chat.completion\",\"created\":1766435426,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"A **README** (short for *read me*) file is a standard text document placed in the root directory of a project or repository. Its primary purpose is to provide essential information about the project to anyone who downloads or clones it. Here’s what a typical `README` file usually includes:\\n\\n---\\n\\n### **1. Proj"
+    },
+    {
+      "testId": "14.6",
+      "passed": false,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-0ks8v9ol4pvyvk39ckeum9\",\"object\":\"chat.completion\",\"created\":1766435433,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"# **A Comprehensive and Detailed Explanation of Variables in Programming**\\n\\n## **Introduction**\\nIn programming, variables are one of the fundamental building blocks that enable computers to store, manipulate, and retrieve data dynamically. They serve as containers that hold values which can be changed during p"
+    },
+    {
+      "testId": "14.7",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ks2ys3qww3no3tat4pjfe\",\"object\":\"chat.completion\",\"created\":1766435440,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Here are five of the most commonly used programming languages in 2024, each with distinct use cases:\\n\\n1. **Python**\\n   - **Why?** Beginner-friendly syntax, versatility (data science, web dev, automation), and strong community support.\\n   - **Key Use Cases:** AI/ML, data analysis (Pandas, NumPy), scripting, web"
+    },
+    {
+      "testId": "14.8",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-e51h5jkzn2q2sw3umq1scx\",\"object\":\"chat.completion\",\"created\":1766435446,\"model\":\"mistralai/ministral-3-3b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I can't directly modify files on your system, but here's how you can change the port number in `config.js` yourself:\\n\\n1. Open your project folder in a code editor (like VS Code)\\n2. Locate the file named `config.js`\\n3. Find the line that contains the port number (likely something like `PORT: 3000`)\\n4. Change "
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-20T23:45:12.387Z",
+    "testedAt": "2025-12-22T20:28:14.981Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -386,10 +865,939 @@
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 100,
-    "reasoningScore": 0,
-    "overallScore": 100
+    "reasoningScore": 65,
+    "overallScore": 56,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": true,
+        "score": 80,
+        "details": "Valid intent JSON with reasoning"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 50,
+        "details": "Unclear action: file_operations"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": false,
+        "score": 30,
+        "details": "Failed to identify logical conflict"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    },
+    "strategicRAGProbes": [
+      {
+        "id": "3.1",
+        "name": "RAG Priority",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 1827,
+        "details": "Correctly used RAG as first tool",
+        "expectedBehavior": "Model should call rag_query BEFORE file reads",
+        "variants": [
+          {
+            "id": "3.1a",
+            "prompt": "Explain the login flow",
+            "passed": true,
+            "score": 100,
+            "response": ""
+          },
+          {
+            "id": "3.1b",
+            "prompt": "Where is user authentication handled?",
+            "passed": true,
+            "score": 100,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.2",
+        "name": "Hierarchical Search",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 3649,
+        "details": "Used RAG but query could be broader",
+        "expectedBehavior": "Should use broader query to get architectural overview",
+        "variants": [
+          {
+            "id": "3.2a",
+            "prompt": "How are the different parts of this codebase connected?",
+            "passed": true,
+            "score": 60,
+            "response": "To understand how the different parts of this codebase are connected, I'll first need to explore its structure and identify key components. Let me perform a semantic search to find:\n\n1. The main modul"
+          },
+          {
+            "id": "3.2b",
+            "prompt": "Give me a high-level overview of the project structure",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.3",
+        "name": "Tool Chaining",
+        "category": "3.x",
+        "passed": true,
+        "score": 70,
+        "latency": 1416,
+        "details": "Used RAG but no follow-up read",
+        "expectedBehavior": "Should RAG first, then read_file for details",
+        "variants": [
+          {
+            "id": "3.3a",
+            "prompt": "Find the JWT validation logic and explain how it works",
+            "passed": true,
+            "score": 70,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.4",
+        "name": "Error Recovery",
+        "category": "3.x",
+        "passed": false,
+        "score": 30,
+        "latency": 1146,
+        "details": "Did not acknowledge search failure",
+        "expectedBehavior": "Should acknowledge not found and offer alternatives",
+        "variants": [
+          {
+            "id": "3.4a",
+            "prompt": "Where is the blockchain integration?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.5",
+        "name": "Result Synthesis",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 1647,
+        "details": "Used RAG but synthesis could be better",
+        "expectedBehavior": "Should search, then synthesize coherent explanation",
+        "variants": [
+          {
+            "id": "3.5a",
+            "prompt": "Trace a user login request from frontend to backend",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.6",
+        "name": "Self-Correction",
+        "category": "3.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1304,
+        "details": "Only one RAG query, could refine",
+        "expectedBehavior": "Should try different queries if first doesnt find it",
+        "variants": [
+          {
+            "id": "3.6a",
+            "prompt": "Find how roles are enforced in the API",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "architecturalProbes": [
+      {
+        "id": "4.1",
+        "name": "Code Comprehension",
+        "category": "4.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2485,
+        "details": "Poor code comprehension",
+        "expectedBehavior": "Should explain JWT validation and user attachment",
+        "variants": [
+          {
+            "id": "4.1a",
+            "prompt": "Explain what db.service does",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          },
+          {
+            "id": "4.1b",
+            "prompt": "How does the UserService class work?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.2",
+        "name": "Bug Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 1641,
+        "details": "Did not identify security issue",
+        "expectedBehavior": "Should identify jwt.decode vs jwt.verify issue",
+        "variants": [
+          {
+            "id": "4.2a",
+            "prompt": "Is the refresh token validation secure?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.2b",
+            "prompt": "Find security vulnerabilities in auth.ts",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.3",
+        "name": "SQL Injection Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 1841,
+        "details": "Did not identify SQL injection",
+        "expectedBehavior": "Should identify string concatenation in SQL query",
+        "variants": [
+          {
+            "id": "4.3a",
+            "prompt": "Is the search query in UserService.java safe?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.3b",
+            "prompt": "Review database queries for injection vulnerabilities",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.4",
+        "name": "XSS Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 1930,
+        "details": "Did not identify XSS vulnerability",
+        "expectedBehavior": "Should identify dangerouslySetInnerHTML vulnerability",
+        "variants": [
+          {
+            "id": "4.4a",
+            "prompt": "Is user input properly sanitized in LoginForm?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.4b",
+            "prompt": "Find XSS issues in the React components",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.5",
+        "name": "Architecture Inference",
+        "category": "4.x",
+        "passed": false,
+        "score": 30,
+        "latency": 1139,
+        "details": "Did not identify patterns",
+        "expectedBehavior": "Should identify layered architecture, MVC/service pattern",
+        "variants": [
+          {
+            "id": "4.5a",
+            "prompt": "How is the code organized?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.6",
+        "name": "Language Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 3645,
+        "details": "Did not identify languages",
+        "expectedBehavior": "Should identify TypeScript, Java, JSX",
+        "variants": [
+          {
+            "id": "4.6a",
+            "prompt": "What tech stack is this project using?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "navigationProbes": [
+      {
+        "id": "5.1",
+        "name": "Locate Implementation",
+        "category": "5.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2018,
+        "details": "Used RAG but didnt find bcrypt",
+        "expectedBehavior": "Should locate bcrypt.hash usage",
+        "variants": [
+          {
+            "id": "5.1a",
+            "prompt": "Where is password hashing implemented?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          },
+          {
+            "id": "5.1b",
+            "prompt": "How is password security handled?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "name": "Cross-Stack Navigation",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 3862,
+        "details": "Did not navigate cross-stack",
+        "expectedBehavior": "Should find both frontend and backend auth",
+        "variants": [
+          {
+            "id": "5.2a",
+            "prompt": "Show me auth across frontend and backend",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.3",
+        "name": "Dependency Tracing",
+        "category": "5.x",
+        "passed": false,
+        "score": 20,
+        "latency": 1104,
+        "details": "Did not trace dependencies",
+        "expectedBehavior": "Should list services and middleware dependencies",
+        "variants": [
+          {
+            "id": "5.3a",
+            "prompt": "What does index.ts import?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.4",
+        "name": "Entry Point Location",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 1987,
+        "details": "Did not find entry points",
+        "expectedBehavior": "Should find index.ts/App.tsx entry points",
+        "variants": [
+          {
+            "id": "5.4a",
+            "prompt": "What is the main entry file?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.5",
+        "name": "Shared Code Detection",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 1389,
+        "details": "Did not find shared code",
+        "expectedBehavior": "Should find shared-utils package",
+        "variants": [
+          {
+            "id": "5.5a",
+            "prompt": "Are there reusable utilities?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "helicopterProbes": [
+      {
+        "id": "6.1",
+        "name": "Project Overview",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 1807,
+        "details": "Good concise overview",
+        "expectedBehavior": "Should summarize project purpose and structure",
+        "variants": [
+          {
+            "id": "6.1a",
+            "prompt": "What is this codebase about?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.2",
+        "name": "Stack Enumeration",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 934,
+        "details": "Found few stacks",
+        "expectedBehavior": "Should list Node, React, React Native, Java, Mendix",
+        "variants": [
+          {
+            "id": "6.2a",
+            "prompt": "List all the project folders and their purposes",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.3",
+        "name": "Team Structure Inference",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 10128,
+        "details": "Suggested team structure",
+        "expectedBehavior": "Should suggest backend/frontend/mobile teams",
+        "variants": [
+          {
+            "id": "6.3a",
+            "prompt": "Who would work on what parts?",
+            "passed": true,
+            "score": 100,
+            "response": "To determine who would typically work on different parts of a codebase, it depends on the team structure, roles, and responsibilities within that project. Here’s how this is usually organized:\n\n---\n\n#"
+          }
+        ]
+      },
+      {
+        "id": "6.4",
+        "name": "Risk Assessment",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2411,
+        "details": "No risk assessment",
+        "expectedBehavior": "Should mention security issues, coupling, etc",
+        "variants": [
+          {
+            "id": "6.4a",
+            "prompt": "Any red flags in this code?",
+            "passed": true,
+            "score": 100,
+            "response": "Could you share the specific code snippet or file you'd like me to review? Once I have it, I can analyze it for potential red flags such as:\n\n- **Security vulnerabilities** (e.g., hardcoded secrets, S"
+          }
+        ]
+      },
+      {
+        "id": "6.5",
+        "name": "Improvement Suggestions",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 13762,
+        "details": "Provided improvements",
+        "expectedBehavior": "Should suggest specific improvements",
+        "variants": [
+          {
+            "id": "6.5a",
+            "prompt": "What would you refactor first?",
+            "passed": true,
+            "score": 100,
+            "response": "To suggest meaningful refactoring steps, I need more context about the codebase. Here are some general guidelines based on common pain points in software projects:\n\n### **Common Areas for Refactoring*"
+          }
+        ]
+      }
+    ],
+    "proactiveProbes": [
+      {
+        "id": "7.1",
+        "name": "Proactive Security Findings",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 1511,
+        "details": "Did not proactively find issues",
+        "expectedBehavior": "Should proactively mention connection leak",
+        "variants": [
+          {
+            "id": "7.1a",
+            "prompt": "Review db.service.ts",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.2",
+        "name": "Improvement Suggestions",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2149,
+        "details": "No proactive suggestions",
+        "expectedBehavior": "Should suggest error handling, cancellation",
+        "variants": [
+          {
+            "id": "7.2a",
+            "prompt": "Can this hook be improved?",
+            "passed": true,
+            "score": 100,
+            "response": "Could you clarify which **hook** you're referring to? For example:\n\n- Is it a React hook?\n- A custom utility function in your codebase?\n- A specific hook from a library like `useReducer`, `useContext`"
+          }
+        ]
+      },
+      {
+        "id": "7.3",
+        "name": "Documentation Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1520,
+        "details": "Did not mention docs but reviewed",
+        "expectedBehavior": "May note missing prop types or docs",
+        "variants": [
+          {
+            "id": "7.3a",
+            "prompt": "What do you think of ProductCard?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.4",
+        "name": "Best Practice Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 60,
+        "latency": 1350,
+        "details": "Reviewed but no best practices",
+        "expectedBehavior": "Should mention best practices for auth",
+        "variants": [
+          {
+            "id": "7.4a",
+            "prompt": "Is the auth middleware well-implemented?",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.5",
+        "name": "Testing Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1112,
+        "details": "Reviewed without test mentions",
+        "expectedBehavior": "May suggest adding tests",
+        "variants": [
+          {
+            "id": "7.5a",
+            "prompt": "Review shared-utils/validation.ts",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.6",
+        "name": "Performance Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1147,
+        "details": "Reviewed without perf notes",
+        "expectedBehavior": "May note re-render or pagination concerns",
+        "variants": [
+          {
+            "id": "7.6a",
+            "prompt": "Any performance issues in UserList?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.7",
+        "name": "Edge Case Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1384,
+        "details": "Reviewed without edge cases",
+        "expectedBehavior": "Should identify edge cases in error handling",
+        "variants": [
+          {
+            "id": "7.7a",
+            "prompt": "What if login fails?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.8",
+        "name": "Accessibility Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1292,
+        "details": "Reviewed without a11y notes",
+        "expectedBehavior": "May note accessibility labels or concerns",
+        "variants": [
+          {
+            "id": "7.8a",
+            "prompt": "Is LoginScreen accessible?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "intentProbes": [
+      {
+        "id": "8.1a",
+        "name": "Implicit RAG - Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly invoked RAG from natural question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1b",
+        "name": "Implicit RAG - Bug Report",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for relevant auth/token code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1c",
+        "name": "Implicit File Read",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not look at file",
+        "toolsInvoked": [
+          "search_files"
+        ],
+        "expectedTools": [
+          "read_file",
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2a",
+        "name": "RAG vs File Read Decision",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly started with RAG for broad question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2b",
+        "name": "Specific vs Broad Query",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Did not read the requested file",
+        "toolsInvoked": [
+          "search_files"
+        ],
+        "expectedTools": [
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.3a",
+        "name": "Knowledge Question - No Tools",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly answered without tools",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3b",
+        "name": "Clarification Request",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly asked for clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3c",
+        "name": "Follow-up Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for database context",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4a",
+        "name": "Code Question Without Context",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched before answering",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4b",
+        "name": "Specific Code Location",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Located and examined the code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.5a",
+        "name": "Ambiguous Reference",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly asked for clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.5b",
+        "name": "Multiple Interpretations",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Made reasonable assumption",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6a",
+        "name": "Implicit Security Review",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Asked for more context",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6b",
+        "name": "Performance Concern Hint",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for user list implementation",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.7a",
+        "name": "Dual Request",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Addressed both auth and error logging",
+        "toolsInvoked": [
+          "rag_query",
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8a",
+        "name": "Hypothetical Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched but did not modify",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8b",
+        "name": "Just Asking",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched without modifying",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      }
+    ],
+    "intentScores": {
+      "invokeCorrectness": 94,
+      "toolSelectionAccuracy": 85,
+      "actionCorrectness": 82,
+      "overInvocationRate": 20,
+      "underInvocationRate": 0,
+      "overallIntentScore": 88
+    },
+    "scoreBreakdown": {
+      "toolScore": 100,
+      "reasoningScore": 65,
+      "ragScore": 62,
+      "bugDetectionScore": 0,
+      "architecturalScore": 8,
+      "navigationScore": 14,
+      "helicopterScore": 68,
+      "proactiveScore": 44,
+      "intentScore": 88,
+      "overallScore": 56
+    }
   },
-  "role": "both",
+  "role": "executor",
   "contextLatency": {
     "testedContextSizes": [
       2048,
@@ -402,21 +1810,48 @@
       262144
     ],
     "latencies": {
-      "2048": 484,
-      "4096": 483,
-      "8192": 557,
-      "16384": 547,
-      "32768": 580,
-      "65536": 600,
-      "131072": 562,
-      "262144": 1147
+      "2048": 438,
+      "4096": 462,
+      "8192": 436,
+      "16384": 475,
+      "32768": 458,
+      "65536": 467,
+      "131072": 586,
+      "262144": 706
     },
     "maxUsableContext": 262144,
     "recommendedContext": 262144,
     "modelMaxContext": 262144,
-    "minLatency": 483,
+    "minLatency": 436,
     "isInteractiveSpeed": true,
     "speedRating": "excellent"
   },
-  "contextLength": 262144
+  "contextLength": 262144,
+  "scoreBreakdown": {
+    "toolScore": 88,
+    "ragScore": 86,
+    "failureModesScore": 43,
+    "statefulScore": 14,
+    "precedenceScore": 50,
+    "complianceScore": 19,
+    "avgLatencyMs": 2303,
+    "latencyScore": 100
+  },
+  "discoveredNativeTools": [
+    "generate_code",
+    "analyze_text",
+    "summarize_text",
+    "translate_text"
+  ],
+  "unmappedNativeTools": [
+    "generate_code",
+    "analyze_text",
+    "translate_text"
+  ],
+  "trainabilityScores": {
+    "systemPromptCompliance": 19,
+    "instructionPersistence": 14,
+    "correctionAcceptance": 43,
+    "overallTrainability": 24
+  }
 }

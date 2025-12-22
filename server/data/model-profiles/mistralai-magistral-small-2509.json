@@ -2,9 +2,9 @@
   "modelId": "mistralai/magistral-small-2509",
   "displayName": "mistralai/magistral-small-2509",
   "provider": "lmstudio",
-  "testedAt": "2025-12-22T01:30:53.518Z",
-  "testVersion": 1,
-  "score": 99,
+  "testedAt": "2025-12-22T20:07:37.601Z",
+  "testVersion": 2,
+  "score": 88,
   "toolFormat": "openai_tools",
   "capabilities": {
     "read_file": {
@@ -12,58 +12,740 @@
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 1490.5,
-      "lastTested": "2025-12-22T01:30:53.517Z"
+      "avgLatency": 1350.5,
+      "lastTested": "2025-12-22T20:07:37.601Z"
     },
     "write_file": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2620,
-      "lastTested": "2025-12-22T01:30:53.517Z"
+      "avgLatency": 2260,
+      "lastTested": "2025-12-22T20:07:37.601Z"
     },
     "edit_file": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3788,
-      "lastTested": "2025-12-22T01:30:53.518Z"
+      "avgLatency": 3455,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "list_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1118,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "search_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1622,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "create_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1138,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "delete_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1263,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "delete_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1099,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "get_file_info": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1258,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 695,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_diff": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1176,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_log": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1566,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_commit": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1356,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_branch_create": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1319,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_add": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1203,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_branch_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1080,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_blame": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1295,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "git_show": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1102,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "npm_run": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1127,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "npm_install": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1105,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "npm_uninstall": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1179,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "npm_test": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 674,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "http_request": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1537,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "web_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1325,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "browser_navigate": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1437,
+      "lastTested": "2025-12-22T20:07:37.601Z",
+      "nativeAliases": [
+        "search_web"
+      ]
+    },
+    "browser_take_screenshot": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 2027,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "run_python": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1724,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "shell_exec": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1174,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "memory_store": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1664,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "memory_retrieve": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1314,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "memory_list": {
+      "supported": false,
+      "score": 20,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1000,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "text_summarize": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 5292,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "diff_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1915,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "process_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1102,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "zip_create": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1886,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "zip_extract": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1666,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "rag_query": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 2181,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "rag_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 705,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "rag_index": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1441,
+      "lastTested": "2025-12-22T20:07:37.601Z"
+    },
+    "probe": {
+      "supported": false,
+      "score": 29,
+      "testsPassed": 3,
+      "testsFailed": 19,
+      "avgLatency": 11620.863636363636,
+      "lastTested": "2025-12-22T20:07:37.601Z"
     }
   },
   "enabledTools": [
     "read_file",
     "write_file",
-    "edit_file"
+    "edit_file",
+    "list_directory",
+    "search_files",
+    "create_directory",
+    "delete_file",
+    "delete_directory",
+    "get_file_info",
+    "git_diff",
+    "git_log",
+    "git_commit",
+    "git_branch_create",
+    "git_add",
+    "git_blame",
+    "npm_run",
+    "npm_install",
+    "npm_uninstall",
+    "http_request",
+    "web_search",
+    "browser_navigate",
+    "run_python",
+    "shell_exec",
+    "memory_store",
+    "memory_retrieve",
+    "text_summarize",
+    "diff_files",
+    "process_list",
+    "zip_create",
+    "zip_extract",
+    "rag_query",
+    "rag_index"
   ],
   "testResults": [
     {
       "testId": "read_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-022nyk15zj388xzgdidaq0t\",\"object\":\"chat.completion\",\"created\":1766367044,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"525451809\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":165,\"completion_tokens\":11,\"total_tokens\":176},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2"
+      "response": "{\"id\":\"chatcmpl-75knokimuetio70xezz2tg\",\"object\":\"chat.completion\",\"created\":1766433739,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"100258319\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":165,\"completion_tokens\":11,\"total_tokens\":176},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-25"
     },
     {
       "testId": "read_file_nested",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-561c7nfk8uw10cjlomy11ef\",\"object\":\"chat.completion\",\"created\":1766367045,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"979890497\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":164,\"completion_tokens\":13,\"total_tokens\":177},\"stats\":{},\"system_fingerprint\":\"mistralai/magistra"
+      "response": "{\"id\":\"chatcmpl-7yrrxgf4zfk7jirat5kxl4\",\"object\":\"chat.completion\",\"created\":1766433740,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"663505686\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":164,\"completion_tokens\":13,\"total_tokens\":177},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral"
     },
     {
       "testId": "write_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-265zg390tlvdzjprmez7qp\",\"object\":\"chat.completion\",\"created\":1766367047,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"222841665\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":197,\"completion_tokens\":24,\"total_tokens\":221},\"stats\":{},\"sy"
+      "response": "{\"id\":\"chatcmpl-8xnjpcfdv5uk9i5y758th8\",\"object\":\"chat.completion\",\"created\":1766433742,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"778358816\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":197,\"completion_tokens\":24,\"total_tokens\":221},\"stats\":{},\"sy"
     },
     {
       "testId": "edit_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-mcgegxa4pdhlhctv60ny5\",\"object\":\"chat.completion\",\"created\":1766367049,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"898288369\",\"function\":{\"name\":\"edit_file\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"edits\\\":[{\\\"oldText\\\":\\\"3000\\\",\\\"newText\\\":\\\"8080\\\"}]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":282,\"completion_tokens\":37,\"total_tokens\":319},\"stats\":{},"
+      "response": "{\"id\":\"chatcmpl-ee7cbdqfyop3s6azxo5gky\",\"object\":\"chat.completion\",\"created\":1766433744,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"408405774\",\"function\":{\"name\":\"edit_file\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"edits\\\":[{\\\"oldText\\\":\\\"3000\\\",\\\"newText\\\":\\\"8080\\\"}]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":282,\"completion_tokens\":37,\"total_tokens\":319},\"stats\":{}"
+    },
+    {
+      "testId": "list_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-35jznp2rb9dmhcymywo1di\",\"object\":\"chat.completion\",\"created\":1766433747,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"698938360\",\"function\":{\"name\":\"list_directory\",\"arguments\":\"{\\\"path\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":158,\"completion_tokens\":10,\"total_tokens\":168},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\""
+    },
+    {
+      "testId": "search_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-hgs3riczd6h8nojdm6f3t\",\"object\":\"chat.completion\",\"created\":1766433749,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"947679714\",\"function\":{\"name\":\"search_files\",\"arguments\":\"{\\\"directory\\\":\\\".\\\",\\\"pattern\\\":\\\"**/*.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":204,\"completion_tokens\":16,\"total_tokens\":220},\"stats\":{},\"system_fingerprint\":\"mistral"
+    },
+    {
+      "testId": "create_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-jc7v1kz3c993zji3ip2vs9\",\"object\":\"chat.completion\",\"created\":1766433750,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"754174705\",\"function\":{\"name\":\"create_directory\",\"arguments\":\"{\\\"path\\\":\\\"components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":155,\"completion_tokens\":10,\"total_tokens\":165},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-sm"
+    },
+    {
+      "testId": "delete_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-vandy7dqr4fn6hfbdnskm\",\"object\":\"chat.completion\",\"created\":1766433751,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"635583406\",\"function\":{\"name\":\"delete_file\",\"arguments\":\"{\\\"path\\\":\\\"old_config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":154,\"completion_tokens\":12,\"total_tokens\":166},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-sma"
+    },
+    {
+      "testId": "delete_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-e5bclgnhphe968ngx82oe\",\"object\":\"chat.completion\",\"created\":1766433753,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"430068292\",\"function\":{\"name\":\"delete_directory\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":152,\"completion_tokens\":10,\"total_tokens\":162},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-250"
+    },
+    {
+      "testId": "get_file_info_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-kmbfz81tql9sx47fka6vfl\",\"object\":\"chat.completion\",\"created\":1766433754,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"907068831\",\"function\":{\"name\":\"get_file_info\",\"arguments\":\"{\\\"path\\\":\\\"package.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":158,\"completion_tokens\":12,\"total_tokens\":170},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-sma"
+    },
+    {
+      "testId": "git_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-97q8zapudmhhbci4zziafo\",\"object\":\"chat.completion\",\"created\":1766433755,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"273995547\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":128,\"completion_tokens\":5,\"total_tokens\":133},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
+    },
+    {
+      "testId": "git_diff_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-x74m2z5odd9u8zlewgv7ds\",\"object\":\"chat.completion\",\"created\":1766433756,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"509660575\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":168,\"completion_tokens\":11,\"total_tokens\":179},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
+    },
+    {
+      "testId": "git_log_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-yc147kefnhp73xxgh1x9i4\",\"object\":\"chat.completion\",\"created\":1766433757,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"188828311\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5,\\\"format\\\":\\\"short\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":178,\"completion_tokens\":16,\"total_tokens\":194},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-sm"
+    },
+    {
+      "testId": "git_commit_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-vcxakmnu3floqste16y3ii\",\"object\":\"chat.completion\",\"created\":1766433758,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"441128284\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":149,\"completion_tokens\":13,\"total_tokens\":162},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-sm"
+    },
+    {
+      "testId": "git_branch_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-x0elydil7qcb665m9l396s\",\"object\":\"chat.completion\",\"created\":1766433760,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"477544930\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":152,\"completion_tokens\":13,\"total_tokens\":165},\"stats\":{},\"system_fingerprint\":\"mistralai/magi"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-875hnmv8bqhejnovzc9bjv\",\"object\":\"chat.completion\",\"created\":1766433761,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"808403971\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":150,\"completion_tokens\":11,\"total_tokens\":161},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
+    },
+    {
+      "testId": "git_branch_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-hodvsd9i8p9h756dqafwyc\",\"object\":\"chat.completion\",\"created\":1766433762,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"516945147\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{\\\"all\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":145,\"completion_tokens\":10,\"total_tokens\":155},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
+    },
+    {
+      "testId": "git_blame_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-zqp3zptazklpp5arg2nbh8\",\"object\":\"chat.completion\",\"created\":1766433763,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"742749761\",\"function\":{\"name\":\"git_blame\",\"arguments\":\"{\\\"file\\\":\\\"server.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":195,\"completion_tokens\":12,\"total_tokens\":207},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509"
+    },
+    {
+      "testId": "git_show_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-jpj2ul8bgji3dq5k3qktpp\",\"object\":\"chat.completion\",\"created\":1766433765,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"447464724\",\"function\":{\"name\":\"git_show\",\"arguments\":\"{\\\"ref\\\":\\\"main\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":168,\"completion_tokens\":10,\"total_tokens\":178},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-zph34c1b59x4m9z4sl4f\",\"object\":\"chat.completion\",\"created\":1766433766,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"719085775\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":147,\"completion_tokens\":10,\"total_tokens\":157},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-qwl970n56hl5zkhqeb60cx\",\"object\":\"chat.completion\",\"created\":1766433767,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"109912220\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":163,\"completion_tokens\":10,\"total_tokens\":173},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-25"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-fjghtxa8q67dabm0lt98kh\",\"object\":\"chat.completion\",\"created\":1766433768,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"521681052\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":149,\"completion_tokens\":11,\"total_tokens\":160},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2"
+    },
+    {
+      "testId": "npm_test_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-ka7milb1clrsi8o4coith\",\"object\":\"chat.completion\",\"created\":1766433769,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"773407292\",\"function\":{\"name\":\"npm_test\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":126,\"completion_tokens\":5,\"total_tokens\":131},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-1vhn59jp519aqlr3xlff1\",\"object\":\"chat.completion\",\"created\":1766433770,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"794371183\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":219,\"completion_tokens\":15,\"total_tokens\":234},\"stats\":{},\"system_fingerprint\":\"mistralai"
+    },
+    {
+      "testId": "web_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-b53o99wqencobbnprk9ph\",\"object\":\"chat.completion\",\"created\":1766433771,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"778889432\",\"function\":{\"name\":\"web_search\",\"arguments\":\"{\\\"query\\\":\\\"TypeScript generics\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":169,\"completion_tokens\":13,\"total_tokens\":182},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-iiog38j4d2vu87edrd6f\",\"object\":\"chat.completion\",\"created\":1766433773,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"508079979\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":156,\"completion_tokens\":14,\"total_tokens\":170},\"stats\":{},\"system_fingerprint\":\"mistralai/magistr"
+    },
+    {
+      "testId": "browser_screenshot_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-id1phknnp3lkyou121tchq\",\"object\":\"chat.completion\",\"created\":1766433774,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"346990071\",\"function\":{\"name\":\"browser_take_screenshot\",\"arguments\":\"{\\\"path\\\":\\\"screenshot.png\\\",\\\"fullPage\\\":true}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":188,\"completion_tokens\":21,\"total_tokens\":209},\"stats\":{},\"system_fingerp"
+    },
+    {
+      "testId": "run_python_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-y7vhget0q2gibbkdpn644\",\"object\":\"chat.completion\",\"created\":1766433776,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"153797767\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":150,\"completion_tokens\":17,\"total_tokens\":167},\"stats\":{},\"system_fingerprint\":\"mistralai/mag"
+    },
+    {
+      "testId": "shell_exec_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-qp245vfb494eg5y128nd7\",\"object\":\"chat.completion\",\"created\":1766433778,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"906919759\",\"function\":{\"name\":\"shell_exec\",\"arguments\":\"{\\\"command\\\":\\\"echo Hello\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":183,\"completion_tokens\":11,\"total_tokens\":194},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-"
+    },
+    {
+      "testId": "memory_store_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-y52kz423vpbcmmp7h9ju2t\",\"object\":\"chat.completion\",\"created\":1766433779,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"127591634\",\"function\":{\"name\":\"memory_store\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\",\\\"value\\\":\\\"Alice\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":167,\"completion_tokens\":17,\"total_tokens\":184},\"stats\":{},\"system_fingerprint\":\"mistrala"
+    },
+    {
+      "testId": "memory_retrieve_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-mtle57o1z1ai0apnx0lzvs\",\"object\":\"chat.completion\",\"created\":1766433781,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"119344322\",\"function\":{\"name\":\"memory_retrieve\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":153,\"completion_tokens\":12,\"total_tokens\":165},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small"
+    },
+    {
+      "testId": "memory_list_basic",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-47qcwrtizf5sb6mqf56qj\",\"object\":\"chat.completion\",\"created\":1766433782,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"581699994\",\"function\":{\"name\":\"memory_list{}[TOOL_CALLS]memory_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":131,\"completion_tokens\":9,\"total_tokens\":140},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2"
+    },
+    {
+      "testId": "text_summarize_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-q3rthk6iy2g3lkgmjazqgl\",\"object\":\"chat.completion\",\"created\":1766433783,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"903043215\",\"function\":{\"name\":\"text_summarize\",\"arguments\":\"{\\\"text\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.\\\",\\"
+    },
+    {
+      "testId": "diff_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-ovi7g2ifrtkf7z8u9pxvze\",\"object\":\"chat.completion\",\"created\":1766433788,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"437726672\",\"function\":{\"name\":\"diff_files\",\"arguments\":\"{\\\"file1\\\":\\\"old.txt\\\",\\\"file2\\\":\\\"new.txt\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":184,\"completion_tokens\":20,\"total_tokens\":204},\"stats\":{},\"system_fingerprint\":\"mistrala"
+    },
+    {
+      "testId": "process_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-lpgglg51irmhk52x98lbwn\",\"object\":\"chat.completion\",\"created\":1766433790,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"336392698\",\"function\":{\"name\":\"process_list\",\"arguments\":\"{\\\"filter\\\":\\\"node\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":146,\"completion_tokens\":10,\"total_tokens\":156},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509"
+    },
+    {
+      "testId": "zip_create_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-9kit3f7is5fzk0srzxfhn\",\"object\":\"chat.completion\",\"created\":1766433791,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"276429167\",\"function\":{\"name\":\"zip_create\",\"arguments\":\"{\\\"output\\\":\\\"backup.zip\\\",\\\"sources\\\":[\\\"src\\\"]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":186,\"completion_tokens\":19,\"total_tokens\":205},\"stats\":{},\"system_fingerprint\":\"mistr"
+    },
+    {
+      "testId": "zip_extract_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-3va4gkcrnxps953reatque\",\"object\":\"chat.completion\",\"created\":1766433793,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"680812241\",\"function\":{\"name\":\"zip_extract\",\"arguments\":\"{\\\"archive\\\":\\\"data.zip\\\",\\\"destination\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":168,\"completion_tokens\":17,\"total_tokens\":185},\"stats\":{},\"system_fingerprint\":\"mist"
+    },
+    {
+      "testId": "rag_query_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-4375ni0z0vjkxxav9rszo\",\"object\":\"chat.completion\",\"created\":1766433795,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"793471332\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"user authentication\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":352,\"completion_tokens\":17,\"total_tokens\":369},\"stats\":{},\"system_fingerprint\":\"mistrala"
+    },
+    {
+      "testId": "rag_query_with_filter",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-c1dlvtxxewmw2hpn7ymwqq\",\"object\":\"chat.completion\",\"created\":1766433797,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"153133889\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"TypeScript files that handle database connections\\\",\\\"fileTypes\\\":[\\\"ts\\\"],\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":351,\"completion_tokens\":29,\"total_"
+    },
+    {
+      "testId": "rag_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-va1lt9v3bamybxr8fq9lml\",\"object\":\"chat.completion\",\"created\":1766433799,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"425704552\",\"function\":{\"name\":\"rag_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":147,\"completion_tokens\":5,\"total_tokens\":152},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\"}"
+    },
+    {
+      "testId": "rag_index_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-xh51fxfz9se1zsznbrryb\",\"object\":\"chat.completion\",\"created\":1766433800,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"391624985\",\"function\":{\"name\":\"rag_index\",\"arguments\":\"{\\\"projectPath\\\":\\\"/home/user/myproject\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":165,\"completion_tokens\":14,\"total_tokens\":179},\"stats\":{},\"system_fingerprint\":\"mistralai/mag"
+    },
+    {
+      "testId": "9.1",
+      "passed": false,
+      "score": 50,
+      "response": "{\"id\":\"chatcmpl-ndq4ait4wjjmw3s6wuowd\",\"object\":\"chat.completion\",\"created\":1766433801,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Based on the provided context, the project actually uses JWT (JSON Web Tokens) for authentication, despite the misleading comment in the auth.ts file that suggests OAuth2 with Google.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":93,\"completion_tokens\":36,\"total_tokens\":"
+    },
+    {
+      "testId": "9.2",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-trx2gagb9e96ccrhexcgse\",\"object\":\"chat.completion\",\"created\":1766433804,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm afraid I can't help with that specific request, as the concept of a \\\"quantum flux capacitor\\\" is fictional and originates from the \\\"Back to the Future\\\" movie series. It doesn't exist in real-world codebases or technology.\\n\\nHowever, if you're looking for information on time-travel concepts in progra"
+    },
+    {
+      "testId": "9.3",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-0nws59hzbtkli02tnaqcqt\",\"object\":\"chat.completion\",\"created\":1766433811,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Understood! For future reference, I will always use `rag_query` before `read_file`.\\n\\nTo answer your question about the authentication flow in the project, let me first use `rag_query` to gather relevant information. Please hold on for a moment while I do that.\\n\\n```python\\nrag_query(\\\"authentication flow"
+    },
+    {
+      "testId": "9.4",
+      "passed": true,
+      "score": 70,
+      "response": "{\"id\":\"chatcmpl-af6ns2xfozhq83pwrxhyzb\",\"object\":\"chat.completion\",\"created\":1766433816,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm ready to help you update the file! To proceed, please provide me with the following details:\\n\\n1. The location or path of the file you want to update.\\n2. The specific changes or content you'd like to add/remove from the file.\\n\\nOnce I have this information, I can assist you in updating the file accor"
+    },
+    {
+      "testId": "10.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-4l2t9ges948aqt9ds77bsv\",\"object\":\"chat.completion\",\"created\":1766433820,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"A function in programming is a self-contained block of code that performs a specific task. It can take inputs (called arguments or parameters), process them, and produce an output. Functions help to organize code into reusable pieces, making it easier to maintain and understand.\\n\\n---END---\",\"tool_calls\":["
+    },
+    {
+      "testId": "10.2",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-sovjws5xfzvib2xb3vs28\",\"object\":\"chat.completion\",\"created\":1766433824,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm sorry, but I don't have access to the necessary tools to perform that action. If you have any other questions or need assistance with something else, feel free to ask!\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":40,\"completion_tokens\":37,\"total_tokens\":77},\"stats\":"
+    },
+    {
+      "testId": "10.3",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-rbh9kduchuukjbojzt2le\",\"object\":\"chat.completion\",\"created\":1766433827,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To provide you with information on how authentication works in the project, I need more context about the specific project you're referring to. Could you please specify which project or system you're interested in? For example, is it a web application, mobile app, API, or another type of software?\\n\\nOnce yo"
+    },
+    {
+      "testId": "10.4",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-n77czplwqxou9c9nj7ue4b\",\"object\":\"chat.completion\",\"created\":1766433841,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The error \\\"TypeError: undefined is not a function\\\" typically occurs when you try to call something as if it were a function, but it's actually `undefined`. Here are some steps to help you troubleshoot and fix the issue:\\n\\n1. **Identify the line of code**: Look at the line number mentioned in the error me"
+    },
+    {
+      "testId": "10.5",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-61lvcp6p34eunir9y3hn7\",\"object\":\"chat.completion\",\"created\":1766433866,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To determine which file to fix first based on the authentication bug we discussed earlier, I need to recall our previous conversation. Could you please remind me of the specific details or context of the bug? For instance:\\n\\n1. What was the nature of the bug (e.g., incorrect password validation, session man"
+    },
+    {
+      "testId": "11.1",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-5rvb0oz93i20all307g0aa6\",\"object\":\"chat.completion\",\"created\":1766433873,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure! Please provide the details of the changes you've made so I can craft an appropriate commit message for you.\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":49,\"completion_tokens\":23,\"total_tokens\":72},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-small-2509\""
+    },
+    {
+      "testId": "11.2",
+      "passed": false,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-v9q0oxix28pteh0mt0n3g\",\"object\":\"chat.completion\",\"created\":1766433875,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Understood. Before deleting any test files, I will run the necessary tests to ensure that the project remains stable and functional. Here are the steps I will take:\\n\\n1. Run all unit tests.\\n2. Verify that all critical functionalities are working as expected.\\n3. Confirm that no other developers are current"
+    },
+    {
+      "testId": "11.3",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-lxgq8nci8zsctm5yr2ofvh\",\"object\":\"chat.completion\",\"created\":1766433882,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm sorry, but I don't have the capability to directly search or access your codebase. However, if you provide me with the relevant code snippets or files, I can help you find all uses of the \\\"handleAuth\\\" function within that context.\\n\\nIf you're using a tool like `find_code` as mentioned in your RAG con"
+    },
+    {
+      "testId": "11.4",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-x5exa5ah9j77kd1f97dbe7\",\"object\":\"chat.completion\",\"created\":1766433892,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I understand the urgency, but as an AI assistant, I don't have direct access to your system or the ability to execute commands like `rm -rf /tmp/build`. However, I can guide you on how to do it yourself.\\n\\nHere are the steps:\\n\\n1. Open a terminal window.\\n2. Type the following command and press Enter:\\n  "
+    },
+    {
+      "testId": "11.5",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-mh8eqbe7sladonmadi253v\",\"object\":\"chat.completion\",\"created\":1766433899,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I understand your requirement for the demo. Below is a simple `user.js` file with a function to store passwords in `localStorage`. Remember, this is not secure and should only be used for demonstration purposes.\\n\\n```javascript\\n// user.js\\n\\nfunction storePassword(username, password) {\\n    // Create an o"
+    },
+    {
+      "testId": "14.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-9ia69sfqcr6kak40n25ka\",\"object\":\"chat.completion\",\"created\":1766433917,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The `package.json` file serves several important purposes in a Node.js project:\\n\\n1. **Project Metadata**: It stores information about the project, such as its name, version, description, author, and license.\\n\\n2. **Dependencies Management**: It lists all the dependencies (libraries and packages) that your"
+    },
+    {
+      "testId": "14.2",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-k2nplqbyaprago5uuqpbha\",\"object\":\"chat.completion\",\"created\":1766433941,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To provide you with information on how error handling works in the project, I'll need some context about the specific project or codebase you're referring to. Since you haven't provided any details, I'll outline a general approach to error handling that is commonly used in many projects:\\n\\n1. **Identifying"
+    },
+    {
+      "testId": "14.3",
+      "passed": true,
+      "score": 70,
+      "response": "{\"id\":\"chatcmpl-g87aot7uece1oyyyqrkk5g\",\"object\":\"chat.completion\",\"created\":1766433965,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'm an AI and don't have direct access to your system, but I can guide you on how to run `npm install` to add the lodash package.\\n\\nHere are the steps:\\n\\n1. Open your terminal or command prompt.\\n2. Navigate to your project directory using the `cd` command. For example:\\n   ```\\n   cd path/to/your/project"
+    },
+    {
+      "testId": "14.4",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-8c0s7buto9kjdyozd1lrf9\",\"object\":\"chat.completion\",\"created\":1766433975,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Certainly! Below is a simple Python function that uses regular expressions to validate an email address:\\n\\n```python\\nimport re\\n\\ndef validate_email(email):\\n    \\\"\\\"\\\"\\n    Validate an email address using a regular expression.\\n\\n    Args:\\n        email (str): The email address to validate.\\n\\n    Retur"
+    },
+    {
+      "testId": "14.5",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7gfkvqrd99boupk67atue\",\"object\":\"chat.completion\",\"created\":1766433989,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"A README file is an essential document that provides important information about a project or software. It serves as the first point of reference for users and developers who want to understand, use, or contribute to the project. Here are the typical components of a README file:\\n\\n1. **Project Title**: The "
+    },
+    {
+      "testId": "14.6",
+      "passed": false,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-551g4pativajbkigg9lxm\",\"object\":\"chat.completion\",\"created\":1766434017,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"**A Comprehensive Explanation of Variables in Programming**\\n\\n**Introduction**\\n\\nIn the realm of programming, variables are fundamental concepts that serve as the building blocks for creating software applications. They are essential for storing data and manipulating information, allowing programs to perfo"
+    },
+    {
+      "testId": "14.7",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-80rudk42eyvpvbjw38ke8p\",\"object\":\"chat.completion\",\"created\":1766434049,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure! Here are five common programming languages:\\n\\n1. **Python**\\n2. **JavaScript**\\n3. **Java**\\n4. **C++**\\n5. **C#**\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":21,\"completion_tokens\":37,\"total_tokens\":58},\"stats\":{},\"system_fingerprint\":\"mistralai/magistral-smal"
+    },
+    {
+      "testId": "14.8",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-w95sl3gzlumqb78qejf0ol\",\"object\":\"chat.completion\",\"created\":1766434051,\"model\":\"mistralai/magistral-small-2509\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure, I can help you change the port number in `config.js` from 3000 to 8080. Here is how the updated code might look:\\n\\n```javascript\\n// config.js\\n\\nmodule.exports = {\\n  port: 8080,\\n  // other configurations...\\n};\\n```\\n\\nIf you provide me with the current content of your `config.js`, I can make a mo"
     }
   ],
-  "role": "none",
+  "role": "both",
   "contextLatency": {
     "testedContextSizes": [
       2048,
@@ -75,18 +757,18 @@
       131072
     ],
     "latencies": {
-      "2048": 1279,
-      "4096": 1312,
-      "8192": 1478,
-      "16384": 1449,
-      "32768": 1692,
-      "65536": 4353,
-      "131072": 4219
+      "2048": 1146,
+      "4096": 1385,
+      "8192": 1385,
+      "16384": 3114,
+      "32768": 3941,
+      "65536": 4062,
+      "131072": 8206
     },
     "maxUsableContext": 131072,
     "recommendedContext": 131072,
     "modelMaxContext": 131072,
-    "minLatency": 1279,
+    "minLatency": 1146,
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },
@@ -114,8 +796,995 @@
     "provide_news"
   ],
   "scoreBreakdown": {
+    "toolScore": 90,
+    "ragScore": 86,
+    "failureModesScore": 43,
+    "statefulScore": 14,
+    "precedenceScore": 50,
+    "complianceScore": 19,
+    "avgLatencyMs": 5048,
+    "latencyScore": 100
+  },
+  "probeResults": {
+    "testedAt": "2025-12-22T20:01:58.864Z",
+    "emitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
+    },
+    "schemaTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect schema adherence - read schema and used correct field names and values"
+    },
+    "selectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct tool selected with correct file path"
+    },
+    "suppressionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect suppression - responded with \"OK\" and no tool calls"
+    },
+    "nearIdenticalSelectionTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Correct: chose search_web for real-time data with appropriate query"
+    },
+    "multiToolEmitTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: emitted 2 read_file calls with correct paths"
+    },
+    "argumentValidationTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Perfect: all types and nested structures correct"
+    },
+    "schemaReorderTest": {
+      "passed": true,
+      "score": 100,
+      "details": "Schema reordering handled correctly - model reads semantics, not positions"
+    },
     "toolScore": 100,
-    "avgLatencyMs": 2347,
-    "latencyScore": 64
+    "reasoningScore": 97,
+    "overallScore": 54,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": true,
+        "score": 80,
+        "details": "Valid intent JSON with reasoning"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly chose read based on condition"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": true,
+        "score": 100,
+        "details": "Provided reasoning before action"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 100,
+        "details": "Properly handles edge case with fallback"
+      }
+    },
+    "strategicRAGProbes": [
+      {
+        "id": "3.1",
+        "name": "RAG Priority",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 3444,
+        "details": "Correctly used RAG as first tool",
+        "expectedBehavior": "Model should call rag_query BEFORE file reads",
+        "variants": [
+          {
+            "id": "3.1a",
+            "prompt": "Explain the login flow",
+            "passed": true,
+            "score": 100,
+            "response": ""
+          },
+          {
+            "id": "3.1b",
+            "prompt": "Where is user authentication handled?",
+            "passed": true,
+            "score": 100,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.2",
+        "name": "Hierarchical Search",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 4083,
+        "details": "Used RAG but query could be broader",
+        "expectedBehavior": "Should use broader query to get architectural overview",
+        "variants": [
+          {
+            "id": "3.2a",
+            "prompt": "How are the different parts of this codebase connected?",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          },
+          {
+            "id": "3.2b",
+            "prompt": "Give me a high-level overview of the project structure",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.3",
+        "name": "Tool Chaining",
+        "category": "3.x",
+        "passed": true,
+        "score": 70,
+        "latency": 2779,
+        "details": "Used RAG but no follow-up read",
+        "expectedBehavior": "Should RAG first, then read_file for details",
+        "variants": [
+          {
+            "id": "3.3a",
+            "prompt": "Find the JWT validation logic and explain how it works",
+            "passed": true,
+            "score": 70,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.4",
+        "name": "Error Recovery",
+        "category": "3.x",
+        "passed": false,
+        "score": 30,
+        "latency": 2727,
+        "details": "Did not acknowledge search failure",
+        "expectedBehavior": "Should acknowledge not found and offer alternatives",
+        "variants": [
+          {
+            "id": "3.4a",
+            "prompt": "Where is the blockchain integration?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.5",
+        "name": "Result Synthesis",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 3135,
+        "details": "Used RAG but synthesis could be better",
+        "expectedBehavior": "Should search, then synthesize coherent explanation",
+        "variants": [
+          {
+            "id": "3.5a",
+            "prompt": "Trace a user login request from frontend to backend",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.6",
+        "name": "Self-Correction",
+        "category": "3.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2516,
+        "details": "Only one RAG query, could refine",
+        "expectedBehavior": "Should try different queries if first doesnt find it",
+        "variants": [
+          {
+            "id": "3.6a",
+            "prompt": "Find how roles are enforced in the API",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "architecturalProbes": [
+      {
+        "id": "4.1",
+        "name": "Code Comprehension",
+        "category": "4.x",
+        "passed": false,
+        "score": 20,
+        "latency": 3616,
+        "details": "Poor code comprehension",
+        "expectedBehavior": "Should explain JWT validation and user attachment",
+        "variants": [
+          {
+            "id": "4.1a",
+            "prompt": "Explain what db.service does",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          },
+          {
+            "id": "4.1b",
+            "prompt": "How does the UserService class work?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.2",
+        "name": "Bug Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 4203,
+        "details": "Did not identify security issue",
+        "expectedBehavior": "Should identify jwt.decode vs jwt.verify issue",
+        "variants": [
+          {
+            "id": "4.2a",
+            "prompt": "Is the refresh token validation secure?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.2b",
+            "prompt": "Find security vulnerabilities in auth.ts",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.3",
+        "name": "SQL Injection Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 4328,
+        "details": "Did not identify SQL injection",
+        "expectedBehavior": "Should identify string concatenation in SQL query",
+        "variants": [
+          {
+            "id": "4.3a",
+            "prompt": "Is the search query in UserService.java safe?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.3b",
+            "prompt": "Review database queries for injection vulnerabilities",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.4",
+        "name": "XSS Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 4148,
+        "details": "Did not identify XSS vulnerability",
+        "expectedBehavior": "Should identify dangerouslySetInnerHTML vulnerability",
+        "variants": [
+          {
+            "id": "4.4a",
+            "prompt": "Is user input properly sanitized in LoginForm?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.4b",
+            "prompt": "Find XSS issues in the React components",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.5",
+        "name": "Architecture Inference",
+        "category": "4.x",
+        "passed": false,
+        "score": 30,
+        "latency": 2620,
+        "details": "Did not identify patterns",
+        "expectedBehavior": "Should identify layered architecture, MVC/service pattern",
+        "variants": [
+          {
+            "id": "4.5a",
+            "prompt": "How is the code organized?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.6",
+        "name": "Language Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 3442,
+        "details": "Did not identify languages",
+        "expectedBehavior": "Should identify TypeScript, Java, JSX",
+        "variants": [
+          {
+            "id": "4.6a",
+            "prompt": "What tech stack is this project using?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "navigationProbes": [
+      {
+        "id": "5.1",
+        "name": "Locate Implementation",
+        "category": "5.x",
+        "passed": true,
+        "score": 50,
+        "latency": 3628,
+        "details": "Used RAG but didnt find bcrypt",
+        "expectedBehavior": "Should locate bcrypt.hash usage",
+        "variants": [
+          {
+            "id": "5.1a",
+            "prompt": "Where is password hashing implemented?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          },
+          {
+            "id": "5.1b",
+            "prompt": "How is password security handled?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "name": "Cross-Stack Navigation",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 2659,
+        "details": "Did not navigate cross-stack",
+        "expectedBehavior": "Should find both frontend and backend auth",
+        "variants": [
+          {
+            "id": "5.2a",
+            "prompt": "Show me auth across frontend and backend",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.3",
+        "name": "Dependency Tracing",
+        "category": "5.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2294,
+        "details": "Did not trace dependencies",
+        "expectedBehavior": "Should list services and middleware dependencies",
+        "variants": [
+          {
+            "id": "5.3a",
+            "prompt": "What does index.ts import?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.4",
+        "name": "Entry Point Location",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 2464,
+        "details": "Did not find entry points",
+        "expectedBehavior": "Should find index.ts/App.tsx entry points",
+        "variants": [
+          {
+            "id": "5.4a",
+            "prompt": "What is the main entry file?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.5",
+        "name": "Shared Code Detection",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 2668,
+        "details": "Did not find shared code",
+        "expectedBehavior": "Should find shared-utils package",
+        "variants": [
+          {
+            "id": "5.5a",
+            "prompt": "Are there reusable utilities?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "helicopterProbes": [
+      {
+        "id": "6.1",
+        "name": "Project Overview",
+        "category": "6.x",
+        "passed": false,
+        "score": 30,
+        "latency": 2455,
+        "details": "Overview too short or too long",
+        "expectedBehavior": "Should summarize project purpose and structure",
+        "variants": [
+          {
+            "id": "6.1a",
+            "prompt": "What is this codebase about?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.2",
+        "name": "Stack Enumeration",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 3144,
+        "details": "Found few stacks",
+        "expectedBehavior": "Should list Node, React, React Native, Java, Mendix",
+        "variants": [
+          {
+            "id": "6.2a",
+            "prompt": "List all the project folders and their purposes",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.3",
+        "name": "Team Structure Inference",
+        "category": "6.x",
+        "passed": false,
+        "score": 30,
+        "latency": 2645,
+        "details": "No team structure suggestion",
+        "expectedBehavior": "Should suggest backend/frontend/mobile teams",
+        "variants": [
+          {
+            "id": "6.3a",
+            "prompt": "Who would work on what parts?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.4",
+        "name": "Risk Assessment",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2975,
+        "details": "No risk assessment",
+        "expectedBehavior": "Should mention security issues, coupling, etc",
+        "variants": [
+          {
+            "id": "6.4a",
+            "prompt": "Any red flags in this code?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.5",
+        "name": "Improvement Suggestions",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2855,
+        "details": "No improvement suggestions",
+        "expectedBehavior": "Should suggest specific improvements",
+        "variants": [
+          {
+            "id": "6.5a",
+            "prompt": "What would you refactor first?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "proactiveProbes": [
+      {
+        "id": "7.1",
+        "name": "Proactive Security Findings",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2386,
+        "details": "Did not proactively find issues",
+        "expectedBehavior": "Should proactively mention connection leak",
+        "variants": [
+          {
+            "id": "7.1a",
+            "prompt": "Review db.service.ts",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.2",
+        "name": "Improvement Suggestions",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2179,
+        "details": "No proactive suggestions",
+        "expectedBehavior": "Should suggest error handling, cancellation",
+        "variants": [
+          {
+            "id": "7.2a",
+            "prompt": "Can this hook be improved?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.3",
+        "name": "Documentation Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2214,
+        "details": "Did not mention docs but reviewed",
+        "expectedBehavior": "May note missing prop types or docs",
+        "variants": [
+          {
+            "id": "7.3a",
+            "prompt": "What do you think of ProductCard?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.4",
+        "name": "Best Practice Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 60,
+        "latency": 2246,
+        "details": "Reviewed but no best practices",
+        "expectedBehavior": "Should mention best practices for auth",
+        "variants": [
+          {
+            "id": "7.4a",
+            "prompt": "Is the auth middleware well-implemented?",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.5",
+        "name": "Testing Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2595,
+        "details": "Reviewed without test mentions",
+        "expectedBehavior": "May suggest adding tests",
+        "variants": [
+          {
+            "id": "7.5a",
+            "prompt": "Review shared-utils/validation.ts",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.6",
+        "name": "Performance Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2670,
+        "details": "Reviewed without perf notes",
+        "expectedBehavior": "May note re-render or pagination concerns",
+        "variants": [
+          {
+            "id": "7.6a",
+            "prompt": "Any performance issues in UserList?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.7",
+        "name": "Edge Case Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2415,
+        "details": "Reviewed without edge cases",
+        "expectedBehavior": "Should identify edge cases in error handling",
+        "variants": [
+          {
+            "id": "7.7a",
+            "prompt": "What if login fails?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.8",
+        "name": "Accessibility Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2334,
+        "details": "Reviewed without a11y notes",
+        "expectedBehavior": "May note accessibility labels or concerns",
+        "variants": [
+          {
+            "id": "7.8a",
+            "prompt": "Is LoginScreen accessible?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "intentProbes": [
+      {
+        "id": "8.1a",
+        "name": "Implicit RAG - Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly invoked RAG from natural question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1b",
+        "name": "Implicit RAG - Bug Report",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for relevant auth/token code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1c",
+        "name": "Implicit File Read",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 80,
+        "details": "Searched for file via RAG",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "read_file",
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2a",
+        "name": "RAG vs File Read Decision",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly started with RAG for broad question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2b",
+        "name": "Specific vs Broad Query",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Did not read the requested file",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.3a",
+        "name": "Knowledge Question - No Tools",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly answered without tools",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3b",
+        "name": "Clarification Request",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly asked for clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3c",
+        "name": "Follow-up Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for database context",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4a",
+        "name": "Code Question Without Context",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched before answering",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4b",
+        "name": "Specific Code Location",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Located and examined the code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.5a",
+        "name": "Ambiguous Reference",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly asked for clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.5b",
+        "name": "Multiple Interpretations",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Made reasonable assumption",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6a",
+        "name": "Implicit Security Review",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Proceeded without knowing which endpoint",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6b",
+        "name": "Performance Concern Hint",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for user list implementation",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.7a",
+        "name": "Dual Request",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Addressed both auth and error logging",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8a",
+        "name": "Hypothetical Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched but did not modify",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8b",
+        "name": "Just Asking",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched without modifying",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      }
+    ],
+    "intentScores": {
+      "invokeCorrectness": 88,
+      "toolSelectionAccuracy": 86,
+      "actionCorrectness": 82,
+      "overInvocationRate": 40,
+      "underInvocationRate": 0,
+      "overallIntentScore": 85
+    },
+    "scoreBreakdown": {
+      "toolScore": 100,
+      "reasoningScore": 97,
+      "ragScore": 62,
+      "bugDetectionScore": 0,
+      "architecturalScore": 8,
+      "navigationScore": 14,
+      "helicopterScore": 24,
+      "proactiveScore": 44,
+      "intentScore": 85,
+      "overallScore": 54
+    }
+  },
+  "trainabilityScores": {
+    "systemPromptCompliance": 19,
+    "instructionPersistence": 14,
+    "correctionAcceptance": 43,
+    "overallTrainability": 24
   }
 }

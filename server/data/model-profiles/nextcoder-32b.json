@@ -2,8 +2,8 @@
   "modelId": "nextcoder-32b",
   "displayName": "nextcoder-32b",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T17:38:19.771Z",
-  "testVersion": 2,
+  "testedAt": "2025-12-22T16:46:24.044Z",
+  "testVersion": 3,
   "score": 0,
   "toolFormat": "openai_tools",
   "capabilities": {
@@ -76,251 +76,438 @@
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1430,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 4788,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "git_diff": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1812,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 6888,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "git_log": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1764,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 7905,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "git_commit": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1811,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 5781,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "git_add": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
-      "testsFailed": 2,
-      "avgLatency": 1672.5,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "testsFailed": 1,
+      "avgLatency": 5849,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "git_branch_create": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1880,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 6035,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1474,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 5718,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "npm_run": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1666,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 5708,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "npm_install": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1673,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 6366,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "npm_uninstall": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1739,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 5724,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "http_request": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 2440,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 9156,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "browser_navigate": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 2280,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 6169,
+      "lastTested": "2025-12-22T16:46:24.044Z",
+      "nativeAliases": [
+        "search_web"
+      ]
     },
     "run_python": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1945,
-      "lastTested": "2025-12-19T17:38:19.771Z"
+      "avgLatency": 6492,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     },
     "mcp_rules": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 0
+    },
+    "read_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 2,
+      "avgLatency": 5529.5,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "write_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 8712,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "edit_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 13526,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "list_directory": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 6112,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "search_files": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 7592,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "create_directory": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 5871,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "delete_file": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 6209,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "delete_directory": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 5790,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "get_file_info": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 6164,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "git_blame": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 7764,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "git_show": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 6809,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "npm_test": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 4534,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "web_search": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 8230,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "browser_take_screenshot": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 8665,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "shell_exec": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 7576,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "memory_store": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 7947,
+      "lastTested": "2025-12-22T16:46:24.044Z"
+    },
+    "memory_retrieve": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 6090,
+      "lastTested": "2025-12-22T16:46:24.044Z"
     }
   },
   "enabledTools": [],
   "testResults": [
     {
-      "testId": "file_read_basic",
+      "testId": "read_file_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-huekakzi7vvjazujfeeon\",\"object\":\"chat.completion\",\"created\":1766165856,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"file_read\\\", \\\"arguments\\\": {\\\"path\\\": \\\"config.json\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":188,\"completion_tokens\":23,\"total_tokens\":211},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-lzv1ap7j8li8ghyq1ip21l\",\"object\":\"chat.completion\",\"created\":1766421772,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"read_file\\\", \\\"arguments\\\": {\\\"path\\\": \\\"./config.json\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":194,\"completion_tokens\":23,\"total_tokens\":217},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
-      "testId": "file_read_nested",
+      "testId": "read_file_nested",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-pf8j27045189lihqxtxp\",\"object\":\"chat.completion\",\"created\":1766165857,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"file_read\\\", \\\"arguments\\\": {\\\"path\\\": \\\"src/utils/helpers.ts\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":187,\"completion_tokens\":25,\"total_tokens\":212},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-n9w3jrpr3k9gfaxwsz79ei\",\"object\":\"chat.completion\",\"created\":1766421780,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"read_file\\\", \\\"arguments\\\": {\\\"path\\\": \\\"src/utils/helpers.ts\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":193,\"completion_tokens\":25,\"total_tokens\":218},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
-      "testId": "file_write_basic",
+      "testId": "write_file_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-41v4bu9oo6dg3a0m310h1k\",\"object\":\"chat.completion\",\"created\":1766165860,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"file_write\\\", \\\"arguments\\\": {\\\"path\\\": \\\"hello.js\\\", \\\"content\\\": \\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":216,\"completion_tokens\":34,\"total_tokens\":250},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-9jka3zmseb7loeho6q07a\",\"object\":\"chat.completion\",\"created\":1766421783,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"write_file\\\", \\\"arguments\\\": {\\\"path\\\": \\\"hello.js\\\", \\\"content\\\": \\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":225,\"completion_tokens\":34,\"total_tokens\":259},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
-      "testId": "file_patch_basic",
+      "testId": "edit_file_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-nqec1wvwgmkvga1vznfp1\",\"object\":\"chat.completion\",\"created\":1766165862,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"file_patch\\\", \\\"arguments\\\": {\\\"path\\\": \\\"app.js\\\", \\\"find\\\": \\\"3000\\\", \\\"replace\\\": \\\"8080\\\"}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":238,\"completion_tokens\":41,\"total_tokens\":279},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-uh7fthjqvu70zr84bvwopx\",\"object\":\"chat.completion\",\"created\":1766421792,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"edit_file\\\", \\\"arguments\\\": {\\\"path\\\": \\\"app.js\\\", \\\"edits\\\": [{\\\"oldText\\\": \\\"3000\\\", \\\"newText\\\": \\\"8080\\\"}], \\\"dryRun\\\": false}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":310,\"completion_tokens\":54,\"total_tokens\":364},\"stats\":{},\"system_fingerprint\":\"n"
     },
     {
-      "testId": "file_list_basic",
+      "testId": "list_directory_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-rfflp7ou2izho36id46a\",\"object\":\"chat.completion\",\"created\":1766165865,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"file_list\\\", \\\"arguments\\\": {\\\"folder\\\": \\\"src\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":181,\"completion_tokens\":22,\"total_tokens\":203},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-5750xyzqqztldq9a5mbg1\",\"object\":\"chat.completion\",\"created\":1766421806,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"list_directory\\\", \\\"arguments\\\": {\\\"path\\\": \\\"src\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":187,\"completion_tokens\":22,\"total_tokens\":209},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
-      "testId": "file_search_basic",
+      "testId": "search_files_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-umj4s554pspdtz36pu4qp\",\"object\":\"chat.completion\",\"created\":1766165867,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"file_search\\\", \\\"arguments\\\": {\\\"query\\\": \\\"TODO\\\", \\\"path\\\": \\\"./\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":202,\"completion_tokens\":27,\"total_tokens\":229},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-t2t88s5lhddby1leqzo9gm\",\"object\":\"chat.completion\",\"created\":1766421812,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"name\\\": \\\"search_files\\\", \\\"arguments\\\": {\\\"directory\\\": \\\".\\\", \\\"pattern\\\": \\\"**/*.ts\\\"}}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":232,\"completion_tokens\":21,\"total_tokens\":253},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "create_directory_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-wdw7io4t4gc3hpqzt1yru\",\"object\":\"chat.completion\",\"created\":1766421819,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"create_directory\\\", \\\"arguments\\\": {\\\"path\\\": \\\"components\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":184,\"completion_tokens\":22,\"total_tokens\":206},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "delete_file_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7y2wa1bwcbrylh2v4dqky\",\"object\":\"chat.completion\",\"created\":1766421825,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"delete_file\\\", \\\"arguments\\\": {\\\"path\\\": \\\"old_config.json\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":183,\"completion_tokens\":24,\"total_tokens\":207},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "delete_directory_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-lwu5bz9mm7b4refsuf41xj\",\"object\":\"chat.completion\",\"created\":1766421831,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"delete_directory\\\", \\\"arguments\\\": {\\\"path\\\": \\\"temp\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":181,\"completion_tokens\":22,\"total_tokens\":203},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "get_file_info_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-j1i62i825nly44h903h1xc\",\"object\":\"chat.completion\",\"created\":1766421837,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"get_file_info\\\", \\\"arguments\\\": {\\\"path\\\": \\\"package.json\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":186,\"completion_tokens\":24,\"total_tokens\":210},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-q78gx6pitb9blvri3e2dl\",\"object\":\"chat.completion\",\"created\":1766165869,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"git_status\\\", \\\"arguments\\\": {}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":157,\"completion_tokens\":18,\"total_tokens\":175},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-pyj5zqy6h0a3stugxfoi1n\",\"object\":\"chat.completion\",\"created\":1766421843,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"git_status\\\", \\\"arguments\\\": {}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":157,\"completion_tokens\":18,\"total_tokens\":175},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "git_diff_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-b47me7bmq4kcptf9dljeft\",\"object\":\"chat.completion\",\"created\":1766165870,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"git_diff\\\", \\\"arguments\\\": {\\\"file\\\": \\\"index.js\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":181,\"completion_tokens\":23,\"total_tokens\":204},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-wtax7b9jamgs5qhuol25lo\",\"object\":\"chat.completion\",\"created\":1766421848,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"git_diff\\\", \\\"arguments\\\": {\\\"file\\\": \\\"index.js\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":197,\"completion_tokens\":23,\"total_tokens\":220},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "git_log_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-c0xhvl6i0fv19muie31j6r\",\"object\":\"chat.completion\",\"created\":1766165872,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"git_log\\\", \\\"arguments\\\": {\\\"count\\\": 5}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":174,\"completion_tokens\":22,\"total_tokens\":196},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-k2dgngv59ndd16a8559fmj\",\"object\":\"chat.completion\",\"created\":1766421855,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"git_log\\\", \\\"arguments\\\": {\\\"count\\\": 5, \\\"format\\\": \\\"oneline\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":207,\"completion_tokens\":29,\"total_tokens\":236},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "git_commit_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-qlvlbzsf4odvatsed4l5bq\",\"object\":\"chat.completion\",\"created\":1766165874,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"git_commit\\\", \\\"arguments\\\": {\\\"message\\\": \\\"Fix login bug\\\"}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":180,\"completion_tokens\":24,\"total_tokens\":204},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-s8t145z6hjyzhvbr9ttu\",\"object\":\"chat.completion\",\"created\":1766421863,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"git_commit\\\", \\\"arguments\\\": {\\\"message\\\": \\\"Fix login bug\\\"}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":177,\"completion_tokens\":24,\"total_tokens\":201},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-zgyd32osezqpcox0xkokmk\",\"object\":\"chat.completion\",\"created\":1766165876,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"git_branch_create\\\", \\\"arguments\\\": {\\\"name\\\": \\\"feature/user-auth\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":182,\"completion_tokens\":25,\"total_tokens\":207},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
-    },
-    {
-      "testId": "npm_run_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-33s19i0x4axij158ubvq8p\",\"object\":\"chat.completion\",\"created\":1766165877,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<run>\\n{\\\"name\\\": \\\"npm_run\\\", \\\"arguments\\\": {\\\"script\\\": \\\"build\\\"}}\\n</run>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":177,\"completion_tokens\":22,\"total_tokens\":199},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
-    },
-    {
-      "testId": "npm_install_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-b0ba9vfful4dzmfhvvdg9a\",\"object\":\"chat.completion\",\"created\":1766165879,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"npm_install\\\", \\\"arguments\\\": {\\\"package\\\": \\\"lodash\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":172,\"completion_tokens\":22,\"total_tokens\":194},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
-    },
-    {
-      "testId": "http_request_get",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-1ks4tu6af7bcpob1anvywd\",\"object\":\"chat.completion\",\"created\":1766165881,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"http_request\\\", \\\"arguments\\\": {\\\"url\\\": \\\"https://api.example.com/users\\\", \\\"method\\\": \\\"GET\\\"}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":218,\"completion_tokens\":33,\"total_tokens\":251},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
-    },
-    {
-      "testId": "browser_navigate_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-p42jom8a6rakkn03x5im6\",\"object\":\"chat.completion\",\"created\":1766165883,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"browser_navigate\\\", \\\"arguments\\\": {\\\"url\\\": \\\"https://github.com\\\", \\\"getContent\\\": true}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":219,\"completion_tokens\":31,\"total_tokens\":250},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
-    },
-    {
-      "testId": "create_new_file_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-2i5w8ebx4d8yxdku83jb8\",\"object\":\"chat.completion\",\"created\":1766165886,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"create_new_file\\\", \\\"arguments\\\": {\\\"path\\\": \\\"README.md\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":200,\"completion_tokens\":24,\"total_tokens\":224},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
-    },
-    {
-      "testId": "folder_create_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-k0pgeiouns2hu4ubx190j\",\"object\":\"chat.completion\",\"created\":1766165887,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"folder_create\\\", \\\"arguments\\\": {\\\"path\\\": \\\"components\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":178,\"completion_tokens\":22,\"total_tokens\":200},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
-    },
-    {
-      "testId": "folder_delete_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-90f26poziwgkb458r4nnxd\",\"object\":\"chat.completion\",\"created\":1766165889,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"folder_delete\\\", \\\"arguments\\\": {\\\"path\\\": \\\"temp\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":179,\"completion_tokens\":22,\"total_tokens\":201},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-4hwd38crim75eq7zocqhc6\",\"object\":\"chat.completion\",\"created\":1766421869,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"git_branch_create\\\", \\\"arguments\\\": {\\\"name\\\": \\\"feature/user-auth\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":181,\"completion_tokens\":25,\"total_tokens\":206},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "git_add_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-l9n90sg6wjp086bcst3a0cr\",\"object\":\"chat.completion\",\"created\":1766165891,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"git_add\\\", \\\"arguments\\\": {\\\"file\\\": \\\"index.js\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":187,\"completion_tokens\":23,\"total_tokens\":210},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
-    },
-    {
-      "testId": "git_add_all",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-monxdvr4hraxkji7yp1n6\",\"object\":\"chat.completion\",\"created\":1766165893,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"git_add\\\", \\\"arguments\\\": {\\\"file\\\": \\\".\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":183,\"completion_tokens\":21,\"total_tokens\":204},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-vktlalp30btljxkdnkpij\",\"object\":\"chat.completion\",\"created\":1766421875,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"git_add\\\", \\\"arguments\\\": {\\\"file\\\": \\\"index.js\\\"}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":180,\"completion_tokens\":23,\"total_tokens\":203},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-20zbj2k72rdvwm4yqd2mcr\",\"object\":\"chat.completion\",\"created\":1766165894,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"git_branch_list\\\", \\\"arguments\\\": {}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":157,\"completion_tokens\":19,\"total_tokens\":176},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-2ayx3u69qqawdb874ailuf\",\"object\":\"chat.completion\",\"created\":1766421881,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"git_branch_list\\\", \\\"arguments\\\": {\\\"all\\\": true}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":174,\"completion_tokens\":22,\"total_tokens\":196},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "git_blame_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-yfxk8v6q16vhfvxywyiy\",\"object\":\"chat.completion\",\"created\":1766421886,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"git_blame\\\", \\\"arguments\\\": {\\\"file\\\": \\\"server.ts\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":224,\"completion_tokens\":24,\"total_tokens\":248},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "git_show_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-vwlrazu00efxx0c5632weq\",\"object\":\"chat.completion\",\"created\":1766421894,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"git_show\\\", \\\"arguments\\\": {\\\"ref\\\": \\\"HEAD\\\"}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":197,\"completion_tokens\":22,\"total_tokens\":219},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "npm_run_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-j0ppkyk72zmceh39eai5k\",\"object\":\"chat.completion\",\"created\":1766421901,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"npm_run\\\", \\\"arguments\\\": {\\\"script\\\": \\\"build\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":176,\"completion_tokens\":22,\"total_tokens\":198},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "npm_install_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-z1gojoobsngmz1tiwgv0na\",\"object\":\"chat.completion\",\"created\":1766421907,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<call>\\n{\\\"name\\\": \\\"npm_install\\\", \\\"arguments\\\": {\\\"package\\\": \\\"lodash\\\", \\\"dev\\\": false}}\\n</call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":191,\"completion_tokens\":27,\"total_tokens\":218},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-tkpskprdd7bgye32z1rftq\",\"object\":\"chat.completion\",\"created\":1766165896,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"npm_uninstall\\\", \\\"arguments\\\": {\\\"package\\\": \\\"axios\\\"}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":178,\"completion_tokens\":23,\"total_tokens\":201},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-o1y0kc3ee1fn28boiywii\",\"object\":\"chat.completion\",\"created\":1766421913,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"npm_uninstall\\\", \\\"arguments\\\": {\\\"package\\\": \\\"axios\\\"}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":178,\"completion_tokens\":23,\"total_tokens\":201},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "npm_test_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-xwlw1ejl4u50axi43zxh3\",\"object\":\"chat.completion\",\"created\":1766421919,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"npm_test\\\", \\\"arguments\\\": {}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":155,\"completion_tokens\":18,\"total_tokens\":173},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "http_request_get",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ataj5w7csg2r3t5vrz55w\",\"object\":\"chat.completion\",\"created\":1766421923,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"http_request\\\", \\\"arguments\\\": {\\\"url\\\": \\\"https://api.example.com/users\\\"}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":248,\"completion_tokens\":27,\"total_tokens\":275},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "web_search_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-5ncsccyb6vitcgn1lo61de\",\"object\":\"chat.completion\",\"created\":1766421932,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<xml>\\n{\\\"name\\\": \\\"web_search\\\", \\\"arguments\\\": {\\\"query\\\": \\\"TypeScript generics\\\", \\\"maxResults\\\": 5}}\\n</xml>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":196,\"completion_tokens\":31,\"total_tokens\":227},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "browser_navigate_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-y020uf3kj7n3bptu50l6uo\",\"object\":\"chat.completion\",\"created\":1766421941,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"name\\\": \\\"browser_navigate\\\", \\\"arguments\\\": {\\\"url\\\": \\\"https://github.com\\\"}}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":185,\"completion_tokens\":20,\"total_tokens\":205},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "browser_screenshot_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-4my5dzpa00cto15co66lm8\",\"object\":\"chat.completion\",\"created\":1766421947,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tool>\\n{\\\"name\\\": \\\"browser_take_screenshot\\\", \\\"arguments\\\": {\\\"path\\\": \\\"screenshot.png\\\", \\\"fullPage\\\": true}}\\n</tool>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":216,\"completion_tokens\":32,\"total_tokens\":248},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     },
     {
       "testId": "run_python_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-fu97j2jcujcjzuoqeiys5\",\"object\":\"chat.completion\",\"created\":1766165897,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<execute>\\n{\\\"name\\\": \\\"run_python\\\", \\\"arguments\\\": {\\\"code\\\": \\\"print('Hello World')\\\"}}\\n</execute>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":179,\"completion_tokens\":26,\"total_tokens\":205},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+      "response": "{\"id\":\"chatcmpl-jqd79feqvncg9lstxlcmb7\",\"object\":\"chat.completion\",\"created\":1766421955,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<execute>\\n{\\\"name\\\": \\\"run_python\\\", \\\"arguments\\\": {\\\"code\\\": \\\"print('Hello World')\\\"}}\\n</execute>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":178,\"completion_tokens\":26,\"total_tokens\":204},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "shell_exec_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-jptcnbd2sl4nou39tqjp5\",\"object\":\"chat.completion\",\"created\":1766421962,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<execute>\\n{\\\"name\\\": \\\"shell_exec\\\", \\\"arguments\\\": {\\\"command\\\": \\\"echo Hello\\\"}}\\n</execute>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":211,\"completion_tokens\":23,\"total_tokens\":234},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "memory_store_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-jl1wtqpxc3axub9r7bgsq\",\"object\":\"chat.completion\",\"created\":1766421970,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<function-call>\\n{\\\"name\\\": \\\"memory_store\\\", \\\"arguments\\\": {\\\"key\\\": \\\"username\\\", \\\"value\\\": \\\"Alice\\\"}}\\n</function-call>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":196,\"completion_tokens\":30,\"total_tokens\":226},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
+    },
+    {
+      "testId": "memory_retrieve_basic",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-7t0trmrszb6o3zmbtgx4lp\",\"object\":\"chat.completion\",\"created\":1766421977,\"model\":\"nextcoder-32b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tools>\\n{\\\"name\\\": \\\"memory_retrieve\\\", \\\"arguments\\\": {\\\"key\\\": \\\"user_name\\\"}}\\n</tools>\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":181,\"completion_tokens\":24,\"total_tokens\":205},\"stats\":{},\"system_fingerprint\":\"nextcoder-32b\"}"
     }
   ],
   "probeResults": {
@@ -375,22 +562,57 @@
       2048,
       4096,
       8192,
-      16384,
-      32768
+      16384
     ],
     "latencies": {
-      "2048": 1879,
-      "4096": 1868,
-      "8192": 1914,
-      "16384": 1944,
-      "32768": 4639
+      "2048": 1881,
+      "4096": 1863,
+      "8192": 1924,
+      "16384": 8112
     },
-    "maxUsableContext": 32768,
-    "recommendedContext": 32768,
+    "maxUsableContext": 16384,
+    "recommendedContext": 16384,
     "modelMaxContext": 32768,
-    "minLatency": 1868,
+    "minLatency": 1863,
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },
-  "contextLength": 32768
+  "contextLength": 32768,
+  "discoveredNativeTools": [
+    "generate_text",
+    "summarize_text",
+    "translate_text",
+    "extract_information",
+    "ask_question",
+    "perform_calculation",
+    "read_file",
+    "write_file",
+    "search_web",
+    "send_email",
+    "schedule_task",
+    "play_audio",
+    "display_image",
+    "convert_format",
+    "compress_data",
+    "encrypt_data"
+  ],
+  "unmappedNativeTools": [
+    "generate_text",
+    "translate_text",
+    "extract_information",
+    "ask_question",
+    "perform_calculation",
+    "send_email",
+    "schedule_task",
+    "play_audio",
+    "display_image",
+    "convert_format",
+    "compress_data",
+    "encrypt_data"
+  ],
+  "scoreBreakdown": {
+    "toolScore": 0,
+    "avgLatencyMs": 6814,
+    "latencyScore": 0
+  }
 }

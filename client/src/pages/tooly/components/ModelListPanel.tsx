@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ModelCard } from './ModelCard';
 import type {
   DiscoveredModel,
@@ -9,6 +10,15 @@ import type {
   TestMode,
   AvailableProviders,
 } from '../types';
+
+type TestAllMode = 'quick' | 'standard' | 'deep' | 'optimization';
+
+const TEST_MODE_OPTIONS: { mode: TestAllMode; label: string; icon: string; desc: string; time: string }[] = [
+  { mode: 'quick', label: 'Quick', icon: '⚡', desc: 'Basic capability check', time: '~30s/model' },
+  { mode: 'standard', label: 'Standard', icon: '🧪', desc: 'Full tests + probes', time: '~3min/model' },
+  { mode: 'deep', label: 'Deep', icon: '🔬', desc: 'All probes + strategic tests', time: '~10min/model' },
+  { mode: 'optimization', label: 'Optimize', icon: '⚙️', desc: 'Sweeps + config generation', time: '~15min/model' },
+];
 
 interface ModelListPanelProps {
   models: DiscoveredModel[];
@@ -68,8 +78,10 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
   fetchModels,
 }) => {
   const lmstudioModels = models.filter(m => m.provider === 'lmstudio');
+  const [showModeDialog, setShowModeDialog] = useState(false);
+  const [selectedTestMode, setSelectedTestMode] = useState<TestAllMode>('standard');
 
-  const handleTestAllModels = async () => {
+  const handleTestAllModels = async (mode: TestAllMode = 'standard') => {
     if (testingAllModels) {
       cancelTestAllRef.current = true;
       return;
@@ -78,6 +90,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
     if (lmstudioModels.length === 0) return;
     
     setTestingAllModels(true);
+    setSelectedTestMode(mode);
     cancelTestAllRef.current = false;
     setTestAllProgress({
       current: 0,
@@ -97,44 +110,48 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
         currentModelName: model.displayName
       } : null);
       
-      // Quick latency check
-      try {
-        const quickLatencyRes = await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/quick-latency`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ provider: model.provider })
-        });
-        
-        if (quickLatencyRes.ok) {
-          const { latency } = await quickLatencyRes.json();
+      // Quick latency check (skip for quick mode - it's fast enough)
+      if (mode !== 'quick') {
+        try {
+          const quickLatencyRes = await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/quick-latency`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider })
+          });
           
-          // Skip if too slow (> 10 seconds)
-          if (latency > 10000) {
+          if (quickLatencyRes.ok) {
+            const { latency } = await quickLatencyRes.json();
+            
+            // Skip if too slow (> 10 seconds for standard, > 15 seconds for deep/optimization)
+            const threshold = mode === 'standard' ? 10000 : 15000;
+            if (latency > threshold) {
+              setTestAllProgress(prev => prev ? {
+                ...prev,
+                skipped: [...prev.skipped, model.displayName]
+              } : null);
+              continue;
+            }
+          } else {
             setTestAllProgress(prev => prev ? {
               ...prev,
               skipped: [...prev.skipped, model.displayName]
             } : null);
             continue;
           }
-        } else {
+        } catch {
           setTestAllProgress(prev => prev ? {
             ...prev,
             skipped: [...prev.skipped, model.displayName]
           } : null);
           continue;
         }
-      } catch {
-        setTestAllProgress(prev => prev ? {
-          ...prev,
-          skipped: [...prev.skipped, model.displayName]
-        } : null);
-        continue;
       }
       
       if (cancelTestAllRef.current) break;
       
-      // Run full tests
+      // Run tests based on mode
       try {
+        // For all modes: run probe first
         await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/probe`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -143,19 +160,26 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
         
         if (cancelTestAllRef.current) break;
         
+        // Run the main test with the selected mode
         await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/test`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ provider: model.provider })
+          body: JSON.stringify({ 
+            provider: model.provider,
+            mode: mode // Pass the selected mode to the test endpoint
+          })
         });
         
         if (cancelTestAllRef.current) break;
         
-        await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/latency-profile`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ provider: model.provider })
-        });
+        // For standard/deep/optimization: run latency profile
+        if (mode !== 'quick') {
+          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/latency-profile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: model.provider })
+          });
+        }
         
         setTestAllProgress(prev => prev ? {
           ...prev,
@@ -173,6 +197,16 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
     await fetchModels();
     setTestingAllModels(false);
     setTimeout(() => setTestAllProgress(null), 5000);
+  };
+
+  const handleTestAllClick = () => {
+    if (testingAllModels) {
+      // If already testing, stop
+      cancelTestAllRef.current = true;
+    } else {
+      // Show mode selection dialog
+      setShowModeDialog(true);
+    }
   };
 
   const handleTestIntents = async () => {
@@ -264,7 +298,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
         <div className="flex items-center gap-2">
           {/* Test All Models Button */}
           <button
-            onClick={handleTestAllModels}
+            onClick={handleTestAllClick}
             disabled={lmstudioModels.length === 0}
             className={`px-3 py-1 text-xs rounded transition-colors ${
               testingAllModels 
@@ -290,12 +324,52 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
         </div>
       </div>
       
+      {/* Mode Selection Dialog - rendered via portal to document.body */}
+      {showModeDialog && createPortal(
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] backdrop-blur-sm">
+          <div className="bg-[#1e1e1e] p-5 rounded-xl border border-gray-700 max-w-sm w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-semibold text-white mb-1">Select Test Mode</h3>
+            <p className="text-xs text-gray-400 mb-4">
+              Testing {lmstudioModels.length} model{lmstudioModels.length !== 1 ? 's' : ''}
+            </p>
+            <div className="space-y-2">
+              {TEST_MODE_OPTIONS.map(({ mode, label, icon, desc, time }) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    setShowModeDialog(false);
+                    handleTestAllModels(mode);
+                  }}
+                  className="w-full p-3 text-left rounded-lg border border-gray-600 hover:border-purple-500 hover:bg-purple-500/10 transition-all group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{icon}</span>
+                      <span className="font-medium text-white group-hover:text-purple-300">{label}</span>
+                    </div>
+                    <span className="text-xs text-gray-500">{time}</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1 ml-7">{desc}</p>
+                </button>
+              ))}
+            </div>
+            <button 
+              onClick={() => setShowModeDialog(false)} 
+              className="mt-4 w-full py-2 text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+
       {/* Test All Progress */}
       {testAllProgress && (
         <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-purple-400">
-              Testing All Models ({testAllProgress.current}/{testAllProgress.total})
+              {TEST_MODE_OPTIONS.find(o => o.mode === selectedTestMode)?.icon} Testing All Models - {selectedTestMode.charAt(0).toUpperCase() + selectedTestMode.slice(1)} ({testAllProgress.current}/{testAllProgress.total})
             </span>
             <span className="text-xs text-gray-400">
               ✅ {testAllProgress.completed.length} | ⏭️ {testAllProgress.skipped.length} skipped

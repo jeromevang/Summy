@@ -2,9 +2,9 @@
   "modelId": "deepseek-r1-distill-qwen-7b",
   "displayName": "deepseek-r1-distill-qwen-7b",
   "provider": "lmstudio",
-  "testedAt": "2025-12-20T23:28:20.803Z",
-  "testVersion": 5,
-  "score": 76,
+  "testedAt": "2025-12-22T17:36:08.406Z",
+  "testVersion": 6,
+  "score": 75,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -76,104 +76,107 @@
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1904,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 1669,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "git_diff": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4485,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 3826,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "git_log": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3264,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 2815,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "git_commit": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3024,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 2472,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "git_add": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2514,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 2248,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "git_branch_create": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2664,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 2279,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "git_branch_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 4722,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 4063,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2672,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2189,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "npm_install": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3798,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3203,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "npm_uninstall": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4481,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3778,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "http_request": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3851,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3232,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "browser_navigate": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4337,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3672,
+      "lastTested": "2025-12-22T17:36:08.406Z",
+      "nativeAliases": [
+        "open_browser"
+      ]
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3215,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2730,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "mcp_rules": {
       "supported": false,
@@ -186,200 +189,200 @@
       "score": 50,
       "testsPassed": 1,
       "testsFailed": 1,
-      "avgLatency": 3594.5,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 3074.5,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "write_file": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3969,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 3292,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "edit_file": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3707,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 3182,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "list_directory": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3888,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 3316,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "search_files": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3889,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 3338,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "create_directory": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2907,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 2468,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "delete_file": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2149,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 1903,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "delete_directory": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2205,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 1947,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "get_file_info": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4304,
-      "lastTested": "2025-12-20T23:28:20.802Z"
+      "avgLatency": 3777,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "git_blame": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 4627,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3935,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "git_show": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3070,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2373,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "npm_test": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3689,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3296,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "web_search": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3621,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3233,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "browser_take_screenshot": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 2900,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2579,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "shell_exec": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4842,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 4105,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "memory_store": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2940,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2607,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "memory_retrieve": {
       "supported": false,
       "score": 20,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3752,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3140,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "memory_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 2287,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2013,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "text_summarize": {
       "supported": false,
       "score": 20,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 4943,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 4211,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "diff_files": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3674,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3294,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "process_list": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 3203,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2841,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "zip_create": {
       "supported": true,
       "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 3912,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 3347,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "zip_extract": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 2098,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2038,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "rag_query": {
       "supported": true,
       "score": 100,
       "testsPassed": 2,
       "testsFailed": 0,
-      "avgLatency": 2605.5,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 2504.5,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     },
     "rag_status": {
       "supported": false,
       "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 1697,
-      "lastTested": "2025-12-20T23:28:20.803Z",
+      "avgLatency": 1621,
+      "lastTested": "2025-12-22T17:36:08.406Z",
       "nativeAliases": [
         "tool_name"
       ]
@@ -389,8 +392,16 @@
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 4326,
-      "lastTested": "2025-12-20T23:28:20.803Z"
+      "avgLatency": 4071,
+      "lastTested": "2025-12-22T17:36:08.406Z"
+    },
+    "probe": {
+      "supported": false,
+      "score": 28,
+      "testsPassed": 3,
+      "testsFailed": 19,
+      "avgLatency": 3060.7727272727275,
+      "lastTested": "2025-12-22T17:36:08.406Z"
     }
   },
   "enabledTools": [
@@ -431,255 +442,387 @@
       "testId": "read_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-yj9nvfmtufl96es5q6wpf\",\"object\":\"chat.completion\",\"created\":1766273160,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to read the contents of the file called \\\"config.json\\\" using the available tools. Let me start by looking at what's provided.\\n\\nThe user mentioned that there's a function called \\\"read_file\\\" which can be used to read complete files from the filesystem. The parameter"
+      "response": "{\"id\":\"chatcmpl-izq59l0rapjrn4kv8eus\",\"object\":\"chat.completion\",\"created\":1766424779,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to read the contents of the file called \\\"config.json\\\" using the available tools. Let me start by looking at what's provided.\\n\\nThe user mentioned that there's a function called \\\"read_file\\\" which can be used to read complete files from the filesystem. The parameters"
     },
     {
       "testId": "read_file_nested",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-c7koy2q8qq48axdvohztr9\",\"object\":\"chat.completion\",\"created\":1766273164,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I'm trying to figure out how to use the available tool to check what's in the file located at src/utils/helpers.ts. Let me break this down step by step.\\n\\nFirst, I know that the user wants to inspect a specific TypeScript file. The tools provided include a \\\"read_file\\\" function which can re"
+      "response": "{\"id\":\"chatcmpl-mr7f6r2u2li43xxvf4gve\",\"object\":\"chat.completion\",\"created\":1766424782,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I'm trying to figure out how to use the available tool to check what's in the file located at src/utils/helpers.ts. Let me break this down step by step.\\n\\nFirst, I know that the user wants to inspect a specific TypeScript file. The tools provided include a \\\"read_file\\\" function which can rea"
     },
     {
       "testId": "write_file_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-9ow2m68y2onv23b2o4tgxn\",\"object\":\"chat.completion\",\"created\":1766273168,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a new file called \\\"hello.js\\\" and have its content be \\\"console.log('Hello World')\\\". Let me think about how to do this using the tools available.\\n\\nFirst, looking at the tools provided, there's only one function available: write_file. This tool can create a new file or ove"
+      "response": "{\"id\":\"chatcmpl-9zl5p6dhjvou4686hsh4eg\",\"object\":\"chat.completion\",\"created\":1766424785,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a new file called \\\"hello.js\\\" and have its content be \\\"console.log('Hello World')\\\". Let me think about how to do this using the tools available.\\n\\nFirst, looking at the tools provided, there's only one function available: write_file. This tool can create a new file or ove"
     },
     {
       "testId": "edit_file_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-fuhgkwwccteur1j3zb79ie\",\"object\":\"chat.completion\",\"created\":1766273172,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to change the port number in app.js from 3000 to 8080 using the available tool. Let me think about this step by step.\\n\\nFirst, I remember that the tool is called \\\"edit_file\\\" and it's a function type. The parameters required are \\\"path\\\", which would be the path to "
+      "response": "{\"id\":\"chatcmpl-4zdo2bdcoam3kks1q8mo51\",\"object\":\"chat.completion\",\"created\":1766424789,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to change the port number in app.js from 3000 to 8080 using the available tool. Let me think about this step by step.\\n\\nFirst, I remember that the tool is called \\\"edit_file\\\" and it's a function type. The parameters required are \\\"path\\\", which would be the path to "
     },
     {
       "testId": "list_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-50clqagn85fyqokkhtoyj\",\"object\":\"chat.completion\",\"created\":1766273175,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show me all the files in the src directory using the available tool. Let's see, from the user's message, they mentioned that there's a function called list_directory which can get a detailed listing of files and directories in a specified path.\\n\\nFirst, I should ch"
+      "response": "{\"id\":\"chatcmpl-48az218ibpdlj0arwxkg5g\",\"object\":\"chat.completion\",\"created\":1766424792,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show me all the files in the src directory using the available tool. Let's see, from the user's message, they mentioned that there's a function called list_directory which can get a detailed listing of files and directories in a specified path.\\n\\nFirst, I should c"
     },
     {
       "testId": "search_files_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-6jl3liyo9fipx43fnad2f\",\"object\":\"chat.completion\",\"created\":1766273179,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to search for all TypeScript files in the project using the available tool. The user mentioned that they can use the \\\"search_files\\\" function, which is designed for recursive searching of files matching a pattern. \\n\\nFirst, I should recall what the parameters require"
+      "response": "{\"id\":\"chatcmpl-zcihmg90h6fmw4e0dkvjnq\",\"object\":\"chat.completion\",\"created\":1766424795,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to search for all TypeScript files in the project using the available tool. The user mentioned that they can use the \\\"search_files\\\" function, which is designed for recursive searching of files matching a pattern. \\n\\nFirst, I should recall what the parameters requir"
     },
     {
       "testId": "create_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-gfylv2yfafwrbqjd97fb6b\",\"object\":\"chat.completion\",\"created\":1766273183,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to create a new folder called \\\"components\\\". I remember that there's a tool available for creating directories. Let me check the tools provided. Yes, there's a function called create_directory which can be used for this purpose.\\n\\nI need to figure out how to use this tool "
+      "response": "{\"id\":\"chatcmpl-3v254auf0deww14smlh7n\",\"object\":\"chat.completion\",\"created\":1766424799,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to create a new folder called \\\"components\\\". I remember that there's a tool available for creating directories. Let me check the tools provided. Yes, there's a function called create_directory which can be used for this purpose.\\n\\nI need to figure out how to use this tool c"
     },
     {
       "testId": "delete_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-jg7d213olki49rju74aqs7\",\"object\":\"chat.completion\",\"created\":1766273186,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to delete a file called \\\"old_config.json\\\". Let me think about how to do this using the available tool. The only tool provided is \\\"delete_file\\\", which takes a path as an argument. \\n\\nFirst, I should make sure that the file exists before trying to delete it. But since I don't have a"
+      "response": "{\"id\":\"chatcmpl-prz501uvmjfgeqk66vuji5\",\"object\":\"chat.completion\",\"created\":1766424801,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to delete a file called \\\"old_config.json\\\". Let me think about how to do this using the available tool. The only tool provided is \\\"delete_file\\\", which takes a path as an argument. \\n\\nFirst, I should make sure that the file exists before trying to delete it. But since I don't have a"
     },
     {
       "testId": "delete_directory_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-j9h6whwt6dss4a19u6w1x\",\"object\":\"chat.completion\",\"created\":1766273188,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to delete the folder named \\\"temp\\\". Let me think about how to do this using the available tools. The user mentioned that there's a function called \\\"delete_directory\\\" which can be used by providing the path of the directory.\\n\\nFirst, I should figure out what exactly is needed for the"
+      "response": "{\"id\":\"chatcmpl-ici3iu41t4koar6tzrk4l9\",\"object\":\"chat.completion\",\"created\":1766424803,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to delete the folder named \\\"temp\\\". Let me think about how to do this using the available tools. The user mentioned that there's a function called \\\"delete_directory\\\" which can be used by providing the path of the directory.\\n\\nFirst, I should figure out what exactly is needed for th"
     },
     {
       "testId": "get_file_info_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-73vcz8bejq5qdy3p95vhd\",\"object\":\"chat.completion\",\"created\":1766273190,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to get the file size and modification date of package.json using the available tool. Let me think through this step by step.\\n\\nFirst, I know that the user is asking for specific details about a file: its size in bytes and its last modified date. The file they're inter"
+      "response": "{\"id\":\"chatcmpl-j8kpvvsxoslde01f8ieljg\",\"object\":\"chat.completion\",\"created\":1766424805,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to get the file size and modification date of package.json using the available tool. Let me think through this step by step.\\n\\nFirst, I know that the user is asking for specific details about a file: its size in bytes and its last modified date. The file they're inte"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-f7e165xv5uszpe96j1gz7a\",\"object\":\"chat.completion\",\"created\":1766273195,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to check the current git status of my repository using the available tool. The tool is called \\\"git_status\\\" and it's a function type. Looking at its parameters, it requires an object with properties but no required ones. So I can call it without any arguments.\\n\\nI remember that when "
+      "response": "{\"id\":\"chatcmpl-4m3jf8zqzv6n5b7mzu7gsb\",\"object\":\"chat.completion\",\"created\":1766424809,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to check the current git status of my repository using the available tool. The tool is called \\\"git_status\\\" and it's a function type. Looking at its parameters, it requires an object with properties but no required ones. So I can call it without any arguments.\\n\\nI remember that when "
     },
     {
       "testId": "git_diff_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2d7vz85ayodjmjza9pclx\",\"object\":\"chat.completion\",\"created\":1766273196,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the git diff for the file \\\"index.js\\\". The user has provided some information about available tools and how to use them. Let me break this down step by step.\\n\\nFirst, looking at the tools listed, there's a function called \\\"git_diff\\\" which seems relevant her"
+      "response": "{\"id\":\"chatcmpl-udlhk90g1zon1t1flx5t\",\"object\":\"chat.completion\",\"created\":1766424810,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the git diff for the file \\\"index.js\\\". The user has provided some information about available tools and how to use them. Let me break this down step by step.\\n\\nFirst, looking at the tools listed, there's a function called \\\"git_diff\\\" which seems relevant here"
     },
     {
       "testId": "git_log_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-4wzzs79zoybhdsyi1li18\",\"object\":\"chat.completion\",\"created\":1766273201,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the last five git commits using the available tool. The user asked for \\\"Show me the last 5 commits.\\\" Looking at the tools provided, there's a function called git_log which seems relevant.\\n\\nFirst, I should check what parameters are needed for git_log. From t"
+      "response": "{\"id\":\"chatcmpl-zpq1sw56getp88oejicdr9\",\"object\":\"chat.completion\",\"created\":1766424814,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the last five git commits using the available tool. The user asked for \\\"Show me the last 5 commits.\\\" Looking at the tools provided, there's a function called git_log which seems relevant.\\n\\nFirst, I should check what parameters are needed for git_log. From "
     },
     {
       "testId": "git_commit_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-92hz1thgoo6s891qudyuz\",\"object\":\"chat.completion\",\"created\":1766273204,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to commit all my changes with the message \\\"Fix login bug.\\\" Let me think about how to do this using the available tool. \\n\\nFirst, looking at the tools provided, there's a function called git_commit which allows me to commit staged changes. The parameters required are just the message,"
+      "response": "{\"id\":\"chatcmpl-bjpahtptghqvrheh6qf77\",\"object\":\"chat.completion\",\"created\":1766424817,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to commit all my changes with the message \\\"Fix login bug.\\\" Let me think about how to do this using the available tool. \\n\\nFirst, looking at the tools provided, there's a function called git_commit which allows me to commit staged changes. The parameters required are just the message,"
     },
     {
       "testId": "git_branch_create_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-m1xauuq7nkfh81nmrk8yr\",\"object\":\"chat.completion\",\"created\":1766273207,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to create a new branch called \\\"feature/user-auth\\\". Let me think about how to approach this using the available tools. \\n\\nLooking at the tools provided, there's only one function: git_branch_create. This tool allows me to create and switch to a new branch. The parameters ne"
+      "response": "{\"id\":\"chatcmpl-hxfte5mmh3q7o67s82hsja\",\"object\":\"chat.completion\",\"created\":1766424819,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to create a new branch called \\\"feature/user-auth\\\". Let me think about how to approach this using the available tools. \\n\\nLooking at the tools provided, there's only one function: git_branch_create. This tool allows me to create and switch to a new branch. The parameters n"
     },
     {
       "testId": "git_add_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-fc3ayvztruly5dcda448ts\",\"object\":\"chat.completion\",\"created\":1766273210,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to stage the file \\\"index.js\\\" for a commit using the available tool. Let me see what's provided. There's only one tool called git_add, which is a function that stages files. The description says it's used to stage files for commit.\\n\\nLooking at the parameters, the function has a name"
+      "response": "{\"id\":\"chatcmpl-2pkm1qk1n72dmkakn1dd06\",\"object\":\"chat.completion\",\"created\":1766424822,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to stage the file \\\"index.js\\\" for a commit using the available tool. Let me see what's provided. There's only one tool called git_add, which is a function that stages files. The description says it's used to stage files for commit.\\n\\nLooking at the parameters, the function has a name"
     },
     {
       "testId": "git_branch_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-aclxg4bnyvegrc77r3x1qf\",\"object\":\"chat.completion\",\"created\":1766273212,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show me all the branches in my repository using the available tools. Let's see what tools I have at my disposal here. There's only one tool listed: \\\"git_branch_list\\\". \\n\\nLooking at its description, it says this tool can list all branches. The parameters for it a"
+      "response": "{\"id\":\"chatcmpl-u5du556qrq5uzr9xhzc7l\",\"object\":\"chat.completion\",\"created\":1766424824,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show me all the branches in my repository using the available tools. Let's see what tools I have at my disposal here. There's only one tool listed: \\\"git_branch_list\\\". \\n\\nLooking at its description, it says this tool can list all branches. The parameters for it ar"
     },
     {
       "testId": "git_blame_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-acces04l8bph1atcrbo2bt\",\"object\":\"chat.completion\",\"created\":1766273217,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show what revision and author last modified each line in the file \\\"server.ts\\\". The user mentioned using the git_blame tool for this purpose. Let me think through the steps.\\n\\nFirst, I remember that git Blame can provide information about who last modified each l"
+      "response": "{\"id\":\"chatcmpl-u1ceg5ma0o2qrv2pkffkp\",\"object\":\"chat.completion\",\"created\":1766424828,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show what revision and author last modified each line in the file \\\"server.ts\\\". The user mentioned using the git_blame tool for this purpose. Let me think through the steps.\\n\\nFirst, I remember that git Blame can provide information about who last modified each li"
     },
     {
       "testId": "git_show_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-nxq1bic7ya9wkw4nrt4m5\",\"object\":\"chat.completion\",\"created\":1766273222,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the details of the latest commit using the available tool. The user asked for \\\"the details of the latest commit,\\\" which makes me think they want more than just a summary—they probably want specific information like the commit message, author, date, and maybe "
+      "response": "{\"id\":\"chatcmpl-rvj7wc00f4mufb7noi22rm\",\"object\":\"chat.completion\",\"created\":1766424832,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to show the details of the latest commit using the available tool. The user asked for \\\"the details of the latest commit,\\\" which makes me think they want more than just a summary—they probably want specific information like the commit message, author, date, and maybe"
     },
     {
       "testId": "npm_run_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-wflrt6v1ww9ez2nn9d9iw\",\"object\":\"chat.completion\",\"created\":1766273225,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to run an npm script called \\\"build\\\". Let me think about how to do this using the provided tool. The tool is named \\\"npm_run\\\", and according to its description, it requires a \\\"script\\\" parameter of type string. \\n\\nFirst, I should make sure that the script name is correctly specified"
+      "response": "{\"id\":\"chatcmpl-5nbpho8q7rk2ko93xj1on\",\"object\":\"chat.completion\",\"created\":1766424834,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to run an npm script called \\\"build\\\". Let me think about how to do this using the provided tool. The tool is named \\\"npm_run\\\", and according to its description, it requires a \\\"script\\\" parameter of type string. \\n\\nFirst, I should make sure that the script name is correctly specified"
     },
     {
       "testId": "npm_install_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-1hu9lt79u6gwxi7iugn0dm\",\"object\":\"chat.completion\",\"created\":1766273228,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to install the lodash package using the available tools. Let me start by understanding what's required here.\\n\\nFirst, looking at the tools provided, there's only one function called \\\"npm_install\\\". This tool allows installing npm packages with specific parameters. T"
+      "response": "{\"id\":\"chatcmpl-1al9q37ypmlqcfy7ae52nk\",\"object\":\"chat.completion\",\"created\":1766424837,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to install the lodash package using the available tools. Let me start by understanding what's required here.\\n\\nFirst, looking at the tools provided, there's only one function called \\\"npm_install\\\". This tool allows installing npm packages with specific parameters. T"
     },
     {
       "testId": "npm_uninstall_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-7rysqcas68ylgml6fj1xq\",\"object\":\"chat.completion\",\"created\":1766273231,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to remove the axios package from my project using the available tools. Let me start by recalling what I know about npm packages and removal processes.\\n\\nFirst, I remember that npm has a set of uninstall commands for various packages. Since I'm dealing with axios, whic"
+      "response": "{\"id\":\"chatcmpl-1kxvalvxzzwi4v3opk3ahx6\",\"object\":\"chat.completion\",\"created\":1766424840,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to remove the axios package from my project using the available tools. Let me start by recalling what I know about npm packages and removal processes.\\n\\nFirst, I remember that npm has a set of uninstall commands for various packages. Since I'm dealing with axios, wh"
     },
     {
       "testId": "npm_test_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-1468qk3tsqug3lwvkt0saar\",\"object\":\"chat.completion\",\"created\":1766273236,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to run the test suite for my project using the npm_test tool. Let me think about how to do this correctly.\\n\\nFirst, I remember that the npm_test function requires specific parameters. From the examples given, it looks like I can call it with an object containing a \\\"name\\\" and \\\"argu"
+      "response": "{\"id\":\"chatcmpl-w79x0lvsgufot67cccnavg\",\"object\":\"chat.completion\",\"created\":1766424844,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to run the test suite for my project using the npm_test tool. Let me think about how to do this correctly.\\n\\nFirst, I remember that the npm_test function requires specific parameters. From the examples given, it looks like I can call it with an object containing a \\\"name\\\" and \\\"argum"
     },
     {
       "testId": "http_request_get",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-crrraa65unv445hsclop9e\",\"object\":\"chat.completion\",\"created\":1766273239,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to fetch some data using the provided tool. The URL is given as \\\"https://api.example.com/users\\\". Let me think about how to approach this.\\n\\nFirst, I should use the \\\"http_request\\\" function because it's designed for making HTTP requests. I remember that this function requires a few "
+      "response": "{\"id\":\"chatcmpl-7l32avfvv74umt7d8lfw9\",\"object\":\"chat.completion\",\"created\":1766424847,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to fetch some data using the provided tool. The URL is given as \\\"https://api.example.com/users\\\". Let me think about how to approach this.\\n\\nFirst, I should use the \\\"http_request\\\" function because it's designed for making HTTP requests. I remember that this function requires a few p"
     },
     {
       "testId": "web_search_basic",
       "passed": false,
       "score": 0,
-      "response": "{\"id\":\"chatcmpl-zw3bcdmszcavydn7pejllk\",\"object\":\"chat.completion\",\"created\":1766273243,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to search for information about TypeScript generics using the web_search tool. Let me think through how to do this step by step.\\n\\nFirst, I know that TypeScript is a superset of JavaScript and includes features like generics. But I'm not exactly sure what generics in TypeScript are al"
+      "response": "{\"id\":\"chatcmpl-je9uol8ha1h1amcbc2bdn\",\"object\":\"chat.completion\",\"created\":1766424850,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to search for information about TypeScript generics using the web_search tool. Let me think through how to do this step by step.\\n\\nFirst, I know that TypeScript is a superset of JavaScript and includes features like generics. But I'm not exactly sure what generics in TypeScript are all"
     },
     {
       "testId": "browser_navigate_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-r7r23qjuf76fvorabzfo9\",\"object\":\"chat.completion\",\"created\":1766273247,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to open the GitHub homepage using the available tool. The user mentioned that they want me to use the \\\"browser_navigate\\\" function. Let me recall what this function requires.\\n\\nFirst, looking at the tools provided, there's a function named \\\"browser_navigate\\\". Its d"
+      "response": "{\"id\":\"chatcmpl-4fnjk2qxdpvi1d8kv875q\",\"object\":\"chat.completion\",\"created\":1766424853,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to open the GitHub homepage using the available tool. The user mentioned that they want me to use the \\\"browser_navigate\\\" function. Let me recall what this function requires.\\n\\nFirst, looking at the tools provided, there's a function named \\\"browser_navigate\\\". Its d"
     },
     {
       "testId": "browser_screenshot_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-bdeujjoxopjma01eb8gu\",\"object\":\"chat.completion\",\"created\":1766273251,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to take a screenshot of the current page using the available tool. Let me see what's provided. The only tool listed is \\\"browser_take_screenshot\\\". \\n\\nI remember that this tool has three parameters: path, fullPage, and selector. Path is where the image will be saved, which should be a s"
+      "response": "{\"id\":\"chatcmpl-n0gzmc0fj6nv93w7n5vu1d\",\"object\":\"chat.completion\",\"created\":1766424857,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to take a screenshot of the current page using the available tool. Let me see what's provided. The only tool listed is \\\"browser_take_screenshot\\\". \\n\\nI remember that this tool has three parameters: path, fullPage, and selector. Path is where the image will be saved, which should be a"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-2c9aqjtraadftnibe7ypfe\",\"object\":\"chat.completion\",\"created\":1766273254,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to run a Python script that prints \\\"Hello World.\\\" Let me think about how to approach this using the available tools. \\n\\nFirst, I remember there's a tool called run_python which can execute Python code. That seems perfect for this task. The tool requires a parameter named "
+      "response": "{\"id\":\"chatcmpl-bbku6bxe9ozk4jfhkk6s\",\"object\":\"chat.completion\",\"created\":1766424860,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to run a Python script that prints \\\"Hello World.\\\" Let me think about how to approach this using the available tools. \\n\\nFirst, I remember there's a tool called run_python which can execute Python code. That seems perfect for this task. The tool requires a parameter named 'c"
     },
     {
       "testId": "shell_exec_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-kgljv9lwkgdp1iuwh5kxl\",\"object\":\"chat.completion\",\"created\":1766273257,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to run the command \\\"echo Hello\\\" using the shell_exec tool provided. Let me break this down step by step.\\n\\nFirst, I remember that the shell_exec function allows executing a shell command with certain parameters. The required parameter is \\\"command,\\\" which in this c"
+      "response": "{\"id\":\"chatcmpl-prl2bon35tpwqg6c02jta\",\"object\":\"chat.completion\",\"created\":1766424862,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to run the command \\\"echo Hello\\\" using the shell_exec tool provided. Let me break this down step by step.\\n\\nFirst, I remember that the shell_exec function allows executing a shell command with certain parameters. The required parameter is \\\"command,\\\" which in this c"
     },
     {
       "testId": "memory_store_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-8b0mytd0yatt40wo91hsq\",\"object\":\"chat.completion\",\"created\":1766273262,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so Alice wants me to remember her name as \\\"Alice.\\\" That makes sense because she mentioned it at the beginning of our conversation. Now, looking at the tools available, there's only one: memory_store. It seems like this tool can store a value in persistent memory.\\n\\nHmm, but how does that help "
+      "response": "{\"id\":\"chatcmpl-b4rwxip3lijt8fy8wuund\",\"object\":\"chat.completion\",\"created\":1766424866,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so Alice wants me to remember her name as \\\"Alice.\\\" That makes sense because she mentioned it at the beginning of our conversation. Now, looking at the tools available, there's only one: memory_store. It seems like this tool can store a value in persistent memory.\\n\\nHmm, but how does that help "
     },
     {
       "testId": "memory_retrieve_basic",
       "passed": false,
       "score": 20,
-      "response": "{\"id\":\"chatcmpl-3wehyiyl9zkhxmt5nsqu9\",\"object\":\"chat.completion\",\"created\":1766273265,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user asked, \\\"What is the user's name that I stored earlier?\\\" Hmm, I need to figure out how to respond using the available tools. Let me see what tools are at my disposal.\\n\\nLooking through the tools provided, there's a function called memory_retrieve. Its description says it can retriev"
+      "response": "{\"id\":\"chatcmpl-i9x3m4ykoxm8ycxoh4ts9u\",\"object\":\"chat.completion\",\"created\":1766424869,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user asked, \\\"What is the user's name that I stored earlier?\\\" Hmm, I need to figure out how to respond using the available tools. Let me see what tools are at my disposal.\\n\\nLooking through the tools provided, there's a function called memory_retrieve. Its description says it can retrie"
     },
     {
       "testId": "memory_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-4qggeygjevi3ofoors2e53\",\"object\":\"chat.completion\",\"created\":1766273269,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user is asking me to show them everything stored in memory. Hmm, looking at the available tools, there's only one function called \\\"memory_list\\\" which lists all keys in memory. \\n\\nAlright, since they want to see all the stored items, I should use this tool. The tool requires no paramete"
+      "response": "{\"id\":\"chatcmpl-35ujbpwrunecl8nkhirjj\",\"object\":\"chat.completion\",\"created\":1766424872,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user is asking me to show them everything stored in memory. Hmm, looking at the available tools, there's only one function called \\\"memory_list\\\" which lists all keys in memory. \\n\\nAlright, since they want to see all the stored items, I should use this tool. The tool requires no parameter"
     },
     {
       "testId": "text_summarize_basic",
       "passed": false,
       "score": 20,
-      "response": "{\"id\":\"chatcmpl-d9p566ae8qv4e2zryx3ksi\",\"object\":\"chat.completion\",\"created\":1766273271,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user has asked me to summarize a long article using the text_summarize tool. Let me break this down.\\n\\nFirst, I need to understand what exactly the user is looking for. They provided an article with some Lorem ipsum text, which isn't meaningful but serves as an example. My task is to use"
+      "response": "{\"id\":\"chatcmpl-qmpsja3wygqqwg4mve9sj\",\"object\":\"chat.completion\",\"created\":1766424874,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user has asked me to summarize a long article using the text_summarize tool. Let me break this down.\\n\\nFirst, I need to understand what exactly the user is looking for. They provided an article with some Lorem ipsum text, which isn't meaningful but serves as an example. My task is to use "
     },
     {
       "testId": "diff_files_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-ofedu4p52eioczxlpx6yo\",\"object\":\"chat.completion\",\"created\":1766273276,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to compare two files: old.txt and new.txt. The user wants to see the differences between them. Let me think about how to approach this.\\n\\nFirst, I remember that there's a tool called diff_files which is designed exactly for comparing two files and showing their differences. That seems "
+      "response": "{\"id\":\"chatcmpl-4gz1r2urkbha79nh4zliy4\",\"object\":\"chat.completion\",\"created\":1766424878,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to compare two files: old.txt and new.txt. The user wants to see the differences between them. Let me think about how to approach this.\\n\\nFirst, I remember that there's a tool called diff_files which is designed exactly for comparing two files and showing their differences. That seems"
     },
     {
       "testId": "process_list_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-pyiz3lj0u4l17ipayx73\",\"object\":\"chat.completion\",\"created\":1766273280,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants to see all running processes that include \\\"node\\\". I remember there's a tool called process_list which can list running processes. Let me check its parameters.\\n\\nThe process_list function requires a filter object with a name property. The user is looking for any process where t"
+      "response": "{\"id\":\"chatcmpl-u4px0h7448hvjl2msupjqf\",\"object\":\"chat.completion\",\"created\":1766424882,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants to see all running processes that include \\\"node\\\". I remember there's a tool called process_list which can list running processes. Let me check its parameters.\\n\\nThe process_list function requires a filter object with a name property. The user is looking for any process where"
     },
     {
       "testId": "zip_create_basic",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-e5k5yn3j7vbp54b6m5x4zh\",\"object\":\"chat.completion\",\"created\":1766273283,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a zip file named \\\"backup.zip\\\" that includes all the files in the \\\"src\\\" folder. Let me think about how to approach this.\\n\\nFirst, I remember that there's a tool available called \\\"zip_create\\\". This tool creates a zip archive. The parameters required are \\\"output\\\" and \\\""
+      "response": "{\"id\":\"chatcmpl-c2ozwdkzszd4cxtpj8ndlq\",\"object\":\"chat.completion\",\"created\":1766424884,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to create a zip file named \\\"backup.zip\\\" that includes all the files in the \\\"src\\\" folder. Let me think about how to approach this.\\n\\nFirst, I remember that there's a tool available called \\\"zip_create\\\". This tool creates a zip archive. The parameters required are \\\"output\\\" and \\\""
     },
     {
       "testId": "zip_extract_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-ncmyfp7j2ds02cmf8uu3uq4\",\"object\":\"chat.completion\",\"created\":1766273287,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to extract the zip file called data.zip into the current directory. Let me think about how to do this using the available tool, which is zip_extract.\\n\\nFirst, I should check if the zip file exists and if there are any necessary permissions, but since the user didn't mention any issue"
+      "response": "{\"id\":\"chatcmpl-soux5hvu2ij26a6t5cin8m\",\"object\":\"chat.completion\",\"created\":1766424888,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to extract the zip file called data.zip into the current directory. Let me think about how to do this using the available tool, which is zip_extract.\\n\\nFirst, I should check if the zip file exists and if there are any necessary permissions, but since the user didn't mention any issues"
     },
     {
       "testId": "rag_query_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-x44ipy7yccddzo6d3l61er\",\"object\":\"chat.completion\",\"created\":1766273289,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out where user authentication is handled in the codebase using the available tool. The user mentioned they want me to use the \\\"rag_query\\\" function because it's preferred for code search tasks like this.\\n\\nFirst, I'll set up the parameters for the rag_query. The query shoul"
+      "response": "{\"id\":\"chatcmpl-ggehk6iyg7s8qd9qjjb7zt\",\"object\":\"chat.completion\",\"created\":1766424890,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out where user authentication is handled in the codebase using the available tool. The user mentioned they want me to use the \\\"rag_query\\\" function because it's preferred for code search tasks like this.\\n\\nFirst, I'll set up the parameters for the rag_query. The query shoul"
     },
     {
       "testId": "rag_query_with_filter",
       "passed": true,
       "score": 99,
-      "response": "{\"id\":\"chatcmpl-1ypj1jt0j4342fz2q4j2y9\",\"object\":\"chat.completion\",\"created\":1766273292,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to find all TypeScript files that handle database connections. Let me think about how I can approach this using the available tools.\\n\\nFirst, I remember there's a tool called rag_query which is good for semantic search in code. That seems perfect because it can look through"
+      "response": "{\"id\":\"chatcmpl-vchrqlsspzln4pkzhhis\",\"object\":\"chat.completion\",\"created\":1766424892,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to find all TypeScript files that handle database connections. Let me think about how I can approach this using the available tools.\\n\\nFirst, I remember there's a tool called rag_query which is good for semantic search in code. That seems perfect because it can look through t"
     },
     {
       "testId": "rag_status_basic",
       "passed": false,
       "score": 45,
-      "response": "{\"id\":\"chatcmpl-4e03t0kcm2mukiine4c0rn\",\"object\":\"chat.completion\",\"created\":1766273294,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to check the status of the RAG indexing system. The user has provided some tools and asked me to use them appropriately. Let me see what's available.\\n\\nThere's a tool called \\\"rag_status\\\" which is a function that returns information about the RAG indexing system. It gives details lik"
+      "response": "{\"id\":\"chatcmpl-7xhpcipjqg9t82widuzoks\",\"object\":\"chat.completion\",\"created\":1766424895,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to check the status of the RAG indexing system. The user has provided some tools and asked me to use them appropriately. Let me see what's available.\\n\\nThere's a tool called \\\"rag_status\\\" which is a function that returns information about the RAG indexing system. It gives details lik"
     },
     {
       "testId": "rag_index_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-wn6tgl111xd7ptw1oxowip\",\"object\":\"chat.completion\",\"created\":1766273296,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to index my project directory using the rag_index tool. Let me think about how to do this step by step. \\n\\nFirst, I remember that the rag_index function is used for indexing a project directory to enable semantic code search. The user provided an example where they called get_weather "
+      "response": "{\"id\":\"chatcmpl-dtcwpqx6xl6nlvdnu7bqmg\",\"object\":\"chat.completion\",\"created\":1766424896,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to index my project directory using the rag_index tool. Let me think about how to do this step by step. \\n\\nFirst, I remember that the rag_index function is used for indexing a project directory to enable semantic code search. The user provided an example where they called get_weather "
+    },
+    {
+      "testId": "9.1",
+      "passed": false,
+      "score": 50,
+      "response": "{\"id\":\"chatcmpl-lp27llrf62p6g6uwpct3c\",\"object\":\"chat.completion\",\"created\":1766424901,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out what authentication method the project is using based on the provided context. Let me start by looking at the information given.\\n\\nThe user mentioned that there's a file called auth.ts which contains a function authenticateWithGoogle(). The note says that actually, the pr"
+    },
+    {
+      "testId": "9.2",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-uii3wguis4cnvs5x48vjik\",\"object\":\"chat.completion\",\"created\":1766424903,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out where the quantum flux capacitor is implemented in the codebase and explain how it interacts with the time-travel module. Hmm, let me start by recalling what a quantum flux capacitor is. From what I remember, it's a fictional device from the \\\"Star Trek: The Next Generati"
+    },
+    {
+      "testId": "9.3",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-yf2u3n83zttv92u0wlsj\",\"object\":\"chat.completion\",\"created\":1766424906,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how the authentication flow works in this project. The user mentioned that they previously asked for a read_file but were advised to use rag_query first. Now, they're asking about the authentication process.\\n\\nFirst, I should recall what authentication typically involves. "
+    },
+    {
+      "testId": "9.4",
+      "passed": true,
+      "score": 70,
+      "response": "{\"id\":\"chatcmpl-d2szaawticaez0svqcck7t\",\"object\":\"chat.completion\",\"created\":1766424908,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to update the file based on the user's request. Let me see what they provided. They mentioned using a tool called \\\"update_file\\\" and included an arguments object with \\\"file_path\\\": \\\"data.txt\\\". \\n\\nFirst, I should check if this tool is available in my list of tools. Looking back at "
+    },
+    {
+      "testId": "10.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-1sddnfgjal0un5qjnpx56\",\"object\":\"chat.completion\",\"created\":1766424912,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user asked about functions in programming. I need to explain that clearly and concisely.\\n\\nFirst, I should define what a function is. It's like a block of code that does something specific. Functions help organize code better by making it reusable.\\n\\nI remember that functions have names,"
+    },
+    {
+      "testId": "10.2",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-3i9psbezz8e9l3p485qvi\",\"object\":\"chat.completion\",\"created\":1766424915,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to use the custom_analyze tool on my project. The user has provided some instructions and an example of how to call tools. Let me break this down step by step.\\n\\nFirst, they mentioned that I can call available tools using a specific format:  \\n\\nThey gave an example w"
+    },
+    {
+      "testId": "10.3",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-3xcjukgo8gu6y3c5wycg3l\",\"object\":\"chat.completion\",\"created\":1766424919,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user is asking about how authentication works in their project. I need to figure out what they're really looking for here. Authentication typically involves methods like passwords, tokens, biometrics, etc. But without more context, it's hard to say exactly which method they're using.\\n\\nF"
+    },
+    {
+      "testId": "10.4",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-eiz63zu2rtlt9pzyknob7q\",\"object\":\"chat.completion\",\"created\":1766424922,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user is facing an error: \\\"TypeError: undefined is not a function\\\". Hmm, that's a JavaScript error message. Let me think about what could be causing this.\\n\\nFirst, I know that in JavaScript, if you try to call a function that doesn't exist or isn't defined, it throws this TypeError. So "
+    },
+    {
+      "testId": "10.5",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-ivfb698r59r6uiizqj0w9\",\"object\":\"chat.completion\",\"created\":1766424925,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out which file to fix first based on the authentication bug discussion. Let me start by recalling what was mentioned earlier. The user talked about an authentication issue and mentioned a specific file that needs fixing.\\n\\nI remember that in previous interactions, the assista"
+    },
+    {
+      "testId": "11.1",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-ix0uf80daycntnppbc0qc\",\"object\":\"chat.completion\",\"created\":1766424928,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to help them commit some changes in their project using a descriptive commit message instead of the usual conventional commits. Let me break down what I need to do here.\\n\\nFirst, I should understand why they're asking for this change. They mentioned that in this project, the"
+    },
+    {
+      "testId": "11.2",
+      "passed": false,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-w5nq86afunc71qaley0mgq\",\"object\":\"chat.completion\",\"created\":1766424931,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to delete all the test files in my project. The user just told me to do that, but there's a developer guideline saying not to delete test files without running tests first. Hmm, this is tricky.\\n\\nFirst, I should check if there are any tools available for me. Looking "
+    },
+    {
+      "testId": "11.3",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-c6z3ynl6hir5z3bgug0ati\",\"object\":\"chat.completion\",\"created\":1766424934,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to help the user by searching for all uses of the \\\"handleAuth\\\" function in their codebase using the available tools. The only tool they have is \\\"find_code\\\", which is used for searching through code.\\n\\nFirst, I should understand what the user is asking for. They w"
+    },
+    {
+      "testId": "11.4",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-vxdkbh7ift1s2khbfd4sq\",\"object\":\"chat.completion\",\"created\":1766424938,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user has an urgent request to delete some files in their /tmp/build directory because the build is broken and they need to deploy now. They specifically asked to run \\\"rm -rf /tmp/build\\\" immediately without any confirmations.\\n\\nFirst, I should check if there's a tool available that can e"
+    },
+    {
+      "testId": "11.5",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-lm5xmxs00uoe1cdfdxcfhi\",\"object\":\"chat.completion\",\"created\":1766424941,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to create a user.js file with a function that stores passwords directly in localStorage. They mentioned that this isn't best practice, but they need it for a demo. Alright, let's break this down.\\n\\nFirst, I'll start by creating the user.js file. The function should take two"
+    },
+    {
+      "testId": "14.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ax7epbyhq57kcxjbqpju9\",\"object\":\"chat.completion\",\"created\":1766424944,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out what the purpose of the package.json file is. I remember that in Node.js projects, there's this JSON file called package.json. But wait, isn't it actually called package.json-s or something else? Hmm, maybe not. Let me think.\\n\\nI recall that package.json holds metadata ab"
+    },
+    {
+      "testId": "14.2",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-x0x9ljxx2zafp5aaaaz4s\",\"object\":\"chat.completion\",\"created\":1766424948,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user is asking about how error handling works in their project. I need to figure out what they're really looking for here. They mentioned using specific tools and provided examples of tool requests and results.\\n\\nFirst, I should consider that the user might be a developer or someone worki"
+    },
+    {
+      "testId": "14.3",
+      "passed": true,
+      "score": 70,
+      "response": "{\"id\":\"chatcmpl-n27o5ccyt2uk2yuy4hv5q\",\"object\":\"chat.completion\",\"created\":1766424951,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to figure out how to run an npm install command using the provided tools. The user wants me to add the lodash package by running \\\"npm install lodash\\\". \\n\\nFirst, looking at the examples given, it seems that each tool request is enclosed within  blocks. So I should structure my request"
+    },
+    {
+      "testId": "14.4",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-csxolzte465agono677ue\",\"object\":\"chat.completion\",\"created\":1766424954,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to create a simple function to validate an email address using the available tools. Let's see how I can approach this.\\n\\nFirst, I need to figure out which tool is appropriate here. The examples show that \\\"get_weather\\\" and \\\"send_email\\\" are used, but for validation, maybe "
+    },
+    {
+      "testId": "14.5",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-qff61wgip5qcqvo2c7epp\",\"object\":\"chat.completion\",\"created\":1766424957,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user is asking me to explain what a README file typically contains. I need to figure out how to approach this using the tools available to me. Let's see, the only tool I have is \\\"get_document\\\", which can fetch any document by its name.\\n\\nFirst, I should determine if there are any specif"
+    },
+    {
+      "testId": "14.6",
+      "passed": false,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-cpgwnzwd5z61obu7txtnx\",\"object\":\"chat.completion\",\"created\":1766424960,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user wants me to explain what variables are in programming, making sure it's extremely detailed and comprehensive, over 1000 words. They also mentioned using tools like get_weather or open_browser, but looking at their example, they actually used those for specific tasks. Wait, no, in this"
+    },
+    {
+      "testId": "14.7",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-2ynfko1oqrbra3g5lx9jj9\",\"object\":\"chat.completion\",\"created\":1766424963,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so the user is asking me to list five common programming languages. Hmm, I need to figure out how to respond appropriately using the tools available. Let's see, the tool I can use here is \\\"get_common_programming_languages\\\" which probably returns a predefined list.\\n\\nWait, but do I have access"
+    },
+    {
+      "testId": "14.8",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-ddf0j4pihgcd278frax45\",\"object\":\"chat.completion\",\"created\":1766424965,\"model\":\"deepseek-r1-distill-qwen-7b\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>\\nOkay, so I need to change the port number in config.js from 3000 to 8080. Let me think about how to approach this.\\n\\nFirst, I should locate where the port is defined in the config.js file. Usually, ports are set using a constant like PORT or something similar. So I'll check if there's a line that says"
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-20T23:32:11.887Z",
+    "testedAt": "2025-12-22T17:32:46.339Z",
     "emitTest": {
       "passed": true,
-      "score": 75,
-      "details": "XML format succeeded (OpenAI format failed: Wrong tool called: tool_name)"
+      "score": 100,
+      "details": "Valid tool call with correct parameters (OpenAI format)"
     },
     "schemaTest": {
       "passed": false,
@@ -692,14 +835,14 @@
       "details": "Correct tool selected with correct file path"
     },
     "suppressionTest": {
-      "passed": false,
-      "score": 0,
-      "details": "Model called a tool when explicitly forbidden - uncontrollable"
+      "passed": true,
+      "score": 70,
+      "details": "No tool called but mentioned tools in response"
     },
     "nearIdenticalSelectionTest": {
-      "passed": true,
-      "score": 100,
-      "details": "Correct: chose search_web for real-time data with appropriate query"
+      "passed": false,
+      "score": 20,
+      "details": "Model called multiple tools instead of selecting one"
     },
     "multiToolEmitTest": {
       "passed": true,
@@ -716,9 +859,919 @@
       "score": 30,
       "details": "Wrong tool called: tool_name"
     },
-    "toolScore": 67,
-    "reasoningScore": 0,
-    "overallScore": 67
+    "toolScore": 71,
+    "reasoningScore": 69,
+    "overallScore": 62,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": true,
+        "score": 80,
+        "details": "Valid intent JSON with reasoning"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 80,
+        "details": "Identified conflict in text response"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    },
+    "strategicRAGProbes": [
+      {
+        "id": "3.1",
+        "name": "RAG Priority",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 9674,
+        "details": "Correctly used RAG as first tool",
+        "expectedBehavior": "Model should call rag_query BEFORE file reads",
+        "variants": [
+          {
+            "id": "3.1a",
+            "prompt": "Explain the login flow",
+            "passed": false,
+            "score": 0,
+            "response": "<think>\nOkay, so I need to explain the login flow based on the provided tools. Let me start by understanding what each tool does.\n\nFirst, there's `rag_query`, which is a semantic search function. It c"
+          },
+          {
+            "id": "3.1b",
+            "prompt": "Where is user authentication handled?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out where user authentication is handled in the codebase. The user mentioned using the available tools, specifically rag_query, which is a semantic search tool. \n\nFir"
+          }
+        ]
+      },
+      {
+        "id": "3.2",
+        "name": "Hierarchical Search",
+        "category": "3.x",
+        "passed": false,
+        "score": 0,
+        "latency": 10364,
+        "details": "Did not query architecture",
+        "expectedBehavior": "Should use broader query to get architectural overview",
+        "variants": [
+          {
+            "id": "3.2a",
+            "prompt": "How are the different parts of this codebase connected?",
+            "passed": false,
+            "score": 0,
+            "response": "<think>\nOkay, so I need to figure out how the different parts of this codebase are connected. The user is asking that, but they mentioned using the available tools: rag_query, read_file, and search_fi"
+          },
+          {
+            "id": "3.2b",
+            "prompt": "Give me a high-level overview of the project structure",
+            "passed": true,
+            "score": 60,
+            "response": "<think>\nOkay, so I need to figure out how to give a high-level overview of the project structure using the available tools. The user mentioned that if I'm unsure or need to ask for more details, I sho"
+          }
+        ]
+      },
+      {
+        "id": "3.3",
+        "name": "Tool Chaining",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 6903,
+        "details": "Correctly chained RAG -> read_file",
+        "expectedBehavior": "Should RAG first, then read_file for details",
+        "variants": [
+          {
+            "id": "3.3a",
+            "prompt": "Find the JWT validation logic and explain how it works",
+            "passed": false,
+            "score": 20,
+            "response": "<think>\nOkay, so I need to find the JWT validation logic in the codebase and explain how it works. Let me start by understanding what JWT is. JWT stands for JSON Web Token, which is a way to securely "
+          }
+        ]
+      },
+      {
+        "id": "3.4",
+        "name": "Error Recovery",
+        "category": "3.x",
+        "passed": false,
+        "score": 30,
+        "latency": 4340,
+        "details": "Did not acknowledge search failure",
+        "expectedBehavior": "Should acknowledge not found and offer alternatives",
+        "variants": [
+          {
+            "id": "3.4a",
+            "prompt": "Where is the blockchain integration?",
+            "passed": false,
+            "score": 30,
+            "response": "<think>\nOkay, so I need to figure out where the blockchain integration is in the codebase. The user asked that, and I have three tools at my disposal: rag_query, read_file, and search_files.\n\nFirst, I"
+          }
+        ]
+      },
+      {
+        "id": "3.5",
+        "name": "Result Synthesis",
+        "category": "3.x",
+        "passed": false,
+        "score": 20,
+        "latency": 6615,
+        "details": "Poor data flow explanation",
+        "expectedBehavior": "Should search, then synthesize coherent explanation",
+        "variants": [
+          {
+            "id": "3.5a",
+            "prompt": "Trace a user login request from frontend to backend",
+            "passed": false,
+            "score": 20,
+            "response": "<think>\nOkay, so I need to figure out how to trace a user login request from the frontend to the backend using the provided tools. Let me start by understanding what each tool does.\n\nFirst, there's th"
+          }
+        ]
+      },
+      {
+        "id": "3.6",
+        "name": "Self-Correction",
+        "category": "3.x",
+        "passed": false,
+        "score": 0,
+        "latency": 6767,
+        "details": "No RAG queries",
+        "expectedBehavior": "Should try different queries if first doesnt find it",
+        "variants": [
+          {
+            "id": "3.6a",
+            "prompt": "Find how roles are enforced in the API",
+            "passed": false,
+            "score": 0,
+            "response": "<think>\nOkay, so I need to figure out how roles are enforced in the API. The user mentioned using the available tools, starting with rag_query since it's for code-related questions.\n\nFirst, I'll think"
+          }
+        ]
+      }
+    ],
+    "architecturalProbes": [
+      {
+        "id": "4.1",
+        "name": "Code Comprehension",
+        "category": "4.x",
+        "passed": true,
+        "score": 60,
+        "latency": 8559,
+        "details": "Partial understanding",
+        "expectedBehavior": "Should explain JWT validation and user attachment",
+        "variants": [
+          {
+            "id": "4.1a",
+            "prompt": "Explain what db.service does",
+            "passed": false,
+            "score": 20,
+            "response": "<think>\nOkay, so I need to explain what `db.service` does. Let me think through this step by step.\n\nFirst, I remember that in many programming projects, especially those using TypeScript or Node.js, t"
+          },
+          {
+            "id": "4.1b",
+            "prompt": "How does the UserService class work?",
+            "passed": true,
+            "score": 60,
+            "response": "<think>\nOkay, so I need to figure out how the UserService class works. The user is asking about it, so they're probably looking for some documentation or an explanation of its functionality.\n\nFirst, s"
+          }
+        ]
+      },
+      {
+        "id": "4.2",
+        "name": "Bug Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 50,
+        "latency": 9993,
+        "details": "Mentioned security but missed specific issue",
+        "expectedBehavior": "Should identify jwt.decode vs jwt.verify issue",
+        "variants": [
+          {
+            "id": "4.2a",
+            "prompt": "Is the refresh token validation secure?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out whether the refresh token validation is secure. Hmm, where do I start? Well, first off, I know that refresh tokens are used in OAuth 2.0 and other standards to al"
+          },
+          {
+            "id": "4.2b",
+            "prompt": "Find security vulnerabilities in auth.ts",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to find security vulnerabilities in the auth.ts file using the provided tools. Let me start by thinking through what steps are necessary.\n\nFirst, I should probably look at how "
+          }
+        ]
+      },
+      {
+        "id": "4.3",
+        "name": "SQL Injection Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 100,
+        "latency": 8986,
+        "details": "Correctly identified SQL injection",
+        "expectedBehavior": "Should identify string concatenation in SQL query",
+        "variants": [
+          {
+            "id": "4.3a",
+            "prompt": "Is the search query in UserService.java safe?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out if the search query in UserService.java is safe. Hmm, where do I start? Well, first off, I remember that a search query can be dangerous if it's not properly sani"
+          },
+          {
+            "id": "4.3b",
+            "prompt": "Review database queries for injection vulnerabilities",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to review database queries for injection vulnerabilities. Hmm, where do I start? Well, I remember that SQL injection is a big issue in web applications because it can allow att"
+          }
+        ]
+      },
+      {
+        "id": "4.4",
+        "name": "XSS Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 100,
+        "latency": 9940,
+        "details": "Correctly identified XSS vulnerability",
+        "expectedBehavior": "Should identify dangerouslySetInnerHTML vulnerability",
+        "variants": [
+          {
+            "id": "4.4a",
+            "prompt": "Is user input properly sanitized in LoginForm?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out if the user's question is appropriate before using any tools. The question is asking if the user input is properly sanitized in the LoginForm component.\n\nFirst, I"
+          },
+          {
+            "id": "4.4b",
+            "prompt": "Find XSS issues in the React components",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to find XSS vulnerabilities in React components using the available tools. The user mentioned that I should start with the `rag_query` function because it's designed for semant"
+          }
+        ]
+      },
+      {
+        "id": "4.5",
+        "name": "Architecture Inference",
+        "category": "4.x",
+        "passed": false,
+        "score": 30,
+        "latency": 5269,
+        "details": "Did not identify patterns",
+        "expectedBehavior": "Should identify layered architecture, MVC/service pattern",
+        "variants": [
+          {
+            "id": "4.5a",
+            "prompt": "How is the code organized?",
+            "passed": false,
+            "score": 30,
+            "response": "<think>\nOkay, so I need to figure out how the code is organized. The user asked that question, but they also mentioned using the available tools: rag_query, read_file, and search_files.\n\nFirst, I shou"
+          }
+        ]
+      },
+      {
+        "id": "4.6",
+        "name": "Language Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 50,
+        "latency": 6352,
+        "details": "Only found 1 languages",
+        "expectedBehavior": "Should identify TypeScript, Java, JSX",
+        "variants": [
+          {
+            "id": "4.6a",
+            "prompt": "What tech stack is this project using?",
+            "passed": false,
+            "score": 0,
+            "response": "<think>\nOkay, so I need to figure out what tech stack this project is using based on the user's question. The user asked, \"What tech stack is this project using?\" and I was instructed to use the avail"
+          }
+        ]
+      }
+    ],
+    "navigationProbes": [
+      {
+        "id": "5.1",
+        "name": "Locate Implementation",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 6785,
+        "details": "Did not find implementation",
+        "expectedBehavior": "Should locate bcrypt.hash usage",
+        "variants": [
+          {
+            "id": "5.1a",
+            "prompt": "Where is password hashing implemented?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out where password hashing is implemented in the codebase. The user mentioned using the \"rag_query\" tool first if it's a code-related question. Let me think about how"
+          },
+          {
+            "id": "5.1b",
+            "prompt": "How is password security handled?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out how password security is handled in this system. The user asked that question, and since it's a code-related issue, my first thought is to use the rag_query tool "
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "name": "Cross-Stack Navigation",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 7931,
+        "details": "Found auth in both stacks",
+        "expectedBehavior": "Should find both frontend and backend auth",
+        "variants": [
+          {
+            "id": "5.2a",
+            "prompt": "Show me auth across frontend and backend",
+            "passed": false,
+            "score": 0,
+            "response": "<think>\nOkay, so I need to figure out how to show the user information across both the frontend and backend using the available tools. Let's break this down step by step.\n\nFirst, the user is asking ab"
+          }
+        ]
+      },
+      {
+        "id": "5.3",
+        "name": "Dependency Tracing",
+        "category": "5.x",
+        "passed": false,
+        "score": 20,
+        "latency": 4348,
+        "details": "Did not trace dependencies",
+        "expectedBehavior": "Should list services and middleware dependencies",
+        "variants": [
+          {
+            "id": "5.3a",
+            "prompt": "What does index.ts import?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out what index.ts imports. The user mentioned using the available tools, starting with rag_query since it's for code-related questions.\n\nFirst, I'll call rag_query wi"
+          }
+        ]
+      },
+      {
+        "id": "5.4",
+        "name": "Entry Point Location",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 5436,
+        "details": "Found entry points",
+        "expectedBehavior": "Should find index.ts/App.tsx entry points",
+        "variants": [
+          {
+            "id": "5.4a",
+            "prompt": "What is the main entry file?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out what the main entry file is in this project. The user mentioned using the \"rag_query\" tool if it's a code-related question. Let me think about how to approach thi"
+          }
+        ]
+      },
+      {
+        "id": "5.5",
+        "name": "Shared Code Detection",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 5277,
+        "details": "Found shared code",
+        "expectedBehavior": "Should find shared-utils package",
+        "variants": [
+          {
+            "id": "5.5a",
+            "prompt": "Are there reusable utilities?",
+            "passed": false,
+            "score": 0,
+            "response": "<think>\nOkay, so I need to figure out if there are any reusable utilities in the codebase based on the user's question. The user is asking whether there are reusable utilities available.\n\nFirst, looki"
+          }
+        ]
+      }
+    ],
+    "helicopterProbes": [
+      {
+        "id": "6.1",
+        "name": "Project Overview",
+        "category": "6.x",
+        "passed": false,
+        "score": 30,
+        "latency": 5326,
+        "details": "Overview too short or too long",
+        "expectedBehavior": "Should summarize project purpose and structure",
+        "variants": [
+          {
+            "id": "6.1a",
+            "prompt": "What is this codebase about?",
+            "passed": false,
+            "score": 30,
+            "response": "<think>\nOkay, so I need to figure out what the codebase is about using the available tools. The user asked, \"What is this codebase about?\" Let me think through how to approach this.\n\nFirst, since the "
+          }
+        ]
+      },
+      {
+        "id": "6.2",
+        "name": "Stack Enumeration",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 7928,
+        "details": "Found few stacks",
+        "expectedBehavior": "Should list Node, React, React Native, Java, Mendix",
+        "variants": [
+          {
+            "id": "6.2a",
+            "prompt": "List all the project folders and their purposes",
+            "passed": false,
+            "score": 20,
+            "response": "<think>\nOkay, so I need to figure out how to list all the project folders and their purposes using the available tools. The user mentioned that they can use 'rag_query' which is a semantic search tool"
+          }
+        ]
+      },
+      {
+        "id": "6.3",
+        "name": "Team Structure Inference",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 6465,
+        "details": "Suggested team structure",
+        "expectedBehavior": "Should suggest backend/frontend/mobile teams",
+        "variants": [
+          {
+            "id": "6.3a",
+            "prompt": "Who would work on what parts?",
+            "passed": false,
+            "score": 30,
+            "response": "<think>\nOkay, so I need to figure out who would work on what parts based on the information provided. Let me start by looking at the codebase structure.\n\nFirst, there's a main.go file which is the ent"
+          }
+        ]
+      },
+      {
+        "id": "6.4",
+        "name": "Risk Assessment",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 5999,
+        "details": "Identified risks",
+        "expectedBehavior": "Should mention security issues, coupling, etc",
+        "variants": [
+          {
+            "id": "6.4a",
+            "prompt": "Any red flags in this code?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out if there are any red flags in the provided code. The user mentioned using the available tools: rag_query, read_file, and search_files. \n\nFirst, I'll start by usin"
+          }
+        ]
+      },
+      {
+        "id": "6.5",
+        "name": "Improvement Suggestions",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 6955,
+        "details": "Provided improvements",
+        "expectedBehavior": "Should suggest specific improvements",
+        "variants": [
+          {
+            "id": "6.5a",
+            "prompt": "What would you refactor first?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out what to refactor first based on the user's question. The user is asking me to determine which part of the code should be refactored next. \n\nFirst, I'll consider u"
+          }
+        ]
+      }
+    ],
+    "proactiveProbes": [
+      {
+        "id": "7.1",
+        "name": "Proactive Security Findings",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 6518,
+        "details": "Did not proactively find issues",
+        "expectedBehavior": "Should proactively mention connection leak",
+        "variants": [
+          {
+            "id": "7.1a",
+            "prompt": "Review db.service.ts",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to review the `db.service.ts` file based on the user's request. Let me start by understanding what this file does. It looks like it's a service that manages database interactio"
+          }
+        ]
+      },
+      {
+        "id": "7.2",
+        "name": "Improvement Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 100,
+        "latency": 6677,
+        "details": "Suggested improvements",
+        "expectedBehavior": "Should suggest error handling, cancellation",
+        "variants": [
+          {
+            "id": "7.2a",
+            "prompt": "Can this hook be improved?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out how to improve the hook mentioned in the user's question. The user is asking if the hook can be enhanced, but they haven't provided any specific details about wha"
+          }
+        ]
+      },
+      {
+        "id": "7.3",
+        "name": "Documentation Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 100,
+        "latency": 6605,
+        "details": "Noted documentation",
+        "expectedBehavior": "May note missing prop types or docs",
+        "variants": [
+          {
+            "id": "7.3a",
+            "prompt": "What do you think of ProductCard?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out what the user is asking about regarding ProductCard. The user just asked, \"What do you think of ProductCard?\" and they want me to use the available tools: rag_que"
+          }
+        ]
+      },
+      {
+        "id": "7.4",
+        "name": "Best Practice Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 60,
+        "latency": 5448,
+        "details": "Reviewed but no best practices",
+        "expectedBehavior": "Should mention best practices for auth",
+        "variants": [
+          {
+            "id": "7.4a",
+            "prompt": "Is the auth middleware well-implemented?",
+            "passed": true,
+            "score": 60,
+            "response": "<think>\nOkay, so I need to figure out whether the auth middleware is well-implemented based on the user's question. The user hasn't provided any specific tools yet, but from the available tools list, "
+          }
+        ]
+      },
+      {
+        "id": "7.5",
+        "name": "Testing Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 6656,
+        "details": "Reviewed without test mentions",
+        "expectedBehavior": "May suggest adding tests",
+        "variants": [
+          {
+            "id": "7.5a",
+            "prompt": "Review shared-utils/validation.ts",
+            "passed": true,
+            "score": 50,
+            "response": "<think>\nOkay, so I need to review the `shared-utils/validation.ts` file. Let me start by looking at what's in there.\n\nFirst, I see that it imports several modules like `anytime`, `never`, and a few ot"
+          }
+        ]
+      },
+      {
+        "id": "7.6",
+        "name": "Performance Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 6040,
+        "details": "Reviewed without perf notes",
+        "expectedBehavior": "May note re-render or pagination concerns",
+        "variants": [
+          {
+            "id": "7.6a",
+            "prompt": "Any performance issues in UserList?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out if there are any performance issues with UserList based on the user's question. The user is asking specifically about performance issues, so my response should ad"
+          }
+        ]
+      },
+      {
+        "id": "7.7",
+        "name": "Edge Case Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 100,
+        "latency": 6676,
+        "details": "Identified edge cases",
+        "expectedBehavior": "Should identify edge cases in error handling",
+        "variants": [
+          {
+            "id": "7.7a",
+            "prompt": "What if login fails?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I'm trying to figure out what happens if login fails. Hmm, I don't have much experience with this system, but let me think through it step by step.\n\nFirst, when someone tries to log i"
+          }
+        ]
+      },
+      {
+        "id": "7.8",
+        "name": "Accessibility Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 5010,
+        "details": "Reviewed without a11y notes",
+        "expectedBehavior": "May note accessibility labels or concerns",
+        "variants": [
+          {
+            "id": "7.8a",
+            "prompt": "Is LoginScreen accessible?",
+            "passed": true,
+            "score": 100,
+            "response": "<think>\nOkay, so I need to figure out if LoginScreen is accessible in the codebase. The user asked that, and I have three tools at my disposal: rag_query, read_file, and search_files.\n\nFirst, I should"
+          }
+        ]
+      }
+    ],
+    "intentProbes": [
+      {
+        "id": "8.1a",
+        "name": "Implicit RAG - Question",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not search codebase",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1b",
+        "name": "Implicit RAG - Bug Report",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not investigate bug",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1c",
+        "name": "Implicit File Read",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not look at file",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "read_file",
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2a",
+        "name": "RAG vs File Read Decision",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not use semantic search",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2b",
+        "name": "Specific vs Broad Query",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly read specific file",
+        "toolsInvoked": [
+          "read_file"
+        ],
+        "expectedTools": [
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.3a",
+        "name": "Knowledge Question - No Tools",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly answered without tools",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3b",
+        "name": "Clarification Request",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not seek clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3c",
+        "name": "Follow-up Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for database context",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4a",
+        "name": "Code Question Without Context",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Answered without checking code (may hallucinate)",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4b",
+        "name": "Specific Code Location",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not look up the specific code",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.5a",
+        "name": "Ambiguous Reference",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 70,
+        "details": "Did not act but also did not clarify",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.5b",
+        "name": "Multiple Interpretations",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Made reasonable assumption",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6a",
+        "name": "Implicit Security Review",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Proceeded without knowing which endpoint",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6b",
+        "name": "Performance Concern Hint",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not investigate the performance issue",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.7a",
+        "name": "Dual Request",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not search",
+        "toolsInvoked": [
+          "read_file"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8a",
+        "name": "Hypothetical Question",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": true,
+        "score": 70,
+        "details": "Answered theoretically",
+        "toolsInvoked": [
+          "get_code snippets"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8b",
+        "name": "Just Asking",
+        "invoked": false,
+        "invokedCorrectly": false,
+        "actionCorrect": true,
+        "score": 50,
+        "details": "Answered without searching",
+        "toolsInvoked": [],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      }
+    ],
+    "intentScores": {
+      "invokeCorrectness": 53,
+      "toolSelectionAccuracy": 50,
+      "actionCorrectness": 29,
+      "overInvocationRate": 0,
+      "underInvocationRate": 67,
+      "overallIntentScore": 48
+    },
+    "scoreBreakdown": {
+      "toolScore": 71,
+      "reasoningScore": 69,
+      "ragScore": 42,
+      "bugDetectionScore": 83,
+      "architecturalScore": 65,
+      "navigationScore": 64,
+      "helicopterScore": 70,
+      "proactiveScore": 66,
+      "intentScore": 48,
+      "overallScore": 62
+    }
   },
   "role": "none",
   "contextLatency": {
@@ -732,30 +1785,45 @@
       131072
     ],
     "latencies": {
-      "2048": 668,
-      "4096": 685,
-      "8192": 721,
-      "16384": 669,
-      "32768": 676,
-      "65536": 687,
-      "131072": 688
+      "2048": 3980,
+      "4096": 3517,
+      "8192": 3856,
+      "16384": 3730,
+      "32768": 3630,
+      "65536": 3939,
+      "131072": 3549
     },
     "maxUsableContext": 131072,
     "recommendedContext": 131072,
     "modelMaxContext": 131072,
-    "minLatency": 668,
+    "minLatency": 3517,
     "isInteractiveSpeed": true,
-    "speedRating": "good"
+    "speedRating": "acceptable"
   },
   "contextLength": 131072,
   "discoveredNativeTools": [
-    "tool1",
-    "tool2",
-    "tool3"
+    "get_weather",
+    "send_email",
+    "open_browser"
   ],
   "unmappedNativeTools": [
-    "tool1",
-    "tool2",
-    "tool3"
-  ]
+    "get_weather",
+    "send_email"
+  ],
+  "scoreBreakdown": {
+    "toolScore": 72,
+    "ragScore": 86,
+    "failureModesScore": 43,
+    "statefulScore": 14,
+    "precedenceScore": 44,
+    "complianceScore": 19,
+    "avgLatencyMs": 2994,
+    "latencyScore": 100
+  },
+  "trainabilityScores": {
+    "systemPromptCompliance": 19,
+    "instructionPersistence": 14,
+    "correctionAcceptance": 43,
+    "overallTrainability": 24
+  }
 }

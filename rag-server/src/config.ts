@@ -22,7 +22,7 @@ export interface RAGConfig {
   
   // Indexing settings
   indexing: {
-    chunkSize: number;        // default: 1000 tokens
+    chunkSize: number;        // default: 1500 tokens (safe for 2048 context embedding models)
     chunkOverlap: number;     // default: 50 tokens
     includePatterns: string[]; // default: ["**/*.ts", "**/*.js", etc.]
     excludePatterns: string[]; // default: ["node_modules", ".git", etc.]
@@ -88,7 +88,7 @@ export const defaultConfig: RAGConfig = {
   },
   
   indexing: {
-    chunkSize: 1000,
+    chunkSize: 1500,
     chunkOverlap: 50,
     includePatterns: [
       '**/*.ts',

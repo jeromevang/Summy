@@ -217,7 +217,7 @@ export class Chunker {
   constructor(options: ChunkerOptions = {}) {
     this.parser = new Parser();
     this.options = {
-      maxChunkTokens: options.maxChunkTokens || 1800,  // Safe for 2048 context (leaves 248 token buffer)
+      maxChunkTokens: options.maxChunkTokens || 1500,  // Safe for 2048 context embedding models (leaves ~500 token buffer for metadata)
       minChunkTokens: options.minChunkTokens || 50,
       includeImports: options.includeImports !== false
     };

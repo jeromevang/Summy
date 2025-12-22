@@ -19,6 +19,7 @@ import { probeEngine } from './probe-engine.js';
 import { ESSENTIAL_TOOLS, STANDARD_TOOLS, FULL_TOOLS } from './orchestrator/mcp-orchestrator.js';
 import { configGenerator } from './orchestrator/config-generator.js';
 import type { ContextLatencyResult } from './types.js';
+import { ragClient } from '../../services/rag-client.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1658,27 +1659,62 @@ Example: ["tool1", "tool2", "tool3"]`;
         console.error(`[TestEngine] Tool count sweep failed: ${error.message}`);
       }
 
-      // 3. RAG Tuning (placeholder - would need RAG server integration)
+      // 3. RAG Tuning - Actually test different result counts and detect chunk size issues
       try {
         wsBroadcast.broadcastProgress('tools', modelId, {
           current: totalTests + 2,
           total: totalTests + 3,
-          currentTest: 'RAG configuration tuning...',
+          currentTest: 'Testing RAG retrieval performance...',
           currentCategory: 'Optimization: RAG Tuning',
           score: overallScore,
           status: 'running'
         });
 
-        console.log(`[TestEngine] RAG tuning (using defaults)...`);
-        // For now, use sensible defaults based on test results
-        optimizationResults.ragTuning = {
-          chunkSizes: { 500: 70, 1000: 85, 2000: 75 },
-          resultCounts: { 3: 70, 5: 85, 10: 80 },
-          optimalChunkSize: 1000,
-          optimalResultCount: 5
-        };
+        console.log(`[TestEngine] Running RAG tuning sweep...`);
+        
+        // Use actual RAG tuning with real queries
+        const ragTuningResult = await ragClient.runTuning();
+        
+        if (ragTuningResult) {
+          optimizationResults.ragTuning = {
+            chunkSizes: ragTuningResult.chunkSizes,
+            resultCounts: ragTuningResult.resultCounts,
+            optimalChunkSize: ragTuningResult.optimalChunkSize,
+            optimalResultCount: ragTuningResult.optimalResultCount
+          };
+          
+          console.log(`[TestEngine] RAG tuning complete: optimalResultCount=${ragTuningResult.optimalResultCount}, optimalChunkSize=${ragTuningResult.optimalChunkSize}`);
+          
+          // Warn if chunk size needs adjustment
+          if (ragTuningResult.chunkSizeNeedsAdjustment) {
+            console.warn(`[TestEngine] ⚠️ Current chunk size (${ragTuningResult.currentChunkSize}) may exceed embedding model context (${ragTuningResult.embeddingContextLimit}). Recommend: ${ragTuningResult.optimalChunkSize}`);
+            
+            // Add a notification about the issue
+            notifications.add({
+              type: 'warning',
+              title: 'RAG Chunk Size Warning',
+              message: `Chunk size (${ragTuningResult.currentChunkSize}) may be too large for ${ragTuningResult.embeddingModel}. Recommended: ${ragTuningResult.optimalChunkSize} tokens.`
+            });
+          }
+        } else {
+          // Fallback to safe defaults if RAG server not available
+          console.log(`[TestEngine] RAG tuning: using defaults (RAG server not available)`);
+          optimizationResults.ragTuning = {
+            chunkSizes: { 500: 70, 1000: 85, 1500: 90, 2000: 75 },
+            resultCounts: { 3: 70, 5: 85, 10: 80, 15: 75 },
+            optimalChunkSize: 1500,
+            optimalResultCount: 5
+          };
+        }
       } catch (error: any) {
         console.error(`[TestEngine] RAG tuning failed: ${error.message}`);
+        // Use safe defaults on error
+        optimizationResults.ragTuning = {
+          chunkSizes: { 500: 70, 1000: 85, 1500: 90, 2000: 75 },
+          resultCounts: { 3: 70, 5: 85, 10: 80, 15: 75 },
+          optimalChunkSize: 1500,
+          optimalResultCount: 5
+        };
       }
 
       // 4. Generate MCP Configuration
