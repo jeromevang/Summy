@@ -9,11 +9,13 @@
     "rag-server"
   ],
   "scripts": {
-    "dev": "concurrently -n server,client,rag -c blue,green,magenta \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:rag\"",
+    "dev": "concurrently -n server,client,rag,continue-tools -c blue,green,magenta,cyan \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:rag\" \"npm run dev:continue-tools\"",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run dev",
     "dev:mcp": "cd mcp-server && npm run dev",
     "dev:rag": "cd rag-server && npm run dev",
+    "dev:cursor-tools": "cd mcp-server && npm run dev:cursor-tools",
+    "dev:continue-tools": "cd mcp-server && npm run dev:continue-tools",
     "kill": "taskkill /F /IM node.exe /T 2>nul || echo No node processes found",
     "build": "npm run build:server && npm run build:client && npm run build:mcp && npm run build:rag",
     "build:server": "cd server && npm run build",
