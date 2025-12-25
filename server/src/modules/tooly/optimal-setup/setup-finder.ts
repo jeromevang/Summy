@@ -3,7 +3,7 @@
  * Scans available models and finds the best configuration
  */
 
-import type { 
+import type {
   HardwareProfile,
   OptimalSetupResult,
   ModelProfileV2,
@@ -29,7 +29,7 @@ export interface GPUInfo {
 export async function detectHardware(): Promise<HardwareProfile> {
   // This is a simplified version
   // Real implementation would use node-gpu-stats or similar
-  
+
   return {
     gpuName: 'Unknown GPU',
     vramGB: 12, // Default assumption
@@ -43,11 +43,11 @@ export async function detectHardware(): Promise<HardwareProfile> {
  */
 export function estimateVramRequirement(modelId: string): number {
   const lowerModel = modelId.toLowerCase();
-  
+
   // Extract size from model name (e.g., "qwen-2.5-72b" -> 72)
   const sizeMatch = lowerModel.match(/(\d+)b/);
   const sizeB = sizeMatch ? parseInt(sizeMatch[1]) : 7;
-  
+
   // Check for quantization
   let quantMultiplier = 1.0;
   if (lowerModel.includes('q4')) quantMultiplier = 0.5;
@@ -55,10 +55,10 @@ export function estimateVramRequirement(modelId: string): number {
   else if (lowerModel.includes('q6')) quantMultiplier = 0.7;
   else if (lowerModel.includes('q8')) quantMultiplier = 0.9;
   else if (lowerModel.includes('gguf')) quantMultiplier = 0.5; // Assume Q4 for GGUF
-  
+
   // Rough VRAM estimate: ~1GB per 1B params for Q4
   const baseVram = sizeB * 1.0 * quantMultiplier;
-  
+
   // Add overhead (~10%)
   return Math.ceil(baseVram * 1.1);
 }
@@ -113,12 +113,12 @@ export interface OptimalSetupInput {
  */
 export function findOptimalSetup(input: OptimalSetupInput): OptimalSetupResult {
   const { hardware, testedModels } = input;
-  
+
   // Filter to models that fit
-  const fittingModels = testedModels.filter(m => 
+  const fittingModels = testedModels.filter(m =>
     !m.vramRequired || fitsInVram(m.vramRequired, hardware.vramGB)
   );
-  
+
   // Convert to candidates
   const candidates: ModelCandidate[] = fittingModels.map(m => ({
     modelId: m.modelId,
@@ -128,28 +128,26 @@ export function findOptimalSetup(input: OptimalSetupInput): OptimalSetupResult {
     vramRequired: m.vramRequired,
     speedRating: m.speedRating
   }));
-  
+
   // Score for each role
   const mainCandidates = candidates
     .map(c => ({ ...c, mainScore: scoreForMainRole(c) }))
-    .sort((a, b) => b.mainScore - a.mainScore)
-    .slice(0, 5);
-  
+    .sort((a, b) => b.mainScore - a.mainScore);
+
   const executorCandidates = candidates
     .map(c => ({ ...c, executorScore: scoreForExecutorRole(c) }))
-    .sort((a, b) => b.executorScore - a.executorScore)
-    .slice(0, 5);
-  
-  // Find optimal pairing
+    .sort((a, b) => b.executorScore - a.executorScore);
+
+  // 1. LEGACY PAIRING (Keep for backward compatibility)
   const pairing = findOptimalPairing(candidates, hardware.vramGB);
-  
+
   let recommendedPairing = {
     mainModel: mainCandidates[0]?.modelId || '',
     executorModel: executorCandidates[0]?.modelId || '',
     confidence: 50,
     reasoning: 'Default selection based on individual scores'
   };
-  
+
   if (pairing) {
     recommendedPairing = {
       mainModel: pairing.mainModel.modelId,
@@ -158,8 +156,8 @@ export function findOptimalSetup(input: OptimalSetupInput): OptimalSetupResult {
       reasoning: pairing.reasoning.join('; ')
     };
   }
-  
-  // Handle single-model case (same model for both roles)
+
+  // Handle single-model case
   if (recommendedPairing.mainModel === recommendedPairing.executorModel) {
     const model = candidates.find(c => c.modelId === recommendedPairing.mainModel);
     if (model) {
@@ -167,22 +165,98 @@ export function findOptimalSetup(input: OptimalSetupInput): OptimalSetupResult {
       recommendedPairing.confidence = Math.min(model.rawScores.overallScore, 90);
     }
   }
-  
+
+  // 2. SWARM CLUSTERING (Knapsack Algorithm)
+  const swarmConfig = findOptimalSwarm(candidates, hardware.vramGB);
+
   return {
     hardware,
     scannedModels: testedModels.length,
     testedModels: testedModels.length,
-    topMainCandidates: mainCandidates.map(c => ({
+    topMainCandidates: mainCandidates.slice(0, 5).map(c => ({
       modelId: c.modelId,
       score: c.mainScore,
       vramRequired: c.vramRequired || 0
     })),
-    topExecutorCandidates: executorCandidates.map(c => ({
+    topExecutorCandidates: executorCandidates.slice(0, 5).map(c => ({
       modelId: c.modelId,
       score: c.executorScore,
       vramRequired: c.vramRequired || 0
     })),
-    recommendedPairing
+    recommendedPairing,
+    recommendedSwarm: swarmConfig
+  };
+}
+
+/**
+ * findOptimalSwarm
+ * Uses a greedy approach to fill VRAM with the best diverse set of models.
+ */
+function findOptimalSwarm(
+  candidates: ModelCandidate[],
+  availableVramGB: number
+): OptimalSetupResult['recommendedSwarm'] {
+  const selectedModels: string[] = [];
+  const roles: Record<string, 'main' | 'executor' | 'specialist'> = {};
+  let currentVramUsage = 0;
+  const reasoning: string[] = [];
+
+  // 1. Pick the best "Main" model (Leader)
+  // We prioritize reasoning capability for the leader.
+  const bestMain = candidates
+    .filter(c => (c.vramRequired || 0) < availableVramGB)
+    .sort((a, b) => scoreForMainRole(b) - scoreForMainRole(a))[0];
+
+  if (!bestMain) {
+    return undefined;
+  }
+
+  selectedModels.push(bestMain.modelId);
+  roles[bestMain.modelId] = 'main';
+  currentVramUsage += (bestMain.vramRequired || 0);
+  reasoning.push(`Selected ${bestMain.displayName} as Swarm Leader (Main).`);
+
+  // 2. Pick the best "Executor" model (Worker)
+  // We want someone good at coding/tools who is NOT the main model
+  const bestExecutor = candidates
+    .filter(c =>
+      !selectedModels.includes(c.modelId) &&
+      (currentVramUsage + (c.vramRequired || 0)) < availableVramGB
+    )
+    .sort((a, b) => scoreForExecutorRole(b) - scoreForExecutorRole(a))[0];
+
+  if (bestExecutor) {
+    selectedModels.push(bestExecutor.modelId);
+    roles[bestExecutor.modelId] = 'executor';
+    currentVramUsage += (bestExecutor.vramRequired || 0);
+    reasoning.push(`Selected ${bestExecutor.displayName} as Primary Executor.`);
+  } else if ((bestMain.vramRequired || 0) * 2 < availableVramGB) {
+    // If we can't find a different executor but have tons of space, 
+    // maybe run a second instance of Main? (Skipping for now to save VRAM for specialists)
+  }
+
+  // 3. Fill remaining space with Specialists
+  // Prioritize models that have high scores in specific areas the others might lack
+  // For now, simpler logic: just add the highest overall score remaining models
+  const remainingCandidates = candidates
+    .filter(c => !selectedModels.includes(c.modelId))
+    .sort((a, b) => b.rawScores.overallScore - a.rawScores.overallScore);
+
+  for (const cand of remainingCandidates) {
+    if ((currentVramUsage + (cand.vramRequired || 0)) < availableVramGB) {
+      selectedModels.push(cand.modelId);
+      roles[cand.modelId] = 'specialist';
+      currentVramUsage += cand.vramRequired || 0;
+      reasoning.push(`Added ${cand.displayName} as Specialist to utilize remaining VRAM.`);
+    }
+  }
+
+  return {
+    models: selectedModels,
+    roles,
+    totalVramUsage: Math.round(currentVramUsage * 10) / 10,
+    confidence: 85, // Placeholder confidence
+    reasoning: reasoning.join(' ')
   };
 }
 
@@ -218,15 +292,15 @@ export function compareModels(
     { category: 'Bug Detection', keyA: modelA.scores.bugDetection, keyB: modelB.scores.bugDetection },
     { category: 'Code Understanding', keyA: modelA.scores.codeUnderstanding, keyB: modelB.scores.codeUnderstanding },
   ];
-  
+
   let winsA = 0;
   let winsB = 0;
-  
+
   const categoryResults = categories.map(cat => {
     const winnerA = cat.keyA > cat.keyB;
     if (cat.keyA > cat.keyB) winsA++;
     else if (cat.keyB > cat.keyA) winsB++;
-    
+
     return {
       category: cat.category,
       winnerA,
@@ -234,11 +308,11 @@ export function compareModels(
       scoreB: cat.keyB
     };
   });
-  
+
   let winner: 'A' | 'B' | 'tie' = 'tie';
   if (winsA > winsB + 1) winner = 'A';
   else if (winsB > winsA + 1) winner = 'B';
-  
+
   // Generate recommendation
   let recommendation = '';
   if (winner === 'A') {
@@ -251,7 +325,7 @@ export function compareModels(
     recommendation = 'Both models are comparable. Consider using them together: ' +
       `${modelA.modelId} as Main, ${modelB.modelId} as Executor`;
   }
-  
+
   return {
     modelA: modelA.modelId,
     modelB: modelB.modelId,
@@ -276,7 +350,7 @@ export function quickAssessModel(modelId: string): {
   recommendedRole: 'main' | 'executor' | 'both' | 'unknown';
 } {
   const lowerModel = modelId.toLowerCase();
-  
+
   // Known strong models for agentic tasks
   const topTierPatterns = [
     { pattern: /qwen.*2\.5.*(72b|32b|14b)/, strengths: ['tool use', 'reasoning'], role: 'both' as const },
@@ -284,14 +358,14 @@ export function quickAssessModel(modelId: string): {
     { pattern: /deepseek.*coder.*v2/, strengths: ['coding', 'tool use'], role: 'executor' as const },
     { pattern: /claude/, strengths: ['reasoning', 'safety'], role: 'main' as const },
   ];
-  
+
   const midTierPatterns = [
     { pattern: /qwen.*2\.5.*(7b|3b)/, role: 'executor' as const },
     { pattern: /llama.*3\.(1|2).*(8b|11b)/, role: 'executor' as const },
     { pattern: /mistral.*(7b|8x7b)/, role: 'executor' as const },
     { pattern: /phi.*3/, role: 'executor' as const },
   ];
-  
+
   for (const tier of topTierPatterns) {
     if (tier.pattern.test(lowerModel)) {
       return {
@@ -302,7 +376,7 @@ export function quickAssessModel(modelId: string): {
       };
     }
   }
-  
+
   for (const tier of midTierPatterns) {
     if (tier.pattern.test(lowerModel)) {
       return {
@@ -313,7 +387,7 @@ export function quickAssessModel(modelId: string): {
       };
     }
   }
-  
+
   return {
     estimatedTier: 'low',
     strengths: [],

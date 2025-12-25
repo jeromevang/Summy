@@ -1,0 +1,2 @@
+﻿--- TEST: Tool with {{ }} in description ---
+Result: SUCCESS

@@ -119,13 +119,13 @@ export class GlobalMemoryStore {
    * Get a global memory value
    */
   get(key: string): GlobalMemory | null {
-    const row = db.prepare(`
+    const row = db.get(`
       SELECT key, value, confidence, source, created_at, updated_at 
       FROM memory_global WHERE key = ?
-    `).get(key) as any;
-    
+    `, [key]);
+
     if (!row) return null;
-    
+
     return {
       key: row.key,
       value: row.value,
@@ -135,14 +135,14 @@ export class GlobalMemoryStore {
       updatedAt: row.updated_at
     };
   }
-  
+
   /**
    * Set a global memory value
    */
   set(key: string, value: string, source: string = 'system', confidence: number = 1.0): void {
     const now = new Date().toISOString();
-    
-    db.prepare(`
+
+    db.run(`
       INSERT INTO memory_global (key, value, confidence, source, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT(key) DO UPDATE SET 
@@ -150,26 +150,26 @@ export class GlobalMemoryStore {
         confidence = excluded.confidence,
         source = excluded.source,
         updated_at = excluded.updated_at
-    `).run(key, value, confidence, source, now, now);
+    `, [key, value, confidence, source, now, now]);
   }
-  
+
   /**
    * Delete a global memory value
    */
   delete(key: string): boolean {
-    const result = db.prepare(`DELETE FROM memory_global WHERE key = ?`).run(key);
+    const result = db.run(`DELETE FROM memory_global WHERE key = ?`, [key]);
     return result.changes > 0;
   }
-  
+
   /**
    * List all global memories
    */
   list(): GlobalMemory[] {
-    const rows = db.prepare(`
+    const rows = db.query(`
       SELECT key, value, confidence, source, created_at, updated_at 
       FROM memory_global ORDER BY updated_at DESC
-    `).all() as any[];
-    
+    `);
+
     return rows.map(row => ({
       key: row.key,
       value: row.value,
@@ -179,18 +179,18 @@ export class GlobalMemoryStore {
       updatedAt: row.updated_at
     }));
   }
-  
+
   /**
    * Search global memories by key or value
    */
   search(query: string): GlobalMemory[] {
-    const rows = db.prepare(`
+    const rows = db.query(`
       SELECT key, value, confidence, source, created_at, updated_at 
       FROM memory_global 
       WHERE key LIKE ? OR value LIKE ?
       ORDER BY confidence DESC
-    `).all(`%${query}%`, `%${query}%`) as any[];
-    
+    `, [`%${query}%`, `%${query}%`]);
+
     return rows.map(row => ({
       key: row.key,
       value: row.value,
@@ -211,12 +211,12 @@ export class ProjectMemoryStore {
    * Get project memories
    */
   getForProject(projectPath: string): ProjectMemory[] {
-    const rows = db.prepare(`
+    const rows = db.query(`
       SELECT id, project_path, key, value, importance, created_at 
       FROM memory_project WHERE project_path = ?
       ORDER BY created_at DESC
-    `).all(projectPath) as any[];
-    
+    `, [projectPath]);
+
     return rows.map(row => ({
       id: row.id,
       projectPath: row.project_path,
@@ -226,38 +226,38 @@ export class ProjectMemoryStore {
       createdAt: row.created_at
     }));
   }
-  
+
   /**
    * Set a project memory
    */
   set(projectPath: string, key: string, value: string, importance: ProjectMemory['importance'] = 'medium'): string {
     const id = uuidv4();
     const now = new Date().toISOString();
-    
-    db.prepare(`
+
+    db.run(`
       INSERT INTO memory_project (id, project_path, key, value, importance, created_at)
       VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT(project_path, key) DO UPDATE SET 
         value = excluded.value,
         importance = excluded.importance
-    `).run(id, projectPath, key, value, importance, now);
-    
+    `, [id, projectPath, key, value, importance, now]);
+
     return id;
   }
-  
+
   /**
    * Delete a project memory
    */
   delete(id: string): boolean {
-    const result = db.prepare(`DELETE FROM memory_project WHERE id = ?`).run(id);
+    const result = db.run(`DELETE FROM memory_project WHERE id = ?`, [id]);
     return result.changes > 0;
   }
-  
+
   /**
    * Get high-importance memories for a project
    */
   getImportant(projectPath: string): ProjectMemory[] {
-    const rows = db.prepare(`
+    const rows = db.query(`
       SELECT id, project_path, key, value, importance, created_at 
       FROM memory_project 
       WHERE project_path = ? AND importance IN ('high', 'critical')
@@ -267,8 +267,8 @@ export class ProjectMemoryStore {
           WHEN 'high' THEN 2 
         END,
         created_at DESC
-    `).all(projectPath) as any[];
-    
+    `, [projectPath]);
+
     return rows.map(row => ({
       id: row.id,
       projectPath: row.project_path,
@@ -290,27 +290,27 @@ export class PatternMemoryStore {
    */
   store(pattern: Omit<PatternMemory, 'id'>): string {
     const id = uuidv4();
-    
-    db.prepare(`
+
+    db.run(`
       INSERT INTO memory_patterns (id, pattern_type, trigger, action, success_rate, occurrence_count, last_used)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(id, pattern.patternType, pattern.trigger, pattern.action, 
-           pattern.successRate, pattern.occurrenceCount, pattern.lastUsed);
-    
+    `, [id, pattern.patternType, pattern.trigger, pattern.action,
+      pattern.successRate, pattern.occurrenceCount, pattern.lastUsed]);
+
     return id;
   }
-  
+
   /**
    * Get a pattern by ID
    */
   get(id: string): PatternMemory | null {
-    const row = db.prepare(`
+    const row = db.get(`
       SELECT id, pattern_type, trigger, action, success_rate, occurrence_count, last_used 
       FROM memory_patterns WHERE id = ?
-    `).get(id) as any;
-    
+    `, [id]);
+
     if (!row) return null;
-    
+
     return {
       id: row.id,
       patternType: row.pattern_type,
@@ -321,37 +321,37 @@ export class PatternMemoryStore {
       lastUsed: row.last_used
     };
   }
-  
+
   /**
    * Update pattern success rate
    */
   updateSuccess(id: string, success: boolean): void {
     const pattern = this.get(id);
     if (!pattern) return;
-    
+
     const newCount = pattern.occurrenceCount + 1;
-    const newRate = success 
+    const newRate = success
       ? (pattern.successRate * pattern.occurrenceCount + 1) / newCount
       : (pattern.successRate * pattern.occurrenceCount) / newCount;
-    
-    db.prepare(`
+
+    db.run(`
       UPDATE memory_patterns 
       SET success_rate = ?, occurrence_count = ?, last_used = ?
       WHERE id = ?
-    `).run(newRate, newCount, new Date().toISOString(), id);
+    `, [newRate, newCount, new Date().toISOString(), id]);
   }
-  
+
   /**
    * Find patterns matching a trigger
    */
   findByTrigger(trigger: string): PatternMemory[] {
-    const rows = db.prepare(`
+    const rows = db.query(`
       SELECT id, pattern_type, trigger, action, success_rate, occurrence_count, last_used 
       FROM memory_patterns 
       WHERE trigger LIKE ?
       ORDER BY success_rate DESC, occurrence_count DESC
-    `).all(`%${trigger}%`) as any[];
-    
+    `, [`%${trigger}%`]);
+
     return rows.map(row => ({
       id: row.id,
       patternType: row.pattern_type,
@@ -362,18 +362,18 @@ export class PatternMemoryStore {
       lastUsed: row.last_used
     }));
   }
-  
+
   /**
    * Get top patterns by success rate
    */
   getTopPatterns(limit: number = 10): PatternMemory[] {
-    const rows = db.prepare(`
+    const rows = db.query(`
       SELECT id, pattern_type, trigger, action, success_rate, occurrence_count, last_used 
       FROM memory_patterns 
       ORDER BY success_rate DESC, occurrence_count DESC
       LIMIT ?
-    `).all(limit) as any[];
-    
+    `, [limit]);
+
     return rows.map(row => ({
       id: row.id,
       patternType: row.pattern_type,
@@ -384,19 +384,19 @@ export class PatternMemoryStore {
       lastUsed: row.last_used
     }));
   }
-  
+
   /**
    * Delete stale patterns
    */
   deleteStale(maxAgeDays: number = 30, minSuccessRate: number = 0.5): number {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - maxAgeDays);
-    
-    const result = db.prepare(`
+
+    const result = db.run(`
       DELETE FROM memory_patterns 
       WHERE last_used < ? AND success_rate < ?
-    `).run(cutoff.toISOString(), minSuccessRate);
-    
+    `, [cutoff.toISOString(), minSuccessRate]);
+
     return result.changes;
   }
 }
@@ -411,37 +411,37 @@ export class InteractionStore {
    */
   store(interaction: Omit<LearningInteraction, 'id'>): string {
     const id = uuidv4();
-    
-    db.prepare(`
+
+    db.run(`
       INSERT INTO learning_interactions 
       (id, model_id, user_request, model_response, user_feedback, correction, extracted_pattern, timestamp)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      id, 
-      interaction.modelId, 
-      interaction.userRequest, 
+    `, [
+      id,
+      interaction.modelId,
+      interaction.userRequest,
       interaction.modelResponse,
       interaction.userFeedback,
       interaction.correction,
       interaction.extractedPattern,
       interaction.timestamp
-    );
-    
+    ]);
+
     return id;
   }
-  
+
   /**
    * Get interactions for a model
    */
   getForModel(modelId: string, limit: number = 100): LearningInteraction[] {
-    const rows = db.prepare(`
+    const rows = db.query(`
       SELECT id, model_id, user_request, model_response, user_feedback, correction, extracted_pattern, timestamp
       FROM learning_interactions 
       WHERE model_id = ?
       ORDER BY timestamp DESC
       LIMIT ?
-    `).all(modelId, limit) as any[];
-    
+    `, [modelId, limit]);
+
     return rows.map(row => ({
       id: row.id,
       modelId: row.model_id,
@@ -453,19 +453,19 @@ export class InteractionStore {
       timestamp: row.timestamp
     }));
   }
-  
+
   /**
    * Get interactions with corrections (for learning)
    */
   getCorrections(limit: number = 50): LearningInteraction[] {
-    const rows = db.prepare(`
+    const rows = db.query(`
       SELECT id, model_id, user_request, model_response, user_feedback, correction, extracted_pattern, timestamp
       FROM learning_interactions 
       WHERE correction IS NOT NULL
       ORDER BY timestamp DESC
       LIMIT ?
-    `).all(limit) as any[];
-    
+    `, [limit]);
+
     return rows.map(row => ({
       id: row.id,
       modelId: row.model_id,

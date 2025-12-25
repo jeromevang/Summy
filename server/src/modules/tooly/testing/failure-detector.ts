@@ -3,13 +3,13 @@
  * Classifies failure modes and generates failure profiles
  */
 
-import { TestResult, TestRunResult } from './test-definitions.js';
+import { TestResult, TestRunResult } from './test-types.js';
 
 // ============================================================
 // TYPES
 // ============================================================
 
-export type FailureType = 
+export type FailureType =
   | 'silent'           // Model fails without indicating failure
   | 'partial'          // Model partially completes task
   | 'protocol_drift'   // Model drifts from expected format
@@ -162,7 +162,7 @@ function isKnownTool(toolName: string): boolean {
     'browser_navigate', 'browser_click', 'browser_type',
     'none' // Special case for no tool
   ];
-  
+
   return knownTools.includes(toolName.toLowerCase());
 }
 
@@ -203,7 +203,7 @@ export function detectAntiPatterns(results: TestResult[]): AntiPattern[] {
   }).length;
 
   // Tool hallucination detection
-  const hallucinatedTools = results.filter(r => 
+  const hallucinatedTools = results.filter(r =>
     r.calledTool && !isKnownTool(r.calledTool)
   );
   if (hallucinatedTools.length > 0) {
@@ -222,7 +222,7 @@ export function detectAntiPatterns(results: TestResult[]): AntiPattern[] {
     const key = r.tool;
     toolFailures.set(key, (toolFailures.get(key) || 0) + 1);
   });
-  
+
   const repeatedFailures = Array.from(toolFailures.entries())
     .filter(([_, count]) => count >= 3);
   if (repeatedFailures.length > 0) {
@@ -246,7 +246,7 @@ export function detectAntiPatterns(results: TestResult[]): AntiPattern[] {
  */
 export function generateFailureProfile(runResult: TestRunResult): FailureProfile {
   const failedResults = runResult.results.filter(r => !r.passed);
-  
+
   if (failedResults.length === 0) {
     return {
       failureType: 'none',
@@ -268,7 +268,7 @@ export function generateFailureProfile(runResult: TestRunResult): FailureProfile
     acc[type] = (acc[type] || 0) + 1;
     return acc;
   }, {} as Record<FailureType, number>);
-  
+
   const primaryFailureType = Object.entries(failureTypeCounts)
     .sort((a, b) => b[1] - a[1])[0]?.[0] as FailureType || 'none';
 
@@ -277,14 +277,14 @@ export function generateFailureProfile(runResult: TestRunResult): FailureProfile
     acc[type] = (acc[type] || 0) + 1;
     return acc;
   }, {} as Record<HallucinationType, number>);
-  
+
   const primaryHallucinationType = Object.entries(hallucinationTypeCounts)
     .filter(([type]) => type !== 'none')
     .sort((a, b) => b[1] - a[1])[0]?.[0] as HallucinationType || 'none';
 
   // Generate patterns
   const patterns: FailurePattern[] = [];
-  
+
   // Pattern: Wrong tool selection
   const wrongToolCount = failureTypes.filter(t => t === 'wrong_tool').length;
   if (wrongToolCount > 0) {
@@ -323,7 +323,7 @@ export function generateFailureProfile(runResult: TestRunResult): FailureProfile
     failureConditions.push('Tends to skip tool calls when uncertain');
   }
 
-  const hardTests = failedResults.filter(r => 
+  const hardTests = failedResults.filter(r =>
     runResult.results.find(orig => orig.testId === r.testId)
   );
   if (hardTests.length > failedResults.length * 0.5) {

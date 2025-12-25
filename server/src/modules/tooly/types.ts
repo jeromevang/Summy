@@ -103,6 +103,7 @@ export interface ProbeEvaluation {
 
 export interface ProbeResult {
   testName: string;
+  testId: string; // Added for Prosthetic Builder mapping
   passed: boolean;
   score: number;
   latency: number;
@@ -110,6 +111,15 @@ export interface ProbeResult {
   response?: any;
   error?: string;
   toolFormat?: ToolFormat;
+}
+
+export interface ProbeRunResult {
+  modelId: string;
+  timestamp: string;
+  results: ProbeResult[];
+  overallScore: number;
+  passedCount: number;
+  failedCount: number;
 }
 
 export interface ProbeTestResult {
@@ -317,6 +327,16 @@ export interface AgenticScores {
   overallScore: number;
 }
 
+export interface BaselineComparison {
+  modelId: string;
+  baselineModelId: string;
+  timestamp: string;
+  deltas: Partial<AgenticScores>;
+  relativePerformance: number; // Percent of baseline
+  strengths: string[];
+  weaknesses: string[];
+}
+
 export interface TrainabilityScores {
   systemPromptCompliance: number;
   instructionPersistence: number;
@@ -348,39 +368,39 @@ export interface ModelProfileV2 {
   provider: 'lmstudio' | 'openai' | 'azure';
   testedAt: string;
   testVersion: number;
-  
+
   // Raw capability scores
   rawScores: AgenticScores;
-  
+
   // Trainability scores
   trainabilityScores: TrainabilityScores;
-  
+
   // Failure profile
   failureProfile: FailureProfile;
-  
+
   // Precedence matrix
   precedenceMatrix?: PrecedenceMatrix;
-  
+
   // Stateful behavior
   statefulProfile?: {
     instructionDecayTurn: number;
     maxReliableContext: number;
     recoversWithReminder: boolean;
   };
-  
+
   // Anti-patterns
   antiPatterns: AntiPatternDetection;
-  
+
   // Score breakdown
   scoreBreakdown: ScoreBreakdown;
-  
+
   // Role recommendation
   recommendedRole: 'main' | 'executor' | 'both' | 'none';
   optimalPairings: string[];
-  
+
   // Optimal settings
   optimalSettings: ModelOptimalSettings;
-  
+
   // MCP config path
   mcpConfigPath?: string;
 }
@@ -434,6 +454,7 @@ export interface ProbeOptions {
   runComplianceProbes?: boolean;
   quickMode?: boolean;
   testMode?: TestMode;
+  isBaseline?: boolean;
 }
 
 export type TestMode = 'quick' | 'standard' | 'deep' | 'optimization';
@@ -480,6 +501,18 @@ export interface ProbeCategory {
 // MCP ORCHESTRATOR
 // ============================================================
 
+export interface ProstheticConfig {
+  modelId: string;
+  level1Prompts: string[];
+  level2Constraints: string[];
+  level3Interventions: {
+    trigger: string;
+    action: 'block' | 'rewrite';
+    message: string;
+  }[];
+  level4Disqualifications: string[];
+}
+
 export interface MCPModelConfig {
   modelId: string;
   toolFormat: 'openai' | 'xml';
@@ -496,6 +529,7 @@ export interface MCPModelConfig {
     ragChunkSize: number;
     ragResultCount: number;
   };
+  prosthetic?: ProstheticConfig;
 }
 
 export const TOOL_TIERS = {
@@ -618,6 +652,13 @@ export interface OptimalSetupResult {
     confidence: number;
     reasoning: string;
   };
+  recommendedSwarm?: {
+    models: string[];
+    roles: Record<string, 'main' | 'executor' | 'specialist'>;
+    totalVramUsage: number;
+    confidence: number;
+    reasoning: string;
+  };
   internetRecommendations?: Array<{
     modelId: string;
     source: string;
@@ -625,5 +666,28 @@ export interface OptimalSetupResult {
     fitsHardware: boolean;
     downloadUrl: string;
   }>;
+}
+
+// ============================================================
+// COGNITIVE LOOP TYPES (Phase 4)
+// ============================================================
+
+export interface MentalModel {
+  summary: string;
+  affectedComponents: string[];
+  constraints: string[];
+  requiredCapabilities: string[];
+  completeness: number;
+}
+
+export type StrategyType = 'refactor' | 'patch' | 'investigate' | 'consult';
+
+export interface IntentJSON {
+  strategy: StrategyType;
+  primaryAction: string;
+  reasoning: string;
+  riskLevel: 'high' | 'medium' | 'low';
+  requiresUserApproval: boolean;
+  targetComponents: string[];
 }
 

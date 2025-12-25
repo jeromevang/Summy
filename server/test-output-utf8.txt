@@ -1,0 +1,5 @@
+﻿--- TEST 1: Basic Chat (No Tools) ---
+Result: {"role":"assistant","content":"Hello! How can I help you today?","tool_calls":[]}
+
+--- TEST 2: Chat with Tools ---
+Result: {"role":"assistant","content":"Hello! How can I assist you today?","tool_calls":[]}

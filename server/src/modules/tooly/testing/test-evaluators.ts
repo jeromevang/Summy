@@ -3,7 +3,7 @@
  * Response evaluation logic for test results
  */
 
-import { ParamCondition, CheckResult, TestDefinition } from './test-definitions.js';
+import { ParamCondition, CheckResult, TestDefinition } from './test-types.js';
 
 // ============================================================
 // TYPES
@@ -33,7 +33,7 @@ export function checkParamCondition(
     if (actual === condition.equals) {
       return { passed: true, reason: 'Value matches exactly' };
     }
-    return { passed: false, reason: `Expected ${condition.equals}, got ${actual}` };
+    return { passed: false, reason: `Expected ${condition.equals}, got ${actual} ` };
   }
 
   // Check contains
@@ -61,9 +61,9 @@ export function checkParamCondition(
     if (condition.exists === exists) {
       return { passed: true, reason: condition.exists ? 'Value exists' : 'Value does not exist' };
     }
-    return { 
-      passed: false, 
-      reason: condition.exists ? 'Expected value to exist' : 'Expected value to not exist' 
+    return {
+      passed: false,
+      reason: condition.exists ? 'Expected value to exist' : 'Expected value to not exist'
     };
   }
 
@@ -163,7 +163,7 @@ export function evaluateResponse(
   // Check if correct tool was called
   maxScore += 50;
   const expectedTool = expected.tool;
-  
+
   let toolMatch = false;
   if (expectedTool === 'none') {
     // Expected no tool call
@@ -178,7 +178,7 @@ export function evaluateResponse(
     // Check direct match or alias match
     const toolAliases = aliases[expectedTool] || [];
     toolMatch = toolName === expectedTool || toolAliases.includes(toolName || '');
-    
+
     checks.push({
       name: 'Correct tool called',
       passed: toolMatch,
@@ -186,7 +186,7 @@ export function evaluateResponse(
       actual: toolName || 'No tool called'
     });
   }
-  
+
   if (toolMatch) {
     totalScore += 50;
   }
@@ -195,19 +195,19 @@ export function evaluateResponse(
   if (toolName && toolArgs && expectedTool !== 'none') {
     const paramChecks = Object.entries(expected.params);
     const scorePerParam = paramChecks.length > 0 ? 50 / paramChecks.length : 0;
-    
+
     for (const [paramName, condition] of paramChecks) {
       maxScore += scorePerParam;
       const actualValue = toolArgs[paramName];
       const result = checkParamCondition(actualValue, condition);
-      
+
       checks.push({
-        name: `Param: ${paramName}`,
+        name: `Param: ${paramName} `,
         passed: result.passed,
         expected: JSON.stringify(condition),
         actual: JSON.stringify(actualValue)
       });
-      
+
       if (result.passed) {
         totalScore += scorePerParam;
       }

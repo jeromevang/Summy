@@ -4,7 +4,7 @@
   "provider": "lmstudio",
   "testedAt": "2025-12-19T17:33:33.924Z",
   "testVersion": 2,
-  "score": 88,
+  "score": 76,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -342,7 +342,7 @@
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-20T23:47:41.347Z",
+    "testedAt": "2025-12-22T21:06:37.098Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -384,10 +384,938 @@
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 81,
-    "reasoningScore": 0,
-    "overallScore": 81
+    "reasoningScore": 64,
+    "overallScore": 76,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": false,
+        "score": 30,
+        "details": "Response contains invalid JSON"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly identified conflict in structured format"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 25,
+        "details": "Invalid JSON"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 70,
+        "details": "Mentions edge case in text response"
+      }
+    },
+    "strategicRAGProbes": [
+      {
+        "id": "3.1",
+        "name": "RAG Priority",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 16500,
+        "details": "Correctly used RAG as first tool",
+        "expectedBehavior": "Model should call rag_query BEFORE file reads",
+        "variants": [
+          {
+            "id": "3.1a",
+            "prompt": "Explain the login flow",
+            "passed": true,
+            "score": 100,
+            "response": "We need to explain the login flow. We need to search codebase to understand the login flow. Use rag_query to find relevant code. Possibly search for files related to authentication, login, etc. Let's "
+          },
+          {
+            "id": "3.1b",
+            "prompt": "Where is user authentication handled?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer: \"Where is user authentication handled?\" Likely they want to know which part of codebase handles authentication. We can search codebase using rag_query or search_files. Let's use rag"
+          }
+        ]
+      },
+      {
+        "id": "3.2",
+        "name": "Hierarchical Search",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 29780,
+        "details": "Used RAG but query could be broader",
+        "expectedBehavior": "Should use broader query to get architectural overview",
+        "variants": [
+          {
+            "id": "3.2a",
+            "prompt": "How are the different parts of this codebase connected?",
+            "passed": true,
+            "score": 60,
+            "response": "We need to answer: \"How are the different parts of this codebase connected?\" There's no specific context given. We need to explore the codebase structure. We can use tools: search_files, rag_query, re"
+          },
+          {
+            "id": "3.2b",
+            "prompt": "Give me a high-level overview of the project structure",
+            "passed": false,
+            "score": 0,
+            "response": "We need to give a high-level overview of the project structure. We're not told what project; presumably there's a codebase in the environment. We need to explore using tools. We can search for files, "
+          }
+        ]
+      },
+      {
+        "id": "3.3",
+        "name": "Tool Chaining",
+        "category": "3.x",
+        "passed": true,
+        "score": 70,
+        "latency": 8036,
+        "details": "Used RAG but no follow-up read",
+        "expectedBehavior": "Should RAG first, then read_file for details",
+        "variants": [
+          {
+            "id": "3.3a",
+            "prompt": "Find the JWT validation logic and explain how it works",
+            "passed": true,
+            "score": 70,
+            "response": "We need to find JWT validation logic in the codebase. Use rag_query to search for relevant code. Probably there are files related to authentication, JWT, security. Use rag_query with query like \"JWT v"
+          }
+        ]
+      },
+      {
+        "id": "3.4",
+        "name": "Error Recovery",
+        "category": "3.x",
+        "passed": false,
+        "score": 30,
+        "latency": 14891,
+        "details": "Did not acknowledge search failure",
+        "expectedBehavior": "Should acknowledge not found and offer alternatives",
+        "variants": [
+          {
+            "id": "3.4a",
+            "prompt": "Where is the blockchain integration?",
+            "passed": false,
+            "score": 30,
+            "response": "We need to answer: \"Where is the blockchain integration?\" Likely referring to some codebase. We need to search for blockchain integration. Use rag_query or search_files? The question likely wants loca"
+          }
+        ]
+      },
+      {
+        "id": "3.5",
+        "name": "Result Synthesis",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 11563,
+        "details": "Good synthesis of flow",
+        "expectedBehavior": "Should search, then synthesize coherent explanation",
+        "variants": [
+          {
+            "id": "3.5a",
+            "prompt": "Trace a user login request from frontend to backend",
+            "passed": true,
+            "score": 100,
+            "response": "We need to trace a user login request from frontend to backend. Likely they want to understand the flow: frontend sends request (maybe via API), goes through routing, hits backend authentication servi"
+          }
+        ]
+      },
+      {
+        "id": "3.6",
+        "name": "Self-Correction",
+        "category": "3.x",
+        "passed": true,
+        "score": 50,
+        "latency": 8638,
+        "details": "Only one RAG query, could refine",
+        "expectedBehavior": "Should try different queries if first doesnt find it",
+        "variants": [
+          {
+            "id": "3.6a",
+            "prompt": "Find how roles are enforced in the API",
+            "passed": true,
+            "score": 50,
+            "response": "We need to find how roles are enforced in the API. Likely codebase includes role enforcement logic, maybe in API middleware, controllers, or services. Use rag_query to search codebase for relevant ter"
+          }
+        ]
+      }
+    ],
+    "architecturalProbes": [
+      {
+        "id": "4.1",
+        "name": "Code Comprehension",
+        "category": "4.x",
+        "passed": true,
+        "score": 60,
+        "latency": 13986,
+        "details": "Partial understanding",
+        "expectedBehavior": "Should explain JWT validation and user attachment",
+        "variants": [
+          {
+            "id": "4.1a",
+            "prompt": "Explain what db.service does",
+            "passed": false,
+            "score": 20,
+            "response": "We need to answer: \"Explain what db.service does\". Likely referring to some codebase. We need to search codebase for db.service. Use rag_query to find relevant files. Then read them. Then explain.\n\nWe"
+          },
+          {
+            "id": "4.1b",
+            "prompt": "How does the UserService class work?",
+            "passed": true,
+            "score": 60,
+            "response": "We need to answer: \"How does the UserService class work?\" This is presumably about some codebase. We have tools: rag_query, read_file, search_files. We can search codebase using rag_query with a query"
+          }
+        ]
+      },
+      {
+        "id": "4.2",
+        "name": "Bug Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 50,
+        "latency": 18331,
+        "details": "Mentioned security but missed specific issue",
+        "expectedBehavior": "Should identify jwt.decode vs jwt.verify issue",
+        "variants": [
+          {
+            "id": "4.2a",
+            "prompt": "Is the refresh token validation secure?",
+            "passed": false,
+            "score": 0,
+            "response": "We need to answer whether refresh token validation is secure. Likely need to examine codebase for refresh token validation logic. Use rag_query to search codebase for relevant terms like \"refresh toke"
+          },
+          {
+            "id": "4.2b",
+            "prompt": "Find security vulnerabilities in auth.ts",
+            "passed": true,
+            "score": 50,
+            "response": "We need to find security vulnerabilities in auth.ts. This is presumably a TypeScript file in the codebase. We can search for the file first using search_files pattern \"auth.ts\". Then read its contents"
+          }
+        ]
+      },
+      {
+        "id": "4.3",
+        "name": "SQL Injection Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 100,
+        "latency": 25704,
+        "details": "Correctly identified SQL injection",
+        "expectedBehavior": "Should identify string concatenation in SQL query",
+        "variants": [
+          {
+            "id": "4.3a",
+            "prompt": "Is the search query in UserService.java safe?",
+            "passed": true,
+            "score": 50,
+            "response": "We need to determine if the search query in UserService.java is safe. Likely there is some code that uses user input in a search query perhaps vulnerable to injection. We need to examine the code. Use"
+          },
+          {
+            "id": "4.3b",
+            "prompt": "Review database queries for injection vulnerabilities",
+            "passed": true,
+            "score": 100,
+            "response": "We need to respond to user's request: \"Review database queries for injection vulnerabilities\". This is a request to review code for injection vulnerabilities. We have tools: rag_query (semantic search"
+          }
+        ]
+      },
+      {
+        "id": "4.4",
+        "name": "XSS Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 100,
+        "latency": 16906,
+        "details": "Correctly identified XSS vulnerability",
+        "expectedBehavior": "Should identify dangerouslySetInnerHTML vulnerability",
+        "variants": [
+          {
+            "id": "4.4a",
+            "prompt": "Is user input properly sanitized in LoginForm?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer whether user input is properly sanitized in LoginForm. Likely we need to search codebase for LoginForm, see how it handles user input. Use rag_query to search codebase for relevant f"
+          },
+          {
+            "id": "4.4b",
+            "prompt": "Find XSS issues in the React components",
+            "passed": true,
+            "score": 100,
+            "response": "We need to find XSS issues in React components. Likely we need to search codebase for potential XSS vulnerabilities. Use rag_query to search for patterns like \"dangerouslySetInnerHTML\", \"innerHTML\", \""
+          }
+        ]
+      },
+      {
+        "id": "4.5",
+        "name": "Architecture Inference",
+        "category": "4.x",
+        "passed": false,
+        "score": 30,
+        "latency": 14904,
+        "details": "Did not identify patterns",
+        "expectedBehavior": "Should identify layered architecture, MVC/service pattern",
+        "variants": [
+          {
+            "id": "4.5a",
+            "prompt": "How is the code organized?",
+            "passed": false,
+            "score": 30,
+            "response": "We need to answer \"How is the code organized?\" This is a general question about code organization. We can explore the codebase structure. We have tools: search_files, rag_query, read_file. Possibly we"
+          }
+        ]
+      },
+      {
+        "id": "4.6",
+        "name": "Language Detection",
+        "category": "4.x",
+        "passed": true,
+        "score": 50,
+        "latency": 24855,
+        "details": "Only found 1 languages",
+        "expectedBehavior": "Should identify TypeScript, Java, JSX",
+        "variants": [
+          {
+            "id": "4.6a",
+            "prompt": "What tech stack is this project using?",
+            "passed": false,
+            "score": 0,
+            "response": "We need to answer: \"What tech stack is this project using?\" We're given a repository but no details. We can search for files that might indicate tech stack: package.json, pom.xml, requirements.txt, se"
+          }
+        ]
+      }
+    ],
+    "navigationProbes": [
+      {
+        "id": "5.1",
+        "name": "Locate Implementation",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 15836,
+        "details": "Found password hashing",
+        "expectedBehavior": "Should locate bcrypt.hash usage",
+        "variants": [
+          {
+            "id": "5.1a",
+            "prompt": "Where is password hashing implemented?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer: \"Where is password hashing implemented?\" Likely they want to know in which part of codebase password hashing is done. We can search codebase using rag_query or search_files. Use rag"
+          },
+          {
+            "id": "5.1b",
+            "prompt": "How is password security handled?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer: \"How is password security handled?\" Likely referring to some codebase. We need to search codebase for password handling. Use rag_query with appropriate query. Possibly find files re"
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "name": "Cross-Stack Navigation",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 19403,
+        "details": "Found auth in both stacks",
+        "expectedBehavior": "Should find both frontend and backend auth",
+        "variants": [
+          {
+            "id": "5.2a",
+            "prompt": "Show me auth across frontend and backend",
+            "passed": true,
+            "score": 50,
+            "response": "We need to interpret the user request: \"Show me auth across frontend and backend\". Likely they want to see authentication implementation across frontend and backend code. We need to search codebase fo"
+          }
+        ]
+      },
+      {
+        "id": "5.3",
+        "name": "Dependency Tracing",
+        "category": "5.x",
+        "passed": false,
+        "score": 20,
+        "latency": 8292,
+        "details": "Did not trace dependencies",
+        "expectedBehavior": "Should list services and middleware dependencies",
+        "variants": [
+          {
+            "id": "5.3a",
+            "prompt": "What does index.ts import?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer: \"What does index.ts import?\" This is a question about a TypeScript file index.ts. We need to find the file and see its import statements. Use rag_query or search_files? Probably sea"
+          }
+        ]
+      },
+      {
+        "id": "5.4",
+        "name": "Entry Point Location",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 8950,
+        "details": "Found entry points",
+        "expectedBehavior": "Should find index.ts/App.tsx entry points",
+        "variants": [
+          {
+            "id": "5.4a",
+            "prompt": "What is the main entry file?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer: \"What is the main entry file?\" Likely referring to a codebase's entry point. We need to search codebase. Use rag_query to find main entry file. Could be something like \"index.js\", \""
+          }
+        ]
+      },
+      {
+        "id": "5.5",
+        "name": "Shared Code Detection",
+        "category": "5.x",
+        "passed": true,
+        "score": 100,
+        "latency": 12649,
+        "details": "Found shared code",
+        "expectedBehavior": "Should find shared-utils package",
+        "variants": [
+          {
+            "id": "5.5a",
+            "prompt": "Are there reusable utilities?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer: \"Are there reusable utilities?\" Likely referring to codebase utilities that can be reused. We can search for files related to utilities, maybe directories like utils, common, etc. U"
+          }
+        ]
+      }
+    ],
+    "helicopterProbes": [
+      {
+        "id": "6.1",
+        "name": "Project Overview",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 11690,
+        "details": "Good concise overview",
+        "expectedBehavior": "Should summarize project purpose and structure",
+        "variants": [
+          {
+            "id": "6.1a",
+            "prompt": "What is this codebase about?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer: \"What is this codebase about?\" We have access to codebase via rag_query, read_file, search_files. We need to explore. Likely we need to get an overview. Use rag_query with a query l"
+          }
+        ]
+      },
+      {
+        "id": "6.2",
+        "name": "Stack Enumeration",
+        "category": "6.x",
+        "passed": true,
+        "score": 60,
+        "latency": 12962,
+        "details": "Found 2/4 stacks",
+        "expectedBehavior": "Should list Node, React, React Native, Java, Mendix",
+        "variants": [
+          {
+            "id": "6.2a",
+            "prompt": "List all the project folders and their purposes",
+            "passed": false,
+            "score": 20,
+            "response": "We need to list all project folders and their purposes. We have tools: rag_query, read_file, search_files. Probably we need to search for directories? There's no direct tool to list directories. Perha"
+          }
+        ]
+      },
+      {
+        "id": "6.3",
+        "name": "Team Structure Inference",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 34964,
+        "details": "Suggested team structure",
+        "expectedBehavior": "Should suggest backend/frontend/mobile teams",
+        "variants": [
+          {
+            "id": "6.3a",
+            "prompt": "Who would work on what parts?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer the user's question: \"Who would work on what parts?\" This seems ambiguous. Possibly they are asking about a project and want to know who would work on which parts. There's no context"
+          }
+        ]
+      },
+      {
+        "id": "6.4",
+        "name": "Risk Assessment",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 23425,
+        "details": "Identified risks",
+        "expectedBehavior": "Should mention security issues, coupling, etc",
+        "variants": [
+          {
+            "id": "6.4a",
+            "prompt": "Any red flags in this code?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to respond to user: \"Any red flags in this code?\" There's no code provided. Possibly they want a code review of some code snippet? The user hasn't provided any code. We need to ask for clarifi"
+          }
+        ]
+      },
+      {
+        "id": "6.5",
+        "name": "Improvement Suggestions",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 35787,
+        "details": "Provided improvements",
+        "expectedBehavior": "Should suggest specific improvements",
+        "variants": [
+          {
+            "id": "6.5a",
+            "prompt": "What would you refactor first?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to understand the context: The user asks \"What would you refactor first?\" There's no context given yet. Possibly they are asking about a codebase that we need to refactor. We need to decide wh"
+          }
+        ]
+      }
+    ],
+    "proactiveProbes": [
+      {
+        "id": "7.1",
+        "name": "Proactive Security Findings",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 7326,
+        "details": "Did not proactively find issues",
+        "expectedBehavior": "Should proactively mention connection leak",
+        "variants": [
+          {
+            "id": "7.1a",
+            "prompt": "Review db.service.ts",
+            "passed": false,
+            "score": 20,
+            "response": "We need to review db.service.ts. Likely a TypeScript file in a NestJS or Angular project? We need to fetch its content. Use search_files to locate db.service.ts. Then read_file. Then analyze. Probably"
+          }
+        ]
+      },
+      {
+        "id": "7.2",
+        "name": "Improvement Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 100,
+        "latency": 21585,
+        "details": "Suggested improvements",
+        "expectedBehavior": "Should suggest error handling, cancellation",
+        "variants": [
+          {
+            "id": "7.2a",
+            "prompt": "Can this hook be improved?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to understand the context. The user asks \"Can this hook be improved?\" There's no specific hook mentioned in the conversation. Possibly they refer to some code snippet or hook that was previous"
+          }
+        ]
+      },
+      {
+        "id": "7.3",
+        "name": "Documentation Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 8261,
+        "details": "Did not mention docs but reviewed",
+        "expectedBehavior": "May note missing prop types or docs",
+        "variants": [
+          {
+            "id": "7.3a",
+            "prompt": "What do you think of ProductCard?",
+            "passed": true,
+            "score": 50,
+            "response": "We need to answer: \"What do you think of ProductCard?\" Likely they want an opinion? Or they want description? Possibly they want an analysis of a component called ProductCard. We need to search codeba"
+          }
+        ]
+      },
+      {
+        "id": "7.4",
+        "name": "Best Practice Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 60,
+        "latency": 8249,
+        "details": "Reviewed but no best practices",
+        "expectedBehavior": "Should mention best practices for auth",
+        "variants": [
+          {
+            "id": "7.4a",
+            "prompt": "Is the auth middleware well-implemented?",
+            "passed": true,
+            "score": 60,
+            "response": "We need to assess if \"auth middleware\" is well-implemented. We need to search codebase for auth middleware implementation. Likely there is some middleware for authentication. Use rag_query to search c"
+          }
+        ]
+      },
+      {
+        "id": "7.5",
+        "name": "Testing Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 9629,
+        "details": "Reviewed without test mentions",
+        "expectedBehavior": "May suggest adding tests",
+        "variants": [
+          {
+            "id": "7.5a",
+            "prompt": "Review shared-utils/validation.ts",
+            "passed": true,
+            "score": 50,
+            "response": "We need to review the file shared-utils/validation.ts. Likely we need to read its contents. Use read_file tool with path shared-utils/validation.ts. Then possibly analyze. The user says \"Review shared"
+          }
+        ]
+      },
+      {
+        "id": "7.6",
+        "name": "Performance Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 8331,
+        "details": "Reviewed without perf notes",
+        "expectedBehavior": "May note re-render or pagination concerns",
+        "variants": [
+          {
+            "id": "7.6a",
+            "prompt": "Any performance issues in UserList?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer: \"Any performance issues in UserList?\" Likely referring to some code component named UserList. We need to search codebase for performance issues related to UserList. Use rag_query to"
+          }
+        ]
+      },
+      {
+        "id": "7.7",
+        "name": "Edge Case Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 100,
+        "latency": 10110,
+        "details": "Identified edge cases",
+        "expectedBehavior": "Should identify edge cases in error handling",
+        "variants": [
+          {
+            "id": "7.7a",
+            "prompt": "What if login fails?",
+            "passed": true,
+            "score": 50,
+            "response": "We need to answer the user's question: \"What if login fails?\" We need to infer context: likely about some authentication system, maybe a codebase. The user asks \"What if login fails?\" They want to kno"
+          }
+        ]
+      },
+      {
+        "id": "7.8",
+        "name": "Accessibility Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 8659,
+        "details": "Reviewed without a11y notes",
+        "expectedBehavior": "May note accessibility labels or concerns",
+        "variants": [
+          {
+            "id": "7.8a",
+            "prompt": "Is LoginScreen accessible?",
+            "passed": true,
+            "score": 100,
+            "response": "We need to answer whether LoginScreen is accessible. Likely referring to some codebase. We need to search codebase for accessibility of LoginScreen. Use rag_query to search. Probably need to find refe"
+          }
+        ]
+      }
+    ],
+    "intentProbes": [
+      {
+        "id": "8.1a",
+        "name": "Implicit RAG - Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly invoked RAG from natural question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1b",
+        "name": "Implicit RAG - Bug Report",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for relevant auth/token code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1c",
+        "name": "Implicit File Read",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not look at file",
+        "toolsInvoked": [
+          "search_files"
+        ],
+        "expectedTools": [
+          "read_file",
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2a",
+        "name": "RAG vs File Read Decision",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly started with RAG for broad question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2b",
+        "name": "Specific vs Broad Query",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly read specific file",
+        "toolsInvoked": [
+          "read_file"
+        ],
+        "expectedTools": [
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.3a",
+        "name": "Knowledge Question - No Tools",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly answered without tools",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3b",
+        "name": "Clarification Request",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly asked for clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3c",
+        "name": "Follow-up Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for database context",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4a",
+        "name": "Code Question Without Context",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched before answering",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4b",
+        "name": "Specific Code Location",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Located and examined the code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.5a",
+        "name": "Ambiguous Reference",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly asked for clarification",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.5b",
+        "name": "Multiple Interpretations",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Made reasonable assumption",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6a",
+        "name": "Implicit Security Review",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Asked for more context",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6b",
+        "name": "Performance Concern Hint",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for user list implementation",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.7a",
+        "name": "Dual Request",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 60,
+        "details": "Only partially addressed request",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8a",
+        "name": "Hypothetical Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched but did not modify",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8b",
+        "name": "Just Asking",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched without modifying",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      }
+    ],
+    "intentScores": {
+      "invokeCorrectness": 94,
+      "toolSelectionAccuracy": 92,
+      "actionCorrectness": 82,
+      "overInvocationRate": 20,
+      "underInvocationRate": 0,
+      "overallIntentScore": 90
+    },
+    "scoreBreakdown": {
+      "toolScore": 81,
+      "reasoningScore": 64,
+      "ragScore": 68,
+      "bugDetectionScore": 83,
+      "architecturalScore": 65,
+      "navigationScore": 84,
+      "helicopterScore": 92,
+      "proactiveScore": 60,
+      "intentScore": 90,
+      "overallScore": 76
+    }
   },
-  "role": "main",
+  "role": "none",
   "contextLatency": {
     "testedContextSizes": [
       2048,
@@ -402,23 +1330,35 @@
       1048576
     ],
     "latencies": {
-      "2048": 5509,
-      "4096": 5491,
-      "8192": 5482,
-      "16384": 5418,
-      "32768": 5469,
-      "65536": 5429,
-      "131072": 5522,
-      "262144": 5467,
-      "524288": 7973,
-      "1048576": 5655
+      "2048": 5776,
+      "4096": 5395,
+      "8192": 5703,
+      "16384": 5466,
+      "32768": 5505,
+      "65536": 5473,
+      "131072": 5507,
+      "262144": 6357,
+      "524288": 5629,
+      "1048576": 6926
     },
     "maxUsableContext": 1048576,
     "recommendedContext": 1048576,
     "modelMaxContext": 1048576,
-    "minLatency": 5418,
+    "minLatency": 5395,
     "isInteractiveSpeed": false,
     "speedRating": "slow"
   },
-  "contextLength": 1048576
+  "contextLength": 1048576,
+  "scoreBreakdown": {
+    "toolScore": 81,
+    "reasoningScore": 64,
+    "ragScore": 68,
+    "bugDetectionScore": 83,
+    "architecturalScore": 65,
+    "navigationScore": 84,
+    "helicopterScore": 92,
+    "proactiveScore": 60,
+    "intentScore": 90,
+    "overallScore": 76
+  }
 }

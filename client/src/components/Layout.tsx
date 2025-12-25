@@ -59,12 +59,34 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link
                   to="/tooly"
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/tooly'
+                    location.pathname === '/tooly' || location.pathname.startsWith('/tooly/')
                       ? 'bg-[#2d2d2d] text-white'
                       : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
                   }`}
                 >
                   Tooly
+                </Link>
+                <Link
+                  to="/tooly/readiness"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/tooly/readiness'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                  title="Agentic Readiness Assessment"
+                >
+                  🚀 Readiness
+                </Link>
+                <Link
+                  to="/tooly/combo-test"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/tooly/combo-test'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                  title="Combo Testing - Find Best Model Pairs"
+                >
+                  🧪 Combo
                 </Link>
                 <Link
                   to="/rag"

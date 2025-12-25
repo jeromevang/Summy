@@ -34,7 +34,7 @@ export { default as antipatternDetector, detectAllAntiPatterns } from './testing
 // SCORING
 // ============================================================
 
-export { 
+export {
   calculateAgenticScore,
   calculateScoreBreakdown,
   recommendRole,
@@ -61,7 +61,7 @@ export {
 // ORCHESTRATOR
 // ============================================================
 
-export { 
+export {
   MCPOrchestrator,
   mcpOrchestrator,
   DEFAULT_CONTEXT_BUDGET,
@@ -126,14 +126,44 @@ export {
 } from './optimal-setup/setup-finder.js';
 
 // ============================================================
+// AGENTIC READINESS (Phase 11)
+// ============================================================
+
+export {
+  AGENTIC_READINESS_SUITE,
+  getReadinessConfig,
+  calculateCategoryScore,
+  calculateOverallScore,
+  isPassing
+} from './testing/agentic-readiness-suite.js';
+
+export {
+  ReadinessRunner,
+  createReadinessRunner,
+  getReadinessRunner
+} from './testing/readiness-runner.js';
+
+export {
+  prostheticStore,
+  buildProstheticPrompt
+} from './learning/prosthetic-store.js';
+
+export {
+  ProstheticLoop,
+  createProstheticLoop
+} from './orchestrator/prosthetic-loop.js';
+
+// ============================================================
 // LEGACY EXPORTS (for backward compatibility)
 // ============================================================
 
 // Re-export existing modules
 export { capabilities, ALL_TOOLS } from './capabilities.js';
-export type { ModelProfile } from './capabilities.js';
-export { testEngine, TEST_DEFINITIONS } from './test-engine.js';
-export { probeEngine, PROBE_CATEGORIES } from './probe-engine.js';
+export type { ModelProfile, AgenticReadinessStatus } from './capabilities.js';
+export { testEngine } from './test-engine.js';
+export { ALL_TEST_DEFINITIONS as TEST_DEFINITIONS } from './testing/test-definitions.js';
+export { probeEngine } from './probe-engine.js';
+export { PROBE_CATEGORIES } from './strategic-probes.js';
 export { INTENT_PROBES, runIntentProbes, calculateIntentScores } from './intent-probes.js';
 
 // Import and re-export default exports

@@ -519,6 +519,123 @@ server.registerTool("datetime", {
 });
 
 // ============================================================
+// RAG - SEMANTIC CODE SEARCH
+// ============================================================
+
+const RAG_SERVER_URL = process.env.RAG_SERVER_URL || 'http://localhost:3002';
+
+server.registerTool("rag_query", {
+  description: "PREFERRED CODE SEARCH: Semantic AI-powered search that finds relevant code by meaning. Use this FIRST for any code search task like 'find X', 'where is Y', 'how does Z work'. Returns code snippets with file paths, line numbers, and relevance scores.",
+  inputSchema: {
+    query: z.string().describe("Natural language query - ask like you would ask a colleague"),
+    limit: z.number().optional().describe("Maximum results (default: 5)"),
+    fileTypes: z.array(z.string()).optional().describe("Filter by file types (e.g., ['ts', 'js'])"),
+    paths: z.array(z.string()).optional().describe("Filter by path patterns")
+  }
+}, async ({ query, limit = 5, fileTypes, paths }) => {
+  console.error(`[RAG] query: ${query}`);
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, limit, filter: { fileTypes, paths } })
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      return errorResult(`RAG query failed: ${error}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.results || data.results.length === 0) {
+      return textResult("No relevant code found for your query.");
+    }
+
+    let output = `Found ${data.results.length} relevant code snippets (${data.latency}ms):\n\n`;
+    for (let i = 0; i < data.results.length; i++) {
+      const r = data.results[i];
+      output += `--- Result ${i + 1} (score: ${(r.score * 100).toFixed(1)}%) ---\n`;
+      output += `File: ${r.filePath}:${r.startLine}-${r.endLine}\n`;
+      if (r.symbolName) output += `Symbol: ${r.symbolName} (${r.symbolType})\n`;
+      output += `\`\`\`${r.language}\n${r.snippet}\n\`\`\`\n\n`;
+    }
+    return textResult(output);
+  } catch (err: any) {
+    if (err.message?.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running. Start it with 'npm run dev:rag'");
+    }
+    return errorResult(`RAG query error: ${err.message}`);
+  }
+});
+
+server.registerTool("rag_status", {
+  description: "Get RAG index status and statistics",
+  inputSchema: {}
+}, async () => {
+  console.error("[RAG] status");
+  try {
+    const [statsRes, configRes] = await Promise.all([
+      fetch(`${RAG_SERVER_URL}/api/rag/stats`),
+      fetch(`${RAG_SERVER_URL}/api/rag/config`)
+    ]);
+
+    if (!statsRes.ok) return errorResult("Failed to get RAG status");
+
+    const stats = await statsRes.json();
+    const config = await configRes.json();
+
+    return textResult(`RAG Index Status:
+  Project: ${stats.projectPath || 'Not set'}
+  Status: ${stats.status}
+  Files indexed: ${stats.totalFiles}
+  Chunks: ${stats.totalChunks}
+  Vectors: ${stats.totalVectors}
+  Embedding model: ${stats.embeddingModel || 'Not set'}
+  Model loaded: ${stats.embeddingModelLoaded ? 'Yes' : 'No'}
+  File watcher: ${stats.fileWatcherActive ? 'Active' : 'Inactive'}`);
+  } catch (err: any) {
+    if (err.message?.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running");
+    }
+    return errorResult(`RAG status error: ${err.message}`);
+  }
+});
+
+server.registerTool("rag_index", {
+  description: "Index a project directory for semantic search. Use this when switching to a new project or to re-index the current project.",
+  inputSchema: {
+    projectPath: z.string().describe("Absolute path to the project directory to index")
+  }
+}, async ({ projectPath }) => {
+  console.error(`[RAG] index: ${projectPath}`);
+  try {
+    // Check if directory exists
+    if (!fs.existsSync(projectPath)) {
+      return errorResult(`Directory does not exist: ${projectPath}`);
+    }
+
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/index`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectPath })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return errorResult(`Failed to start indexing: ${error.error}`);
+    }
+
+    return textResult(`✓ Indexing started for: ${projectPath}\nUse rag_status to check progress.`);
+  } catch (err: any) {
+    if (err.message?.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running. Start it with 'npm run dev:rag'");
+    }
+    return errorResult(`RAG index error: ${err.message}`);
+  }
+});
+
+// ============================================================
 // START SERVER
 // ============================================================
 
@@ -531,7 +648,8 @@ const tools = [
   'system_info', 'disk_usage', 'process_list',
   'clipboard_read', 'clipboard_write',
   'json_validate', 'json_query',
-  'env_get', 'datetime'
+  'env_get', 'datetime',
+  'rag_query', 'rag_status', 'rag_index'
 ];
 
 console.error(`[Extra Tools - Cursor] Tools: ${tools.length} (${tools.join(', ')})`);

@@ -62,7 +62,7 @@ class WSBroadcastService {
    */
   private inferCategory(testType: string, testName?: string): string {
     if (!testName) return testType;
-    
+
     // Extract category from test name patterns
     if (testName.includes('Emit') || testName.includes('Schema') || testName.includes('Selection') || testName.includes('Suppression')) {
       return 'Tool Behavior';
@@ -78,7 +78,7 @@ class WSBroadcastService {
     if (testName.includes('Stateful') || testName.includes('Decay') || testName.includes('Drift')) return 'Stateful';
     if (testName.includes('Precedence') || testName.includes('Conflict')) return 'Precedence';
     if (testName.includes('Compliance') || testName.includes('System Prompt')) return 'Compliance';
-    
+
     return testType === 'probe' ? 'Probe Tests' : testType === 'tools' ? 'Tool Tests' : 'Tests';
   }
 
@@ -105,6 +105,90 @@ class WSBroadcastService {
       status,
       message: message || `Model ${status}`
     });
+  }
+  /**
+   * Broadcast cognitive loop trace events
+   */
+  broadcastCognitiveTrace(step: 'search' | 'understand' | 'decide' | 'act' | 'verify' | 'persist' | 'idle', data?: any) {
+    this.broadcast('cognitive_trace', {
+      step,
+      timestamp: Date.now(),
+      data
+    });
+  }
+
+  /**
+   * Broadcast agentic readiness progress
+   */
+  broadcastReadinessProgress(data: {
+    modelId: string;
+    current: number;
+    total: number;
+    currentTest: string;
+    status: 'running' | 'completed';
+    score: number;
+  }) {
+    console.log(`[WSBroadcast] Readiness progress: ${data.modelId} - ${data.current}/${data.total} - ${data.currentTest} (clients: ${this.clients.size})`);
+    this.broadcast('readiness_progress', data);
+  }
+
+  /**
+   * Broadcast batch readiness progress
+   */
+  broadcastBatchReadinessProgress(data: {
+    currentModel: string | null;
+    currentModelIndex: number;
+    totalModels: number;
+    status: 'running' | 'completed';
+    results: Array<{
+      modelId: string;
+      score: number;
+      certified: boolean;
+    }>;
+    bestModel?: string;
+  }) {
+    console.log(`[WSBroadcast] Batch readiness progress: ${data.currentModel || 'Complete'} - ${data.currentModelIndex}/${data.totalModels} (clients: ${this.clients.size})`);
+    this.broadcast('batch_readiness_progress', data);
+  }
+
+  /**
+   * Broadcast teaching progress
+   */
+  broadcastTeachingProgress(data: {
+    modelId: string;
+    attempt: number;
+    level: 1 | 2 | 3 | 4;
+    currentScore: number;
+    phase: 'initial_assessment' | 'teaching_attempt' | 'teaching_verify' | 'teaching_complete';
+    failedTestsByLevel?: { level: number; count: number }[];
+  }) {
+    console.log(`[WSBroadcast] Teaching progress: ${data.modelId} - Attempt ${data.attempt}, Level ${data.level} (clients: ${this.clients.size})`);
+    this.broadcast('teaching_attempt', data);
+  }
+
+  /**
+   * Broadcast teaching verification progress
+   */
+  broadcastTeachingVerify(data: {
+    modelId: string;
+    attempt: number;
+    phase: 'verifying';
+  }) {
+    console.log(`[WSBroadcast] Teaching verify: ${data.modelId} - Attempt ${data.attempt} (clients: ${this.clients.size})`);
+    this.broadcast('teaching_verify', data);
+  }
+
+  /**
+   * Broadcast teaching completion
+   */
+  broadcastTeachingComplete(data: {
+    modelId: string;
+    success: boolean;
+    finalScore: number;
+    attempts: number;
+  }) {
+    console.log(`[WSBroadcast] Teaching complete: ${data.modelId} - Success: ${data.success}, Score: ${data.finalScore} (clients: ${this.clients.size})`);
+    this.broadcast('teaching_complete', data);
   }
 }
 

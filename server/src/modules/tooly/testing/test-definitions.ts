@@ -14,77 +14,16 @@ import { PRECEDENCE_PROBES } from './categories/precedence-tests.js';
 import { EVOLUTION_TESTS } from './categories/evolution-tests.js';
 import { CALIBRATION_TESTS } from './categories/calibration-tests.js';
 import { COMPLIANCE_PROBES } from './categories/compliance-tests.js';
+import {
+  ParamCondition,
+  TestDefinition,
+  TestResult,
+  CheckResult,
+  TestRunResult,
+  TestMode,
+  TestOptions
+} from './test-types.js';
 import type { ProbeDefinition } from '../types.js';
-
-// ============================================================
-// TYPES
-// ============================================================
-
-export interface ParamCondition {
-  equals?: any;
-  contains?: string;
-  oneOf?: any[];
-  exists?: boolean;
-}
-
-export interface TestDefinition {
-  id: string;
-  tool: string;
-  category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  prompt: string;
-  setupFiles?: Record<string, string>;
-  expected: {
-    tool: string;
-    params: Record<string, ParamCondition>;
-  };
-  tags?: string[];
-  weight?: number; // Weight for scoring (default 1.0)
-}
-
-export interface TestResult {
-  testId: string;
-  tool: string;
-  passed: boolean;
-  score: number;
-  latency: number;
-  checks: CheckResult[];
-  response?: any;
-  error?: string;
-  calledTool?: string;
-  calledArgs?: Record<string, any>;
-}
-
-export interface CheckResult {
-  name: string;
-  passed: boolean;
-  expected?: any;
-  actual?: any;
-}
-
-export interface TestRunResult {
-  modelId: string;
-  startedAt: string;
-  completedAt: string;
-  totalTests: number;
-  passed: number;
-  failed: number;
-  overallScore: number;
-  results: TestResult[];
-  aborted?: boolean;
-}
-
-export type TestMode = 'quick' | 'standard' | 'deep' | 'optimization' | 'keep_on_success' | 'manual';
-
-export interface TestOptions {
-  mode?: TestMode;
-  unloadOthersBefore?: boolean;
-  unloadAfterTest?: boolean;
-  unloadOnlyOnFail?: boolean;
-  contextLength?: number;
-  categories?: string[];
-  signal?: AbortSignal;
-}
 
 // ============================================================
 // TEST CATEGORY DEFINITIONS
@@ -212,7 +151,7 @@ export const FILE_OPERATION_TESTS: TestDefinition[] = [
     prompt: 'Search for all TypeScript files in the project',
     expected: {
       tool: 'search_files',
-      params: { 
+      params: {
         directory: { exists: true },
         pattern: { contains: 'ts' }
       }
@@ -377,8 +316,8 @@ export function getProbesByCategory(categoryId: TestCategoryId): ProbeDefinition
 export function getTestsForMode(mode: TestMode): TestDefinition[] {
   const config = TEST_MODE_CONFIG[mode];
   if (!config) return ALL_TEST_DEFINITIONS;
-  
-  return ALL_TEST_DEFINITIONS.filter(t => 
+
+  return ALL_TEST_DEFINITIONS.filter(t =>
     config.categories.some(cat => t.category === cat)
   );
 }
@@ -389,7 +328,7 @@ export function getTestsForMode(mode: TestMode): TestDefinition[] {
 export function getProbesForMode(mode: TestMode): ProbeDefinition[] {
   const config = TEST_MODE_CONFIG[mode];
   if (!config) return ALL_PROBE_DEFINITIONS;
-  
+
   return ALL_PROBE_DEFINITIONS.filter(p => {
     const categoryPrefix = p.id.split('.')[0];
     return config.categories.some(cat => cat.startsWith(categoryPrefix));

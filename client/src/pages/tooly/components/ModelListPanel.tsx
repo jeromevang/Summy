@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { ModelCard } from './ModelCard';
 import type {
   DiscoveredModel,
@@ -77,6 +78,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
   cancelIntentTestRef,
   fetchModels,
 }) => {
+  const navigate = useNavigate();
   const lmstudioModels = models.filter(m => m.provider === 'lmstudio');
   const [showModeDialog, setShowModeDialog] = useState(false);
   const [selectedTestMode, setSelectedTestMode] = useState<TestAllMode>('standard');
@@ -320,6 +322,22 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {testingIntents ? '⏹️ Stop' : '🎯 Test Intents'}
+          </button>
+          
+          {/* Agentic Readiness Button */}
+          <button
+            onClick={() => navigate('/tooly/readiness')}
+            className="px-3 py-1 text-xs rounded transition-colors bg-cyan-600 hover:bg-cyan-700 text-white"
+          >
+            🚀 Agentic Ready
+          </button>
+          
+          {/* Combo Testing Button */}
+          <button
+            onClick={() => navigate('/tooly/combo-test')}
+            className="px-3 py-1 text-xs rounded transition-colors bg-amber-600 hover:bg-amber-700 text-white"
+          >
+            🧪 Combo Test
           </button>
         </div>
       </div>

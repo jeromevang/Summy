@@ -1,0 +1,290 @@
+{
+  "data": [
+    {
+      "id": "rag-embedder",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "mistralai/ministral-3-14b-reasoning",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen/qwen3-30b-a3b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "openai/gpt-oss-20b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "nvidia/nemotron-3-nano",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen2.5-coder-0.5b-instruct",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen2.5-coder-1.5b-instruct",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "tinyllama-1.1b-chat-v1.0",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "phi-3.1-mini-128k-instruct",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "mungert/osmosis-mcp-4b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen/qwen3-8b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "deepseek-coder-6.7b-base",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "mistralai/mistral-small-3.2",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen/qwen3-4b-2507",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "wizardcoder-15b-v1.0",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "starcoder2-15b-instruct-v0.1",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "text-embedding-nomic-embed-text-v1.5@q4_k_m",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "openhermes-2.5-mistral-7b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "nvidia-nemotron-nano-12b-v2",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "gryphe_codex-24b-small-3.2",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "text-embedding-nomic-embed-text-v1.5@q8_0",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "mistralai/ministral-3-3b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "ministral-3-14b-instruct-2512",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen/qwen2.5-coder-32b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "opus-v1.2-7b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "gpt-oss-coder-20b-i1",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "ziya-coding-34b-v1.0",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "llama-3-8b-instruct-coding-expert",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "gemma-3-27b-tools-i1@iq1_m",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "gemma-3-27b-tools-i1@iq2_m",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "unsloth/qwen3-coder-30b-a3b-instruct",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen/qwen3-coder-30b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "deepseek/deepseek-r1-0528-qwen3-8b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "mistralai/magistral-small-2509",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "osmosis-mcp-4b@bf16",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "osmosis-mcp-4b@q4_k_s",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "llama-3-8b-instruct-32k-v0.1",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "meta-llama-3-8b-instruct",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen/qwen3-14b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen/qwen2.5-coder-14b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "cursorcore-qw2.5-7b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen2.5-coder-32b-instruct",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "nextcoder-32b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "mixtral-8x7b-instruct-v0.1",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "llama-2-7b-chat-hf-function-calling-v2",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "eaddario/watt-tool-8b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "legionarius/watt-tool-8b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "phi-3-mini-4k-instruct-function-calling",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "llama-3.2-1b-instruct",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "maziyarpanahi/mistral-nemo-instruct-2407",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "llama-3.1-nemotron-70b-instruct-hf@q2_k_l",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "llama-3.1-nemotron-70b-instruct-hf@q4_0",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "llama-3-groq-8b-tool-use",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "mistral-7b-instruct-v0.3",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "lmstudio-community/mistral-nemo-instruct-2407",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "qwen2.5-7b-instruct-1m",
+      "object": "model",
+      "owned_by": "organization_owner"
+    },
+    {
+      "id": "deepseek-r1-distill-qwen-7b",
+      "object": "model",
+      "owned_by": "organization_owner"
+    }
+  ],
+  "object": "list"
+}

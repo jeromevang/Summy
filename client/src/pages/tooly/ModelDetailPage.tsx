@@ -100,6 +100,8 @@ export const ModelDetailPage: React.FC = () => {
   const [testProgress, setTestProgress] = useState<TestProgress>({ isRunning: false });
   const [metricsHistory, setMetricsHistory] = useState<SystemMetrics[]>([]);
   const [preflightError, setPreflightError] = useState<PreflightError | null>(null);
+  const [baselineComparison, setBaselineComparison] = useState<any>(null);
+  const [isRefreshingBaseline, setIsRefreshingBaseline] = useState(false);
 
   // WebSocket for real-time updates
   useEffect(() => {
@@ -110,14 +112,14 @@ export const ModelDetailPage: React.FC = () => {
       try {
         const msg = JSON.parse(event.data);
         const payload = msg.payload || msg.data; // Support both formats
-        
+
         if (msg.type === 'system_metrics') {
           setSystemMetrics(payload);
           setMetricsHistory(prev => [...prev.slice(-60), payload]);
         } else if (msg.type === 'test_progress' && payload?.modelId === decodedModelId) {
           // Handle progress - can be { current, total } or just numbers
           const progress = payload.progress || { current: payload.current, total: payload.total };
-          
+
           setTestProgress({
             isRunning: payload.status !== 'completed' && payload.status !== 'cancelled',
             currentTest: payload.currentTest,
@@ -125,7 +127,7 @@ export const ModelDetailPage: React.FC = () => {
             progress: progress,
             status: payload.status
           });
-          
+
           // If completed or cancelled, refresh profile
           if (payload.status === 'completed') {
             fetchProfile();
@@ -146,12 +148,12 @@ export const ModelDetailPage: React.FC = () => {
   // Fetch model profile
   const fetchProfile = useCallback(async () => {
     if (!decodedModelId) return;
-    
+
     setLoading(true);
     try {
       const response = await fetch(`/api/tooly/models/${encodeURIComponent(decodedModelId)}`);
       if (!response.ok) throw new Error('Failed to fetch model');
-      
+
       const data = await response.json();
       setProfile(data.profile || data);
       setError(null);
@@ -164,7 +166,38 @@ export const ModelDetailPage: React.FC = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, [fetchProfile]);
+    fetchBaselineComparison();
+  }, [fetchProfile, decodedModelId]);
+
+  // Fetch baseline comparison
+  const fetchBaselineComparison = useCallback(async () => {
+    if (!decodedModelId) return;
+    try {
+      const response = await fetch(`/api/tooly/baseline/compare/${encodeURIComponent(decodedModelId)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setBaselineComparison(data);
+      } else {
+        setBaselineComparison(null);
+      }
+    } catch (err) {
+      setBaselineComparison(null);
+    }
+  }, [decodedModelId]);
+
+  const handleRefreshBaseline = async () => {
+    setIsRefreshingBaseline(true);
+    try {
+      const response = await fetch('/api/tooly/baseline/generate', { method: 'POST' });
+      if (response.ok) {
+        await fetchBaselineComparison();
+      }
+    } catch (err) {
+      console.error('Failed to refresh baseline:', err);
+    } finally {
+      setIsRefreshingBaseline(false);
+    }
+  };
 
   // Auto-switch to testing tab when test starts
   useEffect(() => {
@@ -174,29 +207,36 @@ export const ModelDetailPage: React.FC = () => {
   }, [testProgress.isRunning]);
 
   // Actions
-  const handleRunTests = async (mode: 'quick' | 'standard' | 'deep' | 'optimization' | string = 'standard', skipPreflight: boolean = false) => {
+  const handleRunTests = async (
+    mode: 'quick' | 'standard' | 'deep' | 'optimization' | string = 'standard',
+    skipPreflight: boolean = false,
+    isBaseline: boolean = false
+  ) => {
     if (!decodedModelId) return;
-    
+
     // Clear any previous pre-flight error
     setPreflightError(null);
-    
+
     try {
       setTestProgress({ isRunning: true, status: 'Starting...' });
       setActiveTab('testing');
-      
+
       const url = new URL(`/api/tooly/models/${encodeURIComponent(decodedModelId)}/test`, window.location.origin);
       url.searchParams.set('mode', mode);
       if (skipPreflight) {
         url.searchParams.set('skipPreflight', 'true');
       }
-      
+      if (isBaseline) {
+        url.searchParams.set('isBaseline', 'true');
+      }
+
       const response = await fetch(url.toString(), { method: 'POST' });
-      
+
       if (!response.ok) throw new Error('Failed to start tests');
-      
+
       // Check the response for pre-flight abort
       const result = await response.json();
-      
+
       if (result.aborted && result.abortReason === 'MODEL_TOO_SLOW') {
         // Model was too slow - show pre-flight error
         setPreflightError({
@@ -209,6 +249,7 @@ export const ModelDetailPage: React.FC = () => {
       } else {
         // Tests ran normally - refresh profile to get results
         fetchProfile();
+        fetchBaselineComparison();
         setTestProgress({ isRunning: false });
       }
     } catch (err: any) {
@@ -219,7 +260,7 @@ export const ModelDetailPage: React.FC = () => {
 
   const handleCancelTests = async () => {
     if (!decodedModelId) return;
-    
+
     try {
       await fetch(`/api/tooly/models/${encodeURIComponent(decodedModelId)}/test`, {
         method: 'DELETE'
@@ -232,17 +273,17 @@ export const ModelDetailPage: React.FC = () => {
 
   const handleClearResults = async () => {
     if (!decodedModelId || testProgress.isRunning) return;
-    
+
     if (!confirm('Clear all test results for this model? This cannot be undone.')) {
       return;
     }
-    
+
     try {
       const response = await fetch(
         `/api/tooly/models/${encodeURIComponent(decodedModelId)}/results`,
         { method: 'DELETE' }
       );
-      
+
       if (response.ok) {
         // Refresh profile to show cleared state
         fetchProfile();
@@ -254,7 +295,7 @@ export const ModelDetailPage: React.FC = () => {
 
   const handleSetAsMain = async () => {
     if (!decodedModelId || testProgress.isRunning) return;
-    
+
     try {
       await fetch('/api/tooly/active-model', {
         method: 'POST',
@@ -269,7 +310,7 @@ export const ModelDetailPage: React.FC = () => {
 
   const handleSetAsExecutor = async () => {
     if (!decodedModelId || testProgress.isRunning) return;
-    
+
     try {
       await fetch('/api/tooly/active-model', {
         method: 'POST',
@@ -348,13 +389,12 @@ export const ModelDetailPage: React.FC = () => {
                 <h1 className="text-xl font-bold text-white">{profile.displayName}</h1>
                 <div className="flex items-center gap-2">
                   {profile.role && profile.role !== 'none' && (
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      profile.role === 'main' ? 'bg-purple-500/20 text-purple-400' :
+                    <span className={`text-xs px-2 py-0.5 rounded ${profile.role === 'main' ? 'bg-purple-500/20 text-purple-400' :
                       profile.role === 'executor' ? 'bg-cyan-500/20 text-cyan-400' :
-                      'bg-green-500/20 text-green-400'
-                    }`}>
-                      {profile.role === 'main' ? '🎯 Main' : 
-                       profile.role === 'executor' ? '⚡ Executor' : '✨ Both'}
+                        'bg-green-500/20 text-green-400'
+                      }`}>
+                      {profile.role === 'main' ? '🎯 Main' :
+                        profile.role === 'executor' ? '⚡ Executor' : '✨ Both'}
                     </span>
                   )}
                   <span className="text-gray-500 text-sm">
@@ -370,8 +410,8 @@ export const ModelDetailPage: React.FC = () => {
                 onClick={handleSetAsMain}
                 disabled={testProgress.isRunning}
                 className={`px-3 py-1.5 rounded text-sm font-medium transition-colors
-                  ${testProgress.isRunning 
-                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                  ${testProgress.isRunning
+                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                     : 'bg-purple-600/20 text-purple-400 hover:bg-purple-600/30'}`}
                 title={testProgress.isRunning ? 'Cannot change while test is running' : 'Set as Main'}
               >
@@ -381,14 +421,14 @@ export const ModelDetailPage: React.FC = () => {
                 onClick={handleSetAsExecutor}
                 disabled={testProgress.isRunning}
                 className={`px-3 py-1.5 rounded text-sm font-medium transition-colors
-                  ${testProgress.isRunning 
-                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                  ${testProgress.isRunning
+                    ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                     : 'bg-cyan-600/20 text-cyan-400 hover:bg-cyan-600/30'}`}
                 title={testProgress.isRunning ? 'Cannot change while test is running' : 'Set as Executor'}
               >
                 ⚡ Exec
               </button>
-              
+
               {testProgress.isRunning ? (
                 <button
                   onClick={handleCancelTests}
@@ -421,23 +461,22 @@ export const ModelDetailPage: React.FC = () => {
             <ScoreRing score={profile.score} size={100} />
             <p className="text-gray-400 text-xs mt-2">Overall Score</p>
           </div>
-          
+
           {/* Radar Chart */}
           <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-3 flex items-center justify-center">
             <SkillRadar data={radarData} size={180} />
           </div>
-          
+
           {/* Latency Chart */}
           <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4 flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-gray-400">⚡ Response Time</span>
               {profile.contextLatency?.speedRating && (
-                <span className={`text-xs px-1.5 py-0.5 rounded ${
-                  profile.contextLatency.speedRating === 'excellent' ? 'bg-green-500/20 text-green-400' :
+                <span className={`text-xs px-1.5 py-0.5 rounded ${profile.contextLatency.speedRating === 'excellent' ? 'bg-green-500/20 text-green-400' :
                   profile.contextLatency.speedRating === 'good' ? 'bg-cyan-500/20 text-cyan-400' :
-                  profile.contextLatency.speedRating === 'acceptable' ? 'bg-amber-500/20 text-amber-400' :
-                  'bg-red-500/20 text-red-400'
-                }`}>
+                    profile.contextLatency.speedRating === 'acceptable' ? 'bg-amber-500/20 text-amber-400' :
+                      'bg-red-500/20 text-red-400'
+                  }`}>
                   {profile.contextLatency.speedRating}
                 </span>
               )}
@@ -446,10 +485,10 @@ export const ModelDetailPage: React.FC = () => {
               <div className="flex-1 flex flex-col justify-end min-h-[100px]">
                 <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1">
                   <span>
-                    Min: {profile.contextLatency.minLatency 
-                      ? (profile.contextLatency.minLatency < 1000 
-                          ? `${profile.contextLatency.minLatency}ms` 
-                          : `${(profile.contextLatency.minLatency/1000).toFixed(1)}s`)
+                    Min: {profile.contextLatency.minLatency
+                      ? (profile.contextLatency.minLatency < 1000
+                        ? `${profile.contextLatency.minLatency}ms`
+                        : `${(profile.contextLatency.minLatency / 1000).toFixed(1)}s`)
                       : 'N/A'}
                   </span>
                   <span>
@@ -458,10 +497,10 @@ export const ModelDetailPage: React.FC = () => {
                 </div>
                 <div className="h-[70px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart 
+                    <AreaChart
                       data={Object.entries(profile.contextLatency.latencies)
                         .map(([size, latency]) => ({
-                          ctx: parseInt(size) >= 1024 ? `${parseInt(size)/1024}K` : `${size}`,
+                          ctx: parseInt(size) >= 1024 ? `${parseInt(size) / 1024}K` : `${size}`,
                           ms: latency as number,
                           size: parseInt(size)
                         }))
@@ -471,28 +510,28 @@ export const ModelDetailPage: React.FC = () => {
                     >
                       <defs>
                         <linearGradient id="latencyGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4}/>
-                          <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <XAxis 
-                        dataKey="ctx" 
-                        tick={{ fontSize: 9, fill: '#666' }} 
+                      <XAxis
+                        dataKey="ctx"
+                        tick={{ fontSize: 9, fill: '#666' }}
                         axisLine={{ stroke: '#2d2d2d' }}
                         tickLine={false}
                         interval={0}
                       />
                       <YAxis hide domain={[0, 'auto']} />
                       <ReferenceLine y={5000} stroke="#ef4444" strokeDasharray="2 2" strokeOpacity={0.5} />
-                      <Tooltip 
+                      <Tooltip
                         contentStyle={{ background: '#1a1a1a', border: '1px solid #2d2d2d', fontSize: 11 }}
-                        formatter={(v: number) => [`${v < 1000 ? `${v}ms` : `${(v/1000).toFixed(1)}s`}`, 'Latency']}
+                        formatter={(v: number) => [`${v < 1000 ? `${v}ms` : `${(v / 1000).toFixed(1)}s`}`, 'Latency']}
                       />
-                      <Area 
-                        type="monotone" 
-                        dataKey="ms" 
-                        stroke="#06b6d4" 
-                        strokeWidth={2} 
+                      <Area
+                        type="monotone"
+                        dataKey="ms"
+                        stroke="#06b6d4"
+                        strokeWidth={2}
                         fill="url(#latencyGradient)"
                         isAnimationActive={false}
                       />
@@ -503,12 +542,12 @@ export const ModelDetailPage: React.FC = () => {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <p className="text-gray-600 text-xs text-center">
-                  Run Standard or Deep<br/>test to measure
+                  Run Standard or Deep<br />test to measure
                 </p>
               </div>
             )}
           </div>
-          
+
           {/* CPU + RAM Real-time Charts */}
           <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4">
             <div className="flex items-center justify-between mb-2">
@@ -522,16 +561,16 @@ export const ModelDetailPage: React.FC = () => {
                 <AreaChart data={metricsHistory}>
                   <defs>
                     <linearGradient id="cpuGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <YAxis domain={[0, 100]} hide />
-                  <Area 
-                    type="monotone" 
-                    dataKey="cpu" 
-                    stroke="#8b5cf6" 
-                    strokeWidth={2} 
+                  <Area
+                    type="monotone"
+                    dataKey="cpu"
+                    stroke="#8b5cf6"
+                    strokeWidth={2}
                     fill="url(#cpuGradient)"
                     isAnimationActive={false}
                   />
@@ -550,16 +589,16 @@ export const ModelDetailPage: React.FC = () => {
                 <AreaChart data={metricsHistory}>
                   <defs>
                     <linearGradient id="ramGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <YAxis domain={[0, systemMetrics?.ramTotalGB || 32]} hide />
-                  <Area 
-                    type="monotone" 
-                    dataKey="ramUsedGB" 
-                    stroke="#3b82f6" 
-                    strokeWidth={2} 
+                  <Area
+                    type="monotone"
+                    dataKey="ramUsedGB"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
                     fill="url(#ramGradient)"
                     isAnimationActive={false}
                   />
@@ -574,11 +613,10 @@ export const ModelDetailPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-400">🎮 GPU</span>
                 {systemMetrics?.gpuTemp && systemMetrics.gpuTemp > 0 && (
-                  <span className={`text-xs ${
-                    systemMetrics.gpuTemp > 80 ? 'text-red-400' :
+                  <span className={`text-xs ${systemMetrics.gpuTemp > 80 ? 'text-red-400' :
                     systemMetrics.gpuTemp > 60 ? 'text-yellow-400' :
-                    'text-gray-500'
-                  }`}>
+                      'text-gray-500'
+                    }`}>
                     🌡️ {systemMetrics.gpuTemp}°C
                   </span>
                 )}
@@ -592,16 +630,16 @@ export const ModelDetailPage: React.FC = () => {
                 <AreaChart data={metricsHistory}>
                   <defs>
                     <linearGradient id="gpuGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <YAxis domain={[0, 100]} hide />
-                  <Area 
-                    type="monotone" 
-                    dataKey="gpu" 
-                    stroke="#10b981" 
-                    strokeWidth={2} 
+                  <Area
+                    type="monotone"
+                    dataKey="gpu"
+                    stroke="#10b981"
+                    strokeWidth={2}
                     fill="url(#gpuGradient)"
                     isAnimationActive={false}
                   />
@@ -612,7 +650,7 @@ export const ModelDetailPage: React.FC = () => {
             <div className="flex items-center justify-between mt-2 mb-1">
               <span className="text-xs text-gray-400">💾 VRAM</span>
               <span className="text-sm font-bold text-amber-400">
-                {systemMetrics?.vramUsedMB 
+                {systemMetrics?.vramUsedMB
                   ? `${(systemMetrics.vramUsedMB / 1024).toFixed(1)}/${(systemMetrics.vramTotalMB! / 1024).toFixed(1)}GB`
                   : 'N/A'}
               </span>
@@ -622,16 +660,16 @@ export const ModelDetailPage: React.FC = () => {
                 <AreaChart data={metricsHistory}>
                   <defs>
                     <linearGradient id="vramGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <YAxis domain={[0, systemMetrics?.vramTotalMB || 16000]} hide />
-                  <Area 
-                    type="monotone" 
-                    dataKey="vramUsedMB" 
-                    stroke="#f59e0b" 
-                    strokeWidth={2} 
+                  <Area
+                    type="monotone"
+                    dataKey="vramUsedMB"
+                    stroke="#f59e0b"
+                    strokeWidth={2}
                     fill="url(#vramGradient)"
                     isAnimationActive={false}
                   />
@@ -648,8 +686,8 @@ export const ModelDetailPage: React.FC = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-3 text-sm font-medium transition-colors relative
-                ${activeTab === tab.id 
-                  ? 'text-purple-400' 
+                ${activeTab === tab.id
+                  ? 'text-purple-400'
                   : 'text-gray-500 hover:text-gray-300'}`}
             >
               <span className="mr-2">{tab.icon}</span>
@@ -667,14 +705,14 @@ export const ModelDetailPage: React.FC = () => {
         {/* Tab Content */}
         <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-6 min-h-[500px]">
           {activeTab === 'overview' && (
-            <OverviewTab 
-              profile={profile} 
+            <OverviewTab
+              profile={profile}
               onRunTests={handleRunTests}
               isTestRunning={testProgress.isRunning}
             />
           )}
           {activeTab === 'testing' && (
-            <TestingTab 
+            <TestingTab
               profile={profile}
               testProgress={testProgress}
               onRunTests={handleRunTests}
@@ -683,23 +721,26 @@ export const ModelDetailPage: React.FC = () => {
               isTestRunning={testProgress.isRunning}
               preflightError={preflightError}
               onDismissPreflightError={() => setPreflightError(null)}
+              baselineComparison={baselineComparison}
+              onRefreshBaseline={handleRefreshBaseline}
+              isRefreshingBaseline={isRefreshingBaseline}
             />
           )}
           {activeTab === 'capabilities' && (
-            <CapabilitiesTab 
+            <CapabilitiesTab
               profile={profile}
               testProgress={testProgress}
             />
           )}
           {activeTab === 'configuration' && (
-            <ConfigurationTab 
+            <ConfigurationTab
               profile={profile}
               isTestRunning={testProgress.isRunning}
               onUpdate={fetchProfile}
             />
           )}
           {activeTab === 'history' && (
-            <HistoryTab 
+            <HistoryTab
               modelId={profile.modelId}
             />
           )}

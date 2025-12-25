@@ -68,6 +68,23 @@ export interface ContextLatencyData {
   recommendedContext: number;
 }
 
+export interface AgenticReadinessStatus {
+  certified: boolean;
+  score: number;
+  assessedAt?: string;
+  certifiedAt?: string;
+  categoryScores: {
+    tool: number;
+    rag: number;
+    reasoning: number;
+    intent: number;
+    browser: number;
+  };
+  failedTests: string[];
+  prostheticApplied: boolean;
+  prostheticLevel?: 1 | 2 | 3 | 4;
+}
+
 export interface ModelProfile {
   modelId: string;
   displayName: string;
@@ -79,23 +96,39 @@ export interface ModelProfile {
   systemPrompt?: string;   // Custom system prompt for this model
   avgLatency?: number;
   contextLength?: number;  // Custom context length override for this model
-  
+  isBaseline?: boolean;    // Whether this model is considered a ground truth baseline
+  teachingResults?: any;   // Saved teaching results for persistence
+
   // Role assignment from probe tests
   role?: 'main' | 'executor' | 'both' | 'none';
-  
+
   // Probe test results
   probeResults?: ProbeResults;
-  
+
   // Context latency profiling
   contextLatency?: ContextLatencyData;
-  
+
   // Native tool discovery results
   discoveredNativeTools?: string[];  // ALL tools the model claims to support
   unmappedNativeTools?: string[];    // Tools that couldn't be matched to any MCP tool
-  
+
+  // Agentic Readiness (certification status for agentic coding)
+  agenticReadiness?: AgenticReadinessStatus;
+
+  // Whether a prosthetic prompt is applied to this model
+  prostheticApplied?: boolean;
+
+  // Trainability scores from agentic readiness assessment
+  trainabilityScores?: {
+    systemPromptCompliance: number;
+    instructionPersistence: number;
+    correctionAcceptance: number;
+    overallTrainability: number;
+  };
+
   capabilities: Record<string, ToolCapability>;
   enabledTools: string[];
-  
+
   testResults?: Array<{
     testId: string;
     passed: boolean;
@@ -120,7 +153,7 @@ export const ALL_TOOLS = [
   'rag_query',
   'rag_status',
   'rag_index',
-  
+
   // File Operations (Official MCP Filesystem Server names)
   'read_file',
   'read_multiple_files',
@@ -135,7 +168,7 @@ export const ALL_TOOLS = [
   'create_directory',
   'delete_directory',
   'list_allowed_directories',
-  
+
   // Git Operations
   'git_status',
   'git_diff',
@@ -154,7 +187,7 @@ export const ALL_TOOLS = [
   'git_branch_list',
   'git_blame',
   'git_show',
-  
+
   // NPM Operations
   'npm_run',
   'npm_install',
@@ -163,12 +196,12 @@ export const ALL_TOOLS = [
   'npm_test',
   'npm_build',
   'npm_list',
-  
+
   // HTTP/Search
   'http_request',
   'url_fetch_content',
   'web_search',
-  
+
   // Browser (Playwright MCP-compatible)
   'browser_navigate',
   'browser_go_back',
@@ -189,31 +222,31 @@ export const ALL_TOOLS = [
   'browser_evaluate',
   'browser_console_messages',
   'browser_network_requests',
-  
+
   // Code Execution
   'shell_exec',
   'run_python',
   'run_node',
   'run_typescript',
-  
+
   // Memory
   'memory_store',
   'memory_retrieve',
   'memory_list',
   'memory_delete',
-  
+
   // Text
   'text_summarize',
   'diff_files',
-  
+
   // Process
   'process_list',
   'process_kill',
-  
+
   // Archive
   'zip_create',
   'zip_extract',
-  
+
   // Utility
   'mcp_rules',
   'env_get',
@@ -286,7 +319,7 @@ export const TOOL_RISK_LEVELS: Record<string, 'low' | 'medium' | 'high'> = {
   browser_snapshot: 'low',
   browser_console_messages: 'low',
   browser_network_requests: 'low',
-  
+
   // Medium risk - writes/modifies
   write_file: 'medium',
   edit_file: 'medium',
@@ -307,7 +340,7 @@ export const TOOL_RISK_LEVELS: Record<string, 'low' | 'medium' | 'high'> = {
   browser_tabs: 'medium',
   zip_create: 'medium',
   zip_extract: 'medium',
-  
+
   // High risk - destructive/system changes
   delete_file: 'high',
   delete_directory: 'high',
@@ -379,7 +412,7 @@ class CapabilitiesService {
     try {
       if (await fs.pathExists(profilePath)) {
         const profile = await fs.readJson(profilePath);
-        
+
         // Filter out removed dangerous tools from old profiles
         if (profile.enabledTools) {
           profile.enabledTools = profile.enabledTools.filter(
@@ -391,7 +424,7 @@ class CapabilitiesService {
             delete profile.capabilities[tool];
           }
         }
-        
+
         this.cache.set(modelId, profile);
         return profile;
       }
@@ -411,7 +444,7 @@ class CapabilitiesService {
 
     await fs.writeJson(profilePath, profile, { spaces: 2 });
     this.cache.set(profile.modelId, profile);
-    
+
     console.log(`[Capabilities] Saved profile for ${profile.modelId}`);
   }
 
@@ -441,7 +474,7 @@ class CapabilitiesService {
    */
   createEmptyProfile(modelId: string, displayName: string, provider: 'lmstudio' | 'openai' | 'azure'): ModelProfile {
     const capabilities: Record<string, ToolCapability> = {};
-    
+
     for (const tool of ALL_TOOLS) {
       capabilities[tool] = {
         supported: false,
@@ -602,6 +635,47 @@ class CapabilitiesService {
   }
 
   /**
+   * Update profile with partial updates
+   */
+  async updateProfile(modelId: string, updates: Partial<ModelProfile>): Promise<void> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) {
+      throw new Error(`Profile not found for model: ${modelId}`);
+    }
+
+    // Merge updates into profile
+    Object.assign(profile, updates);
+    await this.saveProfile(profile);
+    console.log(`[Capabilities] Updated profile for ${modelId}`);
+  }
+
+  /**
+   * Update agentic readiness status
+   */
+  async updateAgenticReadiness(modelId: string, readiness: AgenticReadinessStatus, trainabilityScores?: { systemPromptCompliance: number; instructionPersistence: number; correctionAcceptance: number; overallTrainability: number }): Promise<void> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) {
+      throw new Error(`Profile not found for model: ${modelId}`);
+    }
+
+    profile.agenticReadiness = readiness;
+    profile.score = readiness.score; // Also update the top-level score field
+    if (trainabilityScores) {
+      profile.trainabilityScores = trainabilityScores;
+    }
+    await this.saveProfile(profile);
+    console.log(`[Capabilities] Updated agentic readiness for ${modelId}: certified=${readiness.certified}, score=${readiness.score}`);
+  }
+
+  /**
+   * Get all certified models (agentic ready)
+   */
+  async getCertifiedModels(): Promise<ModelProfile[]> {
+    const allProfiles = await this.getAllProfiles();
+    return allProfiles.filter(p => p.agenticReadiness?.certified === true);
+  }
+
+  /**
    * Get tool categories with status for a model
    */
   async getToolCategories(modelId: string): Promise<Array<{
@@ -667,6 +741,7 @@ class CapabilitiesService {
       proactiveScore?: number;
       intentScore?: number;
       overallScore?: number;
+      isBaseline?: boolean;
     }
   ): Promise<void> {
     let profile = await this.getProfile(modelId);
@@ -677,12 +752,12 @@ class CapabilitiesService {
 
     profile.probeResults = probeResults;
     profile.role = role;
-    
+
     // Update overall score from probe results
     if (probeResults.overallScore) {
       profile.score = probeResults.overallScore;
     }
-    
+
     if (contextLatency) {
       profile.contextLatency = contextLatency;
       // Auto-set recommended context if not manually overridden
@@ -690,10 +765,13 @@ class CapabilitiesService {
         profile.contextLength = contextLatency.recommendedContext;
       }
     }
-    
+
     // Store scoreBreakdown if provided
     if (scoreBreakdown) {
       (profile as any).scoreBreakdown = scoreBreakdown;
+      if (scoreBreakdown.isBaseline !== undefined) {
+        profile.isBaseline = scoreBreakdown.isBaseline;
+      }
     }
 
     await this.saveProfile(profile);

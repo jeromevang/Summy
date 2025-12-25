@@ -3,7 +3,7 @@
  * Tests for handling API changes, tool renames, and deprecations
  */
 
-import { TestDefinition } from '../test-definitions.js';
+import { TestDefinition } from '../test-types.js';
 
 // ============================================================
 // EVOLUTION TEST DEFINITIONS
@@ -36,7 +36,7 @@ Please read the file config.json using the new tool name.`,
 Create a file called notes.txt with the content "Hello World".`,
     expected: {
       tool: 'write_file',
-      params: { 
+      params: {
         path: { contains: 'notes.txt' },
         content: { exists: true }
       }
@@ -54,7 +54,7 @@ Create a file called notes.txt with the content "Hello World".`,
 Find all files containing the word "TODO".`,
     expected: {
       tool: 'search_files',
-      params: { 
+      params: {
         pattern: { contains: 'TODO' }
       }
     },
@@ -72,7 +72,7 @@ Change the port from 3000 to 8080 in server.js with reason "Update for productio
     setupFiles: { 'server.js': 'const port = 3000;' },
     expected: {
       tool: 'edit_file',
-      params: { 
+      params: {
         path: { contains: 'server.js' }
       }
     },
@@ -93,7 +93,7 @@ Change the port from 3000 to 8080 in server.js with reason "Update for productio
 List the contents of the src folder.`,
     expected: {
       tool: 'list_directory',
-      params: { 
+      params: {
         path: { oneOf: ['src', 'src/', './src'] }
       }
     },

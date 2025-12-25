@@ -91,15 +91,46 @@ class IntentRouter {
     this.config = config;
 
     if (config.enableDualModel) {
-      // Load model profiles
+      // Load model profiles (optional - routing works without them)
       if (config.mainModelId) {
         this.mainProfile = await capabilities.getProfile(config.mainModelId);
+        if (!this.mainProfile) {
+          // Create a minimal profile so dual-model can proceed
+          this.mainProfile = {
+            modelId: config.mainModelId,
+            displayName: config.mainModelId,
+            provider: 'lmstudio',
+            testedAt: new Date().toISOString(),
+            testVersion: 1,
+            score: 50,
+            toolFormat: 'openai_tools',
+            capabilities: {},
+            enabledTools: []
+          };
+          console.log(`[IntentRouter] Created placeholder profile for main: ${config.mainModelId}`);
+        }
       }
       if (config.executorModelId) {
         this.executorProfile = await capabilities.getProfile(config.executorModelId);
+        if (!this.executorProfile) {
+          // Create a minimal profile so dual-model can proceed
+          this.executorProfile = {
+            modelId: config.executorModelId,
+            displayName: config.executorModelId,
+            provider: 'lmstudio',
+            testedAt: new Date().toISOString(),
+            testVersion: 1,
+            score: 50,
+            toolFormat: 'openai_tools',
+            capabilities: {},
+            enabledTools: []
+          };
+          console.log(`[IntentRouter] Created placeholder profile for executor: ${config.executorModelId}`);
+        }
       }
 
       console.log(`[IntentRouter] Configured with dual-model: main=${config.mainModelId}, executor=${config.executorModelId}`);
+      console.log(`[IntentRouter] Profiles loaded: main=${!!this.mainProfile}, executor=${!!this.executorProfile}`);
     } else {
       console.log(`[IntentRouter] Configured in single-model mode`);
     }
@@ -203,11 +234,13 @@ class IntentRouter {
       ...messages
     ];
 
+    // Use a shorter timeout for main model (intent extraction should be fast)
+    const mainTimeout = Math.min(this.config.timeout, 30000); // Max 30s for intent
     const mainResponse = await this.callModel(
       this.config.mainModelId!,
       mainMessages,
       undefined, // No tools for main model
-      this.config.timeout
+      mainTimeout
     );
 
     const mainLatency = Date.now() - mainStartTime;
@@ -242,9 +275,15 @@ class IntentRouter {
     // Step 2: Call Executor Model with intent
     const executorStartTime = Date.now();
 
-    const enabledTools = this.executorProfile.enabledTools;
-    const executorTools = tools?.filter(t => enabledTools.includes(t.function?.name)) || 
-                          getToolSchemas(enabledTools);
+    // Use tools passed in, or from executor profile, or fall back to getting all tool schemas
+    const enabledTools = this.executorProfile!.enabledTools?.length 
+      ? this.executorProfile!.enabledTools 
+      : (tools?.map(t => t.function?.name).filter(Boolean) as string[]) || [];
+    
+    // Pass the tools we received (already sanitized by proxy) or get schemas
+    const executorTools = tools && tools.length > 0 
+      ? tools 
+      : getToolSchemas(enabledTools);
 
     const executorSystemPrompt = this.buildExecutorModelPrompt(enabledTools);
     const executorMessages = [
@@ -289,30 +328,18 @@ class IntentRouter {
    * Build system prompt for Main Model (reasoning, no tools)
    */
   private buildMainModelPrompt(): string {
-    return `You are a planning assistant. Your job is to understand user intent and output structured plans.
+    return `Output ONLY a JSON intent. No thinking, no explanations.
 
-You do NOT have access to tools directly. Instead, output your intent as JSON.
+Format:
+{"action":"call_tool","tool":"TOOL_NAME","parameters":{...}}
+or
+{"action":"respond"}
 
-## Output Format
+Common tools: read_file, write_file, edit_file, rag_query, git_status, shell_exec
 
-Always output a JSON object with this structure:
-{
-  "schemaVersion": "1.0",
-  "action": "call_tool" | "respond" | "ask_clarification",
-  "tool": "tool_name",  // only if action is call_tool
-  "parameters": { ... },  // tool parameters
-  "metadata": {
-    "reasoning": "Brief explanation of why",
-    "priority": "normal"
-  }
-}
+Example: User says "read config.json" → {"action":"call_tool","tool":"read_file","parameters":{"filepath":"config.json"}}
 
-## Rules
-1. Analyze the user request carefully
-2. Determine if a tool is needed or if you can respond directly
-3. If a tool is needed, specify which one and with what parameters
-4. Output ONLY the JSON, no other text
-5. If unsure, use action: "ask_clarification"`;
+Output the JSON now:`;
   }
 
   /**
@@ -341,16 +368,38 @@ IMPORTANT:
    * Parse intent from Main Model response
    */
   private parseIntent(response: any): IntentSchema {
-    const content = response?.choices?.[0]?.message?.content || '';
+    let content = response?.choices?.[0]?.message?.content || '';
+    
+    // Remove <think>...</think> blocks (DeepSeek R1 reasoning)
+    content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
     
     try {
-      // Try to extract JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+      // Try to extract JSON from the cleaned response
+      // Use non-greedy match and find all potential JSON objects
+      const jsonMatches = content.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g);
+      if (jsonMatches) {
+        // Try each match until we find valid intent JSON
+        for (const match of jsonMatches) {
+          try {
+            const parsed = JSON.parse(match);
+            if (parsed.action) {
+              console.log('[IntentRouter] Parsed intent:', parsed.action, parsed.tool || '');
+              return parsed;
+            }
+          } catch {
+            // Try next match
+          }
+        }
+      }
+      
+      // Fallback: try parsing the entire content as JSON
+      const parsed = JSON.parse(content);
+      if (parsed.action) {
+        return parsed;
       }
     } catch {
       // Failed to parse JSON
+      console.log('[IntentRouter] Failed to parse intent from:', content.slice(0, 200));
     }
 
     // Default to respond if we can't parse intent

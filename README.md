@@ -1,5 +1,7 @@
 # Summy
 
+# Summy Project Overview!!!!
+
 Context management middleware for LLM conversations between IDEs and cloud providers.
 
 ## Features

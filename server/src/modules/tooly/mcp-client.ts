@@ -128,16 +128,51 @@ class MCPClient {
   }
 
   /**
+   * Exponential backoff configuration
+   */
+  private backoffConfig = {
+    initialDelay: 1000,
+    maxDelay: 30000,
+    factor: 1.5,
+    maxRetries: 5
+  };
+
+  /**
    * Spawn MCP server as child process
    */
   private async spawnChildProcess(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        // Use npx tsx to run TypeScript directly
-        this.process = spawn('npx', ['tsx', 'src/server.ts'], {
+        const isWindows = process.platform === 'win32';
+
+        // Strategy 1: Try running compiled JS directly (Fastest, most stable)
+        const distPath = path.join(this.mcpServerPath, 'dist', 'index.js');
+        // Strategy 2: Fallback to TSX via node_modules (Dev mode)
+        const tsxPath = path.join(this.mcpServerPath, 'node_modules', '.bin', isWindows ? 'tsx.cmd' : 'tsx');
+        const srcPath = path.join(this.mcpServerPath, 'src', 'server.ts');
+
+        let cmd: string;
+        let args: string[];
+
+        // Check if dist exists, otherwise use TSX
+        // Note: fs.existsSync is synchronous, but okay for startup
+        if (require('fs').existsSync(distPath)) {
+          cmd = 'node';
+          args = [distPath];
+          console.log('[MCP] Launching via node dist/index.js');
+        } else {
+          cmd = tsxPath;
+          args = [srcPath];
+          console.log('[MCP] Launching via tsx src/server.ts');
+        }
+
+        console.log(`[MCP] Spawning: ${cmd} ${args.join(' ')}`);
+
+        this.process = spawn(cmd, args, {
           cwd: this.mcpServerPath,
           stdio: ['pipe', 'pipe', 'pipe'],
-          shell: true
+          shell: false, // Important: Don't use shell on Windows to avoid quoting issues with paths
+          env: { ...process.env, FORCE_COLOR: '1' }
         });
 
         // Setup readline for JSON-RPC responses
@@ -162,6 +197,11 @@ class MCPClient {
         this.process.on('exit', (code) => {
           console.log('[MCP] Process exited with code:', code);
           this.handleDisconnect();
+
+          // Trigger autoreconnect if not intentional disconnect
+          if (this.connectionMode !== 'disconnected') {
+            this.attemptReconnectWithBackoff();
+          }
         });
 
         this.process.on('error', (err) => {
@@ -169,7 +209,7 @@ class MCPClient {
           reject(err);
         });
 
-        // Wait for process to start
+        // Wait a bit to ensure it doesn't crash immediately
         setTimeout(() => {
           if (this.process && !this.process.killed) {
             resolve();
@@ -184,19 +224,48 @@ class MCPClient {
     });
   }
 
+  private retryCount = 0;
+  private retryTimer: NodeJS.Timeout | null = null;
+
+  private async attemptReconnectWithBackoff() {
+    if (this.retryCount >= this.backoffConfig.maxRetries) {
+      console.error('[MCP] Max retries reached. Giving up.');
+      notifications.error('MCP Connection Failed', 'Could not reconnect to MCP server after multiple attempts.');
+      return;
+    }
+
+    const delay = Math.min(
+      this.backoffConfig.maxDelay,
+      this.backoffConfig.initialDelay * Math.pow(this.backoffConfig.factor, this.retryCount)
+    );
+
+    console.log(`[MCP] Reconnecting in ${delay}ms (Attempt ${this.retryCount + 1}/${this.backoffConfig.maxRetries})`);
+
+    this.retryTimer = setTimeout(async () => {
+      this.retryCount++;
+      try {
+        await this.reconnect();
+        this.retryCount = 0; // Reset on success
+      } catch (e) {
+        console.error('[MCP] Reconnect attempt failed:', e);
+        this.attemptReconnectWithBackoff(); // Retry again
+      }
+    }, delay);
+  }
+
   /**
    * Handle JSON-RPC response from stdio
    */
   private handleStdioResponse(line: string): void {
     try {
       const response = JSON.parse(line);
-      
+
       if (response.id !== undefined) {
         const pending = this.pendingRequests.get(response.id);
         if (pending) {
           clearTimeout(pending.timeout);
           this.pendingRequests.delete(response.id);
-          
+
           if (response.error) {
             pending.reject(new Error(response.error.message || 'MCP error'));
           } else {
@@ -250,10 +319,10 @@ class MCPClient {
    */
   async reconnect(): Promise<void> {
     if (this.reconnecting) return;
-    
+
     this.reconnecting = true;
     console.log('[MCP] Attempting to reconnect...');
-    
+
     try {
       this.disconnect();
       await this.connect();
@@ -272,20 +341,20 @@ class MCPClient {
     if (ALL_TOOLS.includes(toolName)) {
       return toolName;
     }
-    
+
     // If no modelId provided, can't do alias lookup
     if (!modelId) {
       console.log(`[MCP] No model ID for alias resolution, using tool name as-is: ${toolName}`);
       return toolName;
     }
-    
+
     try {
       const profile = await capabilities.getProfile(modelId);
       if (!profile) {
         console.log(`[MCP] No profile found for ${modelId}, using tool name as-is: ${toolName}`);
         return toolName;
       }
-      
+
       // Search through capabilities to find which MCP tool has this as an alias
       for (const [mcpTool, cap] of Object.entries(profile.capabilities)) {
         if (cap.nativeAliases && cap.nativeAliases.includes(toolName)) {
@@ -293,7 +362,7 @@ class MCPClient {
           return mcpTool;
         }
       }
-      
+
       console.log(`[MCP] No alias found for "${toolName}" in model ${modelId}, using as-is`);
       return toolName;
     } catch (error: any) {
@@ -331,20 +400,20 @@ class MCPClient {
 
       const duration = Date.now() - startTime;
       console.log(`[MCP] Tool ${name} executed in ${duration}ms`);
-      
+
       return result;
 
     } catch (error: any) {
       const duration = Date.now() - startTime;
       console.error(`[MCP] Tool ${name} failed after ${duration}ms:`, error.message);
-      
+
       // Try to reconnect on connection errors
       if (error.code === 'ECONNREFUSED' || error.code === 'ECONNRESET') {
         await this.reconnect();
         // Retry once after reconnect
         return this.executeTool(name, args);
       }
-      
+
       throw error;
     }
   }

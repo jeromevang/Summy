@@ -6,10 +6,10 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { TestRunResult } from '../testing/test-definitions.js';
+import { TestRunResult } from '../testing/test-types.js';
 import { ToolProfiler, ToolProfile, toolProfiler } from './tool-profiler.js';
-import { 
-  DEFAULT_CONTEXT_BUDGET, 
+import {
+  DEFAULT_CONTEXT_BUDGET,
   DEFAULT_RAG_SETTINGS,
   DEFAULT_OPTIMAL_SETTINGS,
   ESSENTIAL_TOOLS,
@@ -94,16 +94,16 @@ const SYSTEM_PROMPT_TEMPLATES: Record<string, string[]> = {
 
 export class ConfigGenerator {
   private configDir: string;
-  
+
   constructor(configDir?: string) {
     this.configDir = configDir || path.resolve(__dirname, '../../../../../mcp-server/configs/models');
   }
-  
+
   /**
    * Generate configuration from test results
    */
   async generateFromTestResults(
-    modelId: string, 
+    modelId: string,
     testResults: TestRunResult,
     options: {
       template?: keyof typeof SYSTEM_PROMPT_TEMPLATES;
@@ -113,32 +113,32 @@ export class ConfigGenerator {
   ): Promise<GeneratedConfig> {
     // First, analyze tool performance
     const toolProfile = toolProfiler.analyzeTestResults(modelId, testResults);
-    
+
     // Determine enabled/disabled tools
     const enabledTools = toolProfiler.getEnabledTools(modelId);
     const disabledTools = toolProfiler.getDisabledTools(modelId);
-    
+
     // Generate tool overrides
     const toolOverrides = this.generateToolOverrides(toolProfile);
-    
+
     // Get system prompt additions
     const template = options.template || 'agentic-coding';
     const systemPromptAdditions = [...SYSTEM_PROMPT_TEMPLATES[template]];
-    
+
     // Add model-specific additions based on test results
     if (testResults.overallScore < 50) {
       systemPromptAdditions.push(
         'Be extra careful with tool parameters - verify before calling'
       );
     }
-    
+
     // Calculate context budget based on model context length
     const contextLength = options.contextLength || 32000;
     const contextBudget = this.calculateContextBudget(contextLength);
-    
+
     // Determine optimal settings
     const optimalSettings = this.determineOptimalSettings(toolProfile, testResults);
-    
+
     const config: GeneratedConfig = {
       modelId,
       version: 1,
@@ -156,21 +156,21 @@ export class ConfigGenerator {
         tierLevel: toolProfile.suggestedTier
       }
     };
-    
+
     // Save to file if requested
     if (options.saveToFile) {
       await this.saveConfig(modelId, config);
     }
-    
+
     return config;
   }
-  
+
   /**
    * Generate tool overrides from profile
    */
   private generateToolOverrides(profile: ToolProfile): Record<string, ToolOverride> {
     const overrides: Record<string, ToolOverride> = {};
-    
+
     for (const rec of profile.recommendations) {
       if (rec.type === 'priority') {
         overrides[rec.tool] = {
@@ -179,7 +179,7 @@ export class ConfigGenerator {
           notes: rec.reason
         };
       }
-      
+
       if (rec.type === 'description') {
         const perf = profile.toolPerformances[rec.tool];
         if (perf) {
@@ -191,10 +191,10 @@ export class ConfigGenerator {
         }
       }
     }
-    
+
     return overrides;
   }
-  
+
   /**
    * Generate improved tool description
    */
@@ -207,17 +207,17 @@ export class ConfigGenerator {
       'rag_query': 'Query the codebase for context. Parameters: query (string, required) - the search query.',
       'list_directory': 'List directory contents. Parameters: path (string, required) - directory to list.',
     };
-    
+
     return baseDescriptions[toolName] || `Use ${toolName} tool with appropriate parameters.`;
   }
-  
+
   /**
    * Calculate context budget based on model context length
    */
   private calculateContextBudget(contextLength: number): GeneratedConfig['contextBudget'] {
     // Reserve 20% for response
     const available = Math.floor(contextLength * 0.8);
-    
+
     return {
       total: contextLength,
       systemPrompt: Math.floor(available * 0.08),  // 8%
@@ -228,12 +228,12 @@ export class ConfigGenerator {
       reserve: Math.floor(available * 0.15)        // 15%
     };
   }
-  
+
   /**
    * Determine optimal settings based on profile and test results
    */
   private determineOptimalSettings(
-    profile: ToolProfile, 
+    profile: ToolProfile,
     testResults: TestRunResult
   ): GeneratedConfig['optimalSettings'] {
     // Start with defaults
@@ -241,7 +241,7 @@ export class ConfigGenerator {
     let ragChunkSize = 1000;
     let ragResultCount = 5;
     let descriptionStyle: 'concise' | 'verbose' | 'detailed' = 'verbose';
-    
+
     // Adjust based on performance
     if (profile.overallScore < 50) {
       // Lower performing models: fewer tools, more description
@@ -254,7 +254,7 @@ export class ConfigGenerator {
       descriptionStyle = 'concise';
       ragResultCount = 7;
     }
-    
+
     // Check for slow performance
     const avgLatency = testResults.results.reduce((sum, r) => sum + r.latency, 0) / testResults.results.length;
     if (avgLatency > 5000) {
@@ -262,7 +262,7 @@ export class ConfigGenerator {
       ragChunkSize = 500;
       ragResultCount = Math.min(ragResultCount, 3);
     }
-    
+
     return {
       maxToolsPerCall,
       ragChunkSize,
@@ -270,37 +270,37 @@ export class ConfigGenerator {
       descriptionStyle
     };
   }
-  
+
   /**
    * Save config to file
    */
   async saveConfig(modelId: string, config: GeneratedConfig): Promise<string> {
     await fs.ensureDir(this.configDir);
-    
+
     // Sanitize model ID for filename
     const filename = modelId.replace(/[/\\:*?"<>|]/g, '_') + '.json';
     const filepath = path.join(this.configDir, filename);
-    
+
     await fs.writeJson(filepath, config, { spaces: 2 });
     console.log(`[ConfigGenerator] Saved config for ${modelId} to ${filepath}`);
-    
+
     return filepath;
   }
-  
+
   /**
    * Load config from file
    */
   async loadConfig(modelId: string): Promise<GeneratedConfig | null> {
     const filename = modelId.replace(/[/\\:*?"<>|]/g, '_') + '.json';
     const filepath = path.join(this.configDir, filename);
-    
+
     if (await fs.pathExists(filepath)) {
       return await fs.readJson(filepath);
     }
-    
+
     return null;
   }
-  
+
   /**
    * List all generated configs
    */
@@ -308,25 +308,25 @@ export class ConfigGenerator {
     if (!await fs.pathExists(this.configDir)) {
       return [];
     }
-    
+
     const files = await fs.readdir(this.configDir);
     return files
       .filter(f => f.endsWith('.json'))
       .map(f => f.replace('.json', '').replace(/_/g, '/'));
   }
-  
+
   /**
    * Delete a config
    */
   async deleteConfig(modelId: string): Promise<boolean> {
     const filename = modelId.replace(/[/\\:*?"<>|]/g, '_') + '.json';
     const filepath = path.join(this.configDir, filename);
-    
+
     if (await fs.pathExists(filepath)) {
       await fs.remove(filepath);
       return true;
     }
-    
+
     return false;
   }
 }
