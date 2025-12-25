@@ -22,7 +22,7 @@ import { getSQLiteVectorStore } from './storage/sqlite-store.js';
 import { initializeTokenizer } from './services/tokenizer.js';
 import { initializeSummarizer, isSummarizerReady } from './services/summarizer.js';
 import { getDependencyGraph, getGraphStats, serializeGraph, loadGraph } from './services/graph-builder.js';
-import { createQueryPlan, buildQueryText, mergeAndRankResults, getContextExpansion, formatSearchResults } from './services/query-router.js';
+import { createQueryPlan, buildQueryText, mergeAndRankResults, getContextExpansion, formatSearchResults, enrichWithCodeContext } from './services/query-router.js';
 import { getRAGDatabase } from './services/database.js';
 
 const app = express();
@@ -498,6 +498,48 @@ app.post('/api/rag/query', async (req: Request, res: Response) => {
         .filter((s): s is FileSummary => s !== null);
     }
     
+    // === CODE-AWARE CONTEXT ENRICHMENT ===
+    // Automatically add related symbols, dependencies, and interfaces
+    // Only for queries that benefit from context (graph, summary, hybrid strategies)
+    let codeContext: { relatedSymbols?: any[]; dependentFiles?: string[]; contextString?: string } | undefined;
+    if (queryPlan.strategy === 'graph' || queryPlan.strategy === 'summary' || queryPlan.strategy === 'hybrid') {
+      try {
+        // Convert results to enriched chunks format for the enrichment function
+        const chunksForEnrichment = filteredResults.map(r => ({
+          id: `${r.filePath}:${r.startLine}`,
+          filePath: r.filePath,
+          startLine: r.startLine,
+          endLine: r.endLine,
+          content: r.snippet,
+          name: r.symbolName || undefined,
+          type: r.symbolType || undefined,
+          language: r.language,
+          tokens: 0
+        }));
+        
+        const enriched = enrichWithCodeContext(chunksForEnrichment as any, {
+          includeCallers: queryPlan.strategy === 'graph',
+          includeCallees: queryPlan.strategy === 'graph',
+          includeDependencies: true,
+          includeDependents: true,
+          includeExports: queryPlan.strategy === 'summary',
+          maxRelated: 5
+        });
+        
+        if (enriched.relatedSymbols.length > 0 || enriched.dependentFiles.length > 0) {
+          codeContext = {
+            relatedSymbols: enriched.relatedSymbols,
+            dependentFiles: enriched.dependentFiles,
+            contextString: enriched.contextString
+          };
+          console.log(`[Query] Enriched with ${enriched.relatedSymbols.length} symbols, ${enriched.dependentFiles.length} dependent files`);
+        }
+      } catch (err) {
+        console.error('[Query] Code context enrichment failed:', err);
+        // Continue without enrichment
+      }
+    }
+    
     timings.total = Date.now() - startTime;
     
     res.json({ 
@@ -511,6 +553,7 @@ app.post('/api/rag/query', async (req: Request, res: Response) => {
       },
       fileSummaries: fileSummaries.length > 0 ? fileSummaries : undefined,
       relatedFiles: relatedFiles.length > 0 ? relatedFiles : undefined,
+      codeContext,  // NEW: code-aware enrichment
       latency: timings.total,
       timings,
       totalResults: filteredResults.length

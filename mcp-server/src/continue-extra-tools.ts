@@ -630,6 +630,87 @@ server.registerTool("rag_index", {
 });
 
 // ============================================================
+// CODE-AWARE TOOLS
+// ============================================================
+
+server.registerTool("find_symbol", {
+  description: "Find functions, classes, interfaces by name.",
+  inputSchema: {
+    name: z.string().describe("Symbol name"),
+    type: z.enum(['function', 'class', 'interface', 'method', 'type', 'variable']).optional(),
+    exported: z.boolean().optional(),
+    limit: z.number().optional()
+  }
+}, async ({ name, type, exported, limit = 10 }) => {
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/symbols/search`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: name, type, exported, limit })
+    });
+    if (!response.ok) return errorResult(`Search failed`);
+    const data = await response.json();
+    if (!data.symbols?.length) return textResult(`No symbols found`);
+    let output = `Found ${data.symbols.length}:\n`;
+    for (const s of data.symbols) output += `${s.type} ${s.name} - ${s.filePath}:${s.startLine}\n`;
+    return textResult(output);
+  } catch (err: any) { return errorResult(err.message); }
+});
+
+server.registerTool("get_callers", {
+  description: "Get functions that call a function.",
+  inputSchema: { symbolName: z.string(), filePath: z.string().optional() }
+}, async ({ symbolName, filePath }) => {
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/symbols/callers`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symbolName, filePath })
+    });
+    if (!response.ok) return errorResult(`Failed`);
+    const data = await response.json();
+    if (!data.callers?.length) return textResult(`No callers`);
+    let output = `Callers of ${symbolName}:\n`;
+    for (const c of data.callers) output += `- ${c.name} (${c.filePath}:${c.startLine})\n`;
+    return textResult(output);
+  } catch (err: any) { return errorResult(err.message); }
+});
+
+server.registerTool("get_file_interface", {
+  description: "Get exports/imports of a file.",
+  inputSchema: { filePath: z.string() }
+}, async ({ filePath }) => {
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/files/interface`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filePath })
+    });
+    if (!response.ok) return errorResult(`Failed`);
+    const data = await response.json();
+    let out = `${filePath}:\n`;
+    if (data.exports?.length) out += `Exports: ${data.exports.map((e:any)=>e.name).join(', ')}\n`;
+    if (data.dependents?.length) out += `Used by: ${data.dependents.slice(0,5).join(', ')}\n`;
+    return textResult(out);
+  } catch (err: any) { return errorResult(err.message); }
+});
+
+server.registerTool("get_dependencies", {
+  description: "Get file dependencies.",
+  inputSchema: { filePath: z.string(), direction: z.enum(['imports', 'importedBy', 'both']).optional() }
+}, async ({ filePath, direction = 'both' }) => {
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/files/dependencies`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filePath, direction })
+    });
+    if (!response.ok) return errorResult(`Failed`);
+    const data = await response.json();
+    let out = `${filePath}:\n`;
+    if (data.imports?.length) out += `Imports: ${data.imports.map((i:any)=>i.toFile).join(', ')}\n`;
+    if (data.dependents?.length) out += `Used by: ${data.dependents.map((d:any)=>d.fromFile).join(', ')}\n`;
+    return textResult(out || 'No deps');
+  } catch (err: any) { return errorResult(err.message); }
+});
+
+// ============================================================
 // SSE SERVER
 // ============================================================
 
@@ -689,7 +770,8 @@ const tools = [
   'json_validate', 'json_query',
   'env_get', 'datetime',
   'npm_scripts', 'npm_outdated',
-  'rag_query', 'rag_status', 'rag_index'
+  'rag_query', 'rag_status', 'rag_index',
+  'find_symbol', 'get_callers', 'get_file_interface', 'get_dependencies'
 ];
 
 app.listen(port, () => {
