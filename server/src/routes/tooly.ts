@@ -2847,5 +2847,48 @@ router.post('/combo-test/context-sizes', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/tooly/combo-test/results
+ * Get all saved combo test results
+ */
+router.get('/combo-test/results', (req, res) => {
+  try {
+    const results = db.getAllComboResults();
+    res.json({ results });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get combo results:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/combo-test/results/top
+ * Get top N combo pairs by score
+ */
+router.get('/combo-test/results/top', (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 10;
+    const results = db.getTopCombos(limit);
+    res.json({ results });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get top combos:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/tooly/combo-test/results
+ * Clear all saved combo test results
+ */
+router.delete('/combo-test/results', (req, res) => {
+  try {
+    const deleted = db.clearAllComboResults();
+    res.json({ deleted, message: `Cleared ${deleted} combo test results` });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to clear combo results:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;
 

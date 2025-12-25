@@ -192,10 +192,52 @@ export const ComboTest: React.FC = () => {
     return () => ws.close();
   }, []);
 
-  // Fetch models on mount
+  // Fetch models and saved results on mount
   useEffect(() => {
     fetchModels();
+    fetchSavedResults();
   }, []);
+
+  // Fetch saved combo results from database
+  const fetchSavedResults = async () => {
+    try {
+      const response = await fetch('/api/tooly/combo-test/results');
+      if (!response.ok) return;
+      const data = await response.json();
+      if (data.results && data.results.length > 0) {
+        // Convert database format to UI format
+        const uiResults = data.results.map((r: any) => ({
+          mainModelId: r.mainModelId,
+          executorModelId: r.executorModelId,
+          totalTests: r.passedCount + r.failedCount,
+          passedTests: r.passedCount,
+          categoryScores: r.categoryScores || [],
+          tierScores: [
+            { tier: 'simple', score: r.tierScores?.simple || 0, passed: 0, total: 0, avgLatency: 0 },
+            { tier: 'medium', score: r.tierScores?.medium || 0, passed: 0, total: 0, avgLatency: 0 },
+            { tier: 'complex', score: r.tierScores?.complex || 0, passed: 0, total: 0, avgLatency: 0 },
+          ],
+          mainScore: r.mainScore || 0,
+          executorScore: r.executorScore || 0,
+          mainCorrectCount: 0,
+          executorSuccessCount: 0,
+          intentAccuracy: 0,
+          executionSuccess: 0,
+          avgLatencyMs: r.avgLatencyMs || 0,
+          minLatencyMs: 0,
+          maxLatencyMs: 0,
+          overallScore: r.overallScore,
+          testResults: r.testResults || [],
+          testedAt: r.testedAt,
+          mainExcluded: r.mainExcluded,
+        }));
+        setResults(uiResults);
+        console.log(`[ComboTest] Loaded ${uiResults.length} saved results`);
+      }
+    } catch (err: any) {
+      console.log('[ComboTest] No saved results:', err.message);
+    }
+  };
 
   const fetchModels = async () => {
     setIsLoadingModels(true);
@@ -953,14 +995,39 @@ export const ComboTest: React.FC = () => {
             <span className="text-white font-medium">{totalCombos}</span> combos × 
             <span className="text-white font-medium"> 9</span> tests = 
             <span className="text-white font-medium"> {totalTests}</span> total tests
+            {results.length > 0 && !isRunning && (
+              <span className="ml-4 text-green-400/60">
+                💾 {results.length} saved results
+              </span>
+            )}
           </div>
-          <button
-            onClick={runAllCombos}
-            disabled={isRunning || selectedMainModels.size === 0 || selectedExecutorModels.size === 0}
-            className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-lg hover:from-amber-400 hover:to-orange-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isRunning ? '🔄 Testing...' : '🚀 Test All Combos'}
-          </button>
+          <div className="flex gap-3">
+            {results.length > 0 && !isRunning && (
+              <button
+                onClick={async () => {
+                  if (confirm('Clear all saved combo test results?')) {
+                    try {
+                      await fetch('/api/tooly/combo-test/results', { method: 'DELETE' });
+                      setResults([]);
+                      setSelectedCombo(null);
+                    } catch (err) {
+                      console.error('Failed to clear results:', err);
+                    }
+                  }
+                }}
+                className="px-4 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                🗑️ Clear Results
+              </button>
+            )}
+            <button
+              onClick={runAllCombos}
+              disabled={isRunning || selectedMainModels.size === 0 || selectedExecutorModels.size === 0}
+              className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-lg hover:from-amber-400 hover:to-orange-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isRunning ? '🔄 Testing...' : '🚀 Test All Combos'}
+            </button>
+          </div>
         </div>
 
         {/* Progress */}
@@ -977,6 +1044,9 @@ export const ComboTest: React.FC = () => {
             <p className="text-gray-500 max-w-md mx-auto">
               Select Main and Executor model candidates above, then click "Test All Combos" 
               to find the best dual-model pairing for your use case.
+            </p>
+            <p className="text-gray-600 text-sm mt-3">
+              Results are automatically saved and persist between sessions.
             </p>
           </div>
         )}

@@ -9,6 +9,7 @@ import axios from 'axios';
 import { LMStudioClient } from '@lmstudio/sdk';
 import { IntentRouter, intentRouter } from '../intent-router.js';
 import { wsBroadcast } from '../../../services/ws-broadcast.js';
+import { db } from '../../../services/database.js';
 
 // ============================================================
 // TYPES
@@ -303,6 +304,35 @@ export class ComboTester {
   }
 
   /**
+   * Save a combo result to the database for persistence
+   */
+  private saveResultToDb(score: ComboScore): void {
+    try {
+      db.saveComboResult({
+        mainModelId: score.mainModelId,
+        executorModelId: score.executorModelId,
+        overallScore: score.overallScore,
+        mainScore: score.mainScore,
+        executorScore: score.executorScore,
+        tierScores: {
+          simple: score.tierScores.find(t => t.tier === 'simple')?.score || 0,
+          medium: score.tierScores.find(t => t.tier === 'medium')?.score || 0,
+          complex: score.tierScores.find(t => t.tier === 'complex')?.score || 0,
+        },
+        categoryScores: score.categoryScores,
+        testResults: score.testResults,
+        avgLatencyMs: score.avgLatencyMs,
+        passedCount: score.passedTests,
+        failedCount: score.totalTests - score.passedTests,
+        mainExcluded: score.mainExcluded || false,
+      });
+      console.log(`[ComboTester] Saved result: ${score.mainModelId} + ${score.executorModelId} = ${score.overallScore}%`);
+    } catch (err: any) {
+      console.error(`[ComboTester] Failed to save result to DB: ${err.message}`);
+    }
+  }
+
+  /**
    * Load both models for dual-model testing
    * Uses smaller context windows to fit both in VRAM
    */
@@ -521,7 +551,10 @@ export class ComboTester {
         results.push(excludedScore);
         comboIndex += this.config.executorModels.length;
         
-        if (this.broadcast) {
+        // Save excluded result to database
+          this.saveResultToDb(excludedScore);
+          
+          if (this.broadcast) {
           const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
           this.broadcast('combo_test_result', {
             result: excludedScore,
@@ -550,7 +583,9 @@ export class ComboTester {
           );
           results.push(score);
 
-          // Broadcast result
+          // Save result to database and broadcast
+          this.saveResultToDb(score);
+          
           if (this.broadcast) {
             const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
             this.broadcast('combo_test_result', {
@@ -565,6 +600,9 @@ export class ComboTester {
           console.error(`[ComboTester] Combo failed: ${err.message}`);
           const failedScore = this.createFailedScore(mainModel, executorModel);
           results.push(failedScore);
+          
+          // Save failed result to database
+          this.saveResultToDb(failedScore);
           
           if (this.broadcast) {
             const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);

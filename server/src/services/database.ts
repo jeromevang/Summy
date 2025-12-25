@@ -4,6 +4,7 @@ import { DBContext, type ContextSessionDB, type ContextMessage, type ContextTurn
 import { DBAnalytics, type AnalyticsEntry, type AnalyticsSummary, type ExecutionLog, type FileBackup, type LogFilters } from './db/db-analytics.js';
 import { DBNotifications, type Notification } from './db/db-notifications.js';
 import { DBConfig } from './db/db-config.js';
+import { DBComboTests, type ComboTestRecord } from './db/db-combo-tests.js';
 
 /**
  * Unified Database Service
@@ -15,6 +16,7 @@ class DatabaseService extends DBBase {
   private analytics = new DBAnalytics();
   private notifications = new DBNotifications();
   private config = new DBConfig();
+  private comboTests = new DBComboTests();
 
   // Legacy Sessions
   getSessions = this.sessions.getSessions.bind(this.sessions);
@@ -78,6 +80,16 @@ class DatabaseService extends DBBase {
   getOrCreateSystemPrompt = this.context.getOrCreateSystemPrompt.bind(this.context);
   getOrCreateToolSet = this.context.getOrCreateToolSet.bind(this.context);
 
+  // Combo Tests
+  saveComboResult = this.comboTests.saveComboResult.bind(this.comboTests);
+  getAllComboResults = this.comboTests.getAllComboResults.bind(this.comboTests);
+  getComboResult = this.comboTests.getComboResult.bind(this.comboTests);
+  getResultsForMainModel = this.comboTests.getResultsForMainModel.bind(this.comboTests);
+  getResultsForExecutorModel = this.comboTests.getResultsForExecutorModel.bind(this.comboTests);
+  getTopCombos = this.comboTests.getTopCombos.bind(this.comboTests);
+  deleteComboResult = this.comboTests.deleteComboResult.bind(this.comboTests);
+  clearAllComboResults = this.comboTests.clearAllComboResults.bind(this.comboTests);
+
   // Utilities
   runCleanup(): { backupsDeleted: number } {
     const backupsDeleted = this.analytics.cleanupExpiredBackups();
@@ -105,5 +117,6 @@ export type {
   ContextTurn,
   ContextSessionDB,
   SystemPrompt,
-  ToolSet
+  ToolSet,
+  ComboTestRecord,
 };
