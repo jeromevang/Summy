@@ -35,7 +35,7 @@ import {
   buildContextualContent 
 } from './summarizer.js';
 import { analyzeFile as analyzeFileDeps, serializeGraph, loadGraph } from './graph-builder.js';
-import { getRAGDatabase, RAGDatabase, StoredChunk as DBStoredChunk, FileSummary as DBFileSummary } from './database.js';
+import { getRAGDatabase, RAGDatabase, StoredChunk as DBStoredChunk, FileSummary as DBFileSummary, SymbolType } from './database.js';
 
 // Progress callback type
 export type ProgressCallback = (progress: IndexProgress) => void;
@@ -275,6 +275,61 @@ export class Indexer {
   }
   
   /**
+   * Map chunk type to symbol type for the symbols table
+   */
+  private mapChunkTypeToSymbolType(chunkType: string): 'function' | 'class' | 'interface' | 'type' | 'method' | 'variable' | 'constant' | 'property' | 'module' {
+    const typeMap: Record<string, 'function' | 'class' | 'interface' | 'type' | 'method' | 'variable' | 'constant' | 'property' | 'module'> = {
+      'function': 'function',
+      'arrow_function': 'function',
+      'method': 'method',
+      'method_definition': 'method',
+      'class': 'class',
+      'class_declaration': 'class',
+      'interface': 'interface',
+      'interface_declaration': 'interface',
+      'type_alias': 'type',
+      'type': 'type',
+      'const': 'constant',
+      'let': 'variable',
+      'var': 'variable',
+      'variable': 'variable',
+      'property': 'property',
+      'module': 'module',
+      'namespace': 'module'
+    };
+    return typeMap[chunkType.toLowerCase()] || 'function';
+  }
+  
+  /**
+   * Extract doc comment from code content
+   */
+  private extractDocComment(content: string): string | null {
+    // Look for JSDoc-style comments /** ... */
+    const jsDocMatch = content.match(/\/\*\*[\s\S]*?\*\//);
+    if (jsDocMatch) {
+      return jsDocMatch[0]
+        .replace(/^\/\*\*\s*/, '')
+        .replace(/\s*\*\/$/, '')
+        .replace(/^\s*\*\s?/gm, '')
+        .trim();
+    }
+    
+    // Look for leading // comments
+    const lines = content.split('\n');
+    const comments: string[] = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('//')) {
+        comments.push(trimmed.replace(/^\/\/\s?/, ''));
+      } else if (trimmed.length > 0) {
+        break; // Stop at first non-comment line
+      }
+    }
+    
+    return comments.length > 0 ? comments.join('\n') : null;
+  }
+  
+  /**
    * Check if file should be included
    */
   private shouldIncludeFile(filePath: string): boolean {
@@ -352,6 +407,8 @@ export class Indexer {
       // For a proper check, we'd need file-level hash tracking
       // For now, always re-index (can be optimized later)
       this.ragDb.deleteChunksByFile(relativePath);
+      this.ragDb.deleteSymbolsByFile(relativePath);
+      this.ragDb.deleteFileDependencies(relativePath);
     }
     
     // Chunk the file
@@ -363,6 +420,19 @@ export class Indexer {
     if (this.config.dependencyGraph?.enabled) {
       const analysis = analyzeFileDeps(relativePath, content, language);
       imports = analysis.imports;
+      
+      // Store file dependencies in SQLite
+      this.ragDb.deleteFileDependencies(relativePath);
+      const deps = imports.map(imp => ({
+        fromFile: relativePath,
+        toFile: imp.from,
+        importType: 'import' as const,
+        importedSymbols: imp.names,
+        isExternal: imp.isExternal
+      }));
+      if (deps.length > 0) {
+        this.ragDb.addFileDependencies(deps);
+      }
     }
     
     // === BATCH EMBEDDING FOR SPEED ===
@@ -513,6 +583,40 @@ export class Indexer {
         purpose: enriched.purpose || null,
         createdAt: new Date().toISOString()
       });
+      
+      // === SYMBOL EXTRACTION ===
+      // Store symbol information for code-aware queries
+      if (chunk.name && chunk.type) {
+        const symbolId = `${relativePath}:${chunk.name}:${chunk.startLine}`;
+        const symbolType = this.mapChunkTypeToSymbolType(chunk.type);
+        
+        // Extract doc comment from content (look for /** ... */ or // comments above)
+        const docComment = this.extractDocComment(chunk.content);
+        
+        // Detect visibility and modifiers from content
+        const isExported = /^export\s/m.test(chunk.content) || content.includes(`export ${chunk.name}`);
+        const isAsync = /^async\s/m.test(chunk.content) || chunk.signature?.includes('async');
+        const isStatic = /static\s/.test(chunk.content);
+        
+        this.ragDb.addSymbol({
+          id: symbolId,
+          name: chunk.name,
+          qualifiedName: `${relativePath}#${chunk.name}`,
+          type: symbolType,
+          filePath: relativePath,
+          startLine: chunk.startLine,
+          endLine: chunk.endLine,
+          signature: chunk.signature || null,
+          docComment,
+          visibility: isExported ? 'public' : 'private',
+          isExported,
+          isAsync,
+          isStatic,
+          parentSymbolId: null, // TODO: track parent class/module
+          chunkId: chunk.id,
+          language: chunk.language
+        });
+      }
       
       this.progress.chunksCreated++;
     }
