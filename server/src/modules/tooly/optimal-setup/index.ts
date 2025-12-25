@@ -3,7 +3,7 @@
  * Exports all optimal-setup-related components
  */
 
-export * from './setup-finder.js';
-export * from './hardware-detector.js';
-export * from './model-scanner.js';
+export * as setupFinder from './setup-finder.js';
+export * as hardwareDetector from './hardware-detector.js';
+export * as modelScanner from './model-scanner.js';
 

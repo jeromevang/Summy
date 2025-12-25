@@ -3,7 +3,7 @@
  * Tests for confidence calibration, uncertainty handling, and "I don't know" responses
  */
 
-import { TestDefinition } from '../test-definitions.js';
+import { TestDefinition } from '../test-types.js';
 
 // ============================================================
 // CALIBRATION TEST DEFINITIONS
@@ -35,7 +35,7 @@ mentioned in ticket PROJ-4521?`,
 If you're not sure, search for it before answering.`,
     expected: {
       tool: 'search_files',
-      params: { 
+      params: {
         pattern: { contains: 'auth' }
       }
     },
@@ -52,7 +52,7 @@ If you're not sure, search for it before answering.`,
     setupFiles: { 'package.json': '{"name": "test"}' },
     expected: {
       tool: 'read_file',
-      params: { 
+      params: {
         path: { contains: 'package.json' }
       }
     },
@@ -69,7 +69,7 @@ If you're not sure, search for it before answering.`,
 different purposes - list all of them instead of guessing which one I mean.)`,
     expected: {
       tool: 'search_files',
-      params: { 
+      params: {
         pattern: { contains: 'config' }
       }
     },
@@ -103,7 +103,7 @@ different purposes - list all of them instead of guessing which one I mean.)`,
 (You should search or query for context rather than making assumptions)`,
     expected: {
       tool: 'rag_query',
-      params: { 
+      params: {
         query: { exists: true }
       }
     },
@@ -134,7 +134,7 @@ different purposes - list all of them instead of guessing which one I mean.)`,
 about its methods? Be clear about what you find vs what you're inferring.`,
     expected: {
       tool: 'search_files',
-      params: { 
+      params: {
         pattern: { contains: 'user' }
       }
     },

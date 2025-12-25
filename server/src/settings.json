@@ -1,0 +1,25 @@
+{
+  "provider": "lmstudio",
+  "openaiModel": "gpt-4o-mini",
+  "azureResourceName": "",
+  "azureDeploymentName": "",
+  "azureApiKey": "",
+  "azureApiVersion": "2024-02-01",
+  "lmstudioUrl": "http://localhost:1234",
+  "lmstudioModel": "mistralai/magistral-small-2509",
+  "defaultCompressionMode": 1,
+  "defaultKeepRecent": 5,
+  "defaultContextLength": 8192,
+  "proxyMode": "both",
+  "enableDualModel": true,
+  "mainModelId": "mistralai/magistral-small-2509",
+  "executorModelId": "llama-3-groq-8b-tool-use",
+  "modules": {
+    "summy": {
+      "enabled": false
+    },
+    "tooly": {
+      "enabled": true
+    }
+  }
+}

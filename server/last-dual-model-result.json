@@ -1,0 +1,133 @@
+{
+  "mode": "dual",
+  "mainResponse": {
+    "id": "chatcmpl-jr55zk0xc2ze6kkptcs",
+    "object": "chat.completion",
+    "created": 1766622970,
+    "model": "mistralai/magistral-small-2509",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"action\":\"call_tool\",\"tool\":\"read_file\",\"parameters\":{\"filepath\":\"WORKING_MEMORY.md\"}}",
+          "tool_calls": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 551,
+      "completion_tokens": 23,
+      "total_tokens": 574
+    },
+    "stats": {},
+    "system_fingerprint": "mistralai/magistral-small-2509"
+  },
+  "executorResponse": {
+    "id": "chatcmpl-j6z4l08mto9cqxjg3025ys",
+    "object": "chat.completion",
+    "created": 1766622978,
+    "model": "llama-3-groq-8b-tool-use",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "type": "function",
+              "id": "179650961",
+              "function": {
+                "name": "read_file",
+                "arguments": "{\"filepath\":\"WORKING_MEMORY.md\"}"
+              }
+            }
+          ]
+        },
+        "logprobs": null,
+        "finish_reason": "tool_calls"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4093,
+      "completion_tokens": 31,
+      "total_tokens": 4124
+    },
+    "stats": {},
+    "system_fingerprint": "llama-3-groq-8b-tool-use"
+  },
+  "finalResponse": {
+    "id": "chatcmpl-j6z4l08mto9cqxjg3025ys",
+    "object": "chat.completion",
+    "created": 1766622978,
+    "model": "llama-3-groq-8b-tool-use",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "",
+          "tool_calls": [
+            {
+              "type": "function",
+              "id": "179650961",
+              "function": {
+                "name": "read_file",
+                "arguments": "{\"filepath\":\"WORKING_MEMORY.md\"}"
+              }
+            }
+          ]
+        },
+        "logprobs": null,
+        "finish_reason": "tool_calls"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4093,
+      "completion_tokens": 31,
+      "total_tokens": 4124
+    },
+    "stats": {},
+    "system_fingerprint": "llama-3-groq-8b-tool-use"
+  },
+  "toolCalls": [
+    {
+      "type": "function",
+      "id": "179650961",
+      "function": {
+        "name": "read_file",
+        "arguments": "{\"filepath\":\"WORKING_MEMORY.md\"}"
+      }
+    }
+  ],
+  "latency": {
+    "main": 9200,
+    "executor": 7106,
+    "total": 16306
+  },
+  "phases": [
+    {
+      "phase": "planning",
+      "systemPrompt": "Output ONLY a JSON intent. No thinking, no explanations.\n\nFormat:\n{\"action\":\"call_tool\",\"tool\":\"TOOL_NAME\",\"parameters\":{...}}\nor\n{\"action\":\"respond\"}\n\nCommon tools: read_file, write_file, edit_file, rag_query, git_status, shell_exec\n\nExample: User says \"read config.json\" → {\"action\":\"call_tool\",\"tool\":\"read_file\",\"parameters\":{\"filepath\":\"config.json\"}}\n\nOutput the JSON now:",
+      "model": "mistralai/magistral-small-2509",
+      "latencyMs": 9200,
+      "reasoning": "{\"action\":\"call_tool\",\"tool\":\"read_file\",\"parameters\":{\"filepath\":\"WORKING_MEMORY.md\"}}"
+    },
+    {
+      "phase": "execution",
+      "systemPrompt": "You are a tool execution assistant. Your job is to translate intent into exact tool calls.\n\nIMPORTANT: \n- You MUST call the tool specified in the intent\n- Follow the schema exactly\n- Do not reason or explain - just execute\n- Output tool calls only, no text\n\n## Available Tools\n\n### git_log\nView commit history.\nParameters:\n- count (optional): Number of commits (default: 10)\n- format (optional): oneline, short, full, graph\n\n### git_commit\nCommit staged changes.\nParameters:\n- message (required): The commit message\n\n### git_add\nStage files for commit.\nParameters:\n- file (optional): File to stage (default: all)\n\n### git_branch_create\nCreate and switch to a new branch.\nParameters:\n- name (required): The branch name\n\n### npm_run\nRun an npm script.\nParameters:\n- script (required): The script name to run\n\n### npm_install\nInstall npm packages.\nParameters:\n- package (optional): Package name (omit for all)\n- dev (optional): Install as dev dependency\n\n### npm_uninstall\nUninstall an npm package.\nParameters:\n- package (required): The package name\n\n### http_request\nMake an HTTP request.\nParameters:\n- url (required): The URL to request\n- method (optional): GET, POST, PUT, DELETE, etc.\n- headers (optional): Request headers object\n- body (optional): Request body\n- timeout (optional): Timeout in milliseconds\n\n### browser_navigate\nNavigate to a URL in the browser.\nParameters:\n- url (required): The URL to navigate to\n\n### run_python\nExecute Python code.\nParameters:\n- code (required): Python code to execute\n\n### read_file\nRead the complete contents of a file from the file system.\nParameters:\n- path (required): Path to the file to read\n\n### write_file\nCreate a new file or completely overwrite an existing file with new content.\nParameters:\n- path (required): Path where the file will be created or overwritten\n- content (required): Content to write to the file\n\n### create_directory\nCreate a new directory or ensure a directory exists.\nParameters:\n- path (required): Path of the directory to create\n\n### get_file_info\nRetrieve detailed metadata about a file or directory.\nParameters:\n- path (required): Path to the file or directory\n\n### web_search\nSearch the web using DuckDuckGo.\nParameters:\n- query (required): Search query\n- maxResults (optional): Maximum results (default: 5)\n\n### shell_exec\nExecute a shell command.\nParameters:\n- command (required): Command to execute\n- cwd (optional): Working directory\n- timeout (optional): Timeout in milliseconds\nRules:\n- Some dangerous commands are blocked\n\n### memory_retrieve\nRetrieve a value from memory by key.\nParameters:\n- key (required): Key to retrieve\n\n### text_summarize\nSummarize text by extracting key sentences.\nParameters:\n- text (required): Text to summarize\n- maxSentences (optional): Maximum sentences (default: 3)\n\n### diff_files\nCompare two files and show differences.\nParameters:\n- file1 (required): Path to first file\n- file2 (required): Path to second file\n\n### process_list\nList running processes.\nParameters:\n- filter (optional): Filter processes by name\n\n### zip_create\nCreate a zip archive from files or directories.\nParameters:\n- output (required): Output zip file path\n- sources (required): Array of files/directories to include\n\n### rag_query\n**PREFERRED FOR CODE SEARCH** - Use this FIRST for any code search or understanding task.\nSemantic AI-powered search that finds relevant code by meaning in a single call.\nUse for: \"find X\", \"where is Y handled\", \"how does Z work\", \"search for\", \"look for\"\nMuch more efficient than multiple grep/search calls.\nParameters:\n- query (required): Natural language query - ask like you would ask a colleague\n- limit (optional): Maximum results to return (default: 5)\n- fileTypes (optional): Filter by file types (e.g., ['ts', 'js', 'py'])\n- paths (optional): Filter by path patterns (e.g., ['src/', 'lib/'])\nReturns: Code snippets with file paths, line numbers, symbols, and relevance scores\n\n### rag_index\nStart indexing a project directory for semantic search.\nParameters:\n- projectPath (required): Absolute path to the project directory to index\n\n## Rules\n\n- Read the intent JSON and call the specified tool\n- Use the exact parameters from the intent\n- Never output text - only tool calls",
+      "model": "llama-3-groq-8b-tool-use",
+      "latencyMs": 7106
+    }
+  ],
+  "intent": {
+    "action": "call_tool",
+    "tool": "read_file",
+    "parameters": {
+      "filepath": "WORKING_MEMORY.md"
+    }
+  }
+}

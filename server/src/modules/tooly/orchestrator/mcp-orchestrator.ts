@@ -6,13 +6,18 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import type { 
+import type {
   MCPModelConfig,
   ModelOptimalSettings,
   ContextBudget,
   RAGSettings,
-  TOOL_TIERS
+  TOOL_TIERS,
+  ProbeRunResult,
+  ProstheticConfig
 } from '../types.js';
+
+import { prostheticPromptBuilder } from './prosthetic-prompt-builder.js';
+import { prostheticStore } from '../learning/prosthetic-store.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -100,11 +105,11 @@ export const FULL_TOOLS = [
 
 export class MCPOrchestrator {
   private configDir: string;
-  
+
   constructor() {
     this.configDir = CONFIG_DIR;
   }
-  
+
   /**
    * Ensure config directories exist
    */
@@ -112,7 +117,7 @@ export class MCPOrchestrator {
     await fs.ensureDir(path.join(this.configDir, 'models'));
     await fs.ensureDir(path.join(this.configDir, 'templates'));
   }
-  
+
   /**
    * Get the config path for a model
    */
@@ -121,13 +126,13 @@ export class MCPOrchestrator {
     const safeId = modelId.replace(/[^a-zA-Z0-9-_.]/g, '_');
     return path.join(this.configDir, 'models', `${safeId}.json`);
   }
-  
+
   /**
    * Load existing config for a model
    */
   async loadConfig(modelId: string): Promise<MCPModelConfig | null> {
     const configPath = this.getConfigPath(modelId);
-    
+
     try {
       if (await fs.pathExists(configPath)) {
         return await fs.readJson(configPath);
@@ -135,23 +140,23 @@ export class MCPOrchestrator {
     } catch (error) {
       console.error(`[MCP Orchestrator] Error loading config for ${modelId}:`, error);
     }
-    
+
     return null;
   }
-  
+
   /**
    * Save config for a model
    */
   async saveConfig(config: MCPModelConfig): Promise<string> {
     await this.ensureDirectories();
     const configPath = this.getConfigPath(config.modelId);
-    
+
     await fs.writeJson(configPath, config, { spaces: 2 });
     console.log(`[MCP Orchestrator] Saved config for ${config.modelId}`);
-    
+
     return configPath;
   }
-  
+
   /**
    * Generate optimized config from test results
    */
@@ -175,14 +180,14 @@ export class MCPOrchestrator {
     } else {
       enabledTools = [...FULL_TOOLS];
     }
-    
+
     // Remove failed tools
     const disabledTools = testResults.failedTools || [];
     enabledTools = enabledTools.filter(t => !disabledTools.includes(t));
-    
+
     // Build system prompt additions based on capabilities
     const systemPromptAdditions: string[] = [];
-    
+
     if (testResults.ragPerformance && testResults.ragPerformance >= 80) {
       // Model is good at RAG, encourage it
       systemPromptAdditions.push('PREFERRED: Use rag_query to search the codebase before reading files directly.');
@@ -190,7 +195,7 @@ export class MCPOrchestrator {
       // Model struggles with RAG, simplify
       systemPromptAdditions.push('NOTE: For code questions, you may read files directly if semantic search is unclear.');
     }
-    
+
     // Calculate optimal context budget based on context performance
     let optimalTotal = 32000;
     if (testResults.contextPerformance) {
@@ -198,12 +203,12 @@ export class MCPOrchestrator {
       const bestContext = contexts
         .filter(([_, latency]) => latency < 10000) // Under 10s
         .sort((a, b) => Number(b[0]) - Number(a[0]))[0];
-      
+
       if (bestContext) {
         optimalTotal = Number(bestContext[0]);
       }
     }
-    
+
     const contextBudget: ContextBudget = {
       total: optimalTotal,
       systemPrompt: Math.min(2000, optimalTotal * 0.06),
@@ -213,7 +218,7 @@ export class MCPOrchestrator {
       history: Math.min(12000, optimalTotal * 0.38),
       reserve: Math.min(5000, optimalTotal * 0.16)
     };
-    
+
     // Determine RAG settings
     const ragSettings: RAGSettings = {
       chunkSize: testResults.ragPerformance && testResults.ragPerformance >= 70 ? 1500 : 800,
@@ -222,7 +227,7 @@ export class MCPOrchestrator {
       includeSummaries: testResults.ragPerformance ? testResults.ragPerformance >= 60 : true,
       includeGraph: testResults.ragPerformance ? testResults.ragPerformance >= 80 : false
     };
-    
+
     return {
       modelId,
       toolFormat: testResults.toolFormat,
@@ -235,28 +240,53 @@ export class MCPOrchestrator {
         maxToolsPerCall: testResults.optimalToolCount || 8,
         ragChunkSize: ragSettings.chunkSize,
         ragResultCount: ragSettings.resultCount
+      },
+      prosthetic: {
+        modelId,
+        level1Prompts: [],
+        level2Constraints: [],
+        level3Interventions: [],
+        level4Disqualifications: []
       }
     };
   }
-  
+
+  /**
+   * Enrich config with Prosthetic Intelligence from probe results
+   */
+  addProstheticIntelligence(config: MCPModelConfig, probeResults: ProbeRunResult): MCPModelConfig {
+    const prostheticConfig = prostheticPromptBuilder.build(probeResults);
+
+    // Add Level 1 prompts to system additions dynamically
+    prostheticConfig.level1Prompts.forEach(p => {
+      if (!config.systemPromptAdditions.includes(p)) {
+        config.systemPromptAdditions.push(p);
+      }
+    });
+
+    config.prosthetic = prostheticConfig;
+    return config;
+  }
+
   /**
    * Get tool schema overrides for a model
    */
   getToolSchemaOverrides(config: MCPModelConfig): Record<string, any> {
     const overrides: Record<string, any> = {};
-    
+
     for (const [toolName, override] of Object.entries(config.toolOverrides)) {
       overrides[toolName] = {
         description: override.description,
         priority: override.priority
       };
     }
-    
+
     return overrides;
   }
-  
+
   /**
    * Build complete system prompt for a model
+   * Automatically applies prosthetic prompt if one exists for the model
    */
   buildSystemPrompt(
     config: MCPModelConfig,
@@ -264,31 +294,63 @@ export class MCPOrchestrator {
     injectedMemories?: string[]
   ): string {
     const parts: string[] = [];
-    
+
+    // Auto-apply prosthetic prompt if certified (prepended for highest priority)
+    const prosthetic = prostheticStore.getPrompt(config.modelId);
+    if (prosthetic && prosthetic.verified) {
+      parts.push('## Agentic Readiness Compensations (Auto-Applied)');
+      parts.push(prosthetic.prompt);
+      parts.push('');
+      
+      // Increment successful runs counter
+      prostheticStore.incrementSuccess(config.modelId);
+    }
+
     // Base prompt
     parts.push(basePrompt);
-    
+
     // Model-specific additions
     if (config.systemPromptAdditions.length > 0) {
       parts.push('\n\n## Model-Specific Instructions');
       parts.push(config.systemPromptAdditions.join('\n'));
     }
-    
+
     // Injected memories
     if (injectedMemories && injectedMemories.length > 0) {
       parts.push('\n\n## Learned Preferences');
       parts.push(injectedMemories.join('\n'));
     }
-    
+
     return parts.join('\n');
   }
-  
+
+  /**
+   * Check if a model has a prosthetic applied
+   */
+  hasProsthetic(modelId: string): boolean {
+    return prostheticStore.hasProsthetic(modelId);
+  }
+
+  /**
+   * Get prosthetic info for a model
+   */
+  getProstheticInfo(modelId: string): { level: number; verified: boolean; successfulRuns: number } | null {
+    const prosthetic = prostheticStore.getPrompt(modelId);
+    if (!prosthetic) return null;
+    
+    return {
+      level: prosthetic.level,
+      verified: prosthetic.verified,
+      successfulRuns: prosthetic.successfulRuns
+    };
+  }
+
   /**
    * List all saved configs
    */
   async listConfigs(): Promise<string[]> {
     await this.ensureDirectories();
-    
+
     try {
       const files = await fs.readdir(path.join(this.configDir, 'models'));
       return files
@@ -298,13 +360,13 @@ export class MCPOrchestrator {
       return [];
     }
   }
-  
+
   /**
    * Delete config for a model
    */
   async deleteConfig(modelId: string): Promise<boolean> {
     const configPath = this.getConfigPath(modelId);
-    
+
     try {
       if (await fs.pathExists(configPath)) {
         await fs.remove(configPath);
@@ -314,7 +376,7 @@ export class MCPOrchestrator {
     } catch (error) {
       console.error(`[MCP Orchestrator] Error deleting config for ${modelId}:`, error);
     }
-    
+
     return false;
   }
 }

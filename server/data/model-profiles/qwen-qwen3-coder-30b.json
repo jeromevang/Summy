@@ -4,7 +4,7 @@
   "provider": "lmstudio",
   "testedAt": "2025-12-21T19:43:37.175Z",
   "testVersion": 3,
-  "score": 89,
+  "score": 44,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -1723,5 +1723,11 @@
     "calculate",
     "format_text",
     "extract_information"
-  ]
+  ],
+  "agenticReadiness": {
+    "certified": false,
+    "score": 44,
+    "testedAt": "2025-12-23T02:33:25.805Z",
+    "testVersion": 1
+  }
 }

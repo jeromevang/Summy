@@ -4,73 +4,9 @@
   "provider": "lmstudio",
   "testedAt": "2025-12-22T19:57:16.725Z",
   "testVersion": 5,
-  "score": 55,
+  "score": 17,
   "toolFormat": "openai_tools",
   "capabilities": {
-    "file_read": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 2,
-      "testsFailed": 0,
-      "avgLatency": 1273,
-      "lastTested": "2025-12-19T17:10:19.024Z"
-    },
-    "file_write": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 761,
-      "lastTested": "2025-12-19T17:10:19.024Z"
-    },
-    "file_patch": {
-      "supported": false,
-      "score": 63,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 721,
-      "lastTested": "2025-12-19T17:10:19.024Z"
-    },
-    "file_list": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 465,
-      "lastTested": "2025-12-19T17:10:19.024Z"
-    },
-    "file_search": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 608,
-      "lastTested": "2025-12-19T17:10:19.024Z"
-    },
-    "create_new_file": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 797,
-      "lastTested": "2025-12-19T17:10:19.024Z"
-    },
-    "folder_create": {
-      "supported": false,
-      "score": 45,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 476,
-      "lastTested": "2025-12-19T17:10:19.024Z"
-    },
-    "folder_delete": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 522,
-      "lastTested": "2025-12-19T17:10:19.024Z"
-    },
     "git_status": {
       "supported": false,
       "score": 45,
@@ -405,12 +341,6 @@
     }
   },
   "enabledTools": [
-    "file_read",
-    "file_write",
-    "file_list",
-    "file_search",
-    "create_new_file",
-    "folder_delete",
     "npm_run",
     "npm_install",
     "http_request",
@@ -1808,5 +1738,11 @@
     "instructionPersistence": 14,
     "correctionAcceptance": 44,
     "overallTrainability": 20
+  },
+  "agenticReadiness": {
+    "certified": false,
+    "score": 17,
+    "testedAt": "2025-12-23T02:10:08.714Z",
+    "testVersion": 1
   }
 }

@@ -12,13 +12,17 @@ import { modelDiscovery } from '../services/model-discovery.js';
 import { analytics } from '../services/analytics.js';
 import { db } from '../services/database.js';
 import { capabilities, ALL_TOOLS, TOOL_CATEGORIES, ModelProfile } from '../modules/tooly/capabilities.js';
-import { testEngine, TEST_DEFINITIONS } from '../modules/tooly/test-engine.js';
-import { probeEngine, PROBE_CATEGORIES } from '../modules/tooly/probe-engine.js';
+import { testEngine } from '../modules/tooly/test-engine.js';
+import { ALL_TEST_DEFINITIONS as TEST_DEFINITIONS } from '../modules/tooly/testing/test-definitions.js';
+import { probeEngine } from '../modules/tooly/probe-engine.js';
+import { PROBE_CATEGORIES } from '../modules/tooly/strategic-probes.js';
 import { rollback } from '../modules/tooly/rollback.js';
 import { mcpClient } from '../modules/tooly/mcp-client.js';
 import { calculateBadges, extractBadgeScores } from '../modules/tooly/badges.js';
 import { calculateRecommendations } from '../modules/tooly/recommendations.js';
 import { lookupModelInfo } from '../services/model-info-lookup.js';
+import { calculateBaselineComparison } from '../modules/tooly/scoring/agentic-scorer.js';
+import { broadcastToClients } from '../services/broadcast-util.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,7 +46,7 @@ router.get('/models', async (req, res) => {
   try {
     const providerFilter = (req.query.provider as string) || 'all';
     let settings: any = {};
-    
+
     try {
       if (await fs.pathExists(SETTINGS_FILE)) {
         settings = await fs.readJson(SETTINGS_FILE);
@@ -62,11 +66,11 @@ router.get('/models', async (req, res) => {
       console.log(`[Tooly] Discovering LM Studio models from: ${settings.lmstudioUrl}`);
       lmstudioModels = await modelDiscovery.discoverLMStudio(settings.lmstudioUrl);
     }
-    
+
     if (providerFilter === 'all' || providerFilter === 'openai') {
       openaiModels = await modelDiscovery.discoverOpenAI(process.env.OPENAI_API_KEY);
     }
-    
+
     if (providerFilter === 'all' || providerFilter === 'azure') {
       azureModels = await modelDiscovery.discoverAzure({
         azureResourceName: settings.azureResourceName,
@@ -113,12 +117,12 @@ router.get('/models/:modelId', async (req, res) => {
   try {
     const { modelId } = req.params;
     const profile = await capabilities.getProfile(modelId);
-    
+
     if (!profile) {
       res.status(404).json({ error: 'Model profile not found' });
       return;
     }
-    
+
     // Get model info from LM Studio SDK if available
     let maxContextLength: number | undefined;
     let trainedForToolUse: boolean | undefined;
@@ -135,10 +139,112 @@ router.get('/models/:modelId', async (req, res) => {
     } catch (e) {
       // Ignore - SDK not available
     }
-    
+
     res.json({ ...profile, maxContextLength, trainedForToolUse, vision });
   } catch (error: any) {
     console.error('[Tooly] Failed to get model profile:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/baseline/generate
+ * Automatically generate ground truth baselines using Gemini
+ */
+router.post('/baseline/generate', async (req, res) => {
+  try {
+    const { baselineEngine } = await import('../modules/tooly/baseline-engine.js');
+    const results = await baselineEngine.autoGenerateBaselines();
+    res.json({
+      success: true,
+      count: results.length,
+      results
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to generate baselines:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/baseline/compare/:modelId
+ * Compare a model's performance against the ground truth baseline
+ */
+router.get('/baseline/compare/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+
+    // Get the target model profile
+    const profile = await capabilities.getProfile(decodedModelId);
+    if (!profile) {
+      return res.status(404).json({ error: 'Model profile not found' });
+    }
+
+    // Get the baseline profile (usually the one with isBaseline: true)
+    const allProfiles = await capabilities.getAllProfiles();
+    const baselineProfile = allProfiles.find(p => (p as any).isBaseline === true);
+
+    // Ensure model has scores
+    if (!profile.probeResults?.overallScore) {
+      return res.status(400).json({ error: 'Profile must have probe results to compare.' });
+    }
+
+    // Convert ModelProfile to AgenticScores format expected by calculateBaselineComparison
+    const modelScores = {
+      toolAccuracy: profile.probeResults.toolScore || 0,
+      intentRecognition: (profile.probeResults as any).intentScores?.overallIntentScore || 0,
+      ragUsage: (profile as any).scoreBreakdown?.ragScore || 0,
+      reasoning: profile.probeResults.reasoningScore || 0,
+      bugDetection: (profile as any).scoreBreakdown?.bugDetectionScore || 0,
+      codeUnderstanding: (profile as any).scoreBreakdown?.architecturalScore || 0,
+      selfCorrection: (profile as any).probeResults?.silentFailureScore || 0,
+      antiPatternPenalty: (profile as any).antiPatterns?.redFlagScore || 0,
+      overallScore: profile.probeResults.overallScore
+    };
+
+    let baselineScores;
+    let baselineModelId;
+
+    if (baselineProfile && baselineProfile.probeResults?.overallScore) {
+      baselineModelId = baselineProfile.modelId;
+      baselineScores = {
+        toolAccuracy: baselineProfile.probeResults.toolScore || 0,
+        intentRecognition: (baselineProfile.probeResults as any).intentScores?.overallIntentScore || 0,
+        ragUsage: (baselineProfile as any).scoreBreakdown?.ragScore || 0,
+        reasoning: baselineProfile.probeResults.reasoningScore || 0,
+        bugDetection: (baselineProfile as any).scoreBreakdown?.bugDetectionScore || 0,
+        codeUnderstanding: (baselineProfile as any).scoreBreakdown?.architecturalScore || 0,
+        selfCorrection: (baselineProfile as any).probeResults?.silentFailureScore || 0,
+        antiPatternPenalty: (baselineProfile as any).antiPatterns?.redFlagScore || 0,
+        overallScore: baselineProfile.probeResults.overallScore
+      };
+    } else {
+      // DEFAULT: Compare against Gemini Ground Truth (Virtual 100% baseline)
+      baselineModelId = 'Gemini Ground Truth';
+      baselineScores = {
+        toolAccuracy: 100,
+        intentRecognition: 100,
+        ragUsage: 100,
+        reasoning: 100,
+        bugDetection: 100,
+        codeUnderstanding: 100,
+        selfCorrection: 100,
+        antiPatternPenalty: 0,
+        overallScore: 100
+      };
+    }
+
+    const comparison = calculateBaselineComparison(
+      modelScores,
+      baselineScores,
+      decodedModelId,
+      baselineModelId
+    );
+
+    res.json(comparison);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to compare baseline:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -151,7 +257,7 @@ router.get('/models/:modelId/info', async (req, res) => {
   try {
     const { modelId } = req.params;
     const skipCache = req.query.refresh === 'true';
-    
+
     const info = await lookupModelInfo(modelId, skipCache);
     res.json(info);
   } catch (error: any) {
@@ -172,10 +278,11 @@ router.post('/models/:modelId/test', async (req, res) => {
     const tools = body.tools;
     // Check both query param and body for mode (client sends via query string)
     const testMode = (req.query.mode as string) || body.testMode || 'manual';  // 'quick' | 'standard' | 'deep' | 'manual'
-    
+    const isBaseline = body.isBaseline === true || req.query.isBaseline === 'true';
+
     // Load settings
     let settings: any = {};
-    
+
     try {
       if (await fs.pathExists(SETTINGS_FILE)) {
         settings = await fs.readJson(SETTINGS_FILE);
@@ -206,7 +313,8 @@ router.post('/models/:modelId/test', async (req, res) => {
       unloadAfterTest: false,
       unloadOnlyOnFail: false,
       contextLength: 4096, // Minimal context for tool capability testing
-      skipPreflight
+      skipPreflight,
+      isBaseline
     };
 
     console.log(`[Tooly] Running tests for ${modelId} with mode: ${testMode}`);
@@ -233,10 +341,10 @@ router.delete('/models/:modelId/test', async (req, res) => {
   try {
     const { modelId } = req.params;
     const decodedModelId = decodeURIComponent(modelId);
-    
+
     const wasRunning = testEngine.isTestRunning(decodedModelId);
     const aborted = testEngine.abortTest(decodedModelId);
-    
+
     if (aborted) {
       console.log(`[Tooly] Cancelled test for ${decodedModelId}`);
       res.json({ success: true, message: 'Test cancelled' });
@@ -259,15 +367,15 @@ router.delete('/models/:modelId/results', async (req, res) => {
   try {
     const { modelId } = req.params;
     const decodedModelId = decodeURIComponent(modelId);
-    
+
     // Get existing profile
     let profile = await capabilities.getProfile(decodedModelId);
-    
+
     if (!profile) {
       res.status(404).json({ error: 'Model profile not found' });
       return;
     }
-    
+
     // Reset test-related fields
     profile.score = 0;
     profile.testVersion = 0;
@@ -278,9 +386,9 @@ router.delete('/models/:modelId/results', async (req, res) => {
     (profile as any).probeResults = undefined;
     (profile as any).discoveredNativeTools = undefined;
     (profile as any).unmappedNativeTools = undefined;
-    
+
     await capabilities.saveProfile(profile);
-    
+
     console.log(`[Tooly] Cleared test results for ${decodedModelId}`);
     res.json({ success: true, message: 'Test results cleared' });
   } catch (error: any) {
@@ -300,10 +408,11 @@ router.post('/models/:modelId/probe', async (req, res) => {
     const body = req.body || {};
     const provider = body.provider || 'lmstudio';
     const runLatencyProfile = body.runLatencyProfile || false;
-    
+    const isBaseline = body.isBaseline === true || req.query.isBaseline === 'true';
+
     // Load settings
     let settings: any = {};
-    
+
     try {
       if (await fs.pathExists(SETTINGS_FILE)) {
         settings = await fs.readJson(SETTINGS_FILE);
@@ -339,6 +448,7 @@ router.post('/models/:modelId/probe', async (req, res) => {
       runProactiveProbes: true,
       runIntentProbes: true,
       quickMode: false,  // Full mode - run all probes
+      isBaseline
     });
 
     // Build probe results for saving
@@ -389,13 +499,13 @@ router.post('/models/:modelId/probe', async (req, res) => {
     if (result.proactiveProbes) {
       probeResultsToSave.proactiveProbes = result.proactiveProbes;
     }
-    
+
     // Save intent probes (8.x) if available
     if (result.intentProbes) {
       probeResultsToSave.intentProbes = result.intentProbes;
       probeResultsToSave.intentScores = result.intentScores;
     }
-    
+
     // Save score breakdown if available
     if (result.scoreBreakdown) {
       probeResultsToSave.scoreBreakdown = result.scoreBreakdown;
@@ -405,9 +515,9 @@ router.post('/models/:modelId/probe', async (req, res) => {
     await capabilities.updateProbeResults(
       modelId,
       probeResultsToSave,
-      result.role,
+      result.role as any,
       result.contextLatency,
-      result.scoreBreakdown
+      { ...result.scoreBreakdown, isBaseline } as any
     );
 
     res.json(result);
@@ -426,7 +536,7 @@ router.post('/models/:modelId/quick-latency', async (req, res) => {
     const { modelId } = req.params;
     const body = req.body || {};
     const provider = body.provider || 'lmstudio';
-    
+
     // Load settings
     let settings: any = {};
     try {
@@ -468,10 +578,10 @@ router.post('/models/:modelId/latency-profile', async (req, res) => {
     const { modelId } = req.params;
     const body = req.body || {};
     const provider = body.provider || 'lmstudio';
-    
+
     // Load settings
     let settings: any = {};
-    
+
     try {
       if (await fs.pathExists(SETTINGS_FILE)) {
         settings = await fs.readJson(SETTINGS_FILE);
@@ -518,7 +628,7 @@ router.put('/models/:modelId/tools/:tool', async (req, res) => {
   try {
     const { modelId, tool } = req.params;
     const { enabled } = req.body;
-    
+
     await capabilities.toggleTool(modelId, tool, enabled);
     res.json({ success: true });
   } catch (error: any) {
@@ -535,7 +645,7 @@ router.put('/models/:modelId/prompt', async (req, res) => {
   try {
     const { modelId } = req.params;
     const { systemPrompt } = req.body;
-    
+
     await capabilities.updateSystemPrompt(modelId, systemPrompt);
     res.json({ success: true });
   } catch (error: any) {
@@ -552,12 +662,12 @@ router.put('/models/:modelId/context-length', async (req, res) => {
   try {
     const { modelId } = req.params;
     const { contextLength } = req.body;
-    
+
     if (!contextLength || typeof contextLength !== 'number') {
       res.status(400).json({ error: 'Invalid context length' });
       return;
     }
-    
+
     await capabilities.updateContextLength(modelId, contextLength);
     res.json({ success: true });
   } catch (error: any) {
@@ -573,11 +683,32 @@ router.put('/models/:modelId/context-length', async (req, res) => {
 router.delete('/models/:modelId/context-length', async (req, res) => {
   try {
     const { modelId } = req.params;
-    
+
     await capabilities.removeContextLength(modelId);
     res.json({ success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to remove context length:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/tooly/models/:modelId/profile
+ * Delete the entire model profile (assessment data, prosthetics, etc.)
+ */
+router.delete('/models/:modelId/profile', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+
+    console.log(`[Tooly] Deleting profile for model: ${decodedModelId}`);
+
+    // Delete the profile file
+    await capabilities.deleteProfile(decodedModelId);
+
+    res.json({ success: true, message: `Profile deleted for ${decodedModelId}` });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to delete profile:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -592,32 +723,32 @@ router.put('/models/:modelId/alias', async (req, res) => {
   try {
     const { modelId } = req.params;
     const { nativeToolName, mcpTool } = req.body;
-    
+
     if (!nativeToolName || typeof nativeToolName !== 'string') {
       res.status(400).json({ error: 'Missing or invalid nativeToolName' });
       return;
     }
-    
+
     // Get or create profile
     let profile = await capabilities.getProfile(modelId);
     if (!profile) {
       res.status(404).json({ error: 'Model profile not found' });
       return;
     }
-    
+
     // Remove the alias from ALL MCP tools first
     for (const tool of ALL_TOOLS) {
       if (profile.capabilities[tool]?.nativeAliases) {
-        profile.capabilities[tool].nativeAliases = 
+        profile.capabilities[tool].nativeAliases =
           profile.capabilities[tool].nativeAliases!.filter(a => a !== nativeToolName);
       }
     }
-    
+
     // Also update unmappedNativeTools
     if (!profile.unmappedNativeTools) {
       profile.unmappedNativeTools = [];
     }
-    
+
     // If mcpTool is provided, add the alias to that tool
     if (mcpTool && ALL_TOOLS.includes(mcpTool)) {
       if (!profile.capabilities[mcpTool]) {
@@ -629,10 +760,10 @@ router.put('/models/:modelId/alias', async (req, res) => {
       if (!profile.capabilities[mcpTool].nativeAliases!.includes(nativeToolName)) {
         profile.capabilities[mcpTool].nativeAliases!.push(nativeToolName);
       }
-      
+
       // Remove from unmapped if it was there
       profile.unmappedNativeTools = profile.unmappedNativeTools.filter(t => t !== nativeToolName);
-      
+
       console.log(`[Tooly] Alias updated: "${nativeToolName}" -> "${mcpTool}" for ${modelId}`);
     } else {
       // Mark as unmapped
@@ -641,11 +772,11 @@ router.put('/models/:modelId/alias', async (req, res) => {
       }
       console.log(`[Tooly] Alias removed: "${nativeToolName}" is now unmapped for ${modelId}`);
     }
-    
+
     await capabilities.saveProfile(profile);
-    
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       nativeToolName,
       mcpTool: mcpTool || null
     });
@@ -692,10 +823,10 @@ router.get('/tests/:tool', (req, res) => {
 router.get('/custom-tests', (req, res) => {
   try {
     const customTests = db.getCustomTests();
-    
+
     // Also include built-in probe tests for display
     const builtInTests = [
-      ...PROBE_CATEGORIES.flatMap((cat: any) => 
+      ...PROBE_CATEGORIES.flatMap((cat: any) =>
         cat.probes.map((p: any) => ({
           id: p.id,
           name: p.name,
@@ -710,7 +841,7 @@ router.get('/custom-tests', (req, res) => {
         }))
       )
     ];
-    
+
     res.json({
       customTests,
       builtInTests,
@@ -730,12 +861,12 @@ router.get('/custom-tests', (req, res) => {
 router.post('/custom-tests', (req, res) => {
   try {
     const { name, category, prompt, expectedTool, expectedBehavior, difficulty, variants } = req.body;
-    
+
     if (!name || !category || !prompt) {
       res.status(400).json({ error: 'name, category, and prompt are required' });
       return;
     }
-    
+
     const id = db.createCustomTest({
       name,
       category,
@@ -745,7 +876,7 @@ router.post('/custom-tests', (req, res) => {
       difficulty,
       variants,
     });
-    
+
     res.json({ id, success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to create custom test:', error);
@@ -761,14 +892,14 @@ router.put('/custom-tests/:id', (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
-    
+
     const success = db.updateCustomTest(id, updates);
-    
+
     if (!success) {
       res.status(404).json({ error: 'Test not found or is built-in' });
       return;
     }
-    
+
     res.json({ success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to update custom test:', error);
@@ -783,14 +914,14 @@ router.put('/custom-tests/:id', (req, res) => {
 router.delete('/custom-tests/:id', (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const success = db.deleteCustomTest(id);
-    
+
     if (!success) {
       res.status(404).json({ error: 'Test not found or is built-in' });
       return;
     }
-    
+
     res.json({ success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to delete custom test:', error);
@@ -806,10 +937,10 @@ router.post('/custom-tests/:id/try', async (req, res) => {
   try {
     const { id } = req.params;
     const { modelId, prompt: overridePrompt } = req.body;
-    
+
     // Get the test
     let test = db.getCustomTest(id);
-    
+
     // If not a custom test, check built-in probes
     if (!test) {
       for (const cat of PROBE_CATEGORIES) {
@@ -826,12 +957,12 @@ router.post('/custom-tests/:id/try', async (req, res) => {
         }
       }
     }
-    
+
     if (!test) {
       res.status(404).json({ error: 'Test not found' });
       return;
     }
-    
+
     // Get model settings
     let settings: any = {};
     try {
@@ -841,16 +972,16 @@ router.post('/custom-tests/:id/try', async (req, res) => {
     } catch {
       // Use defaults
     }
-    
+
     // Use provided modelId or fall back to settings
     const targetModel = modelId || settings.mainModelId || settings.lmstudioModel;
     if (!targetModel) {
       res.status(400).json({ error: 'No model selected' });
       return;
     }
-    
+
     const testPrompt = overridePrompt || test.prompt;
-    
+
     // Build comprehensive tool definitions matching MCP server
     const testTools = [
       // RAG Tools (primary for code understanding)
@@ -861,7 +992,7 @@ router.post('/custom-tests/:id/try', async (req, res) => {
           description: 'Search the codebase using semantic search. Use this FIRST for any code understanding or exploration tasks.',
           parameters: {
             type: 'object',
-            properties: { 
+            properties: {
               query: { type: 'string', description: 'Natural language search query' },
               topK: { type: 'number', description: 'Number of results to return' }
             },
@@ -889,9 +1020,9 @@ router.post('/custom-tests/:id/try', async (req, res) => {
           description: 'Write content to a file',
           parameters: {
             type: 'object',
-            properties: { 
-              path: { type: 'string' }, 
-              content: { type: 'string' } 
+            properties: {
+              path: { type: 'string' },
+              content: { type: 'string' }
             },
             required: ['path', 'content']
           }
@@ -916,8 +1047,8 @@ router.post('/custom-tests/:id/try', async (req, res) => {
           description: 'Search for files matching a pattern',
           parameters: {
             type: 'object',
-            properties: { 
-              path: { type: 'string' }, 
+            properties: {
+              path: { type: 'string' },
               pattern: { type: 'string' },
               regex: { type: 'boolean' }
             },
@@ -958,7 +1089,7 @@ router.post('/custom-tests/:id/try', async (req, res) => {
           description: 'Execute a shell command',
           parameters: {
             type: 'object',
-            properties: { 
+            properties: {
               command: { type: 'string' },
               cwd: { type: 'string' }
             },
@@ -980,7 +1111,7 @@ router.post('/custom-tests/:id/try', async (req, res) => {
         }
       }
     ];
-    
+
     // Make a simple chat completion to test
     const axios = (await import('axios')).default;
     const response = await axios.post(
@@ -988,8 +1119,8 @@ router.post('/custom-tests/:id/try', async (req, res) => {
       {
         model: targetModel,
         messages: [
-          { 
-            role: 'system', 
+          {
+            role: 'system',
             content: `You are a helpful coding assistant working on a test project.
             
 IMPORTANT: Use the available tools when appropriate:
@@ -1011,9 +1142,9 @@ It contains: node-api/, react-web/, java-service/, mendix-widget/, react-native-
       },
       { timeout: 45000 }
     );
-    
+
     const message = response.data.choices?.[0]?.message;
-    
+
     res.json({
       success: true,
       test: {
@@ -1042,26 +1173,26 @@ It contains: node-api/, react-web/, java-service/, mendix-widget/, react-native-
 router.get('/test-project/tree', async (req, res) => {
   try {
     const testProjectPath = path.join(__dirname, '../../data/test-project');
-    
+
     const buildTree = async (dirPath: string, relativePath: string = ''): Promise<any[]> => {
       const entries: any[] = [];
-      
+
       if (!await fs.pathExists(dirPath)) {
         return entries;
       }
-      
+
       const items = await fs.readdir(dirPath, { withFileTypes: true });
-      
+
       for (const item of items) {
         const itemPath = path.join(dirPath, item.name);
         const itemRelativePath = relativePath ? `${relativePath}/${item.name}` : item.name;
-        
+
         if (item.isDirectory()) {
           // Skip node_modules, dist, etc.
           if (['node_modules', 'dist', 'build', '.git', '__pycache__'].includes(item.name)) {
             continue;
           }
-          
+
           entries.push({
             name: item.name,
             path: itemRelativePath,
@@ -1076,18 +1207,18 @@ router.get('/test-project/tree', async (req, res) => {
           });
         }
       }
-      
+
       // Sort: directories first, then files
       entries.sort((a, b) => {
         if (a.type === b.type) return a.name.localeCompare(b.name);
         return a.type === 'directory' ? -1 : 1;
       });
-      
+
       return entries;
     };
-    
+
     const tree = await buildTree(testProjectPath);
-    
+
     res.json({
       tree,
       basePath: 'server/data/test-project',
@@ -1109,7 +1240,7 @@ router.get('/test-project/tree', async (req, res) => {
 router.get('/logs', (req, res) => {
   try {
     const { tool, status, sessionId, limit = 50, offset = 0 } = req.query;
-    
+
     const logs = db.getExecutionLogs({
       tool: tool as string,
       status: status as string,
@@ -1117,7 +1248,7 @@ router.get('/logs', (req, res) => {
       limit: parseInt(limit as string),
       offset: parseInt(offset as string)
     });
-    
+
     res.json({ logs });
   } catch (error: any) {
     console.error('[Tooly] Failed to get logs:', error);
@@ -1133,12 +1264,12 @@ router.get('/logs/:id', (req, res) => {
   try {
     const { id } = req.params;
     const log = db.getExecutionLog(id);
-    
+
     if (!log) {
       res.status(404).json({ error: 'Log not found' });
       return;
     }
-    
+
     const backups = rollback.getBackupsForExecution(id);
     res.json({ log, backups });
   } catch (error: any) {
@@ -1159,7 +1290,7 @@ router.post('/backups/:id/restore', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await rollback.restore(id);
-    
+
     if (result.success) {
       res.json(result);
     } else {
@@ -1180,12 +1311,12 @@ router.get('/backups/:id/status', (req, res) => {
     const { id } = req.params;
     const canRestore = rollback.canRestore(id);
     const timeRemaining = rollback.getTimeRemaining(id);
-    
+
     res.json({
       canRestore,
       timeRemaining,
-      timeRemainingFormatted: timeRemaining !== null 
-        ? rollback.formatTimeRemaining(timeRemaining) 
+      timeRemainingFormatted: timeRemaining !== null
+        ? rollback.formatTimeRemaining(timeRemaining)
         : null
     });
   } catch (error: any) {
@@ -1344,7 +1475,7 @@ router.get('/leaderboards', async (req, res) => {
   try {
     // Get all profiles
     const allProfiles = await capabilities.getAllProfiles();
-    
+
     // Define leaderboard categories
     const leaderboardCategories = [
       { id: 'rag', name: 'Best for RAG', icon: '🔍', scoreKey: 'ragScore' },
@@ -1354,15 +1485,15 @@ router.get('/leaderboards', async (req, res) => {
       { id: 'proactive', name: 'Most Proactive', icon: '💡', scoreKey: 'proactiveScore' },
       { id: 'overall', name: 'Best Overall', icon: '🏆', scoreKey: 'overallScore' },
     ];
-    
+
     const leaderboards = leaderboardCategories.map((category: { id: string; name: string; icon: string; scoreKey: string }) => {
       // Sort profiles by this category's score
       const sorted = allProfiles
         .map((profile: ModelProfile) => {
           const badgeScores = extractBadgeScores(profile);
-          const score = (badgeScores as Record<string, number | undefined>)[category.scoreKey] ?? 
-                       profile.probeResults?.overallScore ?? 
-                       profile.score ?? 0;
+          const score = (badgeScores as Record<string, number | undefined>)[category.scoreKey] ??
+            profile.probeResults?.overallScore ??
+            profile.score ?? 0;
           return {
             modelId: profile.modelId,
             displayName: profile.displayName || profile.modelId.split('/').pop() || profile.modelId,
@@ -1373,7 +1504,7 @@ router.get('/leaderboards', async (req, res) => {
         .sort((a: { score: number }, b: { score: number }) => b.score - a.score)
         .slice(0, 3)
         .map((entry: { modelId: string; displayName: string; score: number }, index: number) => ({ ...entry, rank: index + 1 }));
-      
+
       return {
         id: category.id,
         name: category.name,
@@ -1382,7 +1513,7 @@ router.get('/leaderboards', async (req, res) => {
         entries: sorted,
       };
     });
-    
+
     res.json({ categories: leaderboards });
   } catch (error: any) {
     console.error('[Tooly] Failed to get leaderboards:', error);
@@ -1402,16 +1533,16 @@ router.get('/models/:modelId/detail', async (req, res) => {
   try {
     const { modelId } = req.params;
     const profile = await capabilities.getProfile(modelId);
-    
+
     if (!profile) {
       res.status(404).json({ error: 'Model profile not found' });
       return;
     }
-    
+
     // Extract badge scores and calculate badges
     const badgeScores = extractBadgeScores(profile);
     const badges = calculateBadges(badgeScores);
-    
+
     // Get all profiles for alternative recommendations
     const allProfilesForAlts = await capabilities.getAllProfiles();
     const alternatives = allProfilesForAlts
@@ -1421,10 +1552,10 @@ router.get('/models/:modelId/detail', async (req, res) => {
         modelName: p.displayName || p.modelId,
         scores: extractBadgeScores(p),
       }));
-    
+
     // Calculate recommendations
     const recommendations = calculateRecommendations(badgeScores, alternatives);
-    
+
     // Get tool categories
     const toolCategories = Object.entries(TOOL_CATEGORIES).map(([name, tools]) => {
       const toolsWithStatus = tools.map(tool => ({
@@ -1432,19 +1563,19 @@ router.get('/models/:modelId/detail', async (req, res) => {
         enabled: profile.enabledTools?.includes(tool) || false,
         score: profile.capabilities?.[tool]?.score || 0,
       }));
-      
+
       return {
         name,
         tools: toolsWithStatus,
         enabledCount: toolsWithStatus.filter(t => t.enabled).length,
         totalCount: tools.length,
         score: Math.round(
-          toolsWithStatus.filter(t => t.score > 0).reduce((sum, t) => sum + t.score, 0) / 
+          toolsWithStatus.filter(t => t.score > 0).reduce((sum, t) => sum + t.score, 0) /
           (toolsWithStatus.filter(t => t.score > 0).length || 1)
         ),
       };
     });
-    
+
     // Build complete score breakdown
     const scoreBreakdown = {
       ragScore: badgeScores.ragScore,
@@ -1457,7 +1588,7 @@ router.get('/models/:modelId/detail', async (req, res) => {
       intentScore: badgeScores.intentScore,
       overallScore: profile.score,
     };
-    
+
     // Lookup model info (async, don't block response)
     let modelInfo = null;
     try {
@@ -1465,7 +1596,7 @@ router.get('/models/:modelId/detail', async (req, res) => {
     } catch (e) {
       // Ignore lookup failures
     }
-    
+
     res.json({
       ...profile,
       badges,
@@ -1487,8 +1618,8 @@ router.get('/models/:modelId/detail', async (req, res) => {
 router.post('/probe/:modelId', async (req, res) => {
   try {
     const { modelId } = req.params;
-    const { categories, mode = 'full' } = req.body || {};
-    
+    const { categories, mode = 'full', isBaseline = false } = req.body || {};
+
     // Load settings
     let settings: any = {};
     try {
@@ -1498,7 +1629,7 @@ router.post('/probe/:modelId', async (req, res) => {
     } catch {
       // Use defaults
     }
-    
+
     const probeOptions = {
       runLatencyProfile: mode === 'full',
       runReasoningProbes: !categories || categories.includes('2.x'),
@@ -1512,9 +1643,9 @@ router.post('/probe/:modelId', async (req, res) => {
       runProactiveProbes: !categories || categories.includes('7.x'),
       runIntentProbes: !categories || categories.includes('8.x'),
     };
-    
+
     console.log(`[Tooly] Running probes for ${modelId} (mode: ${mode}, categories: ${categories?.join(', ') || 'all'})`);
-    
+
     const testSettings = {
       lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
       openaiApiKey: process.env.OPENAI_API_KEY,
@@ -1523,14 +1654,14 @@ router.post('/probe/:modelId', async (req, res) => {
       azureDeploymentName: settings.azureDeploymentName,
       azureApiVersion: settings.azureApiVersion
     };
-    
+
     const result = await probeEngine.runAllProbes(
       modelId,
       'lmstudio',
       testSettings,
       probeOptions
     );
-    
+
     // Build probe results for saving (same as /models/:modelId/probe)
     const probeResultsToSave: any = {
       testedAt: result.completedAt,
@@ -1575,13 +1706,13 @@ router.post('/probe/:modelId', async (req, res) => {
     if (result.proactiveProbes) {
       probeResultsToSave.proactiveProbes = result.proactiveProbes;
     }
-    
+
     // Save intent probes (8.x)
     if (result.intentProbes) {
       probeResultsToSave.intentProbes = result.intentProbes;
       probeResultsToSave.intentScores = result.intentScores;
     }
-    
+
     // Save score breakdown
     if (result.scoreBreakdown) {
       probeResultsToSave.scoreBreakdown = result.scoreBreakdown;
@@ -1591,11 +1722,11 @@ router.post('/probe/:modelId', async (req, res) => {
     await capabilities.updateProbeResults(
       modelId,
       probeResultsToSave,
-      result.role,
+      result.role as any,
       result.contextLatency,
-      result.scoreBreakdown
+      { ...result.scoreBreakdown, isBaseline } as any
     );
-    
+
     res.json(result);
   } catch (error: any) {
     console.error('[Tooly] Failed to run probes:', error);
@@ -1614,13 +1745,13 @@ router.post('/probe/:modelId', async (req, res) => {
 router.get('/models/:modelId/test/history', async (req, res) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
-    
+
     // Query test history from database
     const history = db.query(
       `SELECT * FROM test_history WHERE model_id = ? ORDER BY timestamp DESC LIMIT 50`,
       [modelId]
     );
-    
+
     // Parse JSON fields
     const parsedHistory = history.map((entry: any) => ({
       id: entry.id,
@@ -1632,7 +1763,7 @@ router.get('/models/:modelId/test/history', async (req, res) => {
       failedCount: entry.failed_count,
       timestamp: entry.timestamp
     }));
-    
+
     res.json({ history: parsedHistory });
   } catch (error: any) {
     console.error('[Tooly] Failed to get test history:', error);
@@ -1651,13 +1782,13 @@ router.get('/models/:modelId/test/history', async (req, res) => {
 router.get('/models/:modelId/config', async (req, res) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
-    
+
     // Query config from database
     const config = db.query(
       `SELECT * FROM mcp_model_configs WHERE model_id = ?`,
       [modelId]
     )[0];
-    
+
     if (config) {
       res.json({
         modelId: config.model_id,
@@ -1708,7 +1839,7 @@ router.put('/models/:modelId/config', async (req, res) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
     const config = req.body;
-    
+
     // Upsert config
     db.run(
       `INSERT OR REPLACE INTO mcp_model_configs 
@@ -1726,7 +1857,7 @@ router.put('/models/:modelId/config', async (req, res) => {
         JSON.stringify(config.optimalSettings || {})
       ]
     );
-    
+
     res.json({ success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to save config:', error);
@@ -1741,14 +1872,14 @@ router.put('/models/:modelId/config', async (req, res) => {
 router.post('/models/:modelId/config/generate', async (req, res) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
-    
+
     // Get model profile
     const profile = await capabilities.getProfile(modelId);
-    
+
     if (!profile) {
       return res.status(404).json({ error: 'Model not found' });
     }
-    
+
     // Generate optimal config based on profile
     // This is a simplified version - the full implementation would use mcpOrchestrator
     const optimalConfig = {
@@ -1773,7 +1904,7 @@ router.post('/models/:modelId/config/generate', async (req, res) => {
         ragResultCount: 5
       }
     };
-    
+
     // Save config
     db.run(
       `INSERT OR REPLACE INTO mcp_model_configs 
@@ -1791,7 +1922,7 @@ router.post('/models/:modelId/config/generate', async (req, res) => {
         JSON.stringify(optimalConfig.optimalSettings)
       ]
     );
-    
+
     res.json({ success: true, config: optimalConfig });
   } catch (error: any) {
     console.error('[Tooly] Failed to generate config:', error);
@@ -1810,46 +1941,46 @@ router.post('/models/:modelId/config/generate', async (req, res) => {
 router.post('/active-model', async (req, res) => {
   try {
     const { modelId, role } = req.body;
-    
+
     if (!modelId || !role) {
       return res.status(400).json({ error: 'modelId and role are required' });
     }
-    
+
     if (!['main', 'executor'].includes(role)) {
       return res.status(400).json({ error: 'role must be "main" or "executor"' });
     }
-    
+
     // Update model profile with new role
     const profile = await capabilities.getProfile(modelId);
     if (profile) {
-      const newRole = role === 'main' 
+      const newRole = role === 'main'
         ? (profile.role === 'executor' ? 'both' : 'main')
         : (profile.role === 'main' ? 'both' : 'executor');
-      
+
       await capabilities.saveProfile({
         ...profile,
         role: newRole
       });
     }
-    
+
     // Also save to settings
     try {
       let settings: any = {};
       if (await fs.pathExists(SETTINGS_FILE)) {
         settings = await fs.readJson(SETTINGS_FILE);
       }
-      
+
       if (role === 'main') {
         settings.mainModelId = modelId;
       } else {
         settings.executorModelId = modelId;
       }
-      
+
       await fs.writeJson(SETTINGS_FILE, settings, { spaces: 2 });
     } catch (err) {
       console.error('[Tooly] Failed to save active model to settings:', err);
     }
-    
+
     res.json({ success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to set active model:', error);
@@ -1868,7 +1999,7 @@ router.post('/active-model', async (req, res) => {
 router.get('/context/config', async (req, res) => {
   try {
     const { contextManager, contextAnalyzer } = await import('../modules/tooly/index.js');
-    
+
     res.json({
       contextManager: {
         defaultBudget: contextManager.calculateBudgetForModel(32000)
@@ -1889,7 +2020,7 @@ router.put('/context/config', async (req, res) => {
   try {
     const { enabled, modelId, lmstudioUrl, maxTokens, temperature, timeout, cacheEnabled, cacheTTL } = req.body;
     const { contextManager } = await import('../modules/tooly/index.js');
-    
+
     const config: any = {};
     if (enabled !== undefined) config.enabled = enabled;
     if (modelId) config.modelId = modelId;
@@ -1899,26 +2030,26 @@ router.put('/context/config', async (req, res) => {
     if (timeout) config.timeout = timeout;
     if (cacheEnabled !== undefined) config.cacheEnabled = cacheEnabled;
     if (cacheTTL) config.cacheTTL = cacheTTL;
-    
+
     contextManager.configureSmallModel(config);
-    
+
     // Also save to settings file
     try {
       let settings: any = {};
       if (await fs.pathExists(SETTINGS_FILE)) {
         settings = await fs.readJson(SETTINGS_FILE);
       }
-      
+
       settings.smallModel = {
         ...(settings.smallModel || {}),
         ...config
       };
-      
+
       await fs.writeJson(SETTINGS_FILE, settings, { spaces: 2 });
     } catch (err) {
       console.error('[Tooly] Failed to save small model config:', err);
     }
-    
+
     res.json({ success: true, config });
   } catch (error: any) {
     console.error('[Tooly] Failed to update context config:', error);
@@ -1933,14 +2064,14 @@ router.put('/context/config', async (req, res) => {
 router.post('/context/analyze', async (req, res) => {
   try {
     const { query } = req.body;
-    
+
     if (!query) {
       return res.status(400).json({ error: 'query is required' });
     }
-    
+
     const { contextManager } = await import('../modules/tooly/index.js');
     const analysis = await contextManager.analyzeQueryEnhanced(query);
-    
+
     res.json({
       success: true,
       analysis
@@ -1958,14 +2089,14 @@ router.post('/context/analyze', async (req, res) => {
 router.post('/context/summarize', async (req, res) => {
   try {
     const { content, targetTokens = 200 } = req.body;
-    
+
     if (!content) {
       return res.status(400).json({ error: 'content is required' });
     }
-    
+
     const { summarizer } = await import('../modules/tooly/index.js');
     const result = await summarizer.summarizeContent(content, targetTokens);
-    
+
     res.json({
       success: true,
       result
@@ -1983,14 +2114,14 @@ router.post('/context/summarize', async (req, res) => {
 router.post('/context/rank', async (req, res) => {
   try {
     const { query, items, maxItems = 10 } = req.body;
-    
+
     if (!query || !items || !Array.isArray(items)) {
       return res.status(400).json({ error: 'query and items array are required' });
     }
-    
+
     const { contextAnalyzer } = await import('../modules/tooly/index.js');
     const ranking = await contextAnalyzer.rankByRelevance(query, items, maxItems);
-    
+
     res.json({
       success: true,
       ranking
@@ -2027,7 +2158,7 @@ router.get('/optimal-setup/hardware', async (req, res) => {
 router.post('/optimal-setup/scan', async (req, res) => {
   try {
     const { modelScanner } = await import('../modules/tooly/optimal-setup/model-scanner.js');
-    
+
     // Get LM Studio URL from settings
     let lmstudioUrl = 'http://localhost:1234';
     try {
@@ -2035,8 +2166,8 @@ router.post('/optimal-setup/scan', async (req, res) => {
         const settings = await fs.readJson(SETTINGS_FILE);
         lmstudioUrl = settings.lmstudioUrl || lmstudioUrl;
       }
-    } catch {}
-    
+    } catch { }
+
     modelScanner.setUrl(lmstudioUrl);
     const scanResult = await modelScanner.scan();
     res.json(scanResult);
@@ -2069,10 +2200,10 @@ router.get('/optimal-setup/status', async (req, res) => {
   try {
     const { hardwareDetector } = await import('../modules/tooly/optimal-setup/hardware-detector.js');
     const { modelScanner } = await import('../modules/tooly/optimal-setup/model-scanner.js');
-    
+
     const hardware = await hardwareDetector.detect();
     const recommendations = await hardwareDetector.getRecommendedModelSizes();
-    
+
     res.json({
       hardware: {
         gpuName: hardware.primaryGpu?.name || 'None',
@@ -2083,6 +2214,635 @@ router.get('/optimal-setup/status', async (req, res) => {
     });
   } catch (error: any) {
     console.error('[Tooly] Failed to get setup status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// BASELINE ENGINE (Phase 8)
+// ============================================================
+
+/**
+ * POST /api/tooly/baseline/run
+ * Run a test suite through the baseline model (Gemini)
+ */
+router.post('/baseline/run', async (req, res) => {
+  try {
+    const { testIds } = req.body;
+    if (!testIds || !Array.isArray(testIds)) {
+      return res.status(400).json({ error: 'testIds array is required' });
+    }
+
+    const { baselineEngine } = await import('../modules/tooly/baseline-engine.js');
+    const results = await baselineEngine.runBaselineSuite(testIds);
+
+    res.json({ success: true, results });
+  } catch (error: any) {
+    console.error('[Tooly] Baseline run failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// AGENTIC READINESS (Phase 11)
+// ============================================================
+
+/**
+ * POST /api/tooly/readiness/assess
+ * Run the Agentic Readiness assessment on a single model
+ */
+router.post('/readiness/assess', async (req, res) => {
+  try {
+    const { modelId, autoTeach } = req.body;
+    if (!modelId) {
+      return res.status(400).json({ error: 'modelId is required' });
+    }
+
+    // Load settings
+    let settings: any = {};
+    if (await fs.pathExists(SETTINGS_FILE)) {
+      settings = await fs.readJson(SETTINGS_FILE);
+    }
+
+    // Import and create runner
+    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner.js');
+    const { wsBroadcast } = await import('../index.js');
+    const { capabilities } = await import('../modules/tooly/capabilities.js');
+
+    const runner = createReadinessRunner({
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+    }, wsBroadcast as any);
+
+    // Run assessment
+    const result = await runner.assessModel(modelId, 'lmstudio');
+
+    // Save assessment results to profile
+    await capabilities.updateAgenticReadiness(modelId, {
+      certified: result.passed,
+      score: result.overallScore,
+      assessedAt: new Date().toISOString(),
+      categoryScores: result.categoryScores,
+      failedTests: result.failedTests || [],
+      prostheticApplied: false
+    }, result.trainabilityScores);
+
+    // Auto-teach if requested and not passing
+    if (autoTeach && !result.passed) {
+      try {
+        const { createProstheticLoop } = await import('../modules/tooly/orchestrator/prosthetic-loop.js');
+        const loop = createProstheticLoop(runner, wsBroadcast as any);
+        const teachingResult = await loop.runTeachingCycle(modelId, 'lmstudio');
+
+        return res.json({
+          assessment: result,
+          teaching: teachingResult
+        });
+      } catch (teachingError: any) {
+        console.error(`[Tooly] Teaching failed:`, teachingError);
+        console.error(`[Tooly] Teaching error stack:`, teachingError.stack);
+        return res.status(500).json({
+          error: `Assessment completed but teaching failed: ${teachingError.message}`,
+          assessment: result
+        });
+      }
+    }
+
+    res.json({ assessment: result });
+  } catch (error: any) {
+    console.error('[Tooly] Readiness assessment failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/readiness/assess-all
+ * Run the Agentic Readiness assessment on ALL available models
+ */
+router.post('/readiness/assess-all', async (req, res) => {
+  try {
+    // Load settings
+    let settings: any = {};
+    if (await fs.pathExists(SETTINGS_FILE)) {
+      settings = await fs.readJson(SETTINGS_FILE);
+    }
+
+    // Get all available models
+    const lmstudioModels = await modelDiscovery.discoverLMStudio(settings.lmstudioUrl);
+    const modelIds = lmstudioModels.map((m: any) => m.id);
+
+    if (modelIds.length === 0) {
+      return res.status(400).json({ error: 'No models found' });
+    }
+
+    // Import and create runner
+    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner.js');
+    const { wsBroadcast } = await import('../index.js');
+    
+    const runner = createReadinessRunner({
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+    }, wsBroadcast as any);
+
+    // Run batch assessment
+    const result = await runner.assessAllModels(modelIds, 'lmstudio');
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Batch readiness assessment failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/readiness/:modelId
+ * Get the readiness status for a specific model
+ */
+router.get('/readiness/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    
+    const profile = await capabilities.getProfile(modelId);
+    if (!profile) {
+      return res.status(404).json({ error: 'Model profile not found' });
+    }
+
+    const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
+    const prosthetic = prostheticStore.getPrompt(modelId);
+
+    res.json({
+      modelId,
+      agenticReadiness: profile.agenticReadiness || null,
+      prosthetic: prosthetic ? {
+        level: prosthetic.level,
+        verified: prosthetic.verified,
+        successfulRuns: prosthetic.successfulRuns,
+        probesFixed: prosthetic.probesFixed
+      } : null
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Get readiness status failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/readiness/:modelId/teach
+ * Manually trigger the teaching cycle for a model
+ */
+router.post('/readiness/:modelId/teach', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { maxAttempts = 3, startLevel = 1 } = req.body;
+
+    console.log(`[Tooly] Teaching endpoint called for ${modelId}, maxAttempts: ${maxAttempts}, startLevel: ${startLevel}`);
+
+    // Load settings
+    let settings: any = {};
+    if (await fs.pathExists(SETTINGS_FILE)) {
+      settings = await fs.readJson(SETTINGS_FILE);
+    }
+
+    console.log(`[Tooly] Settings loaded, lmstudioUrl: ${settings.lmstudioUrl || 'default'}`);
+
+    // Import and create runner/loop
+    console.log('[Tooly] Importing modules...');
+    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner.js');
+    const { createProstheticLoop } = await import('../modules/tooly/orchestrator/prosthetic-loop.js');
+    const { wsBroadcast } = await import('../index.js');
+
+    console.log('[Tooly] Modules imported successfully');
+
+    const runner = createReadinessRunner({
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+    }, wsBroadcast as any);
+
+    console.log('[Tooly] ReadinessRunner created');
+
+    const loop = createProstheticLoop(runner, wsBroadcast as any);
+    console.log('[Tooly] ProstheticLoop created');
+
+    console.log('[Tooly] Starting teaching cycle...');
+    const result = await loop.runTeachingCycle(modelId, 'lmstudio', {
+      maxAttempts,
+      startLevel
+    });
+
+    console.log(`[Tooly] Teaching cycle completed: ${result.success ? 'SUCCESS' : 'FAILED'}`);
+
+    // Save teaching results to profile for persistence
+    try {
+      const profile = await capabilities.getProfile(modelId);
+      if (profile) {
+        (profile as any).teachingResults = result;
+        await capabilities.saveProfile(profile);
+        console.log(`[Tooly] Saved teaching results to profile for ${modelId}`);
+      }
+    } catch (saveError: any) {
+      console.warn(`[Tooly] Failed to save teaching results:`, saveError?.message);
+    }
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Teaching cycle failed:', error);
+    console.error('[Tooly] Error stack:', error.stack);
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
+});
+
+/**
+ * GET /api/tooly/readiness/:modelId/teaching-result
+ * Get saved teaching results for a model
+ */
+router.get('/readiness/:modelId/teaching-result', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+
+    const profile = await capabilities.getProfile(decodedModelId);
+    const teachingResult = profile?.teachingResults;
+
+    if (teachingResult) {
+      res.json(teachingResult);
+    } else {
+      res.status(404).json({ error: 'No teaching results found for this model' });
+    }
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get teaching results:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/tooly/readiness/:modelId/teaching-result
+ * Delete saved teaching results for a model
+ */
+router.delete('/readiness/:modelId/teaching-result', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+
+    const profile = await capabilities.getProfile(decodedModelId);
+    if (profile && profile.teachingResults) {
+      delete profile.teachingResults;
+      await capabilities.saveProfile(profile);
+      res.json({ success: true, message: 'Teaching results cleared' });
+    } else {
+      res.status(404).json({ error: 'No teaching results found for this model' });
+    }
+  } catch (error: any) {
+    console.error('[Tooly] Failed to delete teaching results:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/readiness/:modelId/certify
+ * Manually certify a model as agentic ready
+ */
+router.post('/readiness/:modelId/certify', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { score, categoryScores } = req.body;
+
+    await capabilities.updateAgenticReadiness(modelId, {
+      certified: true,
+      score: score || 70,
+      certifiedAt: new Date().toISOString(),
+      categoryScores: categoryScores || { tool: 70, rag: 70, reasoning: 70, intent: 70, browser: 70 },
+      failedTests: [],
+      prostheticApplied: false
+    });
+
+    res.json({ success: true, certified: true });
+  } catch (error: any) {
+    console.error('[Tooly] Manual certification failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/tooly/readiness/:modelId/prosthetic
+ * Update or create a prosthetic prompt for a model
+ */
+router.put('/readiness/:modelId/prosthetic', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { prompt, level = 1 } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'prompt is required' });
+    }
+
+    const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
+    
+    prostheticStore.savePrompt({
+      modelId,
+      prompt,
+      level,
+      probesFixed: [],
+      categoryImprovements: {}
+    });
+
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Update prosthetic failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/readiness/certified
+ * Get all certified models
+ */
+router.get('/readiness/certified', async (req, res) => {
+  try {
+    const certifiedModels = await capabilities.getCertifiedModels();
+    
+    res.json({
+      count: certifiedModels.length,
+      models: certifiedModels.map(m => ({
+        modelId: m.modelId,
+        displayName: m.displayName,
+        score: m.agenticReadiness?.score || 0,
+        certifiedAt: m.agenticReadiness?.certifiedAt,
+        prostheticApplied: m.agenticReadiness?.prostheticApplied || false
+      }))
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Get certified models failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// COMBO TESTING (Dual-Model Compatibility)
+// ============================================================
+
+import { ComboTester, COMBO_TEST_CASES, type ComboScore } from '../modules/tooly/testing/combo-tester.js';
+
+// Store for tracking active combo tests
+const activeComboTests: Map<string, { status: string; results?: ComboScore[]; error?: string }> = new Map();
+
+/**
+ * GET /api/tooly/combo-test/cases
+ * Get all combo test cases
+ */
+router.get('/combo-test/cases', (req, res) => {
+  res.json({
+    testCases: COMBO_TEST_CASES,
+    totalCases: COMBO_TEST_CASES.length,
+  });
+});
+
+/**
+ * POST /api/tooly/combo-test/run
+ * Run combo tests on selected model pairs
+ * Body: { mainModels: string[], executorModels: string[] }
+ */
+router.post('/combo-test/run', async (req, res) => {
+  try {
+    const { mainModels, executorModels } = req.body;
+
+    if (!mainModels || !Array.isArray(mainModels) || mainModels.length === 0) {
+      res.status(400).json({ error: 'mainModels array is required' });
+      return;
+    }
+
+    if (!executorModels || !Array.isArray(executorModels) || executorModels.length === 0) {
+      res.status(400).json({ error: 'executorModels array is required' });
+      return;
+    }
+
+    // Get settings for LM Studio URL
+    let settings: any = {};
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch (err: any) {
+      console.log(`[Tooly] Error loading settings: ${err.message}`);
+    }
+
+    const testId = `combo-${Date.now()}`;
+    activeComboTests.set(testId, { status: 'running' });
+
+    // Return test ID immediately
+    res.json({
+      testId,
+      status: 'started',
+      totalCombos: mainModels.length * executorModels.length,
+      totalTests: COMBO_TEST_CASES.length,
+    });
+
+    // Run tests in background with WebSocket broadcasting
+    const broadcastFn = (event: string, data: any) => {
+      broadcastToClients(event, data);
+    };
+
+    const tester = new ComboTester({
+      mainModels,
+      executorModels,
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+      timeout: 60000,
+      taskTimeout: 5000, // 5s per-task timeout
+    }, broadcastFn);
+
+    try {
+      const results = await tester.testAllCombos();
+      activeComboTests.set(testId, { status: 'completed', results });
+      
+      // Broadcast completion
+      broadcastToClients('combo_test_progress', {
+        status: 'completed',
+        results,
+      });
+      
+      console.log(`[Tooly] Combo test ${testId} completed with ${results.length} results`);
+    } catch (err: any) {
+      activeComboTests.set(testId, { status: 'failed', error: err.message });
+      console.error(`[Tooly] Combo test ${testId} failed: ${err.message}`);
+    }
+  } catch (error: any) {
+    console.error('[Tooly] Combo test start failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/combo-test/:testId/status
+ * Get status of a running combo test
+ */
+router.get('/combo-test/:testId/status', (req, res) => {
+  const { testId } = req.params;
+  const test = activeComboTests.get(testId);
+
+  if (!test) {
+    res.status(404).json({ error: 'Test not found' });
+    return;
+  }
+
+  res.json({
+    testId,
+    status: test.status,
+    results: test.results,
+    error: test.error,
+  });
+});
+
+/**
+ * POST /api/tooly/combo-test/quick
+ * Quick test a single combo pair
+ * Body: { mainModelId: string, executorModelId: string }
+ */
+router.post('/combo-test/quick', async (req, res) => {
+  try {
+    const { mainModelId, executorModelId } = req.body;
+
+    if (!mainModelId || !executorModelId) {
+      res.status(400).json({ error: 'mainModelId and executorModelId are required' });
+      return;
+    }
+
+    // Get settings
+    let settings: any = {};
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch (err: any) {
+      console.log(`[Tooly] Error loading settings: ${err.message}`);
+    }
+
+    const tester = new ComboTester({
+      mainModels: [mainModelId],
+      executorModels: [executorModelId],
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+      timeout: 30000,
+    });
+
+    const result = await tester.testCombo(mainModelId, executorModelId);
+    
+    res.json({
+      success: true,
+      result,
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Quick combo test failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/combo-test/recommended
+ * Get recommended model pairs based on existing profiles
+ */
+router.get('/combo-test/recommended', async (req, res) => {
+  try {
+    const profiles = await capabilities.getAllProfiles();
+
+    // Find good main model candidates (high reasoning, low tool score)
+    const mainCandidates = profiles
+      .filter(p => p.scores && p.scores.reasoningScore > 60)
+      .sort((a, b) => (b.scores?.reasoningScore || 0) - (a.scores?.reasoningScore || 0))
+      .slice(0, 5)
+      .map(p => ({
+        modelId: p.modelId,
+        displayName: p.displayName,
+        reasoningScore: p.scores?.reasoningScore || 0,
+        toolScore: p.scores?.toolScore || 0,
+      }));
+
+    // Find good executor candidates (high tool score)
+    const executorCandidates = profiles
+      .filter(p => p.scores && p.scores.toolScore > 60)
+      .sort((a, b) => (b.scores?.toolScore || 0) - (a.scores?.toolScore || 0))
+      .slice(0, 5)
+      .map(p => ({
+        modelId: p.modelId,
+        displayName: p.displayName,
+        toolScore: p.scores?.toolScore || 0,
+        reasoningScore: p.scores?.reasoningScore || 0,
+      }));
+
+    res.json({
+      mainCandidates,
+      executorCandidates,
+      suggestedCombos: mainCandidates.slice(0, 3).flatMap(m =>
+        executorCandidates.slice(0, 2).map(e => ({
+          main: m.modelId,
+          executor: e.modelId,
+          estimatedScore: Math.round((m.reasoningScore * 0.5) + (e.toolScore * 0.5)),
+        }))
+      ),
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Get recommended combos failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/combo-test/context-sizes
+ * Test a combo with different context window sizes
+ * Body: { mainModelId: string, executorModelId: string, contextSizes?: number[] }
+ */
+router.post('/combo-test/context-sizes', async (req, res) => {
+  try {
+    const { mainModelId, executorModelId, contextSizes = [4096, 8192, 16384, 32768] } = req.body;
+
+    if (!mainModelId || !executorModelId) {
+      res.status(400).json({ error: 'mainModelId and executorModelId are required' });
+      return;
+    }
+
+    // Get settings
+    let settings: any = {};
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch (err: any) {
+      console.log(`[Tooly] Error loading settings: ${err.message}`);
+    }
+
+    const results: { contextSize: number; score: any }[] = [];
+
+    for (const contextSize of contextSizes) {
+      console.log(`[Tooly] Testing context size: ${contextSize}`);
+      
+      const tester = new ComboTester({
+        mainModels: [mainModelId],
+        executorModels: [executorModelId],
+        lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+        timeout: 60000,
+        taskTimeout: 5000,
+        contextSize, // Pass context size to tester
+      });
+
+      try {
+        const score = await tester.testCombo(mainModelId, executorModelId);
+        results.push({ contextSize, score });
+      } catch (err: any) {
+        console.error(`[Tooly] Context size ${contextSize} test failed:`, err.message);
+        results.push({
+          contextSize,
+          score: {
+            mainModelId,
+            executorModelId,
+            totalTests: 0,
+            passedTests: 0,
+            intentAccuracy: 0,
+            executionSuccess: 0,
+            avgLatencyMs: 0,
+            overallScore: 0,
+            error: err.message,
+          },
+        });
+      }
+    }
+
+    res.json({ results });
+  } catch (error: any) {
+    console.error('[Tooly] Context sizes test failed:', error);
     res.status(500).json({ error: error.message });
   }
 });

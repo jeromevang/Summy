@@ -1,0 +1,202 @@
+{
+  "_comment": "Agentic Readiness Test Suite Configuration - EDIT THIS FILE TO MODIFY TESTS",
+  "_instructions": [
+    "To add a new test: Add an object to the 'tests' array with id, name, category, description, prompt, expectedTool/expectToolAny/expectedNoTool, and evaluationLogic",
+    "To modify test logic: Update the 'evaluationLogic' field to reference the corresponding evaluation function name",
+    "To change scoring: Modify the 'categoryWeights' and 'threshold' values",
+    "To disable a test: Remove it from the 'tests' array or add '_disabled': true",
+    "Available evaluation functions: evaluateBasicToolEmit, evaluateMultiToolSelection, evaluateToolSuppression, evaluateArgumentValidation, evaluateNearIdenticalToolChoice, evaluateRAGFirstBehavior, evaluateRAGBeforeFileRead, evaluateRAGResultSynthesis, evaluateRAGChaining, evaluateMultiStepPlanning, evaluateConditionalLogic, evaluateContextContinuity, evaluateEdgeCaseAwareness, evaluateQuestionVsAction, evaluateImplicitFileRead, evaluateSearchIntentDetection, evaluateWebSearch, evaluatePageNavigation, evaluateContentExtraction, evaluateBrowserInteraction"
+  ],
+  "version": "1.0.0",
+  "description": "Agentic Readiness Test Suite - Configurable tests for assessing agentic coding capabilities",
+  "threshold": 70,
+  "categoryWeights": {
+    "tool": 0.30,
+    "rag": 0.25,
+    "reasoning": 0.20,
+    "intent": 0.15,
+    "browser": 0.10
+  },
+  "tests": [
+    {
+      "id": "AR-1",
+      "name": "Basic Tool Emit",
+      "category": "tool",
+      "description": "Model should call read_file correctly",
+      "prompt": "Read the file src/index.ts and tell me what it does.",
+      "expectedTool": "read_file",
+      "evaluationLogic": "return evaluateBasicToolEmit(response, toolCalls);"
+    },
+    {
+      "id": "AR-2",
+      "name": "Multi-Tool Selection",
+      "category": "tool",
+      "description": "Model should choose the right tool among similar options",
+      "prompt": "Search for all TypeScript files that contain the word \"authentication\".",
+      "expectedTool": "search_files",
+      "evaluationLogic": "return evaluateMultiToolSelection(response, toolCalls);"
+    },
+    {
+      "id": "AR-3",
+      "name": "Tool Suppression",
+      "category": "tool",
+      "description": "Model should NOT call a tool for a simple conversational query",
+      "prompt": "What is TypeScript?",
+      "expectedNoTool": true,
+      "evaluationLogic": "return evaluateToolSuppression(response, toolCalls);"
+    },
+    {
+      "id": "AR-4",
+      "name": "Argument Validation",
+      "category": "tool",
+      "description": "Model should provide correct and complete arguments to tools",
+      "prompt": "Write \"Hello World\" to a new file called hello.txt in the output folder.",
+      "expectedTool": "write_file",
+      "evaluationLogic": "return evaluateArgumentValidation(response, toolCalls);"
+    },
+    {
+      "id": "AR-5",
+      "name": "Near-Identical Tool Choice",
+      "category": "tool",
+      "description": "Model should choose read_file over read_multiple_files for a single file",
+      "prompt": "Show me the contents of package.json",
+      "expectedTool": "read_file",
+      "evaluationLogic": "return evaluateNearIdenticalToolChoice(response, toolCalls);"
+    },
+    {
+      "id": "AR-6",
+      "name": "RAG-First Behavior",
+      "category": "rag",
+      "description": "Model should use rag_query first when exploring unfamiliar code",
+      "prompt": "How does the authentication system work in this codebase?",
+      "expectedTool": "rag_query",
+      "evaluationLogic": "return evaluateRAGFirstBehavior(response, toolCalls);"
+    },
+    {
+      "id": "AR-7",
+      "name": "RAG Before File Read",
+      "category": "rag",
+      "description": "Model should query RAG before blindly reading files",
+      "prompt": "Find where user passwords are validated.",
+      "expectedTool": "rag_query",
+      "evaluationLogic": "return evaluateRAGBeforeFileRead(response, toolCalls);"
+    },
+    {
+      "id": "AR-8",
+      "name": "RAG Result Synthesis",
+      "category": "rag",
+      "description": "Model should synthesize RAG results into coherent answer",
+      "prompt": "What are the main components of this application?",
+      "expectedTool": "rag_query",
+      "evaluationLogic": "return evaluateRAGResultSynthesis(response, toolCalls);"
+    },
+    {
+      "id": "AR-9",
+      "name": "RAG Chaining",
+      "category": "rag",
+      "description": "Model should follow up RAG query with targeted file reads",
+      "prompt": "Show me the database connection code and explain how it connects.",
+      "expectedToolAny": ["rag_query", "read_file"],
+      "evaluationLogic": "return evaluateRAGChaining(response, toolCalls);"
+    },
+    {
+      "id": "AR-10",
+      "name": "Multi-Step Planning",
+      "category": "reasoning",
+      "description": "Model should plan multiple steps for complex tasks",
+      "prompt": "Refactor the UserService class to use dependency injection. First understand the current implementation, then propose changes.",
+      "expectedToolAny": ["rag_query", "read_file", "search_files"],
+      "evaluationLogic": "return evaluateMultiStepPlanning(response, toolCalls);"
+    },
+    {
+      "id": "AR-11",
+      "name": "Conditional Logic",
+      "category": "reasoning",
+      "description": "Model should handle conditional requirements",
+      "prompt": "If the project uses TypeScript, add types to the utils.js file. Otherwise, add JSDoc comments.",
+      "expectedToolAny": ["read_file", "search_files", "list_directory"],
+      "evaluationLogic": "return evaluateConditionalLogic(response, toolCalls);"
+    },
+    {
+      "id": "AR-12",
+      "name": "Context Continuity",
+      "category": "reasoning",
+      "description": "Model should reference previously gathered information",
+      "prompt": "Based on the code structure, suggest where error handling should be improved.",
+      "expectedToolAny": ["rag_query", "search_files"],
+      "evaluationLogic": "return evaluateContextContinuity(response, toolCalls);"
+    },
+    {
+      "id": "AR-13",
+      "name": "Edge Case Awareness",
+      "category": "reasoning",
+      "description": "Model should consider edge cases in its analysis",
+      "prompt": "Review the input validation in the API endpoints. Are there any missing edge cases?",
+      "expectedToolAny": ["rag_query", "search_files", "read_file"],
+      "evaluationLogic": "return evaluateEdgeCaseAwareness(response, toolCalls);"
+    },
+    {
+      "id": "AR-14",
+      "name": "Question vs Action",
+      "category": "intent",
+      "description": "Model should answer questions without unnecessary tool calls",
+      "prompt": "Explain what dependency injection is and why it's useful.",
+      "expectedNoTool": true,
+      "evaluationLogic": "return evaluateQuestionVsAction(response, toolCalls);"
+    },
+    {
+      "id": "AR-15",
+      "name": "Implicit File Read",
+      "category": "intent",
+      "description": "Model should recognize implicit need to read files",
+      "prompt": "Fix the typo in the README file.",
+      "expectedTool": "read_file",
+      "evaluationLogic": "return evaluateImplicitFileRead(response, toolCalls);"
+    },
+    {
+      "id": "AR-16",
+      "name": "Search Intent Detection",
+      "category": "intent",
+      "description": "Model should recognize when search is needed",
+      "prompt": "Find all TODO comments in the codebase.",
+      "expectedToolAny": ["search_files", "grep", "codebase_search"],
+      "evaluationLogic": "return evaluateSearchIntentDetection(response, toolCalls);"
+    },
+    {
+      "id": "AR-17",
+      "name": "Web Search",
+      "category": "browser",
+      "description": "Model should use web_search for current information",
+      "prompt": "What is the latest version of React and what are its new features?",
+      "expectedTool": "web_search",
+      "evaluationLogic": "return evaluateWebSearch(response, toolCalls);"
+    },
+    {
+      "id": "AR-18",
+      "name": "Page Navigation",
+      "category": "browser",
+      "description": "Model should navigate to URLs when asked",
+      "prompt": "Go to https://docs.python.org and find the section on async programming.",
+      "expectedToolAny": ["browser_navigate", "browser_fetch_content"],
+      "evaluationLogic": "return evaluatePageNavigation(response, toolCalls);"
+    },
+    {
+      "id": "AR-19",
+      "name": "Content Extraction",
+      "category": "browser",
+      "description": "Model should extract content from web pages",
+      "prompt": "Get the main content from https://news.ycombinator.com and summarize the top stories.",
+      "expectedToolAny": ["browser_fetch_content", "browser_navigate", "url_fetch_content"],
+      "evaluationLogic": "return evaluateContentExtraction(response, toolCalls);"
+    },
+    {
+      "id": "AR-20",
+      "name": "Browser Interaction",
+      "category": "browser",
+      "description": "Model should interact with browser elements",
+      "prompt": "Navigate to example.com and click the \"More information\" link.",
+      "expectedToolAny": ["browser_navigate", "browser_click"],
+      "evaluationLogic": "return evaluateBrowserInteraction(response, toolCalls);"
+    }
+  ]
+}

@@ -41,7 +41,7 @@ class NotificationService {
    */
   registerClient(ws: WebSocket): void {
     this.clients.add(ws);
-    
+
     // Send initial unread count
     this.sendToClient(ws, {
       type: 'notification',
@@ -177,8 +177,6 @@ class NotificationService {
    * Mark notification as read
    */
   markAsRead(id: string): void {
-    db.markNotificationAsRead(id);
-    
     this.broadcast({
       type: 'notification',
       action: 'read',
@@ -192,8 +190,8 @@ class NotificationService {
    * Mark all notifications as read
    */
   markAllAsRead(): void {
-    db.markAllNotificationsAsRead();
-    
+    db.markAllNotificationsRead();
+
     this.broadcast({
       type: 'notification',
       action: 'read',
@@ -222,7 +220,7 @@ class NotificationService {
    */
   clearAll(): void {
     db.clearAllNotifications();
-    
+
     this.broadcast({
       type: 'notification',
       action: 'clear',
@@ -237,7 +235,7 @@ class NotificationService {
    */
   delete(id: string): void {
     db.deleteNotification(id);
-    
+
     this.broadcast({
       type: 'notification',
       action: 'clear',
@@ -252,7 +250,7 @@ class NotificationService {
    */
   private broadcast(payload: NotificationPayload): void {
     const message = JSON.stringify(payload);
-    
+
     this.clients.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {
         try {

@@ -1,0 +1,5 @@
+﻿--- TEST: Request WITH "user" field containing | ---
+Result: SUCCESS
+
+--- TEST: Request WITHOUT "user" field ---
+Result: SUCCESS

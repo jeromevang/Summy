@@ -4,7 +4,7 @@
   "provider": "lmstudio",
   "testedAt": "2025-12-19T17:42:10.312Z",
   "testVersion": 2,
-  "score": 0,
+  "score": 11,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -396,5 +396,11 @@
     "isInteractiveSpeed": true,
     "speedRating": "acceptable"
   },
-  "contextLength": 131072
+  "contextLength": 131072,
+  "agenticReadiness": {
+    "certified": false,
+    "score": 11,
+    "testedAt": "2025-12-23T02:08:43.540Z",
+    "testVersion": 1
+  }
 }

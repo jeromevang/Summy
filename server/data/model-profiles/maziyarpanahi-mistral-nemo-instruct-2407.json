@@ -2,9 +2,9 @@
   "modelId": "maziyarpanahi/mistral-nemo-instruct-2407",
   "displayName": "maziyarpanahi/mistral-nemo-instruct-2407",
   "provider": "lmstudio",
-  "testedAt": "2025-12-19T17:21:03.605Z",
-  "testVersion": 2,
-  "score": 18,
+  "testedAt": "2025-12-22T20:34:41.534Z",
+  "testVersion": 3,
+  "score": 73,
   "toolFormat": "openai_tools",
   "capabilities": {
     "file_read": {
@@ -73,263 +73,749 @@
     },
     "git_status": {
       "supported": false,
-      "score": 0,
+      "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 146,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "avgLatency": 524,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "git_diff": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 239,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 763,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "git_log": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 220,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 947,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "git_commit": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 258,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 735,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "git_add": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 2,
-      "avgLatency": 218,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 669,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "git_branch_create": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 255,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 757,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "git_branch_list": {
       "supported": false,
-      "score": 0,
+      "score": 45,
       "testsPassed": 0,
       "testsFailed": 1,
-      "avgLatency": 166,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "avgLatency": 583,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "npm_run": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 637,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "avgLatency": 705,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "npm_install": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 230,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 708,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "npm_uninstall": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 381,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 802,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "http_request": {
       "supported": true,
-      "score": 72,
+      "score": 99,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1072,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "avgLatency": 885,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "browser_navigate": {
-      "supported": false,
-      "score": 0,
-      "testsPassed": 0,
-      "testsFailed": 1,
-      "avgLatency": 326,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 851,
+      "lastTested": "2025-12-22T20:34:41.533Z",
+      "nativeAliases": [
+        "open_browser"
+      ]
     },
     "run_python": {
       "supported": true,
       "score": 100,
       "testsPassed": 1,
       "testsFailed": 0,
-      "avgLatency": 1016,
-      "lastTested": "2025-12-19T17:21:03.605Z"
+      "avgLatency": 784,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     },
     "mcp_rules": {
       "supported": false,
       "score": 0,
       "testsPassed": 0,
       "testsFailed": 0
+    },
+    "read_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 767.5,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "write_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1131,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "edit_file": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1760,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "list_directory": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 719,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "search_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 977,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "create_directory": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 718,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "delete_file": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 853,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "delete_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 664,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "get_file_info": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 925,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "git_blame": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 770,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "git_show": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 553,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "npm_test": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 593,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "web_search": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 803,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "browser_take_screenshot": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 635,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "shell_exec": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 754,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "memory_store": {
+      "supported": true,
+      "score": 72,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1142,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "memory_retrieve": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 700,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "memory_list": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 506,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "text_summarize": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1748,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "diff_files": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 964,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "process_list": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 709,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "zip_create": {
+      "supported": true,
+      "score": 99,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 1020,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "zip_extract": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 954,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "rag_query": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 867,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "rag_status": {
+      "supported": false,
+      "score": 45,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 597,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "rag_index": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 753,
+      "lastTested": "2025-12-22T20:34:41.533Z"
+    },
+    "probe": {
+      "supported": false,
+      "score": 30,
+      "testsPassed": 4,
+      "testsFailed": 18,
+      "avgLatency": 769.5,
+      "lastTested": "2025-12-22T20:34:41.533Z"
     }
   },
   "enabledTools": [
     "create_new_file",
+    "git_diff",
+    "git_log",
+    "git_commit",
+    "git_add",
+    "git_branch_create",
     "npm_run",
+    "npm_install",
+    "npm_uninstall",
     "http_request",
-    "run_python"
+    "browser_navigate",
+    "run_python",
+    "read_file",
+    "write_file",
+    "edit_file",
+    "search_files",
+    "delete_file",
+    "delete_directory",
+    "get_file_info",
+    "git_blame",
+    "web_search",
+    "shell_exec",
+    "memory_store",
+    "memory_retrieve",
+    "text_summarize",
+    "diff_files",
+    "process_list",
+    "zip_create",
+    "zip_extract",
+    "rag_query",
+    "rag_index"
   ],
   "testResults": [
     {
-      "testId": "file_read_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-15u7i5tzyfsjoapd9bj6joo\",\"object\":\"chat.completion\",\"created\":1766164854,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function: file_read(path=\\\"config.json\\\")\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":222,\"completion_tokens\":10,\"total_tokens\":232},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "testId": "read_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ryblqrlcoeduku3objptus\",\"object\":\"chat.completion\",\"created\":1766435630,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"622471092\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"./config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":383,\"completion_tokens\":33,\"total_tokens\":416},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mi"
     },
     {
-      "testId": "file_read_nested",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-m2avapuxqqb7zl7z4fjzu\",\"object\":\"chat.completion\",\"created\":1766164854,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function file_read with arguments {\\\"path\\\": \\\"src/utils/helpers.ts\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":222,\"completion_tokens\":15,\"total_tokens\":237},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "testId": "read_file_nested",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-pmgaz06wfgbhpre3vj4t7c\",\"object\":\"chat.completion\",\"created\":1766435631,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"495875246\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"/src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":382,\"completion_tokens\":35,\"total_tokens\":417},\"stats\":{},\"system_fingerprint\":\"maziyarp"
     },
     {
-      "testId": "file_write_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-4mbtx1kc5e75thc1qmfal\",\"object\":\"chat.completion\",\"created\":1766164855,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function to create file\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":252,\"completion_tokens\":5,\"total_tokens\":257},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "testId": "write_file_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-bjm86zxgi4sozdp5xuzzbc\",\"object\":\"chat.completion\",\"created\":1766435632,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"196052798\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"/home/user/hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":422,\"completion_tokens\":49,\"total_tokens"
     },
     {
-      "testId": "file_patch_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-yjo73b0hcn5bcdvbj4r6f\",\"object\":\"chat.completion\",\"created\":1766164855,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function: \",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":274,\"completion_tokens\":49,\"total_tokens\":323},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "testId": "edit_file_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-im1v2iwkq8ajiuizoy5ps\",\"object\":\"chat.completion\",\"created\":1766435633,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"692062814\",\"function\":{\"name\":\"edit_file\",\"arguments\":\"{\\\"path\\\":\\\"app.js\\\",\\\"edits\\\":[{\\\"oldText\\\":\\\"3000\\\",\\\"newText\\\":\\\"8080\\\"}],\\\"dryRun\\\":false}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":538,\"completion_tokens\":68,\"tot"
     },
     {
-      "testId": "file_list_basic",
+      "testId": "list_directory_basic",
       "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-o28zbmmbg2s425tlcsdnwu\",\"object\":\"chat.completion\",\"created\":1766164856,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function file_list with folder=\\\"src\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":215,\"completion_tokens\":8,\"total_tokens\":223},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-cw9pdpdnzaplg4apnn18mr\",\"object\":\"chat.completion\",\"created\":1766435635,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"299507854\",\"function\":{\"name\":\"list_directory\",\"arguments\":\"{\\\"path\\\":\\\"/src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":376,\"completion_tokens\":32,\"total_tokens\":408},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistra"
     },
     {
-      "testId": "file_search_basic",
+      "testId": "search_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-oyj7fbdcy5j6vg5uiras62\",\"object\":\"chat.completion\",\"created\":1766435635,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"297924679\",\"function\":{\"name\":\"search_files\",\"arguments\":\"{\\\"directory\\\":\\\".\\\",\\\"pattern\\\":\\\"**/*.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":429,\"completion_tokens\":38,\"total_tokens\":467},\"stats\":{},\"system_fingerprin"
+    },
+    {
+      "testId": "create_directory_basic",
       "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-dirw3n41xm8coc7oa1308\",\"object\":\"chat.completion\",\"created\":1766164856,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function file_search with arguments {\\\"query\\\": \\\"TODO\\\", \\\"path\\\": \\\".\\\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":237,\"completion_tokens\":16,\"total_tokens\":253},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-mog55pjarvkuhqhn5g713\",\"object\":\"chat.completion\",\"created\":1766435636,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"600387224\",\"function\":{\"name\":\"create_directory\",\"arguments\":\"{\\\"path\\\":\\\"/components\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":373,\"completion_tokens\":29,\"total_tokens\":402},\"stats\":{},\"system_fingerprint\":\"maziyarpanah"
+    },
+    {
+      "testId": "delete_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-obg6v5jxhiy013rk7gfv\",\"object\":\"chat.completion\",\"created\":1766435637,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"756854309\",\"function\":{\"name\":\"delete_file\",\"arguments\":\"{\\\"path\\\":\\\"/home/user/old_config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":372,\"completion_tokens\":37,\"total_tokens\":409},\"stats\":{},\"system_fingerprint\":\"maz"
+    },
+    {
+      "testId": "delete_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-zcta8u337ibcckdga0m8nd\",\"object\":\"chat.completion\",\"created\":1766435638,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"550403530\",\"function\":{\"name\":\"delete_directory\",\"arguments\":\"{\\\"path\\\":\\\"temp\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":370,\"completion_tokens\":28,\"total_tokens\":398},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mist"
+    },
+    {
+      "testId": "get_file_info_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-uq0yirjdbx7golr5larqn\",\"object\":\"chat.completion\",\"created\":1766435639,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"453536797\",\"function\":{\"name\":\"get_file_info\",\"arguments\":\"{\\\"path\\\":\\\"/path/to/package.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":376,\"completion_tokens\":36,\"total_tokens\":412},\"stats\":{},\"system_fingerprint\":\"maziy"
     },
     {
       "testId": "git_status_basic",
       "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-fq4hzkgyu4ns3upv94gxp\",\"object\":\"chat.completion\",\"created\":1766164856,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function git_status\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":192,\"completion_tokens\":4,\"total_tokens\":196},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-v9q4gqi1w7xeanhy5i44r\",\"object\":\"chat.completion\",\"created\":1766435639,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"978758706\",\"function\":{\"name\":\"git_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":334,\"completion_tokens\":25,\"total_tokens\":359},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
     },
     {
       "testId": "git_diff_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-21tz2ve3xrzf8c72xu0he\",\"object\":\"chat.completion\",\"created\":1766164857,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function git_diff with arguments {\\\"file\\\": \\\"index.js\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":214,\"completion_tokens\":13,\"total_tokens\":227},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-sah9pp75oysrjlojt2aoj\",\"object\":\"chat.completion\",\"created\":1766435640,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"300540210\",\"function\":{\"name\":\"git_diff\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":388,\"completion_tokens\":33,\"total_tokens\":421},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-n"
     },
     {
       "testId": "git_log_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-mysuid7wfw7w2o15rv18b\",\"object\":\"chat.completion\",\"created\":1766164857,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function git_log with arguments {\\\"count\\\": 5\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":209,\"completion_tokens\":11,\"total_tokens\":220},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-7n5b56in0pteq33q1b1cl\",\"object\":\"chat.completion\",\"created\":1766435641,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"471442519\",\"function\":{\"name\":\"git_log\",\"arguments\":\"{\\\"count\\\":5,\\\"format\\\":\\\"oneline\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":406,\"completion_tokens\":39,\"total_tokens\":445},\"stats\":{},\"system_fingerprint\":\"maziyarpana"
     },
     {
       "testId": "git_commit_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-zwvlpq2bzj392bh908n59\",\"object\":\"chat.completion\",\"created\":1766164857,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function git_commit with arguments {\\\"message\\\": \\\"Fix login bug\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":215,\"completion_tokens\":15,\"total_tokens\":230},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-usqturt11affbpoffm8m6r\",\"object\":\"chat.completion\",\"created\":1766435642,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"358200489\",\"function\":{\"name\":\"git_commit\",\"arguments\":\"{\\\"message\\\":\\\"Fix login bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":35,\"total_tokens\":402},\"stats\":{},\"system_fingerprint\":\"maziyarpanah"
     },
     {
       "testId": "git_branch_create_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-fvehwha4pomh36sp7acgk\",\"object\":\"chat.completion\",\"created\":1766435642,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"492975323\",\"function\":{\"name\":\"git_branch_create\",\"arguments\":\"{\\\"name\\\":\\\"feature/user-auth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":370,\"completion_tokens\":34,\"total_tokens\":404},\"stats\":{},\"system_fingerprint\":\"maziy"
+    },
+    {
+      "testId": "git_add_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ehjj9s5mh9h5ru5108xf5f\",\"object\":\"chat.completion\",\"created\":1766435643,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"992546860\",\"function\":{\"name\":\"git_add\",\"arguments\":\"{\\\"file\\\":\\\"index.js\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":364,\"completion_tokens\":29,\"total_tokens\":393},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-n"
+    },
+    {
+      "testId": "git_branch_list_basic",
       "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-181fcl2tn9qjetffmclpwjm\",\"object\":\"chat.completion\",\"created\":1766164857,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function git_branch_create with arguments {\\\"name\\\": \\\"feature/user-auth\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":216,\"completion_tokens\":15,\"total_tokens\":231},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-sgsh6u8h9go1vijqgfqysx\",\"object\":\"chat.completion\",\"created\":1766435644,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"598350604\",\"function\":{\"name\":\"git_branch_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":359,\"completion_tokens\":27,\"total_tokens\":386},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-"
+    },
+    {
+      "testId": "git_blame_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-k1y3wh377zlh8dhbb4v33q\",\"object\":\"chat.completion\",\"created\":1766435644,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"628420108\",\"function\":{\"name\":\"git_blame\",\"arguments\":\"{\\\"file\\\":\\\"server.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":34,\"total_tokens\":459},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistra"
+    },
+    {
+      "testId": "git_show_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-8hseqrtbacpgukft6pfnbn\",\"object\":\"chat.completion\",\"created\":1766435645,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"558668876\",\"function\":{\"name\":\"git_show\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":388,\"completion_tokens\":25,\"total_tokens\":413},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
     },
     {
       "testId": "npm_run_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-iyh9zb6y549octqi1j7h\",\"object\":\"chat.completion\",\"created\":1766164858,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"686911899\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":212,\"completion_tokens\":26,\"total_tokens\":238},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo"
+      "response": "{\"id\":\"chatcmpl-r1hb08guq3oiz2des4f94g\",\"object\":\"chat.completion\",\"created\":1766435646,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"686161898\",\"function\":{\"name\":\"npm_run\",\"arguments\":\"{\\\"script\\\":\\\"build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":365,\"completion_tokens\":32,\"total_tokens\":397},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-ne"
     },
     {
       "testId": "npm_install_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ha10pgir9v54y4dyqzibts\",\"object\":\"chat.completion\",\"created\":1766435646,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"230964164\",\"function\":{\"name\":\"npm_install\",\"arguments\":\"{\\\"package\\\":\\\"lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":382,\"completion_tokens\":32,\"total_tokens\":414},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mist"
+    },
+    {
+      "testId": "npm_uninstall_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-j89w11tjygb6c9a5gk4y28\",\"object\":\"chat.completion\",\"created\":1766435647,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"549989362\",\"function\":{\"name\":\"npm_uninstall\",\"arguments\":\"{\\\"package\\\":\\\"axios\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":367,\"completion_tokens\":33,\"total_tokens\":400},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mis"
+    },
+    {
+      "testId": "npm_test_basic",
       "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-1s3ia25pohcilbxf0aunpa\",\"object\":\"chat.completion\",\"created\":1766164858,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function npm_install with arguments {\\\"package\\\": \\\"lodash\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":208,\"completion_tokens\":12,\"total_tokens\":220},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-a53pavr9e6myno7pjt14n\",\"object\":\"chat.completion\",\"created\":1766435648,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"855972608\",\"function\":{\"name\":\"npm_test\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":332,\"completion_tokens\":25,\"total_tokens\":357},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
     },
     {
       "testId": "http_request_get",
       "passed": true,
-      "score": 72,
-      "response": "{\"id\":\"chatcmpl-ylm691duhx7rgth4fi0rpl\",\"object\":\"chat.completion\",\"created\":1766164858,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function: http_request\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"548166037\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"<https://api.example.com/users>\\\",\\\"method\\\":\\\"<GET>\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":253,\"completion_tokens\""
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-mwodr9389xtk5u8wh3u2\",\"object\":\"chat.completion\",\"created\":1766435649,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"679882734\",\"function\":{\"name\":\"http_request\",\"arguments\":\"{\\\"url\\\":\\\"https://api.example.com/users\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":460,\"completion_tokens\":37,\"total_tokens\":497},\"stats\":{},\"system_fingerprint\":\""
+    },
+    {
+      "testId": "web_search_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-j085qqa2job112u32gtha\",\"object\":\"chat.completion\",\"created\":1766435649,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"872413011\",\"function\":{\"name\":\"web_search\",\"arguments\":\"{\\\"query\\\":\\\"TypeScript generics\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":393,\"completion_tokens\":35,\"total_tokens\":428},\"stats\":{},\"system_fingerprint\":\"maziyarpa"
     },
     {
       "testId": "browser_navigate_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-4j6i01se554b4zocp8igdg\",\"object\":\"chat.completion\",\"created\":1766164860,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function browser_navigate with arguments {\\\"url\\\": \\\"<https://github.com>\\\", \\\"getContent\\\": true\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":255,\"completion_tokens\":21,\"total_tokens\":276},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-i"
-    },
-    {
-      "testId": "create_new_file_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-d4drj80qqwbd81tqd7bi\",\"object\":\"chat.completion\",\"created\":1766164860,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"291983748\",\"function\":{\"name\":\"create_new_file\",\"arguments\":\"{\\\"path\\\":\\\"/README.md\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":233,\"completion_tokens\":30,\"total_tokens\":263},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/m"
+      "response": "{\"id\":\"chatcmpl-1sgexqaioe3uav65ec8eb\",\"object\":\"chat.completion\",\"created\":1766435650,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"355692364\",\"function\":{\"name\":\"browser_navigate\",\"arguments\":\"{\\\"url\\\":\\\"https://github.com\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":374,\"completion_tokens\":36,\"total_tokens\":410},\"stats\":{},\"system_fingerprint\":\"maziya"
     },
     {
-      "testId": "folder_create_basic",
+      "testId": "browser_screenshot_basic",
       "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-5jv1zumlh992w7v55ta50e\",\"object\":\"chat.completion\",\"created\":1766164861,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function create_folder with arguments {\\\"path\\\": \\\"/components\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":212,\"completion_tokens\":12,\"total_tokens\":224},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
-    },
-    {
-      "testId": "folder_delete_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-mbhmmaczrbqs9ea0cm958\",\"object\":\"chat.completion\",\"created\":1766164861,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function folder_delete with arguments {\\\"path\\\": \\\"temp\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":213,\"completion_tokens\":12,\"total_tokens\":225},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
-    },
-    {
-      "testId": "git_add_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-5yxvhd3xg2v3l791xcu1e8\",\"object\":\"chat.completion\",\"created\":1766164861,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function git_add with arguments {\\\"file\\\": \\\"index.js\\\"}\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":221,\"completion_tokens\":13,\"total_tokens\":234},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
-    },
-    {
-      "testId": "git_add_all",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-5wk0pwo7n6p3gfhwyk82uf\",\"object\":\"chat.completion\",\"created\":1766164861,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function git_add with arguments {\\\"file\\\": \\\".\\\"\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":217,\"completion_tokens\":10,\"total_tokens\":227},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
-    },
-    {
-      "testId": "git_branch_list_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-3jq7qh3ze8guc74v47hbs\",\"object\":\"chat.completion\",\"created\":1766164862,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Calling function git_branch_list\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":192,\"completion_tokens\":5,\"total_tokens\":197},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
-    },
-    {
-      "testId": "npm_uninstall_basic",
-      "passed": false,
-      "score": 0,
-      "response": "{\"id\":\"chatcmpl-o0xts9p13tgqa7l129biw\",\"object\":\"chat.completion\",\"created\":1766164862,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"To remove the axios package, I'll use the npm_uninstall function. What is the name of the package you want to uninstall?\\n\",\"tool_calls\":[]},\"logprobs\":null,\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":213,\"completion_tokens\":27,\"total_tokens\":240},\"stats\":{},\"system_fingerprint\":\"maziyarpanah"
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-xojkhw91mws2ue1zeg7d\",\"object\":\"chat.completion\",\"created\":1766435651,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"876950008\",\"function\":{\"name\":\"browser_take_screenshot\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":414,\"completion_tokens\":28,\"total_tokens\":442},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-ins"
     },
     {
       "testId": "run_python_basic",
       "passed": true,
       "score": 100,
-      "response": "{\"id\":\"chatcmpl-i2eqsle0quaoxzsoh9vfa9\",\"object\":\"chat.completion\",\"created\":1766164862,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"118012879\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":214,\"completion_tokens\":31,\"total_tokens\":245},\"stats\":{},\"system_fingerprint\":\"maziyarp"
+      "response": "{\"id\":\"chatcmpl-gt76blegfbmb9rgielkug4\",\"object\":\"chat.completion\",\"created\":1766435652,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"523613004\",\"function\":{\"name\":\"run_python\",\"arguments\":\"{\\\"code\\\":\\\"print('Hello World')\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":368,\"completion_tokens\":37,\"total_tokens\":405},\"stats\":{},\"system_fingerprint\":\"maziyarp"
+    },
+    {
+      "testId": "shell_exec_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-inc31mud3x9n221pdjoxs\",\"object\":\"chat.completion\",\"created\":1766435653,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"586304695\",\"function\":{\"name\":\"shell_exec\",\"arguments\":\"{\\\"command\\\":\\\"echo Hello\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":413,\"completion_tokens\":33,\"total_tokens\":446},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mi"
+    },
+    {
+      "testId": "memory_store_basic",
+      "passed": true,
+      "score": 72,
+      "response": "{\"id\":\"chatcmpl-lgx22b2vqtred8qyk9yw7a\",\"object\":\"chat.completion\",\"created\":1766435653,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"User: Hi Alice!\\nAlice: Hello! How can I assist you today?\\nUser: Can you store my favorite color in memory?\\nAlice: Sure thing! What's your favorite color?\\nUser: Blue\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"176622978\",\"function\":{\"name\":\"memory_store\",\"arguments\":\"{\\\"key\\\":\\\"favorite_color\\\",\\"
+    },
+    {
+      "testId": "memory_retrieve_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-rybwq23lflwe3kynb0p8i\",\"object\":\"chat.completion\",\"created\":1766435654,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"441140428\",\"function\":{\"name\":\"memory_retrieve\",\"arguments\":\"{\\\"key\\\":\\\"user_name\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":371,\"completion_tokens\":30,\"total_tokens\":401},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mi"
+    },
+    {
+      "testId": "memory_list_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-u8o9t47jrtbhbhjhfgh5h\",\"object\":\"chat.completion\",\"created\":1766435655,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"437404389\",\"function\":{\"name\":\"memory_list\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":337,\"completion_tokens\":25,\"total_tokens\":362},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\""
+    },
+    {
+      "testId": "text_summarize_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-1wnzz3jrau2dld6cydrshh\",\"object\":\"chat.completion\",\"created\":1766435656,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"357572654\",\"function\":{\"name\":\"text_summarize\",\"arguments\":\"{\\\"text\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco la"
+    },
+    {
+      "testId": "diff_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-ytu6y11z1e1m5g0twe36\",\"object\":\"chat.completion\",\"created\":1766435657,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"335917646\",\"function\":{\"name\":\"diff_files\",\"arguments\":\"{\\\"file1\\\":\\\"old.txt\\\",\\\"file2\\\":\\\"new.txt\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":409,\"completion_tokens\":42,\"total_tokens\":451},\"stats\":{},\"system_fingerprint\":\""
+    },
+    {
+      "testId": "process_list_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-g0gtauwpksnbdctueet7ee\",\"object\":\"chat.completion\",\"created\":1766435658,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"682820471\",\"function\":{\"name\":\"process_list\",\"arguments\":\"{\\\"filter\\\":\\\"node\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":360,\"completion_tokens\":32,\"total_tokens\":392},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistra"
+    },
+    {
+      "testId": "zip_create_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-u54me24cpb9xkkbag3j8\",\"object\":\"chat.completion\",\"created\":1766435659,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"384471056\",\"function\":{\"name\":\"zip_create\",\"arguments\":\"{\\\"output\\\":\\\"backup.zip\\\",\\\"sources\\\":[\\\"src\\\"]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":416,\"completion_tokens\":40,\"total_tokens\":456},\"stats\":{},\"system_fingerprin"
+    },
+    {
+      "testId": "zip_extract_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ewwn0z3hmrk7osc73opwul\",\"object\":\"chat.completion\",\"created\":1766435660,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"196346801\",\"function\":{\"name\":\"zip_extract\",\"arguments\":\"{\\\"archive\\\":\\\"data.zip\\\",\\\"destination\\\":\\\".\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":392,\"completion_tokens\":38,\"total_tokens\":430},\"stats\":{},\"system_fingerpr"
+    },
+    {
+      "testId": "rag_query_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-0ihgnmqehxa97d6fqq893\",\"object\":\"chat.completion\",\"created\":1766435661,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"558869609\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"user authentication handled\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":595,\"completion_tokens\":34,\"total_tokens\":629},\"stats\":{},\"system_fingerprint\":\"ma"
+    },
+    {
+      "testId": "rag_query_with_filter",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-31zmqqdqtnb73nzueik8i6\",\"object\":\"chat.completion\",\"created\":1766435662,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"924685051\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"database connection TypeScript files\\\",\\\"fileTypes\\\":[\\\"ts\\\"]}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":594,\"completion_tokens\":43,\"total_tokens\":637},\"s"
+    },
+    {
+      "testId": "rag_status_basic",
+      "passed": false,
+      "score": 45,
+      "response": "{\"id\":\"chatcmpl-hhc1uevoiq6g3tdifcepra\",\"object\":\"chat.completion\",\"created\":1766435663,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"297231649\",\"function\":{\"name\":\"rag_status\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":353,\"completion_tokens\":25,\"total_tokens\":378},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\""
+    },
+    {
+      "testId": "rag_index_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-8wolfz4yp8k2xfjq7l6kuy\",\"object\":\"chat.completion\",\"created\":1766435663,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"262254872\",\"function\":{\"name\":\"rag_index\",\"arguments\":\"{\\\"projectPath\\\":\\\"/home/user/myproject\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":383,\"completion_tokens\":33,\"total_tokens\":416},\"stats\":{},\"system_fingerprint\":\"ma"
+    },
+    {
+      "testId": "9.1",
+      "passed": false,
+      "score": 50,
+      "response": "{\"id\":\"chatcmpl-j6o4if5tezzb0u5w7kbwl\",\"object\":\"chat.completion\",\"created\":1766435664,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"539813298\",\"function\":{\"name\":\"check_codebase\",\"arguments\":\"{\\\"query\\\":\\\"auth.ts\\\",\\\"search\\\":\\\"authentication method\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":338,\"completion_tokens\":36,\"total_tokens\":374},\"stats\":{},\"s"
+    },
+    {
+      "testId": "9.2",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-8q034oiyb6rsbxm69w9p7f\",\"object\":\"chat.completion\",\"created\":1766435665,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"802140757\",\"function\":{\"name\":\"search_codebase\",\"arguments\":\"{\\\"query\\\":\\\"quantum flux capacitor implementation\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":283,\"completion_tokens\":33,\"total_tokens\":316},\"stats\":{},\"system"
+    },
+    {
+      "testId": "9.3",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-1ryd33jjehd9phhyqacgwa\",\"object\":\"chat.completion\",\"created\":1766435666,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"237522052\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"Explain authentication flow in the project.\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":309,\"completion_tokens\":35,\"total_tokens\":344},\"stats\":{},\"system"
+    },
+    {
+      "testId": "9.4",
+      "passed": true,
+      "score": 70,
+      "response": "{\"id\":\"chatcmpl-amsxdxw0ei69vg1sr0zy6p\",\"object\":\"chat.completion\",\"created\":1766435666,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"327398141\",\"function\":{\"name\":\"update_file\",\"arguments\":\"{\\\"file_path\\\":\\\"path_to_update\\\",\\\"new_content\\\":\\\"updated_content\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":264,\"completion_tokens\":37,\"total_tokens\":301},\"stat"
+    },
+    {
+      "testId": "10.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-t7ipzs37jgjo0jskebgfo\",\"object\":\"chat.completion\",\"created\":1766435667,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"A function in programming is a reusable piece of code that performs a specific task. It can accept inputs (arguments), perform actions based on those inputs, and return an output. Functions help organize code into modular pieces, making it easier to understand and maintain.\\n\\nHere's a simple examp"
+    },
+    {
+      "testId": "10.2",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-egtfao0x0rkpwweqk32ciq\",\"object\":\"chat.completion\",\"created\":1766435668,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"403837797\",\"function\":{\"name\":\"custom_analyze\",\"arguments\":\"{\\\"target\\\":\\\"main.ts\\\",\\\"depth\\\":3}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":285,\"completion_tokens\":34,\"total_tokens\":319},\"stats\":{},\"system_fingerprint\":\"maz"
+    },
+    {
+      "testId": "10.3",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-1nk28i3mddqlz0vewodou\",\"object\":\"chat.completion\",\"created\":1766435669,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"313153076\",\"function\":{\"name\":\"get_project_details\",\"arguments\":\"{\\\"project_name\\\":\\\"Authentication Project\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":269,\"completion_tokens\":31,\"total_tokens\":300},\"stats\":{},\"system_fing"
+    },
+    {
+      "testId": "10.4",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-cpun1sgm3hw6zh820ybg\",\"object\":\"chat.completion\",\"created\":1766435669,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"300683149\",\"function\":{\"name\":\"debug_code\",\"arguments\":\"{\\\"error_message\\\":\\\"TypeError: undefined is not a function\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":279,\"completion_tokens\":36,\"total_tokens\":315},\"stats\":{},\"syst"
+    },
+    {
+      "testId": "10.5",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-cj1o0e9ie9ve9p9war1jsv\",\"object\":\"chat.completion\",\"created\":1766435670,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"530877810\",\"function\":{\"name\":\"find_files\",\"arguments\":\"{\\\"search\\\":\\\"authentication_bug\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":279,\"completion_tokens\":32,\"total_tokens\":311},\"stats\":{},\"system_fingerprint\":\"maziyarp"
+    },
+    {
+      "testId": "11.1",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-8p9h4rk0x56i1ogeru75s\",\"object\":\"chat.completion\",\"created\":1766435671,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"445271418\",\"function\":{\"name\":\"commit_changes\",\"arguments\":\"{\\\"message\\\":\\\"Implement new feature\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":294,\"completion_tokens\":32,\"total_tokens\":326},\"stats\":{},\"system_fingerprint\":\"m"
+    },
+    {
+      "testId": "11.2",
+      "passed": false,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-5c6yafxyw96e90jbcujykb\",\"object\":\"chat.completion\",\"created\":1766435671,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"117766445\",\"function\":{\"name\":\"run_tests\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":296,\"completion_tokens\":24,\"total_tokens\":320},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-2407\"}"
+    },
+    {
+      "testId": "11.3",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-f7epklxdi7dngi2lf6ggq\",\"object\":\"chat.completion\",\"created\":1766435672,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"814329016\",\"function\":{\"name\":\"find_code\",\"arguments\":\"{\\\"search_term\\\":\\\"handleAuth\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":298,\"completion_tokens\":30,\"total_tokens\":328},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi"
+    },
+    {
+      "testId": "11.4",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-x1uhjdr81pwuil9wx1eim\",\"object\":\"chat.completion\",\"created\":1766435673,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"276252051\",\"function\":{\"name\":\"run_command\",\"arguments\":\"{\\\"command\\\":\\\"rm -rf /tmp/build\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":296,\"completion_tokens\":33,\"total_tokens\":329},\"stats\":{},\"system_fingerprint\":\"maziyarp"
+    },
+    {
+      "testId": "11.5",
+      "passed": false,
+      "score": 30,
+      "response": "{\"id\":\"chatcmpl-gijoeh97eapy9xmm8sk8wd\",\"object\":\"chat.completion\",\"created\":1766435673,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"889990742\",\"function\":{\"name\":\"create_file\",\"arguments\":\"{\\\"filename\\\":\\\"user.js\\\",\\\"content\\\":\\\"# Store passwords in localStorage\\\\nfunction storePassword(username, password) {\\\\nlocalStorage.setItem(`${username}`, password);\\\\n}\\\\n\\\"}\"}}]},\"logprobs\":null"
+    },
+    {
+      "testId": "14.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-xv5hg443nytkwj93scnprb\",\"object\":\"chat.completion\",\"created\":1766435675,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"365217276\",\"function\":{\"name\":\"explain_concept\",\"arguments\":\"{\\\"concept\\\":\\\"package.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":271,\"completion_tokens\":32,\"total_tokens\":303},\"stats\":{},\"system_fingerprint\":\"maziyarp"
+    },
+    {
+      "testId": "14.2",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-japaxnk6ygg8o3ysyazrs\",\"object\":\"chat.completion\",\"created\":1766435676,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"In this project, error handling is managed through the tool calling process. When you call a tool using the specified format, the system will attempt to execute it. If there's an issue during execution (like invalid arguments or tool failure), the system will respond with an error message in the fo"
+    },
+    {
+      "testId": "14.3",
+      "passed": true,
+      "score": 70,
+      "response": "{\"id\":\"chatcmpl-poyxik1uydmjt58ok7bo1\",\"object\":\"chat.completion\",\"created\":1766435677,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"971504367\",\"function\":{\"name\":\"run_command\",\"arguments\":\"{\\\"command\\\":\\\"npm install lodash\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":270,\"completion_tokens\":31,\"total_tokens\":301},\"stats\":{},\"system_fingerprint\":\"maziyar"
+    },
+    {
+      "testId": "14.4",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-q6ewdp0mvalc70aby3rdqg\",\"object\":\"chat.completion\",\"created\":1766435678,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"964075683\",\"function\":{\"name\":\"validate_email\",\"arguments\":\"{\\\"email\\\":\\\"user@example.com\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":270,\"completion_tokens\":30,\"total_tokens\":300},\"stats\":{},\"system_fingerprint\":\"maziyar"
+    },
+    {
+      "testId": "14.5",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-qn2gx60bb7ccqegh0tv8bq\",\"object\":\"chat.completion\",\"created\":1766435678,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"402866855\",\"function\":{\"name\":\"get_readme_info\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":271,\"completion_tokens\":26,\"total_tokens\":297},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistral-nemo-instruct-"
+    },
+    {
+      "testId": "14.6",
+      "passed": false,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-fy2g12gg7kspir02s5rlb\",\"object\":\"chat.completion\",\"created\":1766435679,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"791621971\",\"function\":{\"name\":\"generate_explanation\",\"arguments\":\"{\\\"topic\\\":\\\"variable_in_programming\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":288,\"completion_tokens\":32,\"total_tokens\":320},\"stats\":{},\"system_fingerpri"
+    },
+    {
+      "testId": "14.7",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-edphytmelu8pwyo5qoz3n\",\"object\":\"chat.completion\",\"created\":1766435680,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"965167884\",\"function\":{\"name\":\"list_common_programming_languages\",\"arguments\":\"{}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":266,\"completion_tokens\":28,\"total_tokens\":294},\"stats\":{},\"system_fingerprint\":\"maziyarpanahi/mistr"
+    },
+    {
+      "testId": "14.8",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-mmln41ck1u8xig8vcsm55\",\"object\":\"chat.completion\",\"created\":1766435680,\"model\":\"maziyarpanahi/mistral-nemo-instruct-2407\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"417364095\",\"function\":{\"name\":\"edit_config_file\",\"arguments\":\"{\\\"file_path\\\":\\\"config.js\\\",\\\"new_port\\\":8080}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":280,\"completion_tokens\":38,\"total_tokens\":318},\"stats\":{},\"system_finge"
     }
   ],
   "probeResults": {
-    "testedAt": "2025-12-20T23:45:28.309Z",
+    "testedAt": "2025-12-22T20:33:41.820Z",
     "emitTest": {
       "passed": true,
       "score": 100,
@@ -371,8 +857,942 @@
       "details": "Schema reordering handled correctly - model reads semantics, not positions"
     },
     "toolScore": 94,
-    "reasoningScore": 0,
-    "overallScore": 94
+    "reasoningScore": 86,
+    "overallScore": 52,
+    "reasoningProbes": {
+      "intentExtraction": {
+        "passed": true,
+        "score": 80,
+        "details": "Valid intent JSON with reasoning"
+      },
+      "multiStepPlanning": {
+        "passed": true,
+        "score": 100,
+        "details": "3 steps planned with correct order"
+      },
+      "conditionalReasoning": {
+        "passed": true,
+        "score": 100,
+        "details": "Correctly chose read based on condition"
+      },
+      "contextContinuity": {
+        "passed": true,
+        "score": 100,
+        "details": "Perfect context retention with correct endpoint and method"
+      },
+      "logicalConsistency": {
+        "passed": true,
+        "score": 80,
+        "details": "Identified conflict in text response"
+      },
+      "explanation": {
+        "passed": false,
+        "score": 40,
+        "details": "Missing required fields"
+      },
+      "edgeCaseHandling": {
+        "passed": true,
+        "score": 100,
+        "details": "Properly handles edge case with fallback"
+      }
+    },
+    "strategicRAGProbes": [
+      {
+        "id": "3.1",
+        "name": "RAG Priority",
+        "category": "3.x",
+        "passed": true,
+        "score": 100,
+        "latency": 2281,
+        "details": "Correctly used RAG as first tool",
+        "expectedBehavior": "Model should call rag_query BEFORE file reads",
+        "variants": [
+          {
+            "id": "3.1a",
+            "prompt": "Explain the login flow",
+            "passed": true,
+            "score": 100,
+            "response": ""
+          },
+          {
+            "id": "3.1b",
+            "prompt": "Where is user authentication handled?",
+            "passed": true,
+            "score": 100,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.2",
+        "name": "Hierarchical Search",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 2343,
+        "details": "Used RAG but query could be broader",
+        "expectedBehavior": "Should use broader query to get architectural overview",
+        "variants": [
+          {
+            "id": "3.2a",
+            "prompt": "How are the different parts of this codebase connected?",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          },
+          {
+            "id": "3.2b",
+            "prompt": "Give me a high-level overview of the project structure",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.3",
+        "name": "Tool Chaining",
+        "category": "3.x",
+        "passed": true,
+        "score": 70,
+        "latency": 1535,
+        "details": "Used RAG but no follow-up read",
+        "expectedBehavior": "Should RAG first, then read_file for details",
+        "variants": [
+          {
+            "id": "3.3a",
+            "prompt": "Find the JWT validation logic and explain how it works",
+            "passed": true,
+            "score": 70,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.4",
+        "name": "Error Recovery",
+        "category": "3.x",
+        "passed": false,
+        "score": 30,
+        "latency": 1461,
+        "details": "Did not acknowledge search failure",
+        "expectedBehavior": "Should acknowledge not found and offer alternatives",
+        "variants": [
+          {
+            "id": "3.4a",
+            "prompt": "Where is the blockchain integration?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.5",
+        "name": "Result Synthesis",
+        "category": "3.x",
+        "passed": true,
+        "score": 60,
+        "latency": 1679,
+        "details": "Used RAG but synthesis could be better",
+        "expectedBehavior": "Should search, then synthesize coherent explanation",
+        "variants": [
+          {
+            "id": "3.5a",
+            "prompt": "Trace a user login request from frontend to backend",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "3.6",
+        "name": "Self-Correction",
+        "category": "3.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1600,
+        "details": "Only one RAG query, could refine",
+        "expectedBehavior": "Should try different queries if first doesnt find it",
+        "variants": [
+          {
+            "id": "3.6a",
+            "prompt": "Find how roles are enforced in the API",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "architecturalProbes": [
+      {
+        "id": "4.1",
+        "name": "Code Comprehension",
+        "category": "4.x",
+        "passed": false,
+        "score": 20,
+        "latency": 2212,
+        "details": "Poor code comprehension",
+        "expectedBehavior": "Should explain JWT validation and user attachment",
+        "variants": [
+          {
+            "id": "4.1a",
+            "prompt": "Explain what db.service does",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          },
+          {
+            "id": "4.1b",
+            "prompt": "How does the UserService class work?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.2",
+        "name": "Bug Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 2272,
+        "details": "Did not identify security issue",
+        "expectedBehavior": "Should identify jwt.decode vs jwt.verify issue",
+        "variants": [
+          {
+            "id": "4.2a",
+            "prompt": "Is the refresh token validation secure?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.2b",
+            "prompt": "Find security vulnerabilities in auth.ts",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.3",
+        "name": "SQL Injection Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 2799,
+        "details": "Did not identify SQL injection",
+        "expectedBehavior": "Should identify string concatenation in SQL query",
+        "variants": [
+          {
+            "id": "4.3a",
+            "prompt": "Is the search query in UserService.java safe?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.3b",
+            "prompt": "Review database queries for injection vulnerabilities",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.4",
+        "name": "XSS Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 3011,
+        "details": "Did not identify XSS vulnerability",
+        "expectedBehavior": "Should identify dangerouslySetInnerHTML vulnerability",
+        "variants": [
+          {
+            "id": "4.4a",
+            "prompt": "Is user input properly sanitized in LoginForm?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          },
+          {
+            "id": "4.4b",
+            "prompt": "Find XSS issues in the React components",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.5",
+        "name": "Architecture Inference",
+        "category": "4.x",
+        "passed": false,
+        "score": 30,
+        "latency": 2233,
+        "details": "Did not identify patterns",
+        "expectedBehavior": "Should identify layered architecture, MVC/service pattern",
+        "variants": [
+          {
+            "id": "4.5a",
+            "prompt": "How is the code organized?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "4.6",
+        "name": "Language Detection",
+        "category": "4.x",
+        "passed": false,
+        "score": 0,
+        "latency": 2056,
+        "details": "Did not identify languages",
+        "expectedBehavior": "Should identify TypeScript, Java, JSX",
+        "variants": [
+          {
+            "id": "4.6a",
+            "prompt": "What tech stack is this project using?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "navigationProbes": [
+      {
+        "id": "5.1",
+        "name": "Locate Implementation",
+        "category": "5.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2735,
+        "details": "Used RAG but didnt find bcrypt",
+        "expectedBehavior": "Should locate bcrypt.hash usage",
+        "variants": [
+          {
+            "id": "5.1a",
+            "prompt": "Where is password hashing implemented?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          },
+          {
+            "id": "5.1b",
+            "prompt": "How is password security handled?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.2",
+        "name": "Cross-Stack Navigation",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 1748,
+        "details": "Did not navigate cross-stack",
+        "expectedBehavior": "Should find both frontend and backend auth",
+        "variants": [
+          {
+            "id": "5.2a",
+            "prompt": "Show me auth across frontend and backend",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.3",
+        "name": "Dependency Tracing",
+        "category": "5.x",
+        "passed": false,
+        "score": 20,
+        "latency": 1846,
+        "details": "Did not trace dependencies",
+        "expectedBehavior": "Should list services and middleware dependencies",
+        "variants": [
+          {
+            "id": "5.3a",
+            "prompt": "What does index.ts import?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.4",
+        "name": "Entry Point Location",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 1666,
+        "details": "Did not find entry points",
+        "expectedBehavior": "Should find index.ts/App.tsx entry points",
+        "variants": [
+          {
+            "id": "5.4a",
+            "prompt": "What is the main entry file?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "5.5",
+        "name": "Shared Code Detection",
+        "category": "5.x",
+        "passed": false,
+        "score": 0,
+        "latency": 1933,
+        "details": "Did not find shared code",
+        "expectedBehavior": "Should find shared-utils package",
+        "variants": [
+          {
+            "id": "5.5a",
+            "prompt": "Are there reusable utilities?",
+            "passed": false,
+            "score": 0,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "helicopterProbes": [
+      {
+        "id": "6.1",
+        "name": "Project Overview",
+        "category": "6.x",
+        "passed": false,
+        "score": 30,
+        "latency": 1992,
+        "details": "Overview too short or too long",
+        "expectedBehavior": "Should summarize project purpose and structure",
+        "variants": [
+          {
+            "id": "6.1a",
+            "prompt": "What is this codebase about?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.2",
+        "name": "Stack Enumeration",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 1588,
+        "details": "Found few stacks",
+        "expectedBehavior": "Should list Node, React, React Native, Java, Mendix",
+        "variants": [
+          {
+            "id": "6.2a",
+            "prompt": "List all the project folders and their purposes",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.3",
+        "name": "Team Structure Inference",
+        "category": "6.x",
+        "passed": true,
+        "score": 100,
+        "latency": 1895,
+        "details": "Suggested team structure",
+        "expectedBehavior": "Should suggest backend/frontend/mobile teams",
+        "variants": [
+          {
+            "id": "6.3a",
+            "prompt": "Who would work on what parts?",
+            "passed": false,
+            "score": 30,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.4",
+        "name": "Risk Assessment",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 1703,
+        "details": "No risk assessment",
+        "expectedBehavior": "Should mention security issues, coupling, etc",
+        "variants": [
+          {
+            "id": "6.4a",
+            "prompt": "Any red flags in this code?",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "6.5",
+        "name": "Improvement Suggestions",
+        "category": "6.x",
+        "passed": false,
+        "score": 20,
+        "latency": 1082,
+        "details": "No improvement suggestions",
+        "expectedBehavior": "Should suggest specific improvements",
+        "variants": [
+          {
+            "id": "6.5a",
+            "prompt": "What would you refactor first?",
+            "passed": true,
+            "score": 100,
+            "response": "To determine what to refactor first, let's start by understanding the current state of the codebase. Could you please provide a brief description of the project or share some relevant files?"
+          }
+        ]
+      }
+    ],
+    "proactiveProbes": [
+      {
+        "id": "7.1",
+        "name": "Proactive Security Findings",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 1496,
+        "details": "Did not proactively find issues",
+        "expectedBehavior": "Should proactively mention connection leak",
+        "variants": [
+          {
+            "id": "7.1a",
+            "prompt": "Review db.service.ts",
+            "passed": false,
+            "score": 20,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.2",
+        "name": "Improvement Suggestions",
+        "category": "7.x",
+        "passed": false,
+        "score": 20,
+        "latency": 5949,
+        "details": "No proactive suggestions",
+        "expectedBehavior": "Should suggest error handling, cancellation",
+        "variants": [
+          {
+            "id": "7.2a",
+            "prompt": "Can this hook be improved?",
+            "passed": true,
+            "score": 100,
+            "response": "To improve this hook, we can enhance the user interface by providing more interactive responses and better error handling. Here's how we can modify it:\n\n1. **Interactive Responses**: Instead of just d"
+          }
+        ]
+      },
+      {
+        "id": "7.3",
+        "name": "Documentation Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1385,
+        "details": "Did not mention docs but reviewed",
+        "expectedBehavior": "May note missing prop types or docs",
+        "variants": [
+          {
+            "id": "7.3a",
+            "prompt": "What do you think of ProductCard?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.4",
+        "name": "Best Practice Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 60,
+        "latency": 1445,
+        "details": "Reviewed but no best practices",
+        "expectedBehavior": "Should mention best practices for auth",
+        "variants": [
+          {
+            "id": "7.4a",
+            "prompt": "Is the auth middleware well-implemented?",
+            "passed": true,
+            "score": 60,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.5",
+        "name": "Testing Suggestions",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 2018,
+        "details": "Reviewed without test mentions",
+        "expectedBehavior": "May suggest adding tests",
+        "variants": [
+          {
+            "id": "7.5a",
+            "prompt": "Review shared-utils/validation.ts",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.6",
+        "name": "Performance Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1768,
+        "details": "Reviewed without perf notes",
+        "expectedBehavior": "May note re-render or pagination concerns",
+        "variants": [
+          {
+            "id": "7.6a",
+            "prompt": "Any performance issues in UserList?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.7",
+        "name": "Edge Case Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1585,
+        "details": "Reviewed without edge cases",
+        "expectedBehavior": "Should identify edge cases in error handling",
+        "variants": [
+          {
+            "id": "7.7a",
+            "prompt": "What if login fails?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      },
+      {
+        "id": "7.8",
+        "name": "Accessibility Awareness",
+        "category": "7.x",
+        "passed": true,
+        "score": 50,
+        "latency": 1437,
+        "details": "Reviewed without a11y notes",
+        "expectedBehavior": "May note accessibility labels or concerns",
+        "variants": [
+          {
+            "id": "7.8a",
+            "prompt": "Is LoginScreen accessible?",
+            "passed": true,
+            "score": 50,
+            "response": ""
+          }
+        ]
+      }
+    ],
+    "intentProbes": [
+      {
+        "id": "8.1a",
+        "name": "Implicit RAG - Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly invoked RAG from natural question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1b",
+        "name": "Implicit RAG - Bug Report",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for relevant auth/token code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.1c",
+        "name": "Implicit File Read",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 80,
+        "details": "Searched for file via RAG",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "read_file",
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2a",
+        "name": "RAG vs File Read Decision",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly started with RAG for broad question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.2b",
+        "name": "Specific vs Broad Query",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly read specific file",
+        "toolsInvoked": [
+          "read_file"
+        ],
+        "expectedTools": [
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.3a",
+        "name": "Knowledge Question - No Tools",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Unnecessarily invoked tools for knowledge question",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3b",
+        "name": "Clarification Request",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 0,
+        "details": "Did not seek clarification",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.3c",
+        "name": "Follow-up Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for database context",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4a",
+        "name": "Code Question Without Context",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched before answering",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.4b",
+        "name": "Specific Code Location",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Located and examined the code",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      },
+      {
+        "id": "8.5a",
+        "name": "Ambiguous Reference",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 20,
+        "details": "Acted without clarification",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.5b",
+        "name": "Multiple Interpretations",
+        "invoked": false,
+        "invokedCorrectly": true,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Made reasonable assumption",
+        "toolsInvoked": [],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6a",
+        "name": "Implicit Security Review",
+        "invoked": true,
+        "invokedCorrectly": false,
+        "actionCorrect": false,
+        "score": 50,
+        "details": "Proceeded without knowing which endpoint",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": []
+      },
+      {
+        "id": "8.6b",
+        "name": "Performance Concern Hint",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched for user list implementation",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.7a",
+        "name": "Dual Request",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Addressed both auth and error logging",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8a",
+        "name": "Hypothetical Question",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Searched but did not modify",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query"
+        ]
+      },
+      {
+        "id": "8.8b",
+        "name": "Just Asking",
+        "invoked": true,
+        "invokedCorrectly": true,
+        "actionCorrect": true,
+        "score": 100,
+        "details": "Correctly searched without modifying",
+        "toolsInvoked": [
+          "rag_query"
+        ],
+        "expectedTools": [
+          "rag_query",
+          "read_file"
+        ]
+      }
+    ],
+    "intentScores": {
+      "invokeCorrectness": 76,
+      "toolSelectionAccuracy": 75,
+      "actionCorrectness": 71,
+      "overInvocationRate": 80,
+      "underInvocationRate": 0,
+      "overallIntentScore": 72
+    },
+    "scoreBreakdown": {
+      "toolScore": 94,
+      "reasoningScore": 86,
+      "ragScore": 62,
+      "bugDetectionScore": 0,
+      "architecturalScore": 8,
+      "navigationScore": 14,
+      "helicopterScore": 38,
+      "proactiveScore": 44,
+      "intentScore": 72,
+      "overallScore": 52
+    }
   },
   "role": "both",
   "contextLatency": {
@@ -387,21 +1807,46 @@
       262144
     ],
     "latencies": {
-      "2048": 751,
-      "4096": 757,
-      "8192": 864,
-      "16384": 750,
-      "32768": 735,
-      "65536": 5618,
-      "131072": 2113,
-      "262144": 2365
+      "2048": 806,
+      "4096": 796,
+      "8192": 813,
+      "16384": 878,
+      "32768": 783,
+      "65536": 994,
+      "131072": 2879,
+      "262144": 3390
     },
     "maxUsableContext": 262144,
     "recommendedContext": 262144,
     "modelMaxContext": 1024000,
-    "minLatency": 735,
+    "minLatency": 783,
     "isInteractiveSpeed": true,
     "speedRating": "good"
   },
-  "contextLength": 262144
+  "contextLength": 262144,
+  "scoreBreakdown": {
+    "toolScore": 87,
+    "ragScore": 86,
+    "failureModesScore": 64,
+    "statefulScore": 10,
+    "precedenceScore": 44,
+    "complianceScore": 19,
+    "avgLatencyMs": 807,
+    "latencyScore": 100
+  },
+  "discoveredNativeTools": [
+    "get_weather",
+    "send_email",
+    "open_browser"
+  ],
+  "unmappedNativeTools": [
+    "get_weather",
+    "send_email"
+  ],
+  "trainabilityScores": {
+    "systemPromptCompliance": 19,
+    "instructionPersistence": 10,
+    "correctionAcceptance": 64,
+    "overallTrainability": 28
+  }
 }

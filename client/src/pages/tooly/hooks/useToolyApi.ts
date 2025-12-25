@@ -40,7 +40,8 @@ interface UseToolyApiParams {
   setTryingTest: React.Dispatch<React.SetStateAction<boolean>>;
   setTestResult: React.Dispatch<React.SetStateAction<any | null>>;
   setSelectedTest: React.Dispatch<React.SetStateAction<any | null>>;
-  
+  setSandboxActive: React.Dispatch<React.SetStateAction<boolean>>;
+
   // State values
   providerFilter: ProviderFilter;
   models: DiscoveredModel[];
@@ -76,6 +77,11 @@ export interface ToolyApi {
   handleTryTest: (test: any) => Promise<void>;
   getMainModels: () => DiscoveredModel[];
   getExecutorModels: () => DiscoveredModel[];
+  // Sandbox (Phase 6)
+  enterSandbox: () => Promise<void>;
+  exitSandbox: () => Promise<void>;
+  fetchSandboxStatus: () => Promise<void>;
+  indexSandbox: () => Promise<void>;
 }
 
 export function useToolyApi(params: UseToolyApiParams): ToolyApi {
@@ -107,6 +113,7 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
     setTryingTest,
     setTestResult,
     setSelectedTest,
+    setSandboxActive,
     providerFilter,
     models,
     testMode,
@@ -147,7 +154,7 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
   // Save dual-model configuration
   const saveDualModelConfig = async () => {
     setModelValidationError('');
-    
+
     // Validation
     if (enableDualModel) {
       if (!mainModelId || !executorModelId) {
@@ -160,7 +167,7 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
         return;
       }
     }
-    
+
     setSavingDualModel(true);
     try {
       await fetch('/api/settings', {
@@ -182,15 +189,15 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
 
   // Get models suitable for main role
   const getMainModels = () => models.filter(m => m.role === 'main' || m.role === 'both');
-  
+
   // Get models suitable for executor role
   const getExecutorModels = () => models.filter(m => m.role === 'executor' || m.role === 'both');
-  
+
   // Set model as main and save
   const setAsMainModel = async (modelId: string) => {
     setMainModelId(modelId);
     setModelValidationError('');
-    
+
     // Auto-save
     setSavingDualModel(true);
     try {
@@ -210,13 +217,13 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
       setSavingDualModel(false);
     }
   };
-  
+
   // Set model as executor (auto-enables dual model) and save
   const setAsExecutorModel = async (modelId: string) => {
     setExecutorModelId(modelId);
     setEnableDualModel(true); // Auto-enable dual model
     setModelValidationError('');
-    
+
     // Auto-save
     setSavingDualModel(true);
     try {
@@ -261,17 +268,17 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
         fetch('/api/tooly/mcp/status'),
         fetch('/api/tooly/mcp/tools')
       ]);
-      
+
       if (statusRes.ok) {
         const status = await statusRes.json();
         setMcpStatus(status);
       }
-      
+
       if (toolsRes.ok) {
         const data = await toolsRes.json();
         // Handle nested structure: { tools: { tools: [...] } } or { tools: [...] }
-        const toolsArray = Array.isArray(data.tools) 
-          ? data.tools 
+        const toolsArray = Array.isArray(data.tools)
+          ? data.tools
           : (data.tools?.tools || []);
         // Extract tool names from the tool objects
         const toolNames = toolsArray.map((t: { name: string }) => t.name);
@@ -335,7 +342,7 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
       if (res.ok) {
         const data = await res.json();
         // Sort models alphabetically by display name
-        const sortedModels = (data.models || []).sort((a: DiscoveredModel, b: DiscoveredModel) => 
+        const sortedModels = (data.models || []).sort((a: DiscoveredModel, b: DiscoveredModel) =>
           a.displayName.localeCompare(b.displayName)
         );
         setModels(sortedModels);
@@ -377,32 +384,32 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
 
   const handleSaveTest = async (test: CustomTest) => {
     const method = test.id ? 'PUT' : 'POST';
-    const url = test.id 
+    const url = test.id
       ? `/api/tooly/custom-tests/${encodeURIComponent(test.id)}`
       : '/api/tooly/custom-tests';
-    
+
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(test),
     });
-    
+
     if (!res.ok) {
       const err = await res.json();
       throw new Error(err.error || 'Failed to save test');
     }
-    
+
     await fetchCustomTests();
   };
 
   const handleDeleteTest = async (testId: string) => {
     if (!confirm('Delete this test?')) return;
-    
+
     try {
       const res = await fetch(`/api/tooly/custom-tests/${encodeURIComponent(testId)}`, {
         method: 'DELETE',
       });
-      
+
       if (res.ok) {
         await fetchCustomTests();
         if (selectedTest?.id === testId) {
@@ -419,18 +426,18 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
       alert('Please select a main model first');
       return;
     }
-    
+
     setTryingTest(true);
     setTestResult(null);
     setSelectedTest(test);
-    
+
     try {
       const res = await fetch(`/api/tooly/custom-tests/${encodeURIComponent(test.id)}/try`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ modelId: mainModelId }),
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         setTestResult(data);
@@ -510,7 +517,7 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
       const res = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           provider: modelProvider || 'lmstudio',
           testMode: testMode
         })
@@ -532,7 +539,7 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
       const res = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/probe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           provider: modelProvider || 'lmstudio',
           runLatencyProfile
         })
@@ -573,6 +580,48 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
       console.error('Failed to rollback:', error);
     }
   };
+  // Sandbox API
+  const enterSandbox = async () => {
+    try {
+      const res = await fetch('/api/tooly/sandbox/enter', { method: 'POST' });
+      if (res.ok) {
+        setSandboxActive(true);
+      }
+    } catch (error) {
+      console.error('Failed to enter sandbox:', error);
+    }
+  };
+
+  const exitSandbox = async () => {
+    try {
+      const res = await fetch('/api/tooly/sandbox/exit', { method: 'POST' });
+      if (res.ok) {
+        setSandboxActive(false);
+      }
+    } catch (error) {
+      console.error('Failed to exit sandbox:', error);
+    }
+  };
+
+  const fetchSandboxStatus = async () => {
+    try {
+      const res = await fetch('/api/tooly/sandbox/status');
+      if (res.ok) {
+        const data = await res.json();
+        setSandboxActive(data.active);
+      }
+    } catch (error) {
+      console.error('Failed to fetch sandbox status:', error);
+    }
+  };
+
+  const indexSandbox = async () => {
+    try {
+      await fetch('/api/tooly/sandbox/index', { method: 'POST' });
+    } catch (error) {
+      console.error('Failed to index sandbox:', error);
+    }
+  };
 
   return {
     fetchSettings,
@@ -598,6 +647,9 @@ export function useToolyApi(params: UseToolyApiParams): ToolyApi {
     handleTryTest,
     getMainModels,
     getExecutorModels,
+    enterSandbox,
+    exitSandbox,
+    fetchSandboxStatus,
+    indexSandbox,
   };
 }
-
