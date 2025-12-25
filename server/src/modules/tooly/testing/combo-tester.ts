@@ -52,8 +52,12 @@ export interface ComboTestResult {
   executorCalled: boolean;
   executorToolCalls: string[];
   latencyMs: number;
+  mainLatencyMs?: number;      // Main model latency
+  executorLatencyMs?: number;  // Executor model latency
   error?: string;
   timedOut?: boolean;
+  mainTimedOut?: boolean;      // Main model specifically was too slow
+  executorTimedOut?: boolean;  // Executor model specifically was too slow
   skipped?: boolean;
 }
 
@@ -99,7 +103,9 @@ export interface ComboScore {
   testedAt: string;
   skippedTests?: number;
   timedOutTests?: number;
-  mainExcluded?: boolean;  // True if Main model was excluded due to timeout
+  mainExcluded?: boolean;   // True if Main model was excluded due to timeout
+  mainTimedOut?: boolean;   // True if Main model specifically was too slow
+  executorTimedOut?: boolean; // True if Executor model specifically was too slow
 }
 
 export interface ComboTestConfig {
@@ -432,18 +438,35 @@ export class ComboTester {
           const score = await this.testCombo(mainModel, executorModel, comboIndex, totalCombos);
           results.push(score);
           
-          // Check if Main model timed out - exclude from further testing
-          const hadTimeout = score.testResults?.some(r => r.timedOut) || false;
-          if (hadTimeout && !excludedMainModels.has(mainModel)) {
+          // Check if MAIN model specifically timed out - exclude from further testing
+          // Only exclude if Main was slow, NOT if Executor was slow
+          const mainWasSlow = score.testResults?.some(r => r.mainTimedOut) || false;
+          const executorWasSlow = score.testResults?.some(r => r.executorTimedOut && !r.mainTimedOut) || false;
+          
+          if (mainWasSlow && !excludedMainModels.has(mainModel)) {
             excludedMainModels.add(mainModel);
-            console.log(`[ComboTester] ⚠️ Main model ${mainModel} excluded from further tests (timeout detected)`);
+            console.log(`[ComboTester] ⚠️ Main model ${mainModel} excluded - too slow at generating intent (>5s)`);
             
-            // Broadcast exclusion
+            // Broadcast Main exclusion
             if (this.broadcast) {
               this.broadcast('combo_test_main_excluded', {
                 mainModelId: mainModel,
-                reason: 'timeout',
-                message: `Main model too slow (>5s), skipping remaining executor pairings`,
+                reason: 'main_timeout',
+                message: `Main model too slow (>5s for intent), skipping remaining executor pairings`,
+              });
+            }
+          }
+          
+          // Log if Executor was slow (but don't exclude - continue testing with other executors)
+          if (executorWasSlow) {
+            console.log(`[ComboTester] ℹ️ Executor ${executorModel} was slow with Main ${mainModel}, but continuing tests`);
+            
+            // Broadcast Executor slow warning
+            if (this.broadcast) {
+              this.broadcast('combo_test_executor_slow', {
+                mainModelId: mainModel,
+                executorModelId: executorModel,
+                message: `Executor slow (>5s for tools), but Main is fast - continuing with other executors`,
               });
             }
           }
@@ -692,6 +715,8 @@ export class ComboTester {
 
     const skippedCount = testResults.filter(r => r.skipped).length;
     const timedOutCount = testResults.filter(r => r.timedOut).length;
+    const mainTimedOutFlag = testResults.some(r => r.mainTimedOut);
+    const executorTimedOutFlag = testResults.some(r => r.executorTimedOut && !r.mainTimedOut);
 
     const score: ComboScore = {
       mainModelId,
@@ -714,6 +739,8 @@ export class ComboTester {
       testedAt: new Date().toISOString(),
       skippedTests: skippedCount,
       timedOutTests: timedOutCount,
+      mainTimedOut: mainTimedOutFlag,
+      executorTimedOut: executorTimedOutFlag,
     };
 
     // Log tier breakdown with split scores
@@ -724,11 +751,12 @@ export class ComboTester {
   }
 
   /**
-   * Run a single test case with timeout
+   * Run a single test case with per-model timeout tracking
    */
   private async runSingleTest(test: ComboTestCase, skipped: boolean = false): Promise<ComboTestResult> {
     const startTime = Date.now();
-    const taskTimeout = this.config.taskTimeout || 5000; // Default 5s timeout
+    const taskTimeout = this.config.taskTimeout || 5000; // Default 5s timeout per model
+    const totalTimeout = taskTimeout * 3; // Allow up to 3x for total (Main + Executor + overhead)
 
     // If skipped, return immediately
     if (skipped) {
@@ -758,9 +786,10 @@ export class ComboTester {
       // Get some basic tools for the executor
       const tools = this.getBasicTools();
 
-      // Route through dual-model with timeout
+      // Route through dual-model with a generous total timeout
+      // We'll check individual model latencies after completion
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('TIMEOUT')), taskTimeout);
+        setTimeout(() => reject(new Error('TIMEOUT')), totalTimeout);
       });
 
       const result = await Promise.race([
@@ -769,6 +798,14 @@ export class ComboTester {
       ]);
 
       const latency = Date.now() - startTime;
+      
+      // Extract individual model latencies from the routing result
+      const mainLatency = result.latency?.main || 0;
+      const executorLatency = result.latency?.executor || 0;
+      
+      // Check if individual models were too slow
+      const mainTimedOut = mainLatency > taskTimeout;
+      const executorTimedOut = executorLatency > taskTimeout;
 
       // Analyze the result
       const mainContent = result.mainResponse?.choices?.[0]?.message?.content || '';
@@ -780,6 +817,7 @@ export class ComboTester {
       const mainTool = intent?.tool || null;
 
       // Check if test passed based on category
+      // Note: If either model was too slow, we still record the result but flag the timeout
       let passed = false;
       
       if (test.expectedAction === 'call_tool') {
@@ -824,6 +862,11 @@ export class ComboTester {
         executorCalled: result.mode === 'dual' && !!result.executorResponse,
         executorToolCalls,
         latencyMs: latency,
+        mainLatencyMs: mainLatency,
+        executorLatencyMs: executorLatency,
+        mainTimedOut,
+        executorTimedOut,
+        timedOut: mainTimedOut || executorTimedOut,
       };
     } catch (err: any) {
       const latency = Date.now() - startTime;
@@ -843,6 +886,8 @@ export class ComboTester {
         latencyMs: latency,
         error: isTimeout ? 'Task timed out' : err.message,
         timedOut: isTimeout,
+        // On total timeout, we don't know which model was slow, assume Main
+        mainTimedOut: isTimeout,
       };
     }
   }

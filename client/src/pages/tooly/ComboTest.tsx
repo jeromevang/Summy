@@ -76,7 +76,9 @@ interface ComboScore {
   testedAt: string;
   skippedTests?: number;
   timedOutTests?: number;
-  mainExcluded?: boolean;  // True if Main model was excluded due to timeout
+  mainExcluded?: boolean;    // True if Main model was excluded due to timeout
+  mainTimedOut?: boolean;    // True if Main model specifically was too slow
+  executorTimedOut?: boolean; // True if Executor model specifically was too slow
 }
 
 // Category display info
@@ -468,6 +470,8 @@ export const ComboTest: React.FC = () => {
             <tbody>
               {results.map((result, index) => {
                 const isMainExcluded = result.mainExcluded === true;
+                const isMainSlow = result.mainTimedOut === true;
+                const isExecutorSlow = result.executorTimedOut === true && !isMainSlow;
                 const isSkipped = (result.overallScore === 0 && result.avgLatencyMs === 0) || isMainExcluded;
                 const isBest = index === 0 && result.overallScore > 0;
                 
@@ -482,7 +486,11 @@ export const ComboTest: React.FC = () => {
                       {isBest ? (
                         <span className="text-yellow-400 text-lg">🏆</span>
                       ) : isMainExcluded ? (
-                        <span className="text-red-500" title="Main model excluded (too slow)">🐌</span>
+                        <span className="text-red-500" title="Main model excluded (too slow at intent)">🐌</span>
+                      ) : isMainSlow ? (
+                        <span className="text-red-500" title="Main model slow (>5s for intent)">🐌</span>
+                      ) : isExecutorSlow ? (
+                        <span className="text-orange-400" title="Executor slow (>5s for tools) but Main OK">⏱️</span>
                       ) : isSkipped ? (
                         <span className="text-gray-500">-</span>
                       ) : (
@@ -494,17 +502,23 @@ export const ComboTest: React.FC = () => {
                       )}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`font-mono text-sm ${isMainExcluded ? 'text-red-400 line-through' : 'text-amber-300'}`}>
+                      <span className={`font-mono text-sm ${isMainExcluded || isMainSlow ? 'text-red-400 line-through' : 'text-amber-300'}`}>
                         {getModelName(result.mainModelId)}
                       </span>
                       {isMainExcluded && (
                         <span className="ml-2 text-xs text-red-400/60">excluded</span>
                       )}
+                      {isMainSlow && !isMainExcluded && (
+                        <span className="ml-2 text-xs text-red-400/60">slow</span>
+                      )}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className="text-orange-300 font-mono text-sm">
+                      <span className={`font-mono text-sm ${isExecutorSlow ? 'text-orange-400' : 'text-orange-300'}`}>
                         {getModelName(result.executorModelId)}
                       </span>
+                      {isExecutorSlow && (
+                        <span className="ml-2 text-xs text-orange-400/60">slow</span>
+                      )}
                     </td>
                     <td className="py-3 pr-4 text-center">
                       {isSkipped ? (
@@ -523,7 +537,11 @@ export const ComboTest: React.FC = () => {
                     </td>
                     <td className="py-3 pr-4 text-right">
                       {isMainExcluded ? (
-                        <span className="text-red-400 text-xs" title="Main model too slow, skipped">🐌 TOO SLOW</span>
+                        <span className="text-red-400 text-xs" title="Main model too slow, skipped remaining executors">🐌 MAIN SLOW</span>
+                      ) : isMainSlow ? (
+                        <span className="text-red-400 text-xs" title="Main model too slow (>5s for intent generation)">🐌 {result.overallScore}%</span>
+                      ) : isExecutorSlow ? (
+                        <span className="text-orange-400 text-sm" title="Executor slow (>5s for tools), Main was fast">⏱️ {result.overallScore}%</span>
                       ) : isSkipped ? (
                         <span className="text-red-400 text-sm">SKIP</span>
                       ) : (
