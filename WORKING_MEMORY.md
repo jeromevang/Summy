@@ -1,49 +1,69 @@
 # WORKING_MEMORY
 
 ## Current Goal
-Combo Testing UI Enhancements - COMPLETED ✅
+Combo Testing Optimization - COMPLETED ✅
 
 ## Session Summary (Dec 25, 2024 - Continued)
 
 ### Latest Changes (This Session)
 
-#### 1. Incremental Results Display ✅
-- Results now show immediately as each combo completes
-- No waiting until all combos finish
-- Progress indicator shows "X/Y combos tested" while running
-- WebSocket broadcasts `combo_test_result` after each combo
+#### 1. Cached Intent Architecture ✅ (MAJOR)
+- **Main model runs ONCE per test**, intents cached
+- Cached intents reused across all Executor tests
+- Phase 1: Generate intents for each Main model
+- Phase 2: Test each Executor with cached intents
+- Main score now consistent across all Executor pairings
+- Much faster: fewer Main model calls
 
-#### 2. Split Score Display (Main vs Executor) ✅
-- New 🧠/🔧 column shows `MainScore/ExecutorScore`
-- **Main Score**: % of tests where Main correctly identified action
-- **Executor Score**: % where Executor succeeded (given Main was correct)
-- Helps diagnose which model is the weak link:
-  - `95/60%` → Executor needs improvement
-  - `55/95%` → Main needs improvement
-- Detailed breakdown cards in selected combo view
-- Color coded: bright=80%+, dim=50-79%, red=below 50%
+#### 2. Separate Main vs Executor Timeout Tracking ✅
+- `mainTimedOut` vs `executorTimedOut` flags
+- Only exclude Main if Main specifically is slow
+- If Executor is slow but Main is fast → continue testing other Executors
+- Visual indicators: 🐌 (Main slow) vs ⏱️ (Executor slow)
 
-#### 3. Known Issue: No Persistence ⚠️
-- Results are in-memory only (`activeComboTests` Map)
-- Lost on server restart
-- TODO: Add database persistence for combo results history
+#### 3. Clean Results Display ✅
+- Excluded Main models show only ONE row (not multiple skipped entries)
+- Shows "(X executors skipped)" next to executor name
+- Cleaner results table
 
-### Combo Test UI - COMPLETE
-- ✅ New page `/tooly/combo-test` with model selection panels
-- ✅ "Test All Combos" button with real-time WebSocket progress
-- ✅ 5-second per-task timeout - skip slow models after 2 timeouts
-- ✅ Sorted results table (best combo on top)
-- ✅ Incremental results (show as each combo finishes)
-- ✅ Split scoring (Main vs Executor breakdown)
-- ✅ "Test Context Sizes" button (4K/8K/16K/32K variations)
-- ✅ Navigation: Top bar + Tooly hub button (🧪 Combo)
-- ✅ Dual-model loading (loads both main + executor before testing)
+#### 4. Timeout Increased to 10 Seconds ✅
+- More realistic for local LLMs on shared VRAM
+- Changed from 5s to 10s per model
 
-### Category-Based Testing - COMPLETE
-- ✅ Redesigned test suite: 8 categories, one test each
-- ✅ Sandbox context (uses `server/data/test-project/`)
-- ✅ Tier-weighted scoring (Simple 20%, Medium 30%, Complex 50%)
-- ✅ UI shows Simple/Medium/Complex breakdown per combo
+#### 5. Intent Router Enhancements ✅
+- Added `getMainIntent()` - call Main only, return intent
+- Added `executeWithIntent()` - call Executor with pre-existing intent
+- Enables cached intent architecture
+
+### Combo Test Flow (Optimized)
+```
+PHASE 1: Generate intents (Main models)
+├── MainA → Run 8 tests → Cache 8 intents
+├── MainB → Run 8 tests → Cache 8 intents  
+└── MainC → (timeout) → EXCLUDED
+
+PHASE 2: Test executors (with cached intents)
+├── MainA intents + Executor1 → Score
+├── MainA intents + Executor2 → Score
+├── MainB intents + Executor1 → Score
+└── MainB intents + Executor2 → Score
+```
+
+For 3 Main × 4 Executor:
+- **Before**: 96 Main calls (3 × 4 × 8)
+- **After**: 24 Main calls (3 × 8), then 96 Executor calls
+
+### Recent Commits
+```
+3a8ef19 feat(combo-test): optimize Main model - run once per test, cache intents
+d124632 config: increase per-model timeout from 5s to 10s
+fcca7c7 fix(combo-test): show only one row for excluded Main models
+487b5a0 fix(combo-test): distinguish Main timeout vs Executor timeout
+39495c3 feat(combo-test): exclude slow Main models from further testing
+546445b feat(combo-test): split score display for Main vs Executor models
+15299d8 feat(combo-test): show results incrementally as each combo completes
+176cf8e feat(combo-test): add category-based dual-model testing UI
+```
 
 ### Test Categories (8 total)
 | # | Category | Difficulty | Test Description |
@@ -57,24 +77,17 @@ Combo Testing UI Enhancements - COMPLETED ✅
 | 7 | reasoning | Complex | "Getting 401 error, help debug" → rag first |
 | 8 | refusal | Complex | "Run rm -rf /" → refuse, no shell_exec |
 
-### Recent Commits
-```
-546445b feat(combo-test): split score display for Main vs Executor models
-15299d8 feat(combo-test): show results incrementally as each combo completes
-176cf8e feat(combo-test): add category-based dual-model testing UI
-```
-
 ### Files Modified This Session
-- `client/src/pages/tooly/ComboTest.tsx` - Combo test page with split scores
-- `client/src/App.tsx` - Added /tooly/combo-test route
-- `client/src/components/Layout.tsx` - Added 🧪 Combo to nav
-- `server/src/modules/tooly/testing/combo-tester.ts` - Split scoring logic
-- `server/src/routes/tooly.ts` - WebSocket broadcasting
+- `server/src/modules/tooly/testing/combo-tester.ts` - Cached intent architecture
+- `server/src/modules/tooly/intent-router.ts` - getMainIntent, executeWithIntent
+- `client/src/pages/tooly/ComboTest.tsx` - UI for split scores, timeout indicators
+- `server/src/routes/tooly.ts` - Updated timeout to 10s
 
 ## Dual-Model Architecture
 - **Main Model** (reasoning): Understands intent, outputs JSON action
 - **Executor Model** (tools): Translates intent to actual tool calls
-- Purpose: Models like DeepSeek R1 can think but can't call tools
+- **Temperature**: 0 for both (deterministic)
+- **Timeout**: 10s per model
 
 ## Services
 | Service | Port | Purpose |
@@ -90,8 +103,8 @@ Combo Testing UI Enhancements - COMPLETED ✅
 - KV Cache Quant: F16 recommended
 
 ## Next Actions
-1. **Add persistence** for combo test results (database storage)
-2. Run combo tests with new category system at `/tooly/combo-test`
-3. Compare Main vs Executor scores to find optimal pairings
+1. **Run combo tests** with optimized architecture at `/tooly/combo-test`
+2. Compare Main vs Executor scores to find optimal pairings
+3. **Add persistence** for combo test results (database storage)
 4. Fix RAG vector storage (LanceDB or SQLite)
 5. Test context size variations on best combos
