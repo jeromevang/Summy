@@ -81,6 +81,12 @@ export interface ComboScore {
   categoryScores: CategoryScore[];
   tierScores: TierScore[];
   
+  // Split scores for Main vs Executor
+  mainScore: number;           // % of tests where Main correctly identified action
+  executorScore: number;       // % of tests where Executor succeeded (given Main was correct)
+  mainCorrectCount: number;    // Raw count for Main
+  executorSuccessCount: number; // Raw count for Executor
+  
   // Legacy compatibility
   intentAccuracy: number;
   executionSuccess: number;
@@ -397,6 +403,10 @@ export class ComboTester {
             passedTests: 0,
             categoryScores: [],
             tierScores: [],
+            mainScore: 0,
+            executorScore: 0,
+            mainCorrectCount: 0,
+            executorSuccessCount: 0,
             intentAccuracy: 0,
             executionSuccess: 0,
             avgLatencyMs: 0,
@@ -548,23 +558,63 @@ export class ComboTester {
       }, 0)
     );
 
-    // Legacy metrics for backwards compatibility
+    // Calculate split scores for Main vs Executor
     const validTests = testResults.filter(r => !r.skipped && !r.timedOut);
     const passedTests = validTests.filter(r => r.passed).length;
-    const intentCorrect = validTests.filter(r => {
+    
+    // Main Score: Did Main correctly identify the expected action?
+    const mainCorrectTests = validTests.filter(r => {
       const testCase = COMBO_TEST_CASES.find(t => t.id === r.testId);
-      return r.mainOutputValid && r.mainAction === testCase?.expectedAction;
-    }).length;
-    const executorSuccess = validTests.filter(r => r.executorCalled && r.executorToolCalls.length > 0).length;
-    const toolCallTests = validTests.filter(r => 
-      COMBO_TEST_CASES.find(t => t.id === r.testId)?.expectedAction === 'call_tool'
-    );
-
+      if (!testCase) return false;
+      
+      // For respond/ask_clarification, Main is correct if it didn't try to call tools
+      if (testCase.expectedAction === 'respond' || testCase.expectedAction === 'ask_clarification') {
+        return r.mainAction === 'respond' || r.mainAction === 'ask_clarification';
+      }
+      // For call_tool, Main is correct if it chose the right tool
+      if (testCase.expectedAction === 'call_tool') {
+        return r.mainAction === 'call_tool' && r.mainTool === testCase.expectedTool;
+      }
+      // For multi_step, Main is correct if it recognized need for tools
+      if (testCase.expectedAction === 'multi_step') {
+        return r.mainAction === 'call_tool' || r.mainAction === 'multi_step';
+      }
+      return false;
+    });
+    const mainCorrectCount = mainCorrectTests.length;
+    
+    // Executor Score: Of tests where Main was correct, did Executor succeed?
+    // Only count tests that required tool execution
+    const toolRequiredTests = mainCorrectTests.filter(r => {
+      const testCase = COMBO_TEST_CASES.find(t => t.id === r.testId);
+      return testCase?.expectedAction === 'call_tool' || testCase?.expectedAction === 'multi_step';
+    });
+    const executorSuccessTests = toolRequiredTests.filter(r => {
+      const testCase = COMBO_TEST_CASES.find(t => t.id === r.testId);
+      if (!testCase) return false;
+      
+      // Check if executor called the expected tool(s)
+      if (testCase.expectedTool) {
+        return r.executorToolCalls.includes(testCase.expectedTool);
+      }
+      if (testCase.expectedTools && testCase.expectedTools.length > 0) {
+        return testCase.expectedTools.some(t => r.executorToolCalls.includes(t));
+      }
+      return r.executorToolCalls.length > 0;
+    });
+    const executorSuccessCount = executorSuccessTests.length;
+    
+    // Calculate percentages
     const validTestCount = validTests.length;
+    const mainScore = validTestCount > 0 ? Math.round((mainCorrectCount / validTestCount) * 100) : 0;
+    const executorScore = toolRequiredTests.length > 0 
+      ? Math.round((executorSuccessCount / toolRequiredTests.length) * 100) 
+      : 100; // If no tools needed, Executor gets 100%
+    
+    // Legacy metrics for backwards compatibility
+    const intentCorrect = mainCorrectCount;
     const intentAccuracy = validTestCount > 0 ? (intentCorrect / validTestCount) * 100 : 0;
-    const executionSuccess = toolCallTests.length > 0 
-      ? (executorSuccess / toolCallTests.length) * 100 
-      : (validTestCount > 0 ? 100 : 0);
+    const executionSuccess = executorScore;
 
     const avgLatency = latencies.length > 0 
       ? latencies.reduce((a, b) => a + b, 0) / latencies.length 
@@ -580,6 +630,10 @@ export class ComboTester {
       passedTests,
       categoryScores,
       tierScores,
+      mainScore,
+      executorScore,
+      mainCorrectCount,
+      executorSuccessCount,
       intentAccuracy: Math.round(intentAccuracy),
       executionSuccess: Math.round(executionSuccess),
       avgLatencyMs: Math.round(avgLatency),
@@ -592,9 +646,9 @@ export class ComboTester {
       timedOutTests: timedOutCount,
     };
 
-    // Log tier breakdown
+    // Log tier breakdown with split scores
     const tierLog = tierScores.map(t => `${t.tier}: ${t.score}%`).join(', ');
-    console.log(`[ComboTester] Combo score: ${overallScore}% (${tierLog}, skipped: ${skippedCount}, timedOut: ${timedOutCount})`);
+    console.log(`[ComboTester] Combo: 🧠${mainScore}%/${executorScore}%🔧 overall=${overallScore}% (${tierLog})`);
 
     return score;
   }
