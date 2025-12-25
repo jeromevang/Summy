@@ -519,6 +519,9 @@ export const ComboTest: React.FC = () => {
                       {isExecutorSlow && (
                         <span className="ml-2 text-xs text-orange-400/60">slow</span>
                       )}
+                      {isMainExcluded && (
+                        <span className="ml-2 text-xs text-gray-500">(+ others skipped)</span>
+                      )}
                     </td>
                     <td className="py-3 pr-4 text-center">
                       {isSkipped ? (

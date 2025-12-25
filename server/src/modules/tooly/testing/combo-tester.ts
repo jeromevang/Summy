@@ -390,43 +390,21 @@ export class ComboTester {
         comboIndex++;
         
         // Skip if this Main model has been excluded due to timeout
+        // Don't add to results - the first combo that failed already shows the Main is slow
         if (excludedMainModels.has(mainModel)) {
           console.log(`[ComboTester] Skipping combo ${comboIndex}/${totalCombos}: ${mainModel} excluded (too slow)`);
           
-          const skippedScore: ComboScore = {
-            mainModelId: mainModel,
-            executorModelId: executorModel,
-            totalTests: COMBO_TEST_CASES.length,
-            passedTests: 0,
-            categoryScores: [],
-            tierScores: [],
-            mainScore: 0,
-            executorScore: 0,
-            mainCorrectCount: 0,
-            executorSuccessCount: 0,
-            intentAccuracy: 0,
-            executionSuccess: 0,
-            avgLatencyMs: 0,
-            minLatencyMs: 0,
-            maxLatencyMs: 0,
-            overallScore: 0,
-            testResults: [],
-            testedAt: new Date().toISOString(),
-            skippedTests: COMBO_TEST_CASES.length,
-            mainExcluded: true, // Mark as excluded due to slow Main
-          };
-          results.push(skippedScore);
-          
-          // Broadcast skipped combo
+          // Just broadcast progress without adding another result entry
           if (this.broadcast) {
-            const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
-            this.broadcast('combo_test_result', {
-              result: skippedScore,
-              allResults: sortedResults,
+            this.broadcast('combo_test_progress', {
+              currentMain: mainModel,
+              currentExecutor: executorModel,
+              currentTest: `Skipped (Main too slow)`,
               comboIndex,
               totalCombos,
-              isComplete: comboIndex === totalCombos,
-              mainExcluded: mainModel,
+              testIndex: 0,
+              totalTests: COMBO_TEST_CASES.length,
+              status: 'running',
             });
           }
           continue;
@@ -446,6 +424,9 @@ export class ComboTester {
           if (mainWasSlow && !excludedMainModels.has(mainModel)) {
             excludedMainModels.add(mainModel);
             console.log(`[ComboTester] ⚠️ Main model ${mainModel} excluded - too slow at generating intent (>5s)`);
+            
+            // Mark this result as the one that caused exclusion
+            score.mainExcluded = true;
             
             // Broadcast Main exclusion
             if (this.broadcast) {
