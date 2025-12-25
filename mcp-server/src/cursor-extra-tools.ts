@@ -636,6 +636,194 @@ server.registerTool("rag_index", {
 });
 
 // ============================================================
+// CODE-AWARE TOOLS (Symbols, Relationships, Dependencies)
+// ============================================================
+
+server.registerTool("find_symbol", {
+  description: "Find functions, classes, interfaces, or other symbols by name. Use this when you need to find a specific function or class definition.",
+  inputSchema: {
+    name: z.string().describe("Symbol name to search for (partial match)"),
+    type: z.enum(['function', 'class', 'interface', 'method', 'type', 'variable']).optional().describe("Filter by symbol type"),
+    exported: z.boolean().optional().describe("Only return exported/public symbols"),
+    limit: z.number().optional().describe("Maximum results (default: 10)")
+  }
+}, async ({ name, type, exported, limit = 10 }) => {
+  console.error(`[Symbols] find: ${name}`);
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/symbols/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: name, type, exported, limit })
+    });
+
+    if (!response.ok) {
+      return errorResult(`Symbol search failed: ${await response.text()}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.symbols || data.symbols.length === 0) {
+      return textResult(`No symbols found matching "${name}"`);
+    }
+
+    let output = `Found ${data.symbols.length} symbols:\n\n`;
+    for (const sym of data.symbols) {
+      output += `${sym.type} ${sym.name}`;
+      if (sym.isExported) output += ' (exported)';
+      output += `\n  File: ${sym.filePath}:${sym.startLine}-${sym.endLine}\n`;
+      if (sym.signature) output += `  Signature: ${sym.signature}\n`;
+      output += '\n';
+    }
+
+    return textResult(output);
+  } catch (err: any) {
+    if (err.message?.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running.");
+    }
+    return errorResult(`Symbol search error: ${err.message}`);
+  }
+});
+
+server.registerTool("get_callers", {
+  description: "Get all functions/methods that call a specific function. Useful for understanding code impact.",
+  inputSchema: {
+    symbolName: z.string().describe("Name of the function/method"),
+    filePath: z.string().optional().describe("Narrow to a specific file")
+  }
+}, async ({ symbolName, filePath }) => {
+  console.error(`[Symbols] callers: ${symbolName}`);
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/symbols/callers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symbolName, filePath })
+    });
+
+    if (!response.ok) {
+      return errorResult(`Get callers failed: ${await response.text()}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.callers || data.callers.length === 0) {
+      return textResult(`No callers found for "${symbolName}".`);
+    }
+
+    let output = `Functions calling "${symbolName}" (${data.callers.length}):\n\n`;
+    for (const caller of data.callers) {
+      output += `- ${caller.name} in ${caller.filePath}:${caller.startLine}\n`;
+    }
+
+    return textResult(output);
+  } catch (err: any) {
+    if (err.message?.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running.");
+    }
+    return errorResult(`Get callers error: ${err.message}`);
+  }
+});
+
+server.registerTool("get_file_interface", {
+  description: "Get the public interface of a file: what it exports, imports, and what depends on it.",
+  inputSchema: {
+    filePath: z.string().describe("Path to the file (relative to project root)")
+  }
+}, async ({ filePath }) => {
+  console.error(`[Files] interface: ${filePath}`);
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/files/interface`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filePath })
+    });
+
+    if (!response.ok) {
+      return errorResult(`Get interface failed: ${await response.text()}`);
+    }
+
+    const data = await response.json();
+    
+    let output = `Interface for ${filePath}:\n\n`;
+    
+    if (data.exports?.length > 0) {
+      output += `EXPORTS:\n`;
+      for (const exp of data.exports) {
+        output += `  ${exp.type} ${exp.name}${exp.signature ? `: ${exp.signature}` : ''}\n`;
+      }
+      output += '\n';
+    }
+    
+    if (data.imports?.length > 0) {
+      output += `IMPORTS:\n`;
+      for (const imp of data.imports) {
+        output += `  from "${imp.from}": ${imp.symbols.join(', ')}\n`;
+      }
+      output += '\n';
+    }
+    
+    if (data.dependents?.length > 0) {
+      output += `USED BY:\n`;
+      for (const dep of data.dependents.slice(0, 10)) {
+        output += `  - ${dep}\n`;
+      }
+    }
+
+    return textResult(output);
+  } catch (err: any) {
+    if (err.message?.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running.");
+    }
+    return errorResult(`Get interface error: ${err.message}`);
+  }
+});
+
+server.registerTool("get_dependencies", {
+  description: "Get what files a specific file imports, or what files depend on it.",
+  inputSchema: {
+    filePath: z.string().describe("Path to the file"),
+    direction: z.enum(['imports', 'importedBy', 'both']).optional().describe("Direction (default: both)")
+  }
+}, async ({ filePath, direction = 'both' }) => {
+  console.error(`[Files] deps: ${filePath}`);
+  try {
+    const response = await fetch(`${RAG_SERVER_URL}/api/rag/files/dependencies`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filePath, direction })
+    });
+
+    if (!response.ok) {
+      return errorResult(`Get dependencies failed: ${await response.text()}`);
+    }
+
+    const data = await response.json();
+    let output = `Dependencies for ${filePath}:\n\n`;
+    
+    if (data.imports?.length > 0) {
+      output += `IMPORTS:\n`;
+      for (const imp of data.imports) {
+        output += `  ${imp.isExternal ? '📦' : '📄'} ${imp.toFile}\n`;
+      }
+      output += '\n';
+    }
+    
+    if (data.dependents?.length > 0) {
+      output += `IMPORTED BY:\n`;
+      for (const dep of data.dependents) {
+        output += `  📄 ${dep.fromFile}\n`;
+      }
+    }
+
+    return textResult(output || 'No dependencies found.');
+  } catch (err: any) {
+    if (err.message?.includes('ECONNREFUSED')) {
+      return errorResult("RAG server is not running.");
+    }
+    return errorResult(`Get dependencies error: ${err.message}`);
+  }
+});
+
+// ============================================================
 // START SERVER
 // ============================================================
 
@@ -649,7 +837,8 @@ const tools = [
   'clipboard_read', 'clipboard_write',
   'json_validate', 'json_query',
   'env_get', 'datetime',
-  'rag_query', 'rag_status', 'rag_index'
+  'rag_query', 'rag_status', 'rag_index',
+  'find_symbol', 'get_callers', 'get_file_interface', 'get_dependencies'
 ];
 
 console.error(`[Extra Tools - Cursor] Tools: ${tools.length} (${tools.join(', ')})`);
