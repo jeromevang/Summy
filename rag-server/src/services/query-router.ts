@@ -8,6 +8,7 @@
 import { RAGConfig, EnrichedChunk, FileSummary } from '../config.js';
 import { generateHypotheticalCode, expandQuery } from './summarizer.js';
 import { findRelatedFiles, getDependencyChain } from './graph-builder.js';
+import { getRAGDatabase, CodeSymbol, FileDependency } from './database.js';
 
 export type SearchStrategy = 'code' | 'summary' | 'file' | 'graph' | 'hybrid';
 
@@ -269,5 +270,255 @@ export function buildQueryText(plan: QueryPlan): string {
   }
   
   return parts.join('');
+}
+
+// ============================================================
+// CODE-AWARE CONTEXT ENRICHMENT
+// ============================================================
+
+export interface EnrichedContext {
+  /** Related symbols (callers, callees, etc.) */
+  relatedSymbols: CodeSymbol[];
+  /** Files that depend on found files */
+  dependentFiles: string[];
+  /** Files that found files depend on */
+  dependencyFiles: string[];
+  /** Exported interface of found files */
+  exports: { file: string; symbols: CodeSymbol[] }[];
+  /** Formatted context string for model */
+  contextString: string;
+}
+
+/**
+ * Enrich search results with code-aware context
+ * This automatically adds related symbols, dependencies, and interfaces
+ */
+export function enrichWithCodeContext(
+  foundChunks: EnrichedChunk[],
+  options: {
+    includeCallers?: boolean;
+    includeCallees?: boolean;
+    includeDependencies?: boolean;
+    includeDependents?: boolean;
+    includeExports?: boolean;
+    maxRelated?: number;
+  } = {}
+): EnrichedContext {
+  const {
+    includeCallers = true,
+    includeCallees = true,
+    includeDependencies = true,
+    includeDependents = true,
+    includeExports = true,
+    maxRelated = 5
+  } = options;
+
+  const ragDb = getRAGDatabase();
+  const relatedSymbols: CodeSymbol[] = [];
+  const dependentFiles = new Set<string>();
+  const dependencyFiles = new Set<string>();
+  const exports: { file: string; symbols: CodeSymbol[] }[] = [];
+  const seenSymbols = new Set<string>();
+  const foundFiles = new Set<string>();
+
+  // Collect unique files from chunks
+  for (const chunk of foundChunks) {
+    foundFiles.add(chunk.filePath);
+  }
+
+  // For each found chunk, gather related context
+  for (const chunk of foundChunks) {
+    // Get symbol for this chunk if it has a name
+    if (chunk.name && chunk.type) {
+      const symbolId = `${chunk.filePath}:${chunk.name}:${chunk.startLine}`;
+      
+      if (includeCallers || includeCallees) {
+        const callGraph = ragDb.getCallGraph(symbolId);
+        
+        if (includeCallers) {
+          for (const caller of callGraph.callers.slice(0, maxRelated)) {
+            if (!seenSymbols.has(caller.id)) {
+              seenSymbols.add(caller.id);
+              relatedSymbols.push(caller);
+            }
+          }
+        }
+        
+        if (includeCallees) {
+          for (const callee of callGraph.callees.slice(0, maxRelated)) {
+            if (!seenSymbols.has(callee.id)) {
+              seenSymbols.add(callee.id);
+              relatedSymbols.push(callee);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Get file-level dependencies
+  for (const filePath of foundFiles) {
+    if (includeDependencies) {
+      const deps = ragDb.getFileDependencies(filePath);
+      for (const dep of deps.slice(0, maxRelated)) {
+        if (!dep.isExternal && !foundFiles.has(dep.toFile)) {
+          dependencyFiles.add(dep.toFile);
+        }
+      }
+    }
+
+    if (includeDependents) {
+      const dependents = ragDb.getFileDependents(filePath);
+      for (const dep of dependents.slice(0, maxRelated)) {
+        if (!foundFiles.has(dep.fromFile)) {
+          dependentFiles.add(dep.fromFile);
+        }
+      }
+    }
+
+    if (includeExports) {
+      const exportedSymbols = ragDb.getExportedSymbols(filePath);
+      if (exportedSymbols.length > 0) {
+        exports.push({ file: filePath, symbols: exportedSymbols });
+      }
+    }
+  }
+
+  // Build context string for model
+  const contextString = formatCodeContext({
+    relatedSymbols: relatedSymbols.slice(0, maxRelated * 2),
+    dependentFiles: Array.from(dependentFiles).slice(0, maxRelated),
+    dependencyFiles: Array.from(dependencyFiles).slice(0, maxRelated),
+    exports
+  });
+
+  return {
+    relatedSymbols: relatedSymbols.slice(0, maxRelated * 2),
+    dependentFiles: Array.from(dependentFiles).slice(0, maxRelated),
+    dependencyFiles: Array.from(dependencyFiles).slice(0, maxRelated),
+    exports,
+    contextString
+  };
+}
+
+/**
+ * Format code context into a string for model consumption
+ */
+function formatCodeContext(context: {
+  relatedSymbols: CodeSymbol[];
+  dependentFiles: string[];
+  dependencyFiles: string[];
+  exports: { file: string; symbols: CodeSymbol[] }[];
+}): string {
+  const parts: string[] = [];
+
+  // Related symbols
+  if (context.relatedSymbols.length > 0) {
+    parts.push('## Related Functions/Classes');
+    for (const sym of context.relatedSymbols) {
+      const sig = sym.signature || `${sym.type} ${sym.name}`;
+      parts.push(`- \`${sym.filePath}\`: ${sig}`);
+    }
+    parts.push('');
+  }
+
+  // Dependencies
+  if (context.dependencyFiles.length > 0) {
+    parts.push('## Imports from');
+    for (const file of context.dependencyFiles) {
+      parts.push(`- ${file}`);
+    }
+    parts.push('');
+  }
+
+  // Dependents
+  if (context.dependentFiles.length > 0) {
+    parts.push('## Used by');
+    for (const file of context.dependentFiles) {
+      parts.push(`- ${file}`);
+    }
+    parts.push('');
+  }
+
+  // Exports
+  if (context.exports.length > 0) {
+    parts.push('## Exported Interface');
+    for (const { file, symbols } of context.exports) {
+      parts.push(`### ${file}`);
+      for (const sym of symbols.slice(0, 5)) {
+        const sig = sym.signature || `${sym.type} ${sym.name}`;
+        parts.push(`- ${sig}`);
+      }
+    }
+    parts.push('');
+  }
+
+  return parts.join('\n');
+}
+
+/**
+ * Search for symbols by name (for explicit symbol queries)
+ */
+export function searchSymbols(
+  query: string,
+  options?: {
+    type?: 'function' | 'class' | 'interface' | 'method';
+    exported?: boolean;
+    limit?: number;
+  }
+): CodeSymbol[] {
+  const ragDb = getRAGDatabase();
+  return ragDb.searchSymbols(query, {
+    type: options?.type,
+    exported: options?.exported,
+    limit: options?.limit || 10
+  });
+}
+
+/**
+ * Get the full interface of a file (exports + imports)
+ */
+export function getFileInterface(filePath: string): {
+  exports: CodeSymbol[];
+  imports: { from: string; symbols: string[] }[];
+  dependents: string[];
+} {
+  const ragDb = getRAGDatabase();
+  const fileInterface = ragDb.getFileInterface(filePath);
+  const dependents = ragDb.getFileDependents(filePath).map(d => d.fromFile);
+  
+  return {
+    ...fileInterface,
+    dependents
+  };
+}
+
+/**
+ * Get call graph for a function/method
+ */
+export function getCallGraph(symbolName: string, filePath?: string): {
+  symbol: CodeSymbol | null;
+  callers: CodeSymbol[];
+  callees: CodeSymbol[];
+} {
+  const ragDb = getRAGDatabase();
+  
+  // Find the symbol
+  const symbols = ragDb.searchSymbols(symbolName, { limit: 10 });
+  let targetSymbol = symbols[0] || null;
+  
+  // If filePath provided, filter to that file
+  if (filePath && symbols.length > 0) {
+    const filtered = symbols.find(s => s.filePath === filePath || s.filePath.includes(filePath));
+    if (filtered) targetSymbol = filtered;
+  }
+  
+  if (!targetSymbol) {
+    return { symbol: null, callers: [], callees: [] };
+  }
+  
+  const { callers, callees } = ragDb.getCallGraph(targetSymbol.id);
+  
+  return { symbol: targetSymbol, callers, callees };
 }
 

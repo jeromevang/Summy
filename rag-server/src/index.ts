@@ -766,6 +766,127 @@ app.get('/api/rag/hierarchical/status', async (req: Request, res: Response) => {
   }
 });
 
+// =============================================================================
+// CODE-AWARE ENDPOINTS (Symbols, Relationships, Dependencies)
+// =============================================================================
+
+// Search for symbols by name
+app.post('/api/rag/symbols/search', async (req: Request, res: Response) => {
+  try {
+    const { query, type, exported, limit = 10 } = req.body;
+    
+    if (!query) {
+      return res.status(400).json({ error: 'query is required' });
+    }
+    
+    const ragDb = getRAGDatabase(config.storage.dataPath);
+    const symbols = ragDb.searchSymbols(query, { type, exported, limit });
+    
+    res.json({ symbols, count: symbols.length });
+  } catch (error: any) {
+    console.error('[Symbols] Search error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get callers of a function/method
+app.post('/api/rag/symbols/callers', async (req: Request, res: Response) => {
+  try {
+    const { symbolName, filePath } = req.body;
+    
+    if (!symbolName) {
+      return res.status(400).json({ error: 'symbolName is required' });
+    }
+    
+    const ragDb = getRAGDatabase(config.storage.dataPath);
+    
+    // Find the symbol
+    const symbols = ragDb.searchSymbols(symbolName, { limit: 10 });
+    let targetSymbol = symbols[0] || null;
+    
+    // If filePath provided, filter to that file
+    if (filePath && symbols.length > 0) {
+      const filtered = symbols.find(s => s.filePath === filePath || s.filePath.includes(filePath));
+      if (filtered) targetSymbol = filtered;
+    }
+    
+    if (!targetSymbol) {
+      return res.json({ symbol: null, callers: [], callees: [] });
+    }
+    
+    const { callers, callees } = ragDb.getCallGraph(targetSymbol.id);
+    
+    res.json({ symbol: targetSymbol, callers, callees });
+  } catch (error: any) {
+    console.error('[Symbols] Callers error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get file interface (exports, imports, dependents)
+app.post('/api/rag/files/interface', async (req: Request, res: Response) => {
+  try {
+    const { filePath } = req.body;
+    
+    if (!filePath) {
+      return res.status(400).json({ error: 'filePath is required' });
+    }
+    
+    const ragDb = getRAGDatabase(config.storage.dataPath);
+    const fileInterface = ragDb.getFileInterface(filePath);
+    const dependents = ragDb.getFileDependents(filePath).map(d => d.fromFile);
+    
+    res.json({
+      ...fileInterface,
+      dependents
+    });
+  } catch (error: any) {
+    console.error('[Files] Interface error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get file dependencies
+app.post('/api/rag/files/dependencies', async (req: Request, res: Response) => {
+  try {
+    const { filePath, direction = 'both' } = req.body;
+    
+    if (!filePath) {
+      return res.status(400).json({ error: 'filePath is required' });
+    }
+    
+    const ragDb = getRAGDatabase(config.storage.dataPath);
+    
+    let imports: any[] = [];
+    let dependents: any[] = [];
+    
+    if (direction === 'imports' || direction === 'both') {
+      imports = ragDb.getFileDependencies(filePath);
+    }
+    
+    if (direction === 'importedBy' || direction === 'both') {
+      dependents = ragDb.getFileDependents(filePath);
+    }
+    
+    res.json({ imports, dependents });
+  } catch (error: any) {
+    console.error('[Files] Dependencies error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get code statistics
+app.get('/api/rag/code/stats', async (req: Request, res: Response) => {
+  try {
+    const ragDb = getRAGDatabase(config.storage.dataPath);
+    const stats = ragDb.getCodeStats();
+    res.json(stats);
+  } catch (error: any) {
+    console.error('[Code] Stats error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error('[RAG Server Error]', err);
