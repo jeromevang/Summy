@@ -376,13 +376,27 @@ export class ComboTester {
         try {
           const score = await this.testCombo(mainModel, executorModel, comboIndex, totalCombos);
           results.push(score);
+          
+          // Broadcast combo result immediately after each combo completes
+          if (this.broadcast) {
+            const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
+            this.broadcast('combo_test_result', {
+              result: score,
+              allResults: sortedResults,
+              comboIndex,
+              totalCombos,
+              isComplete: comboIndex === totalCombos,
+            });
+          }
         } catch (err: any) {
           console.error(`[ComboTester] Combo failed: ${err.message}`);
-          results.push({
+          const failedScore: ComboScore = {
             mainModelId: mainModel,
             executorModelId: executorModel,
             totalTests: COMBO_TEST_CASES.length,
             passedTests: 0,
+            categoryScores: [],
+            tierScores: [],
             intentAccuracy: 0,
             executionSuccess: 0,
             avgLatencyMs: 0,
@@ -391,7 +405,20 @@ export class ComboTester {
             overallScore: 0,
             testResults: [],
             testedAt: new Date().toISOString(),
-          });
+          };
+          results.push(failedScore);
+          
+          // Broadcast failed combo result too
+          if (this.broadcast) {
+            const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
+            this.broadcast('combo_test_result', {
+              result: failedScore,
+              allResults: sortedResults,
+              comboIndex,
+              totalCombos,
+              isComplete: comboIndex === totalCombos,
+            });
+          }
         }
       }
     }

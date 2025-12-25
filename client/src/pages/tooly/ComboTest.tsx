@@ -149,8 +149,19 @@ export const ComboTest: React.FC = () => {
           setProgress(message.data);
           
           if (message.data.status === 'completed') {
-            // Fetch final results
-            fetchTestResults();
+            setIsRunning(false);
+          }
+        }
+        
+        // Handle incremental combo results
+        if (message.type === 'combo_test_result') {
+          console.log('[ComboTest] Combo Result:', message.data);
+          // Update results with the sorted list from server
+          setResults(message.data.allResults || []);
+          
+          if (message.data.isComplete) {
+            setIsRunning(false);
+            setProgress(null);
           }
         }
       } catch (e) {
@@ -180,10 +191,6 @@ export const ComboTest: React.FC = () => {
     }
   };
 
-  const fetchTestResults = async () => {
-    // Poll for results if we have a test running
-    // This is a fallback - WebSocket should handle most updates
-  };
 
   // Toggle model selection
   const toggleMainModel = (modelId: string) => {
@@ -247,27 +254,7 @@ export const ComboTest: React.FC = () => {
       
       const data = await response.json();
       console.log('[ComboTest] Started test:', data.testId);
-
-      // Poll for results
-      const pollForResults = async () => {
-        const statusRes = await fetch(`/api/tooly/combo-test/${data.testId}/status`);
-        if (statusRes.ok) {
-          const status = await statusRes.json();
-          if (status.status === 'completed' && status.results) {
-            setResults(status.results);
-            setIsRunning(false);
-          } else if (status.status === 'failed') {
-            setError(status.error || 'Test failed');
-            setIsRunning(false);
-          } else {
-            // Keep polling
-            setTimeout(pollForResults, 2000);
-          }
-        }
-      };
-
-      // Start polling after a short delay
-      setTimeout(pollForResults, 3000);
+      // Results will come via WebSocket 'combo_test_result' events
 
     } catch (err: any) {
       setError(err.message);
@@ -387,10 +374,28 @@ export const ComboTest: React.FC = () => {
   const renderResults = () => {
     if (results.length === 0) return null;
 
+    // Calculate how many combos are done
+    const completedCombos = results.length;
+    const totalCombosExpected = selectedMainModels.size * selectedExecutorModels.size;
+    const stillRunning = isRunning && completedCombos < totalCombosExpected;
+
     return (
       <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-white">Results</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-white">Results</h2>
+            {stillRunning && (
+              <span className="flex items-center gap-2 text-amber-400 text-sm">
+                <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+                {completedCombos}/{totalCombosExpected} combos tested
+              </span>
+            )}
+            {!stillRunning && results.length > 0 && (
+              <span className="text-gray-500 text-sm">
+                {results.length} combo{results.length !== 1 ? 's' : ''} tested
+              </span>
+            )}
+          </div>
           <button
             onClick={() => {
               const csv = [
