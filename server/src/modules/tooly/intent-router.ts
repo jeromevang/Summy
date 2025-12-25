@@ -479,6 +479,87 @@ IMPORTANT:
   getConfig(): RouterConfig | null {
     return this.config;
   }
+
+  /**
+   * Call Main model only to get intent (without calling Executor)
+   * Useful for caching intents across multiple Executor tests
+   */
+  async getMainIntent(
+    messages: any[],
+    timeout?: number
+  ): Promise<{ intent: IntentSchema; mainResponse: any; latencyMs: number }> {
+    if (!this.config) {
+      throw new Error('IntentRouter not configured');
+    }
+
+    const mainStartTime = Date.now();
+    const mainSystemPrompt = this.buildMainModelPrompt();
+    const mainMessages = [
+      { role: 'system', content: mainSystemPrompt },
+      ...messages
+    ];
+
+    const mainTimeout = timeout || Math.min(this.config.timeout, 30000);
+    const mainResponse = await this.callModel(
+      this.config.mainModelId!,
+      mainMessages,
+      undefined, // No tools for main model
+      mainTimeout
+    );
+
+    const latencyMs = Date.now() - mainStartTime;
+    const intent = this.parseIntent(mainResponse);
+
+    return { intent, mainResponse, latencyMs };
+  }
+
+  /**
+   * Call Executor model with a pre-existing intent
+   * Useful for testing multiple Executors with the same cached intent
+   */
+  async executeWithIntent(
+    intent: IntentSchema,
+    tools?: any[],
+    timeout?: number
+  ): Promise<{ executorResponse: any; toolCalls: any[]; latencyMs: number }> {
+    if (!this.config) {
+      throw new Error('IntentRouter not configured');
+    }
+
+    // If no tool call needed, return empty result
+    if (intent.action === 'respond' || intent.action === 'ask_clarification') {
+      return { executorResponse: null, toolCalls: [], latencyMs: 0 };
+    }
+
+    const executorStartTime = Date.now();
+
+    // Use tools passed in, or from executor profile
+    const enabledTools = this.executorProfile?.enabledTools?.length 
+      ? this.executorProfile.enabledTools 
+      : (tools?.map(t => t.function?.name).filter(Boolean) as string[]) || [];
+    
+    const executorTools = tools && tools.length > 0 
+      ? tools 
+      : getToolSchemas(enabledTools);
+
+    const executorSystemPrompt = this.buildExecutorModelPrompt(enabledTools);
+    const executorMessages = [
+      { role: 'system', content: executorSystemPrompt },
+      { role: 'user', content: `Execute this intent:\n${JSON.stringify(intent, null, 2)}` }
+    ];
+
+    const executorResponse = await this.callModel(
+      this.config.executorModelId!,
+      executorMessages,
+      executorTools,
+      timeout || this.config.timeout
+    );
+
+    const latencyMs = Date.now() - executorStartTime;
+    const toolCalls = executorResponse?.choices?.[0]?.message?.tool_calls || [];
+
+    return { executorResponse, toolCalls, latencyMs };
+  }
 }
 
 // Export singleton
