@@ -76,6 +76,7 @@ interface ComboScore {
   testedAt: string;
   skippedTests?: number;
   timedOutTests?: number;
+  mainExcluded?: boolean;  // True if Main model was excluded due to timeout
 }
 
 // Category display info
@@ -141,6 +142,9 @@ export const ComboTest: React.FC = () => {
   const [selectedCombo, setSelectedCombo] = useState<{ main: string; executor: string } | null>(null);
   const [isTestingContext, setIsTestingContext] = useState(false);
   const [contextResults, setContextResults] = useState<ContextSizeResult[]>([]);
+  
+  // Track excluded Main models
+  const [excludedMainModels, setExcludedMainModels] = useState<Set<string>>(new Set());
 
   // WebSocket for real-time progress
   useEffect(() => {
@@ -169,6 +173,12 @@ export const ComboTest: React.FC = () => {
             setIsRunning(false);
             setProgress(null);
           }
+        }
+        
+        // Handle Main model exclusion notification
+        if (message.type === 'combo_test_main_excluded') {
+          console.log('[ComboTest] Main model excluded:', message.data);
+          setExcludedMainModels(prev => new Set([...prev, message.data.mainModelId]));
         }
       } catch (e) {
         // Ignore parse errors
@@ -245,6 +255,7 @@ export const ComboTest: React.FC = () => {
     setError(null);
     setResults([]);
     setProgress(null);
+    setExcludedMainModels(new Set());
 
     try {
       const response = await fetch('/api/tooly/combo-test/run', {
@@ -399,6 +410,11 @@ export const ComboTest: React.FC = () => {
             {!stillRunning && results.length > 0 && (
               <span className="text-gray-500 text-sm">
                 {results.length} combo{results.length !== 1 ? 's' : ''} tested
+                {excludedMainModels.size > 0 && (
+                  <span className="text-red-400 ml-2">
+                    ({excludedMainModels.size} Main model{excludedMainModels.size !== 1 ? 's' : ''} excluded)
+                  </span>
+                )}
               </span>
             )}
           </div>
@@ -451,7 +467,8 @@ export const ComboTest: React.FC = () => {
             </thead>
             <tbody>
               {results.map((result, index) => {
-                const isSkipped = result.overallScore === 0 && result.avgLatencyMs === 0;
+                const isMainExcluded = result.mainExcluded === true;
+                const isSkipped = (result.overallScore === 0 && result.avgLatencyMs === 0) || isMainExcluded;
                 const isBest = index === 0 && result.overallScore > 0;
                 
                 return (
@@ -464,6 +481,8 @@ export const ComboTest: React.FC = () => {
                     <td className="py-3 pr-4">
                       {isBest ? (
                         <span className="text-yellow-400 text-lg">🏆</span>
+                      ) : isMainExcluded ? (
+                        <span className="text-red-500" title="Main model excluded (too slow)">🐌</span>
                       ) : isSkipped ? (
                         <span className="text-gray-500">-</span>
                       ) : (
@@ -475,9 +494,12 @@ export const ComboTest: React.FC = () => {
                       )}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className="text-amber-300 font-mono text-sm">
+                      <span className={`font-mono text-sm ${isMainExcluded ? 'text-red-400 line-through' : 'text-amber-300'}`}>
                         {getModelName(result.mainModelId)}
                       </span>
+                      {isMainExcluded && (
+                        <span className="ml-2 text-xs text-red-400/60">excluded</span>
+                      )}
                     </td>
                     <td className="py-3 pr-4">
                       <span className="text-orange-300 font-mono text-sm">
@@ -500,7 +522,9 @@ export const ComboTest: React.FC = () => {
                       )}
                     </td>
                     <td className="py-3 pr-4 text-right">
-                      {isSkipped ? (
+                      {isMainExcluded ? (
+                        <span className="text-red-400 text-xs" title="Main model too slow, skipped">🐌 TOO SLOW</span>
+                      ) : isSkipped ? (
                         <span className="text-red-400 text-sm">SKIP</span>
                       ) : (
                         <span className={`font-bold ${
