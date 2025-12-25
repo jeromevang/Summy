@@ -113,7 +113,7 @@ export interface ComboTestConfig {
   executorModels: string[];
   lmstudioUrl: string;
   timeout?: number;
-  taskTimeout?: number; // Per-task timeout (default 5000ms)
+  taskTimeout?: number; // Per-task timeout (default 10000ms)
   contextSize?: number; // Context window size for testing
 }
 
@@ -736,7 +736,7 @@ export class ComboTester {
    */
   private async runSingleTest(test: ComboTestCase, skipped: boolean = false): Promise<ComboTestResult> {
     const startTime = Date.now();
-    const taskTimeout = this.config.taskTimeout || 5000; // Default 5s timeout per model
+    const taskTimeout = this.config.taskTimeout || 10000; // Default 10s timeout per model
     const totalTimeout = taskTimeout * 3; // Allow up to 3x for total (Main + Executor + overhead)
 
     // If skipped, return immediately

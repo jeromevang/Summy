@@ -2643,7 +2643,7 @@ router.post('/combo-test/run', async (req, res) => {
       executorModels,
       lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
       timeout: 60000,
-      taskTimeout: 5000, // 5s per-task timeout
+      taskTimeout: 10000, // 10s per-task timeout
     }, broadcastFn);
 
     try {
@@ -2814,7 +2814,7 @@ router.post('/combo-test/context-sizes', async (req, res) => {
         executorModels: [executorModelId],
         lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
         timeout: 60000,
-        taskTimeout: 5000,
+        taskTimeout: 10000,
         contextSize, // Pass context size to tester
       });
 
