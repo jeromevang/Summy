@@ -99,6 +99,7 @@ export interface ComboScore {
   testedAt: string;
   skippedTests?: number;
   timedOutTests?: number;
+  mainExcluded?: boolean;  // True if Main model was excluded due to timeout
 }
 
 export interface ComboTestConfig {
@@ -368,20 +369,84 @@ export class ComboTester {
 
   /**
    * Test all combinations of main + executor models
+   * Excludes Main models that timeout (>5s) from further testing
    */
   async testAllCombos(): Promise<ComboScore[]> {
     const results: ComboScore[] = [];
     const totalCombos = this.config.mainModels.length * this.config.executorModels.length;
     let comboIndex = 0;
+    
+    // Track Main models that are too slow (had a timeout)
+    const excludedMainModels = new Set<string>();
 
     for (const mainModel of this.config.mainModels) {
       for (const executorModel of this.config.executorModels) {
         comboIndex++;
+        
+        // Skip if this Main model has been excluded due to timeout
+        if (excludedMainModels.has(mainModel)) {
+          console.log(`[ComboTester] Skipping combo ${comboIndex}/${totalCombos}: ${mainModel} excluded (too slow)`);
+          
+          const skippedScore: ComboScore = {
+            mainModelId: mainModel,
+            executorModelId: executorModel,
+            totalTests: COMBO_TEST_CASES.length,
+            passedTests: 0,
+            categoryScores: [],
+            tierScores: [],
+            mainScore: 0,
+            executorScore: 0,
+            mainCorrectCount: 0,
+            executorSuccessCount: 0,
+            intentAccuracy: 0,
+            executionSuccess: 0,
+            avgLatencyMs: 0,
+            minLatencyMs: 0,
+            maxLatencyMs: 0,
+            overallScore: 0,
+            testResults: [],
+            testedAt: new Date().toISOString(),
+            skippedTests: COMBO_TEST_CASES.length,
+            mainExcluded: true, // Mark as excluded due to slow Main
+          };
+          results.push(skippedScore);
+          
+          // Broadcast skipped combo
+          if (this.broadcast) {
+            const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
+            this.broadcast('combo_test_result', {
+              result: skippedScore,
+              allResults: sortedResults,
+              comboIndex,
+              totalCombos,
+              isComplete: comboIndex === totalCombos,
+              mainExcluded: mainModel,
+            });
+          }
+          continue;
+        }
+        
         console.log(`[ComboTester] Testing combo ${comboIndex}/${totalCombos}: ${mainModel} + ${executorModel}`);
 
         try {
           const score = await this.testCombo(mainModel, executorModel, comboIndex, totalCombos);
           results.push(score);
+          
+          // Check if Main model timed out - exclude from further testing
+          const hadTimeout = score.testResults?.some(r => r.timedOut) || false;
+          if (hadTimeout && !excludedMainModels.has(mainModel)) {
+            excludedMainModels.add(mainModel);
+            console.log(`[ComboTester] ⚠️ Main model ${mainModel} excluded from further tests (timeout detected)`);
+            
+            // Broadcast exclusion
+            if (this.broadcast) {
+              this.broadcast('combo_test_main_excluded', {
+                mainModelId: mainModel,
+                reason: 'timeout',
+                message: `Main model too slow (>5s), skipping remaining executor pairings`,
+              });
+            }
+          }
           
           // Broadcast combo result immediately after each combo completes
           if (this.broadcast) {
@@ -435,6 +500,11 @@ export class ComboTester {
 
     // Sort by overall score descending
     results.sort((a, b) => b.overallScore - a.overallScore);
+    
+    // Log excluded models
+    if (excludedMainModels.size > 0) {
+      console.log(`[ComboTester] Excluded Main models: ${Array.from(excludedMainModels).join(', ')}`);
+    }
 
     return results;
   }
