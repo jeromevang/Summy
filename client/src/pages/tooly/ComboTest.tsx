@@ -22,6 +22,8 @@ interface Model {
   displayName?: string;
   role?: 'main' | 'executor' | 'both';
   score?: number;
+  sizeBytes?: number;
+  quantization?: string;
 }
 
 interface ComboTestResult {
@@ -201,12 +203,29 @@ export const ComboTest: React.FC = () => {
       const response = await fetch('/api/tooly/models?provider=lmstudio');
       if (!response.ok) throw new Error('Failed to fetch models');
       const data = await response.json();
-      setModels(data.models || []);
+      // Sort models by size (smallest first)
+      const sortedModels = (data.models || []).sort((a: Model, b: Model) => {
+        const sizeA = a.sizeBytes || 0;
+        const sizeB = b.sizeBytes || 0;
+        return sizeA - sizeB;
+      });
+      setModels(sortedModels);
     } catch (err: any) {
       setError(err.message);
     } finally {
       setIsLoadingModels(false);
     }
+  };
+
+  // Format bytes to human-readable size
+  const formatSize = (bytes?: number): string => {
+    if (!bytes) return '?';
+    const gb = bytes / (1024 * 1024 * 1024);
+    if (gb >= 1) {
+      return `${gb.toFixed(1)}GB`;
+    }
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(0)}MB`;
   };
 
 
@@ -845,18 +864,23 @@ export const ComboTest: React.FC = () => {
                       onChange={() => toggleMainModel(model.id)}
                       className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-amber-500 focus:ring-amber-500"
                     />
-                    <span className="text-sm text-gray-200 truncate">
-                      {model.displayName || model.id}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-gray-200 truncate block">
+                        {model.displayName || model.id}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-500 font-mono whitespace-nowrap">
+                      {formatSize(model.sizeBytes)}
                     </span>
                     {model.role === 'main' && (
-                      <span className="ml-auto text-xs text-amber-400/60">main</span>
+                      <span className="text-xs text-amber-400/60">main</span>
                     )}
                   </label>
                 ))}
               </div>
             )}
             <div className="mt-3 text-sm text-gray-500">
-              {selectedMainModels.size} selected
+              {selectedMainModels.size} selected • sorted by size ↑
             </div>
           </div>
 
@@ -902,18 +926,23 @@ export const ComboTest: React.FC = () => {
                       onChange={() => toggleExecutorModel(model.id)}
                       className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-orange-500 focus:ring-orange-500"
                     />
-                    <span className="text-sm text-gray-200 truncate">
-                      {model.displayName || model.id}
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-gray-200 truncate block">
+                        {model.displayName || model.id}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-500 font-mono whitespace-nowrap">
+                      {formatSize(model.sizeBytes)}
                     </span>
                     {model.role === 'executor' && (
-                      <span className="ml-auto text-xs text-orange-400/60">executor</span>
+                      <span className="text-xs text-orange-400/60">executor</span>
                     )}
                   </label>
                 ))}
               </div>
             )}
             <div className="mt-3 text-sm text-gray-500">
-              {selectedExecutorModels.size} selected
+              {selectedExecutorModels.size} selected • sorted by size ↑
             </div>
           </div>
         </div>
