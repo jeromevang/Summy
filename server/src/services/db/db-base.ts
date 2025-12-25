@@ -274,6 +274,28 @@ CREATE TABLE IF NOT EXISTS ground_truth (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Combo Test Results (Main + Executor pairs)
+CREATE TABLE IF NOT EXISTS combo_test_results (
+  id TEXT PRIMARY KEY,
+  main_model_id TEXT NOT NULL,
+  executor_model_id TEXT NOT NULL,
+  overall_score REAL NOT NULL,
+  main_score REAL DEFAULT 0,
+  executor_score REAL DEFAULT 0,
+  tier_scores TEXT, -- JSON: { simple, medium, complex }
+  category_scores TEXT, -- JSON: CategoryScore[]
+  test_results TEXT, -- JSON: ComboTestResult[]
+  avg_latency_ms REAL DEFAULT 0,
+  passed_count INTEGER DEFAULT 0,
+  failed_count INTEGER DEFAULT 0,
+  main_excluded INTEGER DEFAULT 0,
+  tested_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(main_model_id, executor_model_id)
+);
+CREATE INDEX IF NOT EXISTS idx_combo_results_main ON combo_test_results(main_model_id);
+CREATE INDEX IF NOT EXISTS idx_combo_results_executor ON combo_test_results(executor_model_id);
+CREATE INDEX IF NOT EXISTS idx_combo_results_score ON combo_test_results(overall_score DESC);
 `;
 
 export class DBBase {
