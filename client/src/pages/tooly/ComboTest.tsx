@@ -60,6 +60,12 @@ interface ComboScore {
   passedTests: number;
   categoryScores?: CategoryScore[];
   tierScores?: TierScore[];
+  // Split scores
+  mainScore: number;           // % where Main correctly identified action
+  executorScore: number;       // % where Executor succeeded (given Main was correct)
+  mainCorrectCount?: number;
+  executorSuccessCount?: number;
+  // Legacy
   intentAccuracy: number;
   executionSuccess: number;
   avgLatencyMs: number;
@@ -399,14 +405,17 @@ export const ComboTest: React.FC = () => {
           <button
             onClick={() => {
               const csv = [
-                ['Rank', 'Main Model', 'Executor Model', 'Score', 'Intent', 'Execution', 'Avg Latency'],
+                ['Rank', 'Main Model', 'Executor Model', 'Main Score', 'Executor Score', 'Overall Score', 'Simple', 'Medium', 'Complex', 'Avg Latency'],
                 ...results.map((r, i) => [
                   i + 1,
                   r.mainModelId,
                   r.executorModelId,
+                  r.mainScore,
+                  r.executorScore,
                   r.overallScore,
-                  r.intentAccuracy,
-                  r.executionSuccess,
+                  r.tierScores?.find(t => t.tier === 'simple')?.score ?? 0,
+                  r.tierScores?.find(t => t.tier === 'medium')?.score ?? 0,
+                  r.tierScores?.find(t => t.tier === 'complex')?.score ?? 0,
                   r.avgLatencyMs
                 ])
               ].map(row => row.join(',')).join('\n');
@@ -431,6 +440,7 @@ export const ComboTest: React.FC = () => {
                 <th className="pb-3 pr-4">#</th>
                 <th className="pb-3 pr-4">Main Model</th>
                 <th className="pb-3 pr-4">Executor Model</th>
+                <th className="pb-3 pr-4 text-center" title="Main (Intent) / Executor (Tools)">🧠/🔧</th>
                 <th className="pb-3 pr-4 text-right">Score</th>
                 <th className="pb-3 pr-4 text-right text-green-400/70">Simple</th>
                 <th className="pb-3 pr-4 text-right text-yellow-400/70">Medium</th>
@@ -473,6 +483,21 @@ export const ComboTest: React.FC = () => {
                       <span className="text-orange-300 font-mono text-sm">
                         {getModelName(result.executorModelId)}
                       </span>
+                    </td>
+                    <td className="py-3 pr-4 text-center">
+                      {isSkipped ? (
+                        <span className="text-gray-500">-/-</span>
+                      ) : (
+                        <span className="font-mono text-sm" title={`Main: ${result.mainScore}% intent accuracy | Executor: ${result.executorScore}% tool success`}>
+                          <span className={result.mainScore >= 80 ? 'text-amber-400' : result.mainScore >= 50 ? 'text-amber-600' : 'text-red-400'}>
+                            {result.mainScore}
+                          </span>
+                          <span className="text-gray-500">/</span>
+                          <span className={result.executorScore >= 80 ? 'text-orange-400' : result.executorScore >= 50 ? 'text-orange-600' : 'text-red-400'}>
+                            {result.executorScore}
+                          </span>
+                        </span>
+                      )}
                     </td>
                     <td className="py-3 pr-4 text-right">
                       {isSkipped ? (
@@ -580,6 +605,37 @@ export const ComboTest: React.FC = () => {
                   {isTestingContext ? 'Testing...' : '📐 Test Context Sizes'}
                 </button>
               </div>
+
+              {/* Split Score Summary */}
+              {selectedResult && (
+                <div className="mb-6 grid grid-cols-2 gap-4">
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">🧠</span>
+                      <span className="text-amber-400 font-medium">Main Model (Intent)</span>
+                    </div>
+                    <div className="text-3xl font-bold text-white mb-1">
+                      {selectedResult.mainScore}%
+                    </div>
+                    <div className="text-gray-400 text-sm">
+                      {selectedResult.mainCorrectCount ?? '?'}/{selectedResult.totalTests - (selectedResult.skippedTests || 0) - (selectedResult.timedOutTests || 0)} correct routing decisions
+                    </div>
+                  </div>
+                  <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">🔧</span>
+                      <span className="text-orange-400 font-medium">Executor Model (Tools)</span>
+                    </div>
+                    <div className="text-3xl font-bold text-white mb-1">
+                      {selectedResult.executorScore}%
+                    </div>
+                    <div className="text-gray-400 text-sm">
+                      {selectedResult.executorSuccessCount ?? '?'} successful tool executions
+                      <span className="text-gray-500 text-xs block">(of tests where Main was correct)</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Category Scores Breakdown */}
               {selectedResult?.tierScores && (
