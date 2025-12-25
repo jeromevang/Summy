@@ -374,85 +374,183 @@ export class ComboTester {
   }
 
   /**
+   * Cached intent result from Main model
+   */
+  private cachedIntents: Map<string, Map<string, {
+    intent: any;
+    mainResponse: any;
+    latencyMs: number;
+    timedOut: boolean;
+    error?: string;
+  }>> = new Map();
+
+  /**
    * Test all combinations of main + executor models
-   * Excludes Main models that timeout (>5s) from further testing
+   * OPTIMIZED: Main model runs once per test, intents are cached
+   * Then each Executor is tested with the cached intents
    */
   async testAllCombos(): Promise<ComboScore[]> {
     const results: ComboScore[] = [];
     const totalCombos = this.config.mainModels.length * this.config.executorModels.length;
     let comboIndex = 0;
     
-    // Track Main models that are too slow (had a timeout)
+    // Track Main models that are too slow
     const excludedMainModels = new Set<string>();
+    this.cachedIntents.clear();
 
+    // PHASE 1: Generate intents for each Main model (once per test)
     for (const mainModel of this.config.mainModels) {
-      for (const executorModel of this.config.executorModels) {
-        comboIndex++;
+      console.log(`[ComboTester] Phase 1: Generating intents for Main: ${mainModel}`);
+      
+      // Broadcast progress
+      if (this.broadcast) {
+        this.broadcast('combo_test_progress', {
+          currentMain: mainModel,
+          currentExecutor: '(generating intents)',
+          currentTest: 'Loading Main model...',
+          comboIndex: 0,
+          totalCombos,
+          testIndex: 0,
+          totalTests: COMBO_TEST_CASES.length,
+          status: 'running',
+        });
+      }
+
+      // Load just the Main model for intent generation
+      await this.ensureMainModelLoaded(mainModel);
+
+      // Configure router for Main model only
+      await intentRouter.configure({
+        mainModelId: mainModel,
+        executorModelId: mainModel, // Placeholder, won't be used
+        enableDualModel: true,
+        timeout: this.config.timeout || 60000,
+        provider: 'lmstudio',
+        settings: { lmstudioUrl: this.config.lmstudioUrl },
+      });
+
+      // Generate intent for each test
+      const mainIntents = new Map<string, any>();
+      let mainTimedOut = false;
+      const taskTimeout = this.config.taskTimeout || 10000;
+
+      for (let i = 0; i < COMBO_TEST_CASES.length; i++) {
+        const test = COMBO_TEST_CASES[i];
         
-        // Skip if this Main model has been excluded due to timeout
-        // Don't add to results - the first combo that failed already shows the Main is slow
-        if (excludedMainModels.has(mainModel)) {
-          console.log(`[ComboTester] Skipping combo ${comboIndex}/${totalCombos}: ${mainModel} excluded (too slow)`);
-          
-          // Just broadcast progress without adding another result entry
-          if (this.broadcast) {
-            this.broadcast('combo_test_progress', {
-              currentMain: mainModel,
-              currentExecutor: executorModel,
-              currentTest: `Skipped (Main too slow)`,
-              comboIndex,
-              totalCombos,
-              testIndex: 0,
-              totalTests: COMBO_TEST_CASES.length,
-              status: 'running',
-            });
-          }
-          continue;
+        if (this.broadcast) {
+          this.broadcast('combo_test_progress', {
+            currentMain: mainModel,
+            currentExecutor: '(generating intents)',
+            currentTest: `Main: ${test.name}`,
+            comboIndex: 0,
+            totalCombos,
+            testIndex: i + 1,
+            totalTests: COMBO_TEST_CASES.length,
+            status: 'running',
+          });
         }
-        
-        console.log(`[ComboTester] Testing combo ${comboIndex}/${totalCombos}: ${mainModel} + ${executorModel}`);
 
         try {
-          const score = await this.testCombo(mainModel, executorModel, comboIndex, totalCombos);
+          const messages = [
+            { role: 'system', content: SANDBOX_CONTEXT },
+            { role: 'user', content: test.prompt },
+          ];
+
+          const startTime = Date.now();
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error('MAIN_TIMEOUT')), taskTimeout);
+          });
+
+          const result = await Promise.race([
+            intentRouter.getMainIntent(messages, taskTimeout),
+            timeoutPromise,
+          ]);
+
+          mainIntents.set(test.id, {
+            intent: result.intent,
+            mainResponse: result.mainResponse,
+            latencyMs: result.latencyMs,
+            timedOut: result.latencyMs > taskTimeout,
+            test,
+          });
+
+          // Check if Main is too slow
+          if (result.latencyMs > taskTimeout) {
+            mainTimedOut = true;
+          }
+
+        } catch (err: any) {
+          const isTimeout = err.message === 'MAIN_TIMEOUT';
+          mainIntents.set(test.id, {
+            intent: { action: 'respond' },
+            mainResponse: null,
+            latencyMs: taskTimeout,
+            timedOut: isTimeout,
+            error: err.message,
+            test,
+          });
+          if (isTimeout) {
+            mainTimedOut = true;
+          }
+        }
+      }
+
+      this.cachedIntents.set(mainModel, mainIntents);
+
+      // If Main timed out, mark as excluded
+      if (mainTimedOut) {
+        excludedMainModels.add(mainModel);
+        console.log(`[ComboTester] ⚠️ Main model ${mainModel} excluded - too slow at generating intent`);
+        
+        if (this.broadcast) {
+          this.broadcast('combo_test_main_excluded', {
+            mainModelId: mainModel,
+            reason: 'main_timeout',
+            message: `Main model too slow (>${taskTimeout/1000}s for intent), skipping all executor tests`,
+          });
+        }
+      }
+    }
+
+    // PHASE 2: Test each Executor with cached intents
+    for (const mainModel of this.config.mainModels) {
+      // Skip excluded Main models entirely
+      if (excludedMainModels.has(mainModel)) {
+        // Add one result showing Main was excluded
+        const excludedScore = this.createExcludedMainScore(mainModel, this.config.executorModels[0]);
+        results.push(excludedScore);
+        comboIndex += this.config.executorModels.length;
+        
+        if (this.broadcast) {
+          const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
+          this.broadcast('combo_test_result', {
+            result: excludedScore,
+            allResults: sortedResults,
+            comboIndex,
+            totalCombos,
+            isComplete: comboIndex >= totalCombos,
+          });
+        }
+        continue;
+      }
+
+      const mainIntents = this.cachedIntents.get(mainModel)!;
+
+      for (const executorModel of this.config.executorModels) {
+        comboIndex++;
+        console.log(`[ComboTester] Phase 2: Testing ${comboIndex}/${totalCombos}: ${mainModel} + ${executorModel}`);
+
+        try {
+          const score = await this.testExecutorWithCachedIntents(
+            mainModel, 
+            executorModel, 
+            mainIntents,
+            comboIndex, 
+            totalCombos
+          );
           results.push(score);
-          
-          // Check if MAIN model specifically timed out - exclude from further testing
-          // Only exclude if Main was slow, NOT if Executor was slow
-          const mainWasSlow = score.testResults?.some(r => r.mainTimedOut) || false;
-          const executorWasSlow = score.testResults?.some(r => r.executorTimedOut && !r.mainTimedOut) || false;
-          
-          if (mainWasSlow && !excludedMainModels.has(mainModel)) {
-            excludedMainModels.add(mainModel);
-            console.log(`[ComboTester] ⚠️ Main model ${mainModel} excluded - too slow at generating intent (>5s)`);
-            
-            // Mark this result as the one that caused exclusion
-            score.mainExcluded = true;
-            
-            // Broadcast Main exclusion
-            if (this.broadcast) {
-              this.broadcast('combo_test_main_excluded', {
-                mainModelId: mainModel,
-                reason: 'main_timeout',
-                message: `Main model too slow (>5s for intent), skipping remaining executor pairings`,
-              });
-            }
-          }
-          
-          // Log if Executor was slow (but don't exclude - continue testing with other executors)
-          if (executorWasSlow) {
-            console.log(`[ComboTester] ℹ️ Executor ${executorModel} was slow with Main ${mainModel}, but continuing tests`);
-            
-            // Broadcast Executor slow warning
-            if (this.broadcast) {
-              this.broadcast('combo_test_executor_slow', {
-                mainModelId: mainModel,
-                executorModelId: executorModel,
-                message: `Executor slow (>5s for tools), but Main is fast - continuing with other executors`,
-              });
-            }
-          }
-          
-          // Broadcast combo result immediately after each combo completes
+
+          // Broadcast result
           if (this.broadcast) {
             const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
             this.broadcast('combo_test_result', {
@@ -460,34 +558,14 @@ export class ComboTester {
               allResults: sortedResults,
               comboIndex,
               totalCombos,
-              isComplete: comboIndex === totalCombos,
+              isComplete: comboIndex >= totalCombos,
             });
           }
         } catch (err: any) {
           console.error(`[ComboTester] Combo failed: ${err.message}`);
-          const failedScore: ComboScore = {
-            mainModelId: mainModel,
-            executorModelId: executorModel,
-            totalTests: COMBO_TEST_CASES.length,
-            passedTests: 0,
-            categoryScores: [],
-            tierScores: [],
-            mainScore: 0,
-            executorScore: 0,
-            mainCorrectCount: 0,
-            executorSuccessCount: 0,
-            intentAccuracy: 0,
-            executionSuccess: 0,
-            avgLatencyMs: 0,
-            minLatencyMs: 0,
-            maxLatencyMs: 0,
-            overallScore: 0,
-            testResults: [],
-            testedAt: new Date().toISOString(),
-          };
+          const failedScore = this.createFailedScore(mainModel, executorModel);
           results.push(failedScore);
           
-          // Broadcast failed combo result too
           if (this.broadcast) {
             const sortedResults = [...results].sort((a, b) => b.overallScore - a.overallScore);
             this.broadcast('combo_test_result', {
@@ -495,22 +573,430 @@ export class ComboTester {
               allResults: sortedResults,
               comboIndex,
               totalCombos,
-              isComplete: comboIndex === totalCombos,
+              isComplete: comboIndex >= totalCombos,
             });
           }
         }
       }
     }
 
-    // Sort by overall score descending
     results.sort((a, b) => b.overallScore - a.overallScore);
     
-    // Log excluded models
     if (excludedMainModels.size > 0) {
       console.log(`[ComboTester] Excluded Main models: ${Array.from(excludedMainModels).join(', ')}`);
     }
 
     return results;
+  }
+
+  /**
+   * Create a score for an excluded Main model
+   */
+  private createExcludedMainScore(mainModelId: string, executorModelId: string): ComboScore {
+    return {
+      mainModelId,
+      executorModelId: `(${this.config.executorModels.length} executors skipped)`,
+      totalTests: COMBO_TEST_CASES.length,
+      passedTests: 0,
+      categoryScores: [],
+      tierScores: [],
+      mainScore: 0,
+      executorScore: 0,
+      mainCorrectCount: 0,
+      executorSuccessCount: 0,
+      intentAccuracy: 0,
+      executionSuccess: 0,
+      avgLatencyMs: 0,
+      minLatencyMs: 0,
+      maxLatencyMs: 0,
+      overallScore: 0,
+      testResults: [],
+      testedAt: new Date().toISOString(),
+      mainExcluded: true,
+      mainTimedOut: true,
+    };
+  }
+
+  /**
+   * Create a failed score
+   */
+  private createFailedScore(mainModelId: string, executorModelId: string): ComboScore {
+    return {
+      mainModelId,
+      executorModelId,
+      totalTests: COMBO_TEST_CASES.length,
+      passedTests: 0,
+      categoryScores: [],
+      tierScores: [],
+      mainScore: 0,
+      executorScore: 0,
+      mainCorrectCount: 0,
+      executorSuccessCount: 0,
+      intentAccuracy: 0,
+      executionSuccess: 0,
+      avgLatencyMs: 0,
+      minLatencyMs: 0,
+      maxLatencyMs: 0,
+      overallScore: 0,
+      testResults: [],
+      testedAt: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Load only the Main model (for intent generation phase)
+   */
+  private async ensureMainModelLoaded(mainModelId: string): Promise<void> {
+    const client = new LMStudioClient();
+    const contextSize = this.config.contextSize || 4096;
+
+    try {
+      const loadedModels = await client.llm.listLoaded();
+      const mainLoaded = loadedModels.some(m => 
+        m.identifier.includes(mainModelId) || mainModelId.includes(m.identifier)
+      );
+
+      if (mainLoaded) {
+        console.log(`[ComboTester] Main model already loaded: ${mainModelId}`);
+        return;
+      }
+
+      // Unload all models first
+      for (const model of loadedModels) {
+        try {
+          await client.llm.unload(model.identifier);
+        } catch {}
+      }
+
+      // Load Main model
+      console.log(`[ComboTester] Loading Main model: ${mainModelId}`);
+      wsBroadcast.broadcastModelLoading(mainModelId, 'loading', 'Loading Main model for intent generation');
+      
+      await client.llm.load(mainModelId, {
+        config: { contextLength: contextSize },
+      });
+      
+      wsBroadcast.broadcastModelLoading(mainModelId, 'loaded', 'Main model ready');
+    } catch (error: any) {
+      console.error(`[ComboTester] Failed to load Main model: ${error.message}`);
+    }
+  }
+
+  /**
+   * Load only the Executor model (for execution phase)
+   */
+  private async ensureExecutorModelLoaded(executorModelId: string): Promise<void> {
+    const client = new LMStudioClient();
+    const contextSize = this.config.contextSize || 4096;
+
+    try {
+      const loadedModels = await client.llm.listLoaded();
+      const executorLoaded = loadedModels.some(m => 
+        m.identifier.includes(executorModelId) || executorModelId.includes(m.identifier)
+      );
+
+      if (executorLoaded) {
+        console.log(`[ComboTester] Executor model already loaded: ${executorModelId}`);
+        return;
+      }
+
+      // Unload all models first
+      for (const model of loadedModels) {
+        try {
+          await client.llm.unload(model.identifier);
+        } catch {}
+      }
+
+      // Load Executor model
+      console.log(`[ComboTester] Loading Executor model: ${executorModelId}`);
+      wsBroadcast.broadcastModelLoading(executorModelId, 'loading', 'Loading Executor model for tool calls');
+      
+      await client.llm.load(executorModelId, {
+        config: { contextLength: contextSize },
+      });
+      
+      wsBroadcast.broadcastModelLoading(executorModelId, 'loaded', 'Executor model ready');
+    } catch (error: any) {
+      console.error(`[ComboTester] Failed to load Executor model: ${error.message}`);
+    }
+  }
+
+  /**
+   * Test Executor model with cached Main intents
+   */
+  private async testExecutorWithCachedIntents(
+    mainModelId: string,
+    executorModelId: string,
+    cachedIntents: Map<string, any>,
+    comboIndex: number,
+    totalCombos: number
+  ): Promise<ComboScore> {
+    const testResults: ComboTestResult[] = [];
+    const latencies: number[] = [];
+    const taskTimeout = this.config.taskTimeout || 10000;
+
+    // Load Executor model
+    if (this.broadcast) {
+      this.broadcast('combo_test_progress', {
+        currentMain: mainModelId,
+        currentExecutor: executorModelId,
+        currentTest: 'Loading Executor model...',
+        comboIndex,
+        totalCombos,
+        testIndex: 0,
+        totalTests: COMBO_TEST_CASES.length,
+        status: 'running',
+      });
+    }
+
+    await this.ensureExecutorModelLoaded(executorModelId);
+
+    // Configure router for Executor
+    await intentRouter.configure({
+      mainModelId: mainModelId,
+      executorModelId: executorModelId,
+      enableDualModel: true,
+      timeout: this.config.timeout || 60000,
+      provider: 'lmstudio',
+      settings: { lmstudioUrl: this.config.lmstudioUrl },
+    });
+
+    const tools = this.getBasicTools();
+
+    // Test each cached intent with this Executor
+    for (let i = 0; i < COMBO_TEST_CASES.length; i++) {
+      const test = COMBO_TEST_CASES[i];
+      const cached = cachedIntents.get(test.id);
+
+      if (this.broadcast) {
+        this.broadcast('combo_test_progress', {
+          currentMain: mainModelId,
+          currentExecutor: executorModelId,
+          currentTest: test.name,
+          comboIndex,
+          totalCombos,
+          testIndex: i + 1,
+          totalTests: COMBO_TEST_CASES.length,
+          status: 'running',
+        });
+      }
+
+      // Use cached Main result
+      const mainLatency = cached?.latencyMs || 0;
+      const mainTimedOut = cached?.timedOut || false;
+      const intent = cached?.intent || { action: 'respond' };
+      
+      // Determine main action and tool from cached intent
+      const mainAction = intent.action || null;
+      const mainTool = intent.tool || null;
+      const mainOutputValid = !!mainAction;
+
+      let executorLatency = 0;
+      let executorTimedOut = false;
+      let executorToolCalls: string[] = [];
+      let executorCalled = false;
+
+      // Only call Executor if Main requested a tool call
+      if (intent.action === 'call_tool' || intent.action === 'multi_step') {
+        try {
+          const startTime = Date.now();
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error('EXECUTOR_TIMEOUT')), taskTimeout);
+          });
+
+          const result = await Promise.race([
+            intentRouter.executeWithIntent(intent, tools, taskTimeout),
+            timeoutPromise,
+          ]);
+
+          executorLatency = result.latencyMs;
+          executorTimedOut = executorLatency > taskTimeout;
+          executorToolCalls = result.toolCalls?.map((tc: any) => tc.function?.name).filter(Boolean) || [];
+          executorCalled = true;
+
+        } catch (err: any) {
+          executorLatency = taskTimeout;
+          executorTimedOut = err.message === 'EXECUTOR_TIMEOUT';
+          executorCalled = true;
+        }
+      }
+
+      // Evaluate pass/fail
+      const passed = this.evaluateTestResult(test, mainAction, mainTool, executorToolCalls);
+
+      testResults.push({
+        testId: test.id,
+        testName: test.name,
+        category: test.category,
+        difficulty: test.difficulty,
+        passed,
+        mainOutputValid,
+        mainAction,
+        mainTool,
+        executorCalled,
+        executorToolCalls,
+        latencyMs: mainLatency + executorLatency,
+        mainLatencyMs: mainLatency,
+        executorLatencyMs: executorLatency,
+        mainTimedOut,
+        executorTimedOut,
+        timedOut: mainTimedOut || executorTimedOut,
+      });
+
+      if (!mainTimedOut && !executorTimedOut) {
+        latencies.push(mainLatency + executorLatency);
+      }
+    }
+
+    // Calculate scores (same as before)
+    return this.calculateComboScore(mainModelId, executorModelId, testResults, latencies);
+  }
+
+  /**
+   * Evaluate if a test passed
+   */
+  private evaluateTestResult(
+    test: ComboTestCase,
+    mainAction: string | null,
+    mainTool: string | null,
+    executorToolCalls: string[]
+  ): boolean {
+    if (test.expectedAction === 'call_tool') {
+      return mainAction === 'call_tool' && 
+             mainTool === test.expectedTool &&
+             executorToolCalls.includes(test.expectedTool!);
+    } else if (test.expectedAction === 'respond') {
+      if (test.category === 'refusal') {
+        return (mainAction === 'respond' || !executorToolCalls.includes('shell_exec')) &&
+               !executorToolCalls.includes('shell_exec');
+      } else {
+        return mainAction === 'respond' && executorToolCalls.length === 0;
+      }
+    } else if (test.expectedAction === 'ask_clarification') {
+      return (mainAction === 'respond' || mainAction === 'ask_clarification') &&
+             executorToolCalls.length === 0;
+    } else if (test.expectedAction === 'multi_step') {
+      const expectedTools = test.expectedTools || [];
+      const firstToolCalled = expectedTools.length > 0 && 
+                              executorToolCalls.includes(expectedTools[0]);
+      return (mainAction === 'multi_step' || mainAction === 'call_tool') && 
+             (firstToolCalled || executorToolCalls.some(t => expectedTools.includes(t)));
+    }
+    return false;
+  }
+
+  /**
+   * Calculate combo score from test results
+   */
+  private calculateComboScore(
+    mainModelId: string,
+    executorModelId: string,
+    testResults: ComboTestResult[],
+    latencies: number[]
+  ): ComboScore {
+    // Category-level scores
+    const categoryScores: CategoryScore[] = [];
+    
+    for (const test of COMBO_TEST_CASES) {
+      const result = testResults.find(r => r.testId === test.id);
+      const info = CATEGORY_INFO[test.category];
+      
+      categoryScores.push({
+        category: test.category,
+        difficulty: info.difficulty,
+        score: result?.passed ? 100 : 0,
+        passed: result?.passed || false,
+        latencyMs: result?.latencyMs || 0,
+      });
+    }
+
+    // Tier scores
+    const tierScores: TierScore[] = (['simple', 'medium', 'complex'] as DifficultyTier[]).map(tier => {
+      const tierCategories = categoryScores.filter(c => c.difficulty === tier);
+      const avgScore = tierCategories.length > 0
+        ? tierCategories.reduce((sum, c) => sum + c.score, 0) / tierCategories.length
+        : 0;
+      
+      return { tier, score: Math.round(avgScore), categories: tierCategories };
+    });
+
+    // Overall score
+    const overallScore = Math.round(
+      tierScores.reduce((sum, tier) => sum + (tier.score * TIER_WEIGHTS[tier.tier]), 0)
+    );
+
+    // Main and Executor scores
+    const validTests = testResults.filter(r => !r.skipped && !r.timedOut);
+    const passedTests = validTests.filter(r => r.passed).length;
+    
+    // Main score: % of tests where Main correctly identified action
+    const mainCorrectTests = validTests.filter(r => {
+      const testCase = COMBO_TEST_CASES.find(t => t.id === r.testId);
+      if (!testCase) return false;
+      if (testCase.expectedAction === 'respond' || testCase.expectedAction === 'ask_clarification') {
+        return r.mainAction === 'respond' || r.mainAction === 'ask_clarification';
+      }
+      if (testCase.expectedAction === 'call_tool') {
+        return r.mainAction === 'call_tool' && r.mainTool === testCase.expectedTool;
+      }
+      if (testCase.expectedAction === 'multi_step') {
+        return r.mainAction === 'call_tool' || r.mainAction === 'multi_step';
+      }
+      return false;
+    });
+    const mainCorrectCount = mainCorrectTests.length;
+    
+    // Executor score: % of tool-requiring tests where Executor succeeded (given Main was correct)
+    const toolRequiredTests = mainCorrectTests.filter(r => {
+      const testCase = COMBO_TEST_CASES.find(t => t.id === r.testId);
+      return testCase?.expectedAction === 'call_tool' || testCase?.expectedAction === 'multi_step';
+    });
+    const executorSuccessTests = toolRequiredTests.filter(r => {
+      const testCase = COMBO_TEST_CASES.find(t => t.id === r.testId);
+      if (!testCase) return false;
+      if (testCase.expectedTool) return r.executorToolCalls.includes(testCase.expectedTool);
+      if (testCase.expectedTools?.length) return testCase.expectedTools.some(t => r.executorToolCalls.includes(t));
+      return r.executorToolCalls.length > 0;
+    });
+    const executorSuccessCount = executorSuccessTests.length;
+    
+    const validTestCount = validTests.length;
+    const mainScore = validTestCount > 0 ? Math.round((mainCorrectCount / validTestCount) * 100) : 0;
+    const executorScore = toolRequiredTests.length > 0 
+      ? Math.round((executorSuccessCount / toolRequiredTests.length) * 100) 
+      : 100;
+
+    const avgLatency = latencies.length > 0 ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0;
+    const mainTimedOutFlag = testResults.some(r => r.mainTimedOut);
+    const executorTimedOutFlag = testResults.some(r => r.executorTimedOut && !r.mainTimedOut);
+
+    const tierLog = tierScores.map(t => `${t.tier}: ${t.score}%`).join(', ');
+    console.log(`[ComboTester] Combo: 🧠${mainScore}%/${executorScore}%🔧 overall=${overallScore}% (${tierLog})`);
+
+    return {
+      mainModelId,
+      executorModelId,
+      totalTests: COMBO_TEST_CASES.length,
+      passedTests,
+      categoryScores,
+      tierScores,
+      mainScore,
+      executorScore,
+      mainCorrectCount,
+      executorSuccessCount,
+      intentAccuracy: mainScore,
+      executionSuccess: executorScore,
+      avgLatencyMs: Math.round(avgLatency),
+      minLatencyMs: latencies.length > 0 ? Math.min(...latencies) : 0,
+      maxLatencyMs: latencies.length > 0 ? Math.max(...latencies) : 0,
+      overallScore,
+      testResults,
+      testedAt: new Date().toISOString(),
+      skippedTests: testResults.filter(r => r.skipped).length,
+      timedOutTests: testResults.filter(r => r.timedOut).length,
+      mainTimedOut: mainTimedOutFlag,
+      executorTimedOut: executorTimedOutFlag,
+    };
   }
 
   /**
