@@ -26,7 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { IndexProgress, CodeChunk, EnrichedChunk, FileSummary, defaultConfig, RAGConfig } from '../config.js';
 import { Chunker, getChunker, detectLanguage } from './chunker.js';
 import { getLMStudioEmbedder, LMStudioEmbedder } from '../embeddings/lmstudio.js';
-import { getHNSWLibStore, HNSWLibStore } from '../storage/hnswlib.js';
+import { getSQLiteVectorStore, SQLiteVectorStore } from '../storage/sqlite-store.js';
 import { 
   initializeSummarizer, 
   isSummarizerReady, 
@@ -62,7 +62,7 @@ export class Indexer {
   private config: RAGConfig;
   private chunker: Chunker;
   private embedder: LMStudioEmbedder;
-  private vectorStore: HNSWLibStore;
+  private vectorStore: SQLiteVectorStore;
 
   private progress: IndexProgress;
   private progressCallback: ProgressCallback | null = null;
@@ -85,7 +85,7 @@ export class Indexer {
       minChunkTokens: 50
     });
     this.embedder = getLMStudioEmbedder();
-    this.vectorStore = getHNSWLibStore(this.config.storage.dataPath);
+    this.vectorStore = getSQLiteVectorStore(path.join(this.config.storage.dataPath, 'vectors.db'));
     
     // Initialize SQLite database for persistent storage
     this.ragDb = getRAGDatabase(this.config.storage.dataPath);

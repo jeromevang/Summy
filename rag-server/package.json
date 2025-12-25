@@ -28,7 +28,6 @@
     "glob": "^11.0.0",
     "umap-js": "^1.4.0",
     "uuid": "^11.0.3",
-    "vectra": "^0.9.0",
     "ws": "^8.18.0"
   },
   "optionalDependencies": {
