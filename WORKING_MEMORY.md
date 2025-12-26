@@ -1,53 +1,86 @@
 # WORKING_MEMORY
 
 ## Current Goal
-CLI Dashboard - NEW ✅
+Self-Improving Agentic System - Build hybrid testing + production learning system
 
-## Session Summary (Dec 26, 2024 - Late Evening)
+## Session Summary (Dec 26, 2024 - Night)
 
-### CLI Dashboard Created ✅ (Latest)
-**Built a modern ASCII terminal dashboard for real-time monitoring**
+### Plan Created: Self-Improving Agentic System
+**Plan file:** `c:\Users\Jerome\.cursor\plans\self-improving_agentic_system_0ee41105.plan.md`
 
-**Run with:** `npm run dashboard` (from root or server folder)
+### Key Decisions Made
 
-**Features:**
-- **Services Panel** - Live status of API (3001), RAG (3002), WS (3003), MCP (3006)
-- **System Metrics** - CPU, GPU, VRAM gauges with live updates
-- **Dual-Model Status** - Main + Executor model info and scores
-- **Live Stats** - Request count, tool calls, avg latency, errors
-- **Activity Log** - Scrolling log of recent requests
-- **Error Panel** - Toggle with 'E' key for critical errors
+1. **Hybrid Testing Approach (Option C)**
+   - Quick smoke test (30s, 8 tests) before deployment
+   - Deploy with monitoring, learn from real failures
+   - Manual controller trigger (no auto hot-swap yet)
 
-**Keyboard Controls:**
-- `Q` - Quit dashboard
-- `R` - Force refresh
-- `T` - Run combo tests
-- `C` - Clear stats
-- `E` - Toggle error panel
+2. **Native vs Trainable Distinction**
+   - Track `nativeScore` - works out of the box
+   - Track `trainedScore` - after prosthetic applied
+   - Track `trainable` - can learn (true/false/null)
+   - `blockedCapabilities` - route to different model
 
-**Technical Details:**
-- Uses `blessed` + `blessed-contrib` for terminal UI
-- WebSocket for real-time updates (polling as 10s fallback)
-- Dashboard requests have `X-Dashboard-Request` header (server skips logging)
+3. **Controller Model: Manual First**
+   - User loads Qwen-32B in LM Studio manually
+   - User clicks "Analyze" in Controller page
+   - Controller reads failure-log.json, generates prosthetic + tests
+   - User reviews and approves
+   - No auto hot-swap until validated
 
-**Files Created/Modified:**
-- `server/src/cli/dashboard.ts` - New dashboard implementation
-- `server/package.json` - Added blessed, blessed-contrib, chalk dependencies
-- `package.json` - Added `dashboard` script
-- `server/src/index.ts` - Skip logging for dashboard requests
+4. **JSON Storage (DB-independent)**
+   - `server/data/failure-log.json` - failure persistence
+   - `server/data/combo-profiles/` - combo test results
+   - `server/data/model-profiles/*.json` - already exists (60+ profiles)
+   - `server/data/prosthetic-prompts.json` - already exists
 
-### Error Suppression Fixed ✅
-**Concern:** Silent catch blocks were swallowing errors
+### Existing Infrastructure (Don't Rebuild!)
 
-**Fixed:**
-- All catch blocks in dashboard.ts now log errors
-- Intent-router catch blocks log parse failures
-- Server still has 70+ silent catches in other files (legacy, to review later)
+| Component | File | Status |
+|-----------|------|--------|
+| Model hot-swap | `server/src/services/lmstudio-model-manager.ts` | Ready |
+| WebSocket broadcasts | `server/src/services/ws-broadcast.ts` | Ready |
+| Prosthetic Loop | `server/src/modules/tooly/orchestrator/prosthetic-loop.ts` | Ready |
+| Prosthetic Store | `server/src/modules/tooly/learning/prosthetic-store.ts` | Ready |
+| Failure Detector | `server/src/modules/tooly/testing/failure-detector.ts` | Ready |
+| CognitiveHUD | `client/src/pages/tooly/components/CognitiveHUD.tsx` | Needs wiring |
+| Test Sandbox | `server/src/modules/tooly/test-sandbox.ts` | Ready |
+| executeAgenticLoop | `server/src/modules/tooly/cognitive-engine.ts` | Ready |
 
-### Previous Session Work (Still Valid)
-- Robust Intent Parser with 11+ tool call formats
-- Combo Testing at 100% pass rate
-- Dual-Model Routing stable
+### Files to Create
+
+| File | Purpose |
+|------|---------|
+| `server/src/services/failure-log.ts` | JSON-based failure persistence |
+| `server/src/services/failure-observer.ts` | Pattern detection + WS notifications |
+| `server/src/modules/tooly/testing/smoke-tester.ts` | Quick 8-test assessment |
+| `client/src/pages/tooly/Controller.tsx` | Meta-agent visibility UI |
+| `client/src/pages/tooly/components/CapabilityMap.tsx` | Native/learned/blocked display |
+| `client/src/pages/tooly/components/FailurePatternCard.tsx` | Grouped failures |
+| `client/src/pages/tooly/components/ProstheticReview.tsx` | Approval modal |
+
+### Model Profile Schema Extension
+
+```json
+{
+  "capabilities": {
+    "rag_query": { "nativeScore": 90, "trainedScore": null, "trainable": null },
+    "multi_step": { "nativeScore": 35, "trainedScore": 78, "trainable": true }
+  },
+  "nativeStrengths": ["rag_query"],
+  "learnedCapabilities": ["multi_step"],
+  "blockedCapabilities": ["param_extraction"]
+}
+```
+
+### 20 Tasks in Plan
+
+**Phase 1 (Foundation):** failure-log, combo-json, profile-schema
+**Phase 2 (Smoke Test):** smoke-tester, trainability, endpoint
+**Phase 3 (Monitoring):** wire-logging, failure-observer, wire-hud
+**Phase 4 (Controller):** controller-page, controller-endpoint, test-generator
+**Phase 5 (Routing):** capability-routing, fallback-chain
+**Client:** app-routes, smoke-ui, capability-map, dashboard-badges, failure-cards, prosthetic-review
 
 ## Current Active Settings
 ```json
@@ -66,13 +99,20 @@ CLI Dashboard - NEW ✅
 | RAG WebSocket | 3003 | Real-time progress |
 | Continue MCP | 3006 | Extra tools (SSE) |
 
-## Key Files This Session
-- `server/src/cli/dashboard.ts` - NEW: ASCII dashboard
-- `server/src/index.ts` - Skip logging for dashboard polling
-- `server/src/modules/tooly/intent-router.ts` - Added error logging to catch blocks
-
 ## Next Actions
-1. Test dashboard with live traffic
-2. Add `/api/tooly/metrics` endpoint for system metrics
-3. Review and fix remaining 70+ silent catch blocks in codebase
-4. Consider adding WebSocket broadcast for real-time dashboard updates
+1. Start Phase 1: Create failure-log.ts
+2. Extend model profile schema with capabilities
+3. Add combo profile JSON export
+4. Then proceed with smoke-tester in Phase 2
+
+## Important Context
+- Controller model: Qwen2.5-32B-Instruct (already in LM Studio)
+- Hot-swap code exists in modelManager, just need endpoint for manual trigger
+- CognitiveHUD exists, just needs WebSocket wiring to Sessions page
+- Prosthetic teaching loop fully implemented, needs failure trigger
+
+## Previous Session Work (Still Valid)
+- CLI Dashboard created (`npm run dashboard`)
+- Robust Intent Parser with 11+ tool call formats
+- executeAgenticLoop fully implemented with rag_query, read_file, etc.
+- Combo Testing at 100% pass rate
