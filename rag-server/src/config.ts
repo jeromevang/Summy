@@ -88,7 +88,7 @@ export const defaultConfig: RAGConfig = {
   },
   
   indexing: {
-    chunkSize: 1500,
+    chunkSize: 1200,  // Safe for 2048 context embedding models (nomic-embed)
     chunkOverlap: 50,
     includePatterns: [
       '**/*.ts',
