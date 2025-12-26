@@ -68,8 +68,13 @@ app.use(express.json());
 
 // General request logging middleware - captures EVERYTHING from ngrok
 app.use((req, res, next) => {
-  // Skip logging internal endpoints to reduce noise
+  // Skip logging internal endpoints and dashboard polling to reduce noise
   if (req.url === '/health' || req.url === '/debug' || req.url.startsWith('/debug/') || req.url === '/api/sessions') {
+    return next();
+  }
+  
+  // Skip logging dashboard polling requests
+  if (req.headers['x-dashboard-request']) {
     return next();
   }
 

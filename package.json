@@ -17,6 +17,7 @@
     "dev:cursor-tools": "cd mcp-server && npm run dev:cursor-tools",
     "dev:continue-tools": "cd mcp-server && npm run dev:continue-tools",
     "kill": "taskkill /F /IM node.exe /T 2>nul || echo No node processes found",
+    "dashboard": "cd server && npm run dashboard",
     "build": "npm run build:server && npm run build:client && npm run build:mcp && npm run build:rag",
     "build:server": "cd server && npm run build",
     "build:client": "cd client && npm run build",

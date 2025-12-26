@@ -1,67 +1,62 @@
 # WORKING_MEMORY
 
 ## Current Goal
-LanceDB Vector Store Migration - COMPLETED ✅
+CLI Dashboard - NEW ✅
 
-## Session Summary (Dec 26, 2024)
+## Session Summary (Dec 26, 2024 - Late Evening)
 
-### LanceDB Migration ✅ (MAJOR)
-**Replaced SQLite brute-force vector search with LanceDB ANN search**
+### CLI Dashboard Created ✅ (Latest)
+**Built a modern ASCII terminal dashboard for real-time monitoring**
 
-| Aspect | Before (SQLite) | After (LanceDB) |
-|--------|-----------------|-----------------|
-| Search complexity | O(n) brute-force | O(log n) ANN |
-| 10K vectors | ~100ms | ~1ms |
-| Storage | 3KB/vector (BLOB) | ~1KB/vector (columnar) |
-| File | `vectors.db` | `lance/` directory |
+**Run with:** `npm run dashboard` (from root or server folder)
 
-Changes:
-- Created `rag-server/src/storage/lancedb-store.ts`
-- Uses `@lancedb/lancedb` package (v0.23.0)
-- Uses `makeArrowTable` with `vectorColumns` option for proper schema
-- Vector column auto-detected as `vector` field (number[])
-- Replaced all `getSQLiteVectorStore` calls with `getLanceDBStore`
-- Data stored in `rag-server/data/indices/lance/`
-- Reduced chunk size to 1200 tokens (fits nomic-embed 2048 context)
+**Features:**
+- **Services Panel** - Live status of API (3001), RAG (3002), WS (3003), MCP (3006)
+- **System Metrics** - CPU, GPU, VRAM gauges with live updates
+- **Dual-Model Status** - Main + Executor model info and scores
+- **Live Stats** - Request count, tool calls, avg latency, errors
+- **Activity Log** - Scrolling log of recent requests
+- **Error Panel** - Toggle with 'E' key for critical errors
 
-Key learnings:
-- LanceDB needs `number[]` not `Float32Array` for proper vector detection
-- Use empty strings instead of null for string fields
-- `vectorSearch()` method for explicit vector queries
+**Keyboard Controls:**
+- `Q` - Quit dashboard
+- `R` - Force refresh
+- `T` - Run combo tests
+- `C` - Clear stats
+- `E` - Toggle error panel
 
-### Recent Commits
+**Technical Details:**
+- Uses `blessed` + `blessed-contrib` for terminal UI
+- WebSocket for real-time updates (polling as 10s fallback)
+- Dashboard requests have `X-Dashboard-Request` header (server skips logging)
+
+**Files Created/Modified:**
+- `server/src/cli/dashboard.ts` - New dashboard implementation
+- `server/package.json` - Added blessed, blessed-contrib, chalk dependencies
+- `package.json` - Added `dashboard` script
+- `server/src/index.ts` - Skip logging for dashboard requests
+
+### Error Suppression Fixed ✅
+**Concern:** Silent catch blocks were swallowing errors
+
+**Fixed:**
+- All catch blocks in dashboard.ts now log errors
+- Intent-router catch blocks log parse failures
+- Server still has 70+ silent catches in other files (legacy, to review later)
+
+### Previous Session Work (Still Valid)
+- Robust Intent Parser with 11+ tool call formats
+- Combo Testing at 100% pass rate
+- Dual-Model Routing stable
+
+## Current Active Settings
+```json
+{
+  "enableDualModel": true,
+  "mainModelId": "qwen/qwen3-4b-2507",
+  "executorModelId": "mistralai/ministral-3-3b"
+}
 ```
-90857f5 feat(rag): replace SQLite vector store with LanceDB for O(log n) ANN search
-7429522 feat: add code-aware tools and context enrichment
-f18a7b6 feat(rag): add code-aware tables for symbols, modules, and relationships
-e089ae6 feat(rag): replace Vectra with SQLite-based vector store
-```
-
-## RAG Architecture
-
-```
-SQLite (rag.db)              LanceDB (lance/)
-┌─────────────────┐          ┌─────────────────┐
-│ • Chunks (text) │          │ • 768D vectors  │
-│ • Symbols       │  chunk_  │ • ANN index     │
-│ • Relationships │◄───id───►│ • O(log n)      │
-│ • Summaries     │          │                 │
-│ • File deps     │          │                 │
-└─────────────────┘          └─────────────────┘
-```
-
-### What's Good ✅
-- **LanceDB** - Fast O(log n) vector search
-- **SQLite** - Reliable metadata storage
-- **Code-aware** - Symbols, relationships, dependencies tracked
-- **Automatic enrichment** - Related context auto-added
-- **Multi-strategy** - code, summary, graph, hybrid
-- **HyDE support** - Hypothetical code generation
-- **Query expansion** - Multiple related queries
-
-### Still Needed ⚠️
-1. **AST-based call relationship extraction** - Parse function bodies for `calls` relationships
-2. **Cross-file analysis** - Track what functions call other functions
 
 ## Services
 | Service | Port | Purpose |
@@ -71,7 +66,13 @@ SQLite (rag.db)              LanceDB (lance/)
 | RAG WebSocket | 3003 | Real-time progress |
 | Continue MCP | 3006 | Extra tools (SSE) |
 
+## Key Files This Session
+- `server/src/cli/dashboard.ts` - NEW: ASCII dashboard
+- `server/src/index.ts` - Skip logging for dashboard polling
+- `server/src/modules/tooly/intent-router.ts` - Added error logging to catch blocks
+
 ## Next Actions
-1. Implement AST-based call relationship extraction
-2. Test RAG performance with LanceDB on larger codebases
-3. Run combo tests at `/tooly/combo-test`
+1. Test dashboard with live traffic
+2. Add `/api/tooly/metrics` endpoint for system metrics
+3. Review and fix remaining 70+ silent catch blocks in codebase
+4. Consider adding WebSocket broadcast for real-time dashboard updates
