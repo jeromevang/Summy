@@ -1,9 +1,30 @@
 # WORKING_MEMORY
 
 ## Current Goal
-RAG Code-Aware Enhancement - COMPLETED ✅
+LanceDB Vector Store Migration - COMPLETED ✅
 
 ## Session Summary (Dec 26, 2024)
+
+### LanceDB Migration ✅ (MAJOR)
+**Replaced SQLite brute-force vector search with LanceDB ANN search**
+
+- **Before:** O(n) brute-force cosine similarity in SQLite BLOBs
+- **After:** O(log n) approximate nearest neighbor with LanceDB
+
+Changes:
+- Created `rag-server/src/storage/lancedb-store.ts`
+- Uses `@lancedb/lancedb` package (v0.23.0)
+- Uses `makeArrowTable` with `vectorColumns` option for proper schema
+- Vector column auto-detected as `vector` field (number[])
+- Replaced all `getSQLiteVectorStore` calls with `getLanceDBStore`
+- Data stored in `rag-server/data/indices/lance/`
+
+Key learnings:
+- LanceDB needs `number[]` not `Float32Array` for proper vector detection
+- Use empty strings instead of null for string fields
+- `vectorSearch()` method for explicit vector queries
+
+### Previous Session Summary
 
 ### Major Changes This Session
 

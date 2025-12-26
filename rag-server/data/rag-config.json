@@ -11,7 +11,7 @@
     "dataPath": "./data/indices"
   },
   "indexing": {
-    "chunkSize": 1500,
+    "chunkSize": 1200,
     "chunkOverlap": 50,
     "includePatterns": [
       "**/*.ts",

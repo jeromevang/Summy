@@ -26,7 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { IndexProgress, CodeChunk, EnrichedChunk, FileSummary, defaultConfig, RAGConfig } from '../config.js';
 import { Chunker, getChunker, detectLanguage } from './chunker.js';
 import { getLMStudioEmbedder, LMStudioEmbedder } from '../embeddings/lmstudio.js';
-import { getSQLiteVectorStore, SQLiteVectorStore } from '../storage/sqlite-store.js';
+import { getLanceDBStore, LanceDBStore } from '../storage/lancedb-store.js';
 import { 
   initializeSummarizer, 
   isSummarizerReady, 
@@ -62,7 +62,7 @@ export class Indexer {
   private config: RAGConfig;
   private chunker: Chunker;
   private embedder: LMStudioEmbedder;
-  private vectorStore: SQLiteVectorStore;
+  private vectorStore: LanceDBStore;
 
   private progress: IndexProgress;
   private progressCallback: ProgressCallback | null = null;
@@ -85,7 +85,7 @@ export class Indexer {
       minChunkTokens: 50
     });
     this.embedder = getLMStudioEmbedder();
-    this.vectorStore = getSQLiteVectorStore(path.join(this.config.storage.dataPath, 'vectors.db'));
+    this.vectorStore = getLanceDBStore(path.join(this.config.storage.dataPath, 'lance'));
     
     // Initialize SQLite database for persistent storage
     this.ragDb = getRAGDatabase(this.config.storage.dataPath);
@@ -595,7 +595,7 @@ export class Indexer {
         
         // Detect visibility and modifiers from content
         const isExported = /^export\s/m.test(chunk.content) || content.includes(`export ${chunk.name}`);
-        const isAsync = /^async\s/m.test(chunk.content) || chunk.signature?.includes('async');
+        const isAsync = /^async\s/m.test(chunk.content) || (chunk.signature?.includes('async') ?? false);
         const isStatic = /static\s/.test(chunk.content);
         
         this.ragDb.addSymbol({

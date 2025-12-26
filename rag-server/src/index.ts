@@ -4,7 +4,7 @@
  * Provides:
  * - Code indexing with tree-sitter AST parsing
  * - Vector embeddings via LM Studio
- * - Semantic search via HNSWLib
+ * - Semantic search via LanceDB (fast ANN)
  * - Real-time indexing progress via WebSocket
  * - File watching for auto-reindex
  */
@@ -18,7 +18,7 @@ import fs from 'fs/promises';
 import { defaultConfig, RAGConfig, IndexProgress, RAGResult, RAGMetrics, FileSummary } from './config.js';
 import { getIndexer, Indexer } from './services/indexer.js';
 import { getLMStudioEmbedder } from './embeddings/lmstudio.js';
-import { getSQLiteVectorStore } from './storage/sqlite-store.js';
+import { getLanceDBStore } from './storage/lancedb-store.js';
 import { initializeTokenizer } from './services/tokenizer.js';
 import { initializeSummarizer, isSummarizerReady } from './services/summarizer.js';
 import { getDependencyGraph, getGraphStats, serializeGraph, loadGraph } from './services/graph-builder.js';
@@ -108,7 +108,7 @@ function broadcast(type: string, data: any): void {
 
 // Get current stats for broadcasting
 async function getStats() {
-  const vectorStore = getSQLiteVectorStore(path.join(config.storage.dataPath, 'vectors.db'));
+  const vectorStore = getLanceDBStore(path.join(config.storage.dataPath, 'lance'));
   const embedder = getLMStudioEmbedder();
   
   let diskUsage = 0;
@@ -198,7 +198,7 @@ async function initializeServices(): Promise<void> {
   indexer.onProgress(broadcastProgress);
   
   // Try to load existing index
-  const vectorStore = getSQLiteVectorStore(path.join(config.storage.dataPath, 'vectors.db'));
+  const vectorStore = getLanceDBStore(path.join(config.storage.dataPath, 'lance'));
   try {
     await vectorStore.load();
     console.log('[RAG Server] Loaded existing vector index');
@@ -283,7 +283,7 @@ app.put('/api/rag/config', async (req: Request, res: Response) => {
 // Get index statistics
 app.get('/api/rag/stats', async (req: Request, res: Response) => {
   try {
-    const vectorStore = getSQLiteVectorStore(path.join(config.storage.dataPath, 'vectors.db'));
+    const vectorStore = getLanceDBStore(path.join(config.storage.dataPath, 'lance'));
     const embedder = getLMStudioEmbedder();
     const diskUsage = await vectorStore.getDiskUsage();
     
