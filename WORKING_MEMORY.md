@@ -8,8 +8,12 @@ LanceDB Vector Store Migration - COMPLETED ✅
 ### LanceDB Migration ✅ (MAJOR)
 **Replaced SQLite brute-force vector search with LanceDB ANN search**
 
-- **Before:** O(n) brute-force cosine similarity in SQLite BLOBs
-- **After:** O(log n) approximate nearest neighbor with LanceDB
+| Aspect | Before (SQLite) | After (LanceDB) |
+|--------|-----------------|-----------------|
+| Search complexity | O(n) brute-force | O(log n) ANN |
+| 10K vectors | ~100ms | ~1ms |
+| Storage | 3KB/vector (BLOB) | ~1KB/vector (columnar) |
+| File | `vectors.db` | `lance/` directory |
 
 Changes:
 - Created `rag-server/src/storage/lancedb-store.ts`
@@ -18,107 +22,46 @@ Changes:
 - Vector column auto-detected as `vector` field (number[])
 - Replaced all `getSQLiteVectorStore` calls with `getLanceDBStore`
 - Data stored in `rag-server/data/indices/lance/`
+- Reduced chunk size to 1200 tokens (fits nomic-embed 2048 context)
 
 Key learnings:
 - LanceDB needs `number[]` not `Float32Array` for proper vector detection
 - Use empty strings instead of null for string fields
 - `vectorSearch()` method for explicit vector queries
 
-### Previous Session Summary
-
-### Major Changes This Session
-
-#### 1. Combo Test Persistence ✅
-- Results saved to SQLite database (`combo_test_results` table)
-- Auto-update on re-run (UPSERT)
-- Load saved results on page mount
-- Clear results button added
-
-#### 2. SQLite Vector Store ✅ (MAJOR)
-- **Replaced Vectra (JSON) with SQLite**
-- No more "Unexpected end of JSON input" errors
-- Vectors stored as BLOBs (4 bytes/float)
-- ACID transactions, WAL mode
-- File: `rag-server/src/storage/sqlite-store.ts`
-
-#### 3. Code-Aware RAG Database ✅ (MAJOR)
-New tables for code intelligence:
-- `modules` - Directory/module tracking
-- `symbols` - Functions, classes, interfaces, types
-- `relationships` - Calls, imports, extends, uses
-- `file_dependencies` - File-level imports
-
-Symbol fields: name, qualifiedName, type, signature, docComment, visibility, isExported, isAsync, isStatic
-
-#### 4. Automatic Context Enrichment ✅
-RAG queries now auto-include related context:
-- Related symbols (callers/callees)
-- Dependent files
-- File exports
-- Works for: graph, summary, hybrid strategies
-
-#### 5. MCP Code-Aware Tools ✅
-New tools for all MCP servers:
-- `find_symbol` - Search functions, classes by name
-- `get_callers` - Find what calls a function
-- `get_file_interface` - Get exports/imports/dependents
-- `get_dependencies` - File-level dependencies
-- `get_code_stats` - Codebase statistics
-
-Added to: server.ts, cursor-extra-tools.ts, continue-extra-tools.ts
-
 ### Recent Commits
 ```
+90857f5 feat(rag): replace SQLite vector store with LanceDB for O(log n) ANN search
 7429522 feat: add code-aware tools and context enrichment
 f18a7b6 feat(rag): add code-aware tables for symbols, modules, and relationships
 e089ae6 feat(rag): replace Vectra with SQLite-based vector store
-d74cfef feat(combo-test): persist results to database with auto-update
-6ed557e feat(combo-test): sort model lists by size and display size
 ```
 
-### RAG API Endpoints (New)
-- `POST /api/rag/symbols/search` - Search symbols
-- `POST /api/rag/symbols/callers` - Get call graph
-- `POST /api/rag/files/interface` - Get file interface
-- `POST /api/rag/files/dependencies` - Get file dependencies
-- `GET /api/rag/code/stats` - Get code statistics
+## RAG Architecture
 
-### RAG Query Response (Enhanced)
-```json
-{
-  "results": [...],
-  "codeContext": {
-    "relatedSymbols": [...],
-    "dependentFiles": [...],
-    "contextString": "## Related Functions\n..."
-  }
-}
+```
+SQLite (rag.db)              LanceDB (lance/)
+┌─────────────────┐          ┌─────────────────┐
+│ • Chunks (text) │          │ • 768D vectors  │
+│ • Symbols       │  chunk_  │ • ANN index     │
+│ • Relationships │◄───id───►│ • O(log n)      │
+│ • Summaries     │          │                 │
+│ • File deps     │          │                 │
+└─────────────────┘          └─────────────────┘
 ```
 
-## Is RAG Optimal for Any Model?
-
-### ✅ What's Good
-- **SQLite storage** - Reliable, no JSON corruption
+### What's Good ✅
+- **LanceDB** - Fast O(log n) vector search
+- **SQLite** - Reliable metadata storage
 - **Code-aware** - Symbols, relationships, dependencies tracked
 - **Automatic enrichment** - Related context auto-added
 - **Multi-strategy** - code, summary, graph, hybrid
 - **HyDE support** - Hypothetical code generation
 - **Query expansion** - Multiple related queries
 
-### ⚠️ Improvements Possible
-1. **Call relationship tracking** - Currently symbols stored but call relationships not fully extracted during indexing
-2. **Cross-file analysis** - Need deeper AST parsing for actual call detection
-3. **Vector search optimization** - Current brute-force cosine similarity, could use approximate nearest neighbors (HNSW)
-
-### What Works Now
-| Feature | Status |
-|---------|--------|
-| Semantic code search | ✅ Works |
-| Symbol extraction | ✅ Works |
-| File dependencies | ✅ Works |
-| Automatic context | ✅ Works |
-| MCP tools | ✅ Works |
-| Call graph | ⚠️ Partial (needs AST parsing) |
+### Still Needed ⚠️
+1. **AST-based call relationship extraction** - Parse function bodies for `calls` relationships
+2. **Cross-file analysis** - Track what functions call other functions
 
 ## Services
 | Service | Port | Purpose |
@@ -129,7 +72,6 @@ d74cfef feat(combo-test): persist results to database with auto-update
 | Continue MCP | 3006 | Extra tools (SSE) |
 
 ## Next Actions
-1. Run combo tests at `/tooly/combo-test`
-2. Test new code-aware tools: `find_symbol`, `get_callers`
-3. Consider adding AST-based call relationship extraction
-4. Test with different models
+1. Implement AST-based call relationship extraction
+2. Test RAG performance with LanceDB on larger codebases
+3. Run combo tests at `/tooly/combo-test`
