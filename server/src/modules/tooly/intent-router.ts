@@ -257,12 +257,55 @@ class IntentRouter {
     // Extract intent from main model response
     const intent = this.parseIntent(mainResponse);
 
-    // If no tool call needed, return main response directly
+    // If no tool call needed, generate proper response
     if (intent.action === 'respond' || intent.action === 'ask_clarification') {
+      // Extract the response text from intent metadata or generate one
+      let responseText = intent.metadata?.response || intent.metadata?.question || '';
+      
+      // If no response was included in the intent, we need to generate one
+      if (!responseText) {
+        // Make a quick call to generate a natural response
+        try {
+          const responseMessages = [
+            { role: 'system', content: 'You are a helpful coding assistant. Respond naturally and helpfully.' },
+            ...messages
+          ];
+          const naturalResponse = await this.callModel(
+            this.config.mainModelId!,
+            responseMessages,
+            undefined,
+            mainTimeout
+          );
+          responseText = naturalResponse?.choices?.[0]?.message?.content || 'I understand. How can I help you further?';
+        } catch {
+          responseText = intent.action === 'ask_clarification' 
+            ? 'Could you please provide more details about what you need?'
+            : 'I understand. How can I help you further?';
+        }
+      }
+      
+      // Build a proper response object with the text content
+      const properResponse = {
+        id: mainResponse.id,
+        object: 'chat.completion',
+        created: mainResponse.created,
+        model: mainResponse.model,
+        choices: [{
+          index: 0,
+          message: {
+            role: 'assistant',
+            content: responseText,
+            tool_calls: []
+          },
+          finish_reason: 'stop'
+        }],
+        usage: mainResponse.usage
+      };
+      
       return {
         mode: 'dual',
         mainResponse,
-        finalResponse: mainResponse,
+        finalResponse: properResponse,
         latency: {
           main: mainLatency,
           total: Date.now() - startTime
@@ -328,18 +371,26 @@ class IntentRouter {
    * Build system prompt for Main Model (reasoning, no tools)
    */
   private buildMainModelPrompt(): string {
-    return `Output ONLY a JSON intent. No thinking, no explanations.
+    return `You are an intent classifier. Analyze the user message and output ONLY a JSON intent.
 
 Format:
 {"action":"call_tool","tool":"TOOL_NAME","parameters":{...}}
-or
-{"action":"respond"}
+{"action":"respond","response":"Your helpful response here"}
+{"action":"ask_clarification","question":"What specific clarification is needed"}
 
 Common tools: read_file, write_file, edit_file, rag_query, git_status, shell_exec
 
-Example: User says "read config.json" → {"action":"call_tool","tool":"read_file","parameters":{"filepath":"config.json"}}
+Rules:
+- Use "call_tool" when the user wants to interact with files, search code, or run commands
+- Use "respond" for greetings, general questions, explanations (include your response in the JSON)
+- Use "ask_clarification" when the request is too vague to act on
 
-Output the JSON now:`;
+Examples:
+- "Read config.json" → {"action":"call_tool","tool":"read_file","parameters":{"filepath":"config.json"}}
+- "Hello!" → {"action":"respond","response":"Hello! How can I help you with your code today?"}
+- "Fix the bug" → {"action":"ask_clarification","question":"Which file and function has the bug? What error are you seeing?"}
+
+Output ONLY the JSON:`;
   }
 
   /**
@@ -365,41 +416,196 @@ IMPORTANT:
   }
 
   /**
+   * Known tool call wrapper patterns - extensible list
+   * Each pattern has a regex to match and extract the JSON, and a name for logging
+   */
+  private static readonly TOOL_CALL_PATTERNS: Array<{ name: string; regex: RegExp; jsonGroup: number }> = [
+    // Qwen format: <tool_call>{"name": "...", "arguments": {...}}</tool_call>
+    { name: 'tool_call', regex: /<tool_call>\s*(\{[\s\S]*?\})\s*<\/tool_call>/i, jsonGroup: 1 },
+    // Gemma tools format: [TOOL_REQUEST]{"name": "...", "arguments": {...}}[END_TOOL_RESULT]
+    { name: 'TOOL_REQUEST', regex: /\[TOOL_REQUEST\]\s*(\{[\s\S]*?\})\s*\[END_TOOL_RESULT\]/i, jsonGroup: 1 },
+    // Function call format: <function_call>{"name": "...", "arguments": {...}}</function_call>
+    { name: 'function_call', regex: /<function_call>\s*(\{[\s\S]*?\})\s*<\/function_call>/i, jsonGroup: 1 },
+    // Pipe format: <|tool_call|>{"name": "...", "arguments": {...}}<|/tool_call|>
+    { name: 'pipe_tool_call', regex: /<\|tool_call\|>\s*(\{[\s\S]*?\})\s*<\|\/tool_call\|>/i, jsonGroup: 1 },
+    // Bracket format: [[tool_call]]{"name": "...", "arguments": {...}}[[/tool_call]]
+    { name: 'bracket_tool_call', regex: /\[\[tool_call\]\]\s*(\{[\s\S]*?\})\s*\[\[\/tool_call\]\]/i, jsonGroup: 1 },
+    // Action format: <action>{"name": "...", "arguments": {...}}</action>
+    { name: 'action', regex: /<action>\s*(\{[\s\S]*?\})\s*<\/action>/i, jsonGroup: 1 },
+    // FUNCTION_CALL format: FUNCTION_CALL: {"name": "...", "arguments": {...}}
+    { name: 'FUNCTION_CALL', regex: /FUNCTION_CALL:\s*(\{[\s\S]*?\})/i, jsonGroup: 1 },
+    // Tool format: <tool>{"name": "...", "arguments": {...}}</tool>
+    { name: 'tool', regex: /<tool>\s*(\{[\s\S]*?\})\s*<\/tool>/i, jsonGroup: 1 },
+    // Start/end markers: [START_TOOL_CALL]{"name": "...", "arguments": {...}}[END_TOOL_CALL]
+    { name: 'START_TOOL_CALL', regex: /\[START_TOOL_CALL\]\s*(\{[\s\S]*?\})\s*\[END_TOOL_CALL\]/i, jsonGroup: 1 },
+    // Hermes format: <tool_call>name(args)</tool_call> - handled separately
+    { name: 'hermes_tool', regex: /<tool_call>\s*(\w+)\s*\(([\s\S]*?)\)\s*<\/tool_call>/i, jsonGroup: 0 },
+  ];
+
+  /**
+   * Clean all known tool call wrapper formats from content
+   */
+  private cleanToolCallFormats(content: string): string {
+    let cleaned = content;
+    
+    // Remove all known wrapper patterns
+    for (const pattern of IntentRouter.TOOL_CALL_PATTERNS) {
+      cleaned = cleaned.replace(new RegExp(pattern.regex.source, 'gi'), '');
+    }
+    
+    // Also remove any remaining common patterns
+    cleaned = cleaned
+      .replace(/<[a-z_]+>\s*\{[\s\S]*?\}\s*<\/[a-z_]+>/gi, '') // Generic XML-style wrappers
+      .replace(/\[[A-Z_]+\]\s*\{[\s\S]*?\}\s*\[\/[A-Z_]+\]/gi, '') // Generic bracket wrappers
+      .replace(/\[[A-Z_]+\]\s*\{[\s\S]*?\}\s*\[[A-Z_]+\]/gi, '') // Paired bracket markers
+      .trim();
+    
+    return cleaned;
+  }
+
+  /**
+   * Try to extract a tool call from JSON object
+   * Handles various field name conventions
+   */
+  private extractToolFromJson(json: any): { tool: string; parameters: Record<string, any> } | null {
+    // Try different field name conventions for the tool name
+    const toolName = json.name || json.tool || json.function || json.tool_name || json.function_name;
+    if (!toolName) return null;
+    
+    // Try different field name conventions for parameters
+    const params = json.arguments || json.parameters || json.params || json.args || json.input || {};
+    
+    // Handle string arguments (some models output JSON as string)
+    const parsedParams = typeof params === 'string' ? JSON.parse(params) : params;
+    
+    return { tool: toolName, parameters: parsedParams };
+  }
+
+  /**
    * Parse intent from Main Model response
+   * Robust parser that handles ANY tool call format
    */
   private parseIntent(response: any): IntentSchema {
     let content = response?.choices?.[0]?.message?.content || '';
     
-    // Remove <think>...</think> blocks (DeepSeek R1 reasoning)
-    content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+    // Remove thinking blocks (DeepSeek R1, Claude, etc.)
+    content = content
+      .replace(/<think>[\s\S]*?<\/think>/gi, '')
+      .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+      .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
+      .trim();
     
+    // 1. Try all known wrapper patterns
+    for (const pattern of IntentRouter.TOOL_CALL_PATTERNS) {
+      const match = content.match(pattern.regex);
+      if (match) {
+        try {
+          // Special handling for function-call style (name(args))
+          if (pattern.name === 'hermes_tool' && match[1] && match[2]) {
+            const toolName = match[1];
+            let params = {};
+            try {
+              // Try to parse args as JSON
+              params = JSON.parse(match[2]);
+            } catch {
+              // Try as key=value pairs
+              params = { input: match[2] };
+            }
+            console.log(`[IntentRouter] Parsed ${pattern.name} format:`, toolName);
+            return {
+              schemaVersion: '1.0',
+              action: 'call_tool',
+              tool: toolName,
+              parameters: params,
+              metadata: { reasoning: `Parsed from ${pattern.name} format` }
+            };
+          }
+          
+          // Standard JSON extraction
+          const jsonStr = match[pattern.jsonGroup];
+          const toolJson = JSON.parse(jsonStr);
+          const extracted = this.extractToolFromJson(toolJson);
+          
+          if (extracted) {
+            console.log(`[IntentRouter] Parsed ${pattern.name} format:`, extracted.tool);
+            const textBefore = content.split(match[0])[0].trim();
+            return {
+              schemaVersion: '1.0',
+              action: 'call_tool',
+              tool: extracted.tool,
+              parameters: extracted.parameters,
+              metadata: { reasoning: textBefore || `Parsed from ${pattern.name} format` }
+            };
+          }
+        } catch (e) {
+          console.log(`[IntentRouter] Failed to parse ${pattern.name} format:`, e);
+        }
+      }
+    }
+    
+    // 2. Try to find any JSON with tool-like structure
     try {
-      // Try to extract JSON from the cleaned response
-      // Use non-greedy match and find all potential JSON objects
+      // Match all JSON objects in content
       const jsonMatches = content.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g);
       if (jsonMatches) {
-        // Try each match until we find valid intent JSON
         for (const match of jsonMatches) {
           try {
             const parsed = JSON.parse(match);
+            
+            // Check for our intent format first (action field)
             if (parsed.action) {
               console.log('[IntentRouter] Parsed intent:', parsed.action, parsed.tool || '');
-              return parsed;
+              return {
+                schemaVersion: '1.0',
+                action: parsed.action,
+                tool: parsed.tool,
+                parameters: parsed.parameters,
+                metadata: {
+                  response: parsed.response,
+                  question: parsed.question,
+                  reasoning: parsed.reasoning
+                }
+              };
             }
-          } catch {
-            // Try next match
+            
+            // Check for tool call format (name + arguments)
+            const extracted = this.extractToolFromJson(parsed);
+            if (extracted) {
+              console.log('[IntentRouter] Parsed raw JSON tool call:', extracted.tool);
+              const textBefore = content.split(match)[0].trim();
+              return {
+                schemaVersion: '1.0',
+                action: 'call_tool',
+                tool: extracted.tool,
+                parameters: extracted.parameters,
+                metadata: { reasoning: textBefore || 'Parsed from raw JSON' }
+              };
+            }
+          } catch (err: any) {
+            // JSON parse failed for this match, try next
+            console.log('[IntentRouter] JSON parse failed for match, trying next:', err?.message?.slice(0, 50));
           }
         }
       }
-      
-      // Fallback: try parsing the entire content as JSON
-      const parsed = JSON.parse(content);
-      if (parsed.action) {
-        return parsed;
-      }
-    } catch {
-      // Failed to parse JSON
-      console.log('[IntentRouter] Failed to parse intent from:', content.slice(0, 200));
+    } catch (err: any) {
+      // All JSON parsing attempts failed, will use fallback
+      console.log('[IntentRouter] All JSON parsing failed:', err?.message?.slice(0, 50));
+    }
+    
+    // 3. Natural language response - clean up any unrecognized tool formats
+    console.log('[IntentRouter] No tool format detected, treating as natural response');
+    const cleanContent = this.cleanToolCallFormats(content);
+    
+    // If after cleanup we have meaningful content, use it
+    if (cleanContent && cleanContent.length > 0) {
+      return {
+        schemaVersion: '1.0',
+        action: 'respond',
+        metadata: {
+          response: cleanContent,
+          reasoning: 'Model responded naturally'
+        }
+      };
     }
 
     // Default to respond if we can't parse intent

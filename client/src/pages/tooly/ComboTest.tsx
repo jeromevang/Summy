@@ -213,9 +213,9 @@ export const ComboTest: React.FC = () => {
           passedTests: r.passedCount,
           categoryScores: r.categoryScores || [],
           tierScores: [
-            { tier: 'simple', score: r.tierScores?.simple || 0, passed: 0, total: 0, avgLatency: 0 },
-            { tier: 'medium', score: r.tierScores?.medium || 0, passed: 0, total: 0, avgLatency: 0 },
-            { tier: 'complex', score: r.tierScores?.complex || 0, passed: 0, total: 0, avgLatency: 0 },
+            { tier: 'simple', score: r.tierScores?.simple || 0, categories: r.tierScores?.simpleCategories || [] },
+            { tier: 'medium', score: r.tierScores?.medium || 0, categories: r.tierScores?.mediumCategories || [] },
+            { tier: 'complex', score: r.tierScores?.complex || 0, categories: r.tierScores?.complexCategories || [] },
           ],
           mainScore: r.mainScore || 0,
           executorScore: r.executorScore || 0,
@@ -763,7 +763,7 @@ export const ComboTest: React.FC = () => {
                           </span>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {tier.categories.map((cat) => {
+                          {(tier.categories || []).map((cat) => {
                             const label = CATEGORY_LABELS[cat.category];
                             return (
                               <div 

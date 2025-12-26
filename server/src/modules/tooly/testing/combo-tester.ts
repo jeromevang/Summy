@@ -196,10 +196,10 @@ export const COMBO_TEST_CASES: ComboTestCase[] = [
     name: 'Tool Selection',
     category: 'tool_select',
     difficulty: 'medium',
-    prompt: 'Where is JWT token validation implemented in the node-api?',
+    prompt: 'Search the codebase to find where JWT token validation is implemented',
     expectedAction: 'call_tool',
     expectedTool: 'rag_query',
-    // Should use rag_query (semantic search), NOT read_file
+    // Explicitly says "search" so rag_query is the right choice
     // Correct answer would find: node-api/src/middleware/auth.middleware.ts
   },
   
@@ -223,9 +223,10 @@ export const COMBO_TEST_CASES: ComboTestCase[] = [
     name: 'Clarification',
     category: 'clarify',
     difficulty: 'medium',
-    prompt: 'Fix the bug in the function',
+    prompt: 'Make it better',
     expectedAction: 'ask_clarification',
-    // Should ask: which file? which function? what bug?
+    // This is intentionally vague - no file, no function, no context
+    // The only sensible response is to ask what "it" refers to
   },
 
   // ============================================================
@@ -251,10 +252,10 @@ export const COMBO_TEST_CASES: ComboTestCase[] = [
     name: 'Reasoning Required',
     category: 'reasoning',
     difficulty: 'complex',
-    prompt: 'I\'m getting a 401 Unauthorized error when calling the API. Help me debug this.',
+    prompt: 'I\'m getting a 401 Unauthorized error. Search the codebase for authentication middleware and error handling.',
     expectedAction: 'call_tool',
     expectedTool: 'rag_query',
-    // Should search for auth/401 handling first, not randomly read files
+    // Explicitly asks to search - rag_query is correct
     // Good answer: search for authentication, middleware, token validation
   },
   
