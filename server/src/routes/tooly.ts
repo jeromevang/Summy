@@ -2250,13 +2250,17 @@ router.post('/baseline/run', async (req, res) => {
 /**
  * POST /api/tooly/readiness/assess
  * Run the Agentic Readiness assessment on a single model
+ * Supports dual-model mode with executorModelId and flakiness with runCount
  */
 router.post('/readiness/assess', async (req, res) => {
   try {
-    const { modelId, autoTeach } = req.body;
+    const { modelId, executorModelId, autoTeach, runCount = 1 } = req.body;
     if (!modelId) {
       return res.status(400).json({ error: 'modelId is required' });
     }
+
+    const isDualMode = !!executorModelId;
+    console.log(`[Tooly] Readiness assessment: ${modelId}${isDualMode ? ` + ${executorModelId}` : ''} (runCount: ${runCount})`);
 
     // Load settings
     let settings: any = {};
@@ -2273,8 +2277,19 @@ router.post('/readiness/assess', async (req, res) => {
       lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
     }, wsBroadcast as any);
 
-    // Run assessment
-    const result = await runner.assessModel(modelId, 'lmstudio');
+    // Run assessment with new options
+    const result = await runner.assessModel(modelId, { 
+      provider: 'lmstudio',
+      executorModelId: isDualMode ? executorModelId : undefined,
+      runCount: Math.min(Math.max(1, runCount), 3) // Clamp to 1-3
+    });
+
+    // Add mode info to result for frontend
+    const enrichedResult = {
+      ...result,
+      mode: isDualMode ? 'dual' : 'single',
+      executorModelId: isDualMode ? executorModelId : undefined
+    };
 
     // Save assessment results to profile
     await capabilities.updateAgenticReadiness(modelId, {
@@ -2283,7 +2298,11 @@ router.post('/readiness/assess', async (req, res) => {
       assessedAt: new Date().toISOString(),
       categoryScores: result.categoryScores,
       failedTests: result.failedTests || [],
-      prostheticApplied: false
+      prostheticApplied: false,
+      qualifyingGatePassed: (result as any).qualifyingGatePassed ?? true,
+      mode: isDualMode ? 'dual' : 'single',
+      executorModelId: isDualMode ? executorModelId : undefined,
+      testResults: result.testResults || []
     }, result.trainabilityScores);
 
     // Auto-teach if requested and not passing
@@ -2294,7 +2313,7 @@ router.post('/readiness/assess', async (req, res) => {
         const teachingResult = await loop.runTeachingCycle(modelId, 'lmstudio');
 
         return res.json({
-          assessment: result,
+          assessment: enrichedResult,
           teaching: teachingResult
         });
       } catch (teachingError: any) {
@@ -2302,12 +2321,12 @@ router.post('/readiness/assess', async (req, res) => {
         console.error(`[Tooly] Teaching error stack:`, teachingError.stack);
         return res.status(500).json({
           error: `Assessment completed but teaching failed: ${teachingError.message}`,
-          assessment: result
+          assessment: enrichedResult
         });
       }
     }
 
-    res.json({ assessment: result });
+    res.json({ assessment: enrichedResult });
   } catch (error: any) {
     console.error('[Tooly] Readiness assessment failed:', error);
     res.status(500).json({ error: error.message });
@@ -2343,7 +2362,7 @@ router.post('/readiness/assess-all', async (req, res) => {
     }, wsBroadcast as any);
 
     // Run batch assessment
-    const result = await runner.assessAllModels(modelIds, 'lmstudio');
+    const result = await runner.assessAllModels(modelIds, { provider: 'lmstudio' });
 
     res.json(result);
   } catch (error: any) {
@@ -3545,6 +3564,259 @@ router.post('/controller/apply-prosthetic', async (req, res) => {
     });
   } catch (error: any) {
     console.error('[Tooly] Failed to apply prosthetic:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// PROSTHETIC MANAGEMENT ROUTES (NEW)
+// ============================================================
+
+/**
+ * GET /api/tooly/prosthetics
+ * List all prosthetic prompts
+ */
+router.get('/prosthetics', async (req, res) => {
+  try {
+    const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
+    const prosthetics = prostheticStore.listPrompts();
+    const stats = prostheticStore.getStats();
+    
+    res.json({
+      prosthetics,
+      stats
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to list prosthetics:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/prosthetics/:modelId
+ * Get prosthetic for a specific model
+ */
+router.get('/prosthetics/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+    
+    const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
+    const prosthetic = prostheticStore.getPrompt(decodedModelId);
+    
+    if (!prosthetic) {
+      return res.status(404).json({ error: 'No prosthetic found for this model' });
+    }
+    
+    res.json(prosthetic);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get prosthetic:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/tooly/prosthetics/:modelId
+ * Update prosthetic for a model
+ */
+router.put('/prosthetics/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+    const { prompt, level, targetTaskTypes, contextSizeRange } = req.body;
+    
+    const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
+    
+    prostheticStore.savePrompt({
+      modelId: decodedModelId,
+      prompt,
+      level: level || 1,
+      probesFixed: [],
+      categoryImprovements: {},
+      targetTaskTypes,
+      contextSizeRange
+    });
+    
+    res.json({ success: true, message: 'Prosthetic updated' });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to update prosthetic:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * DELETE /api/tooly/prosthetics/:modelId
+ * Delete prosthetic for a model
+ */
+router.delete('/prosthetics/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+    
+    const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
+    const deleted = prostheticStore.deletePrompt(decodedModelId);
+    
+    res.json({ success: deleted, message: deleted ? 'Prosthetic deleted' : 'No prosthetic found' });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to delete prosthetic:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// CONTEXT FILL TESTING ROUTES (NEW)
+// ============================================================
+
+/**
+ * POST /api/tooly/context-fill/:modelId
+ * Run context fill profile for a model
+ */
+router.post('/context-fill/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { contextLimit = 8192 } = req.body;
+    const decodedModelId = decodeURIComponent(modelId);
+    
+    // Load settings
+    let settings: any = {};
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch {
+      // Use defaults
+    }
+    
+    const testSettings = {
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+    };
+    
+    const { createContextFillTester } = await import('../modules/tooly/testing/context-fill-tester.js');
+    const { intentRouter } = await import('../modules/tooly/intent-router.js');
+    
+    // Configure router first
+    await intentRouter.configure({
+      mainModelId: decodedModelId,
+      executorModelId: decodedModelId,
+      enableDualModel: false,
+      timeout: 120000,
+      provider: 'lmstudio',
+      settings: testSettings
+    });
+    
+    const tester = createContextFillTester(testSettings);
+    const result = await tester.runContextFillProfile(decodedModelId, contextLimit);
+    
+    // Save to model profile
+    const profile = await capabilities.getProfile(decodedModelId);
+    if (profile) {
+      (profile as any).contextPerformance = result;
+      await capabilities.saveProfile(profile);
+    }
+    
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Context fill test failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/context-fill/:modelId
+ * Get saved context fill profile for a model
+ */
+router.get('/context-fill/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+    
+    const profile = await capabilities.getProfile(decodedModelId);
+    if (!profile || !(profile as any).contextPerformance) {
+      return res.status(404).json({ error: 'No context fill profile found' });
+    }
+    
+    res.json((profile as any).contextPerformance);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get context fill profile:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// KNOWLEDGE DISTILLATION ROUTES (NEW)
+// ============================================================
+
+/**
+ * GET /api/tooly/distillation/capabilities
+ * Get available capabilities for distillation
+ */
+router.get('/distillation/capabilities', async (req, res) => {
+  try {
+    const { createKnowledgeDistiller } = await import('../modules/tooly/learning/knowledge-distiller.js');
+    const distiller = createKnowledgeDistiller({ lmstudioUrl: 'http://localhost:1234' });
+    const capabilities = distiller.getAvailableCapabilities();
+    
+    res.json({ capabilities });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get distillation capabilities:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/distillation/run
+ * Run knowledge distillation from teacher to student model
+ */
+router.post('/distillation/run', async (req, res) => {
+  try {
+    const { teacherModelId, studentModelId, capability } = req.body;
+    
+    if (!teacherModelId || !studentModelId || !capability) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: teacherModelId, studentModelId, capability' 
+      });
+    }
+    
+    // Load settings
+    let settings: any = {};
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        settings = await fs.readJson(SETTINGS_FILE);
+      }
+    } catch {
+      // Use defaults
+    }
+    
+    const testSettings = {
+      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+    };
+    
+    const { createKnowledgeDistiller } = await import('../modules/tooly/learning/knowledge-distiller.js');
+    const distiller = createKnowledgeDistiller(testSettings);
+    const result = await distiller.distillFromStrongModel(teacherModelId, studentModelId, capability);
+    
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Knowledge distillation failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/distillation/best-teacher/:capability
+ * Find the best teacher model for a capability
+ */
+router.get('/distillation/best-teacher/:capability', async (req, res) => {
+  try {
+    const { capability } = req.params;
+    
+    const { createKnowledgeDistiller } = await import('../modules/tooly/learning/knowledge-distiller.js');
+    const distiller = createKnowledgeDistiller({ lmstudioUrl: 'http://localhost:1234' });
+    const teacherModel = await distiller.findBestTeacher(capability);
+    
+    res.json({ teacherModel, capability });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to find best teacher:', error);
     res.status(500).json({ error: error.message });
   }
 });

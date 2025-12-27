@@ -5,25 +5,83 @@
     "To modify test logic: Update the 'evaluationLogic' field to reference the corresponding evaluation function name",
     "To change scoring: Modify the 'categoryWeights' and 'threshold' values",
     "To disable a test: Remove it from the 'tests' array or add '_disabled': true",
-    "Available evaluation functions: evaluateBasicToolEmit, evaluateMultiToolSelection, evaluateToolSuppression, evaluateArgumentValidation, evaluateNearIdenticalToolChoice, evaluateRAGFirstBehavior, evaluateRAGBeforeFileRead, evaluateRAGResultSynthesis, evaluateRAGChaining, evaluateMultiStepPlanning, evaluateConditionalLogic, evaluateContextContinuity, evaluateEdgeCaseAwareness, evaluateQuestionVsAction, evaluateImplicitFileRead, evaluateSearchIntentDetection, evaluateWebSearch, evaluatePageNavigation, evaluateContentExtraction, evaluateBrowserInteraction"
+    "QUALIFYING GATE: First 5 tests (QG-1 to QG-5) are hard requirements - model is disqualified if ANY fail",
+    "Available evaluation functions: evaluateBasicToolEmit, evaluateMultiToolSelection, evaluateToolSuppression, evaluateArgumentValidation, evaluateNearIdenticalToolChoice, evaluateRAGFirstBehavior, evaluateRAGBeforeFileRead, evaluateRAGResultSynthesis, evaluateRAGChaining, evaluateMultiStepPlanning, evaluateConditionalLogic, evaluateContextContinuity, evaluateEdgeCaseAwareness, evaluateQuestionVsAction, evaluateImplicitFileRead, evaluateSearchIntentDetection, evaluateWebSearch, evaluatePageNavigation, evaluateContentExtraction, evaluateBrowserInteraction, evaluateToolFormatValid, evaluateInstructionFollowing, evaluateContextCoherence, evaluateBasicReasoning, evaluateStateTransition"
   ],
-  "version": "1.0.0",
-  "description": "Agentic Readiness Test Suite - Configurable tests for assessing agentic coding capabilities",
+  "version": "2.0.0",
+  "description": "Agentic Readiness Test Suite with Qualifying Gate - Tests for assessing agentic coding capabilities",
   "threshold": 70,
+  "qualifyingGateCount": 5,
   "categoryWeights": {
-    "tool": 0.30,
-    "rag": 0.25,
-    "reasoning": 0.20,
-    "intent": 0.15,
-    "browser": 0.10
+    "qualifying": 0.00,
+    "tool": 0.20,
+    "rag": 0.18,
+    "reasoning": 0.15,
+    "intent": 0.10,
+    "browser": 0.10,
+    "multi_turn": 0.10,
+    "boundary": 0.10,
+    "fault_injection": 0.07
   },
   "tests": [
     {
+      "_comment": "=== QUALIFYING GATE (QG-1 to QG-5) - MUST ALL PASS ===",
+      "id": "QG-1",
+      "name": "Tool Format Valid",
+      "category": "qualifying",
+      "description": "Model MUST output valid tool call format (JSON structure with function name and arguments)",
+      "prompt": "Read the file node-api/src/index.ts",
+      "expectedTool": "read_file",
+      "isQualifyingGate": true,
+      "evaluationLogic": "return evaluateToolFormatValid(response, toolCalls);"
+    },
+    {
+      "id": "QG-2",
+      "name": "Instruction Following",
+      "category": "qualifying",
+      "description": "Model MUST follow system prompt structure and use provided tools",
+      "prompt": "List all files in the node-api/src directory.",
+      "expectedTool": "list_directory",
+      "isQualifyingGate": true,
+      "evaluationLogic": "return evaluateInstructionFollowing(response, toolCalls);"
+    },
+    {
+      "id": "QG-3",
+      "name": "Context Coherence",
+      "category": "qualifying",
+      "description": "Model MUST NOT hallucinate files or context that doesn't exist",
+      "prompt": "What files are in the project root? Only list what you can verify.",
+      "expectedToolAny": ["list_directory", "rag_query"],
+      "isQualifyingGate": true,
+      "evaluationLogic": "return evaluateContextCoherence(response, toolCalls);"
+    },
+    {
+      "id": "QG-4",
+      "name": "Basic Reasoning",
+      "category": "qualifying",
+      "description": "Model MUST break down multi-step tasks logically",
+      "prompt": "To add a new API endpoint, what files would I need to modify? Think step by step.",
+      "expectedToolAny": ["rag_query", "list_directory", "search_files"],
+      "isQualifyingGate": true,
+      "evaluationLogic": "return evaluateBasicReasoning(response, toolCalls);"
+    },
+    {
+      "id": "QG-5",
+      "name": "State Transition",
+      "category": "qualifying",
+      "description": "Model MUST use tool results correctly (not ignore or contradict them)",
+      "prompt": "Read node-api/package.json and tell me the project name from that file.",
+      "expectedTool": "read_file",
+      "isQualifyingGate": true,
+      "evaluationLogic": "return evaluateStateTransition(response, toolCalls);"
+    },
+    {
+      "_comment": "=== CAPABILITY DISCOVERY TESTS (AR-1 onwards) ===",
       "id": "AR-1",
       "name": "Basic Tool Emit",
       "category": "tool",
       "description": "Model should call read_file correctly",
-      "prompt": "Read the file src/index.ts and tell me what it does.",
+      "prompt": "Read the file react-web/src/App.tsx and tell me what it does.",
       "expectedTool": "read_file",
       "evaluationLogic": "return evaluateBasicToolEmit(response, toolCalls);"
     },
@@ -50,7 +108,7 @@
       "name": "Argument Validation",
       "category": "tool",
       "description": "Model should provide correct and complete arguments to tools",
-      "prompt": "Write \"Hello World\" to a new file called hello.txt in the output folder.",
+      "prompt": "Write \"Hello World\" to a new file called hello.txt in the shared-utils folder.",
       "expectedTool": "write_file",
       "evaluationLogic": "return evaluateArgumentValidation(response, toolCalls);"
     },
@@ -59,7 +117,7 @@
       "name": "Near-Identical Tool Choice",
       "category": "tool",
       "description": "Model should choose read_file over read_multiple_files for a single file",
-      "prompt": "Show me the contents of package.json",
+      "prompt": "Show me the contents of node-api/package.json",
       "expectedTool": "read_file",
       "evaluationLogic": "return evaluateNearIdenticalToolChoice(response, toolCalls);"
     },
@@ -104,7 +162,7 @@
       "name": "Multi-Step Planning",
       "category": "reasoning",
       "description": "Model should plan multiple steps for complex tasks",
-      "prompt": "Refactor the UserService class to use dependency injection. First understand the current implementation, then propose changes.",
+      "prompt": "Refactor the auth.service.ts to use dependency injection. First understand the current implementation, then propose changes.",
       "expectedToolAny": ["rag_query", "read_file", "search_files"],
       "evaluationLogic": "return evaluateMultiStepPlanning(response, toolCalls);"
     },
@@ -113,7 +171,7 @@
       "name": "Conditional Logic",
       "category": "reasoning",
       "description": "Model should handle conditional requirements",
-      "prompt": "If the project uses TypeScript, add types to the utils.js file. Otherwise, add JSDoc comments.",
+      "prompt": "If the project uses TypeScript, add types to the validation.ts file. Otherwise, add JSDoc comments.",
       "expectedToolAny": ["read_file", "search_files", "list_directory"],
       "evaluationLogic": "return evaluateConditionalLogic(response, toolCalls);"
     },
@@ -149,7 +207,7 @@
       "name": "Implicit File Read",
       "category": "intent",
       "description": "Model should recognize implicit need to read files",
-      "prompt": "Fix the typo in the README file.",
+      "prompt": "Fix any typos in the README file.",
       "expectedTool": "read_file",
       "evaluationLogic": "return evaluateImplicitFileRead(response, toolCalls);"
     },
@@ -197,6 +255,138 @@
       "prompt": "Navigate to example.com and click the \"More information\" link.",
       "expectedToolAny": ["browser_navigate", "browser_click"],
       "evaluationLogic": "return evaluateBrowserInteraction(response, toolCalls);"
+    },
+    {
+      "_comment": "=== ERROR RECOVERY TESTS (ER-1 to ER-3) ===",
+      "id": "ER-1",
+      "name": "File Not Found Recovery",
+      "category": "reasoning",
+      "description": "Model should handle file not found errors gracefully and try alternatives",
+      "prompt": "Read the file nonexistent-file-12345.ts and summarize it. If it doesn't exist, search for similar files.",
+      "expectedToolAny": ["read_file", "search_files", "list_directory"],
+      "evaluationLogic": "return evaluateFileNotFoundRecovery(response, toolCalls);"
+    },
+    {
+      "id": "ER-2",
+      "name": "Tool Failure Recovery",
+      "category": "reasoning",
+      "description": "Model should suggest alternatives when a tool fails",
+      "prompt": "Try to run the broken_tool_xyz command. If it fails, explain what you would do instead.",
+      "expectedNoTool": false,
+      "evaluationLogic": "return evaluateToolFailureRecovery(response, toolCalls);"
+    },
+    {
+      "id": "ER-3",
+      "name": "Graceful Degradation",
+      "category": "reasoning",
+      "description": "Model should provide partial results when full completion isn't possible",
+      "prompt": "Analyze all 1000 test files in the tests/ folder. If that's too many, sample a representative set.",
+      "expectedToolAny": ["list_directory", "search_files", "rag_query"],
+      "evaluationLogic": "return evaluateGracefulDegradation(response, toolCalls);"
+    },
+    {
+      "_comment": "=== MULTI-TURN CONVERSATION TESTS (MT-1 to MT-3) ===",
+      "id": "MT-1",
+      "name": "Context Retention",
+      "category": "multi_turn",
+      "description": "Model remembers context from previous turns in conversation",
+      "prompt": "Based on the file you just read, what port does the server listen on?",
+      "isMultiTurn": true,
+      "turns": [
+        { "role": "user", "content": "Read the file node-api/src/index.ts" },
+        { "role": "user", "content": "What port does it listen on?" }
+      ],
+      "expectedToolAny": ["read_file"],
+      "evaluationLogic": "return evaluateContextRetention(response, toolCalls, conversationHistory);"
+    },
+    {
+      "id": "MT-2",
+      "name": "Reference Resolution",
+      "category": "multi_turn",
+      "description": "Model resolves references like 'that file' from previous turn",
+      "prompt": "Read that file",
+      "isMultiTurn": true,
+      "turns": [
+        { "role": "user", "content": "Find the auth middleware in the codebase" },
+        { "role": "user", "content": "Read that file" }
+      ],
+      "expectedToolAny": ["rag_query", "read_file", "search_files"],
+      "evaluationLogic": "return evaluateReferenceResolution(response, toolCalls, conversationHistory);"
+    },
+    {
+      "id": "MT-3",
+      "name": "Tool Result Memory",
+      "category": "multi_turn",
+      "description": "Model remembers and uses tool results from previous turns",
+      "prompt": "Read the first file from that list",
+      "isMultiTurn": true,
+      "turns": [
+        { "role": "user", "content": "List all files in node-api/src" },
+        { "role": "user", "content": "Read the first file from that list" }
+      ],
+      "expectedToolAny": ["list_directory", "read_file"],
+      "evaluationLogic": "return evaluateToolResultMemory(response, toolCalls, conversationHistory);"
+    },
+    {
+      "_comment": "=== BEHAVIORAL BOUNDARY TESTS (BB-1 to BB-3) ===",
+      "id": "BB-1",
+      "name": "Tool Chain Length 2",
+      "category": "boundary",
+      "description": "Model can handle a 2-tool chain successfully",
+      "prompt": "Find where authentication is implemented using RAG, then read that file and explain the auth flow.",
+      "expectedToolAny": ["rag_query", "read_file"],
+      "chainLength": 2,
+      "evaluationLogic": "return evaluateToolChain(response, toolCalls, 2);"
+    },
+    {
+      "id": "BB-2",
+      "name": "Tool Chain Length 4",
+      "category": "boundary",
+      "description": "Model can handle a 4-tool chain successfully",
+      "prompt": "Search for all route files, list the API directory, read the main routes file, then find the corresponding middleware.",
+      "expectedToolAny": ["search_files", "list_directory", "read_file", "rag_query"],
+      "chainLength": 4,
+      "evaluationLogic": "return evaluateToolChain(response, toolCalls, 4);"
+    },
+    {
+      "id": "BB-3",
+      "name": "Decision Nesting",
+      "category": "boundary",
+      "description": "Model handles nested conditional logic",
+      "prompt": "If the project has TypeScript config, check if it uses strict mode. If strict mode is enabled, find all files with 'any' type and list them. If not in strict mode, just count how many TypeScript files exist.",
+      "expectedToolAny": ["read_file", "search_files", "list_directory"],
+      "evaluationLogic": "return evaluateDecisionNesting(response, toolCalls);"
+    },
+    {
+      "_comment": "=== FAULT INJECTION TESTS (FI-1 to FI-3) ===",
+      "id": "FI-1",
+      "name": "File Not Found Recovery",
+      "category": "fault_injection",
+      "description": "Model gracefully handles file not found errors",
+      "prompt": "Read the file node-api/src/nonexistent-file-12345.ts and explain what it does.",
+      "expectedToolAny": ["read_file"],
+      "faultType": "file_not_found",
+      "evaluationLogic": "return evaluateFaultRecovery(response, toolCalls, 'file_not_found');"
+    },
+    {
+      "id": "FI-2",
+      "name": "Permission Denied Recovery",
+      "category": "fault_injection",
+      "description": "Model handles permission denied errors gracefully",
+      "prompt": "Write to the file /etc/passwd with content 'test'. If that fails, explain why.",
+      "expectedToolAny": ["write_file"],
+      "faultType": "permission_denied",
+      "evaluationLogic": "return evaluateFaultRecovery(response, toolCalls, 'permission_denied');"
+    },
+    {
+      "id": "FI-3",
+      "name": "Graceful Error Explanation",
+      "category": "fault_injection",
+      "description": "Model explains errors clearly and suggests alternatives",
+      "prompt": "Search for a function called 'impossibleFunctionThatDoesNotExist12345' in the codebase.",
+      "expectedToolAny": ["search_files", "rag_query"],
+      "faultType": "no_results",
+      "evaluationLogic": "return evaluateFaultRecovery(response, toolCalls, 'no_results');"
     }
   ]
 }

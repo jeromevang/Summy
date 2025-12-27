@@ -4,7 +4,7 @@
   "provider": "lmstudio",
   "testedAt": "2025-12-26T23:49:24.057Z",
   "testVersion": 2,
-  "score": 61,
+  "score": 64,
   "toolFormat": "openai",
   "capabilities": {
     "read_file": {
@@ -70,7 +70,7 @@
     "list_directory",
     "rag_query"
   ],
-  "systemPrompt": "## CRITICAL BEHAVIOR REQUIREMENTS\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Tool Selection\n- Only call tools when the task requires external action\n- Choose the most specific tool for the task (read_file for one file, search_files for searching)\n- Provide complete and accurate arguments to tools\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n### MANDATORY CONSTRAINTS\n- You MUST follow the above rules without exception\n- Failure to use RAG before file reads is a critical error\n- Unnecessary tool calls for knowledge questions waste resources\n\n\n",
+  "systemPrompt": "## CRITICAL BEHAVIOR REQUIREMENTS\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Tool Selection\n- Only call tools when the task requires external action\n- Choose the most specific tool for the task (read_file for one file, search_files for searching)\n- Provide complete and accurate arguments to tools\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n### MANDATORY CONSTRAINTS\n- You MUST follow the above rules without exception\n- Failure to use RAG before file reads is a critical error\n- Unnecessary tool calls for knowledge questions waste resources\n\n\n## CRITICAL BEHAVIOR REQUIREMENTS\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Tool Selection\n- Only call tools when the task requires external action\n- Choose the most specific tool for the task (read_file for one file, search_files for searching)\n- Provide complete and accurate arguments to tools\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Tool Selection\n- Only call tools when the task requires external action\n- Choose the most specific tool for the task (read_file for one file, search_files for searching)\n- Provide complete and accurate arguments to tools\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n\n## CRITICAL BEHAVIOR REQUIREMENTS\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Tool Selection\n- Only call tools when the task requires external action\n- Choose the most specific tool for the task (read_file for one file, search_files for searching)\n- Provide complete and accurate arguments to tools\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n### MANDATORY CONSTRAINTS\n- You MUST follow the above rules without exception\n- Failure to use RAG before file reads is a critical error\n- Unnecessary tool calls for knowledge questions waste resources\n\n\n",
   "prostheticApplied": true,
   "testResults": [
     {
@@ -224,5 +224,57 @@
     "isInteractiveSpeed": true,
     "speedRating": "excellent"
   },
-  "contextLength": 65536
+  "contextLength": 65536,
+  "smokeTestResults": {
+    "testedAt": "2025-12-27T02:22:07.601Z",
+    "passed": true,
+    "score": 100,
+    "nativeCapabilities": [
+      "tool",
+      "intent",
+      "multi_step",
+      "param_extraction",
+      "format",
+      "browser",
+      "reasoning"
+    ],
+    "trainableCapabilities": [
+      "rag"
+    ],
+    "blockedCapabilities": []
+  },
+  "nativeStrengths": [
+    "tool",
+    "intent",
+    "multi_step",
+    "param_extraction",
+    "format",
+    "browser",
+    "reasoning"
+  ],
+  "learnedCapabilities": [
+    "rag"
+  ],
+  "blockedCapabilities": [],
+  "agenticReadiness": {
+    "certified": false,
+    "score": 64,
+    "assessedAt": "2025-12-27T02:23:13.715Z",
+    "categoryScores": {
+      "tool": 80,
+      "rag": 63,
+      "reasoning": 50,
+      "intent": 33,
+      "browser": 90
+    },
+    "failedTests": [
+      "AR-2",
+      "AR-8",
+      "AR-10",
+      "AR-11",
+      "AR-15",
+      "AR-16"
+    ],
+    "prostheticApplied": false
+  }
 }

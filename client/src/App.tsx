@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import Sessions from './pages/Sessions';
 import ContextEditor from './pages/ContextEditor';
 import Tooly from './pages/tooly';
 import { ModelDetailPage } from './pages/tooly/ModelDetailPage';
-import { OptimalSetup } from './pages/tooly/OptimalSetup';
 import { AgenticReadiness } from './pages/tooly/AgenticReadiness';
 import { ComboTest } from './pages/tooly/ComboTest';
+import { ProstheticManager } from './pages/tooly/ProstheticManager';
 import Controller from './pages/tooly/Controller';
 import Debug from './pages/Debug';
 import RAG from './pages/RAG';
@@ -57,9 +57,11 @@ function App() {
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/tooly" element={<Tooly />} />
             <Route path="/tooly/model/:modelId" element={<ModelDetailPage />} />
-            <Route path="/tooly/optimal-setup" element={<OptimalSetup />} />
+            {/* OptimalSetup deprecated - redirect to readiness */}
+            <Route path="/tooly/optimal-setup" element={<Navigate to="/tooly/readiness" replace />} />
             <Route path="/tooly/readiness" element={<AgenticReadiness />} />
             <Route path="/tooly/combo-test" element={<ComboTest />} />
+            <Route path="/tooly/prosthetics" element={<ProstheticManager />} />
             <Route path="/tooly/controller" element={<Controller />} />
             <Route path="/rag" element={<RAG />} />
             <Route path="/settings" element={<Settings />} />

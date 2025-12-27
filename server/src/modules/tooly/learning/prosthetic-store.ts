@@ -18,6 +18,14 @@ const __dirname = path.dirname(__filename);
 // TYPES
 // ============================================================
 
+export interface ProstheticVersion {
+  version: number;
+  prompt: string;
+  createdAt: string;
+  scoreImprovement: number;
+  testedAgainst: string[]; // Test IDs
+}
+
 export interface ProstheticEntry {
   modelId: string;
   prompt: string;
@@ -34,6 +42,14 @@ export interface ProstheticEntry {
   updatedAt: string;
   successfulRuns: number;
   verified: boolean;
+  // NEW: Version tracking
+  currentVersion: number;
+  versions: ProstheticVersion[];
+  // NEW: Task-type targeting
+  targetTaskTypes?: string[]; // ['rag_heavy', 'tool_heavy', 'reasoning']
+  contextSizeRange?: [number, number]; // [minTokens, maxTokens]
+  // NEW: Distillation source
+  learnedFromModel?: string;
 }
 
 interface ProstheticStoreData {
@@ -98,20 +114,38 @@ class ProstheticStore {
   /**
    * Save prosthetic prompt for a model
    */
-  savePrompt(entry: Omit<ProstheticEntry, 'createdAt' | 'updatedAt' | 'successfulRuns' | 'verified'>): void {
+  savePrompt(entry: Omit<ProstheticEntry, 'createdAt' | 'updatedAt' | 'successfulRuns' | 'verified' | 'currentVersion' | 'versions'>): void {
     const existingEntry = this.data.entries[entry.modelId];
     const now = new Date().toISOString();
+
+    // Handle versioning
+    const currentVersion = (existingEntry?.currentVersion || 0) + 1;
+    const newVersion: ProstheticVersion = {
+      version: currentVersion,
+      prompt: entry.prompt,
+      createdAt: now,
+      scoreImprovement: 0,
+      testedAgainst: entry.probesFixed || []
+    };
+
+    const versions = existingEntry?.versions || [];
+    versions.push(newVersion);
 
     this.data.entries[entry.modelId] = {
       ...entry,
       createdAt: existingEntry?.createdAt || now,
       updatedAt: now,
       successfulRuns: existingEntry?.successfulRuns || 0,
-      verified: false
+      verified: false,
+      currentVersion,
+      versions,
+      targetTaskTypes: entry.targetTaskTypes || [],
+      contextSizeRange: entry.contextSizeRange,
+      learnedFromModel: entry.learnedFromModel
     };
 
     this.save();
-    console.log(`[ProstheticStore] Saved prosthetic for ${entry.modelId} (Level ${entry.level})`);
+    console.log(`[ProstheticStore] Saved prosthetic for ${entry.modelId} (Level ${entry.level}, Version ${currentVersion})`);
   }
 
   /**

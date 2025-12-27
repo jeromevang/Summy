@@ -119,17 +119,25 @@ class WSBroadcastService {
 
   /**
    * Broadcast agentic readiness progress
+   * Extended to support qualifying gate phase and dual-model mode
    */
   broadcastReadinessProgress(data: {
     modelId: string;
     current: number;
     total: number;
     currentTest: string;
+    currentCategory?: string;
     status: 'running' | 'completed';
     score: number;
+    passed?: boolean;
+    // Qualifying gate & dual-model support
+    phase?: 'qualifying' | 'discovery';
+    mode?: 'single' | 'dual';
+    attribution?: 'main' | 'executor' | 'loop' | null;
   }) {
-    console.log(`[WSBroadcast] Readiness progress: ${data.modelId} - ${data.current}/${data.total} - ${data.currentTest} (clients: ${this.clients.size})`);
-    this.broadcast('readiness_progress', data);
+    const phase = data.phase || (data.current <= 5 ? 'qualifying' : 'discovery');
+    console.log(`[WSBroadcast] Readiness [${phase}]: ${data.modelId} - ${data.current}/${data.total} - ${data.currentTest} (${data.mode || 'single'} mode, clients: ${this.clients.size})`);
+    this.broadcast('readiness_progress', { ...data, phase });
   }
 
   /**

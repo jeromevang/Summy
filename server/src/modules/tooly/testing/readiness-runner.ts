@@ -2,11 +2,12 @@
  * Readiness Runner
  * 
  * Runs the Agentic Readiness Test Suite on models to assess their
- * capability for agentic coding tasks. Supports single model assessment
- * and batch testing all available models.
+ * capability for agentic coding tasks. 
+ * 
+ * CRITICAL: Uses intentRouter.route() to test through the REAL production flow,
+ * not direct LLM calls. This ensures tests validate actual behavior.
  */
 
-import axios from 'axios';
 import {
   getAgenticReadinessSuite,
   getReadinessConfig,
@@ -18,8 +19,34 @@ import {
   type BatchReadinessResult
 } from './agentic-readiness-suite.js';
 import { getToolSchemas } from '../tool-prompts.js';
-import { COMMON_STOP_STRINGS } from '../probes/probe-utils.js';
 import { capabilities } from '../capabilities.js';
+import { intentRouter, type RoutingResult } from '../intent-router.js';
+import { executeAgenticLoop } from '../cognitive-engine.js';
+
+// ============================================================
+// SANDBOX CONTEXT (Same as combo-tester for consistency)
+// ============================================================
+
+export const SANDBOX_CONTEXT = `You are a coding assistant working on a test project.
+
+PROJECT LOCATION: server/data/test-project/
+
+PROJECT STRUCTURE:
+- node-api/          Express API with authentication
+  - src/index.ts     Main entry point
+  - src/middleware/auth.middleware.ts   JWT validation
+  - src/services/auth.service.ts        User auth logic
+  - src/routes/users.ts, products.ts    API routes
+- react-web/         React frontend
+  - src/context/AuthContext.tsx         Auth state provider
+  - src/hooks/useAuth.ts                Auth hook
+  - src/components/LoginForm.tsx        Login UI
+- java-service/      Spring-style Java backend
+- shared-utils/      Shared utilities (validation, formatting)
+- react-native-app/  Mobile app
+- mendix-widget/     Mendix widget development
+
+Use the tools available to complete tasks. Always use rag_query first when exploring unfamiliar code.`;
 
 // ============================================================
 // TYPES
@@ -40,8 +67,14 @@ interface BroadcastFn {
     current: number;
     total: number;
     currentTest: string;
+    currentCategory?: string;
     status: 'running' | 'completed';
     score: number;
+    passed?: boolean;
+    // NEW: Detailed phase info for dual-model visibility
+    phase?: 'qualifying' | 'discovery';
+    mode?: 'single' | 'dual';
+    attribution?: 'main' | 'executor' | 'both' | null;
   }): void;
   broadcastBatchReadinessProgress(data: {
     currentModel: string | null;
@@ -55,6 +88,23 @@ interface BroadcastFn {
     }>;
     bestModel?: string;
   }): void;
+}
+
+interface TestRunResult {
+  testId: string;
+  testName: string;
+  category: string;
+  passed: boolean;
+  score: number;
+  details: string;
+  latency: number;
+  // NEW: Production flow metrics
+  mode?: 'single' | 'dual';
+  mainLatency?: number;
+  executorLatency?: number;
+  toolsExecuted?: string[];
+  iterations?: number;
+  attribution?: 'main' | 'executor' | 'both' | null;
 }
 
 // ============================================================
@@ -72,16 +122,31 @@ export class ReadinessRunner {
 
   /**
    * Assess a single model against the Agentic Readiness Test Suite
+   * Uses the REAL production flow via intentRouter.route()
    */
   async assessModel(
     modelId: string,
-    provider: 'lmstudio' | 'openai' | 'azure' = 'lmstudio'
+    options: {
+      provider?: 'lmstudio' | 'openai' | 'azure';
+      executorModelId?: string; // For dual-model testing
+      runCount?: number; // For flakiness detection (default 1, max 3)
+    } = {}
   ): Promise<ReadinessResult> {
-    const startTime = Date.now();
-    const testResults: ReadinessResult['testResults'] = [];
-    const suite = getAgenticReadinessSuite();
+    const { 
+      provider = 'lmstudio', 
+      executorModelId,
+      runCount = 1 
+    } = options;
     
-    console.log(`[ReadinessRunner] Starting assessment for ${modelId}, ${suite.length} tests`);
+    const startTime = Date.now();
+    const testResults: TestRunResult[] = [];
+    const suite = getAgenticReadinessSuite();
+    const isDualMode = !!executorModelId;
+    
+    console.log(`[ReadinessRunner] Starting assessment for ${modelId}${isDualMode ? ` + ${executorModelId}` : ''}, ${suite.length} tests, ${runCount}x runs`);
+
+    // Configure intent router for this assessment
+    await this.configureRouter(modelId, executorModelId, provider);
 
     // Broadcast start
     this.broadcast?.broadcastReadinessProgress({
@@ -90,73 +155,132 @@ export class ReadinessRunner {
       total: suite.length,
       currentTest: 'Starting...',
       status: 'running',
-      score: 0
+      score: 0,
+      mode: isDualMode ? 'dual' : 'single',
+      phase: 'qualifying'
     });
 
-    console.log(`[ReadinessRunner] Assessment started for ${modelId}`);
+    // Determine qualifying gate count (first N tests)
+    const qualifyingGateCount = (getReadinessConfig() as any).qualifyingGateCount || 5;
+    let qualifyingGatePassed = true;
+    let disqualifiedAt: string | null = null;
 
-    console.log(`[ReadinessRunner] Starting test loop with ${suite.length} tests`);
-
+    // Run each test (with optional multiple runs for flakiness detection)
     for (let i = 0; i < suite.length; i++) {
       const test = suite[i];
-      console.log(`[ReadinessRunner] About to run test ${i + 1}/${suite.length}: ${test.id} - ${test.name}`);
+      const isQualifyingTest = i < qualifyingGateCount;
+      
+      console.log(`[ReadinessRunner] Test ${i + 1}/${suite.length}: ${test.id} - ${test.name}${isQualifyingTest ? ' [QUALIFYING]' : ''}`);
 
-      const result = await this.runSingleTest(test, modelId, provider);
-      testResults.push(result);
+      // Run test multiple times if requested (but only once for qualifying gate - speed)
+      const effectiveRunCount = isQualifyingTest ? 1 : Math.min(runCount, 3);
+      const runs: TestRunResult[] = [];
+      for (let run = 0; run < effectiveRunCount; run++) {
+        const result = await this.runSingleTest(test, modelId, isDualMode);
+        runs.push(result);
+      }
 
-      // Broadcast progress after test completion
+      // Aggregate results (use best score, track consistency)
+      const bestResult = runs.reduce((best, r) => r.score > best.score ? r : best, runs[0]);
+      const consistency = runs.filter(r => r.passed === bestResult.passed).length / runs.length;
+      
+      // Add consistency info to details if running multiple times
+      if (effectiveRunCount > 1) {
+        bestResult.details += ` | Consistency: ${Math.round(consistency * 100)}% (${runs.filter(r => r.passed).length}/${runs.length} passed)`;
+      }
+
+      testResults.push(bestResult);
+
+      // Check qualifying gate failure - FAST FAIL
+      if (isQualifyingTest && !bestResult.passed) {
+        qualifyingGatePassed = false;
+        disqualifiedAt = test.name;
+        console.log(`[ReadinessRunner] ❌ DISQUALIFIED at ${test.name} - stopping early`);
+        
+        this.broadcast?.broadcastReadinessProgress({
+          modelId,
+          current: i + 1,
+          total: suite.length,
+          currentTest: `DISQUALIFIED: ${test.name}`,
+          currentCategory: test.category,
+          status: 'completed',
+          score: 0,
+          passed: false,
+          mode: isDualMode ? 'dual' : 'single',
+          phase: 'qualifying',
+          attribution: bestResult.attribution
+        });
+        
+        // Fast fail - stop testing
+        break;
+      }
+
+      // Broadcast progress
       const currentScore = this.calculateRunningScore(testResults);
-      console.log(`[ReadinessRunner] Test ${i + 1}/${suite.length} completed: ${test.name} - Result: ${result.passed ? 'PASS' : 'FAIL'} - Running score: ${currentScore}`);
 
       this.broadcast?.broadcastReadinessProgress({
         modelId,
         current: i + 1,
         total: suite.length,
         currentTest: test.name,
+        currentCategory: test.category,
         status: 'running',
-        score: currentScore
+        score: currentScore,
+        passed: bestResult.passed,
+        mode: isDualMode ? 'dual' : 'single',
+        phase: isQualifyingTest ? 'qualifying' : 'discovery',
+        attribution: bestResult.attribution
       });
+
+      console.log(`[ReadinessRunner] Test ${i + 1}/${suite.length}: ${bestResult.passed ? 'PASS' : 'FAIL'} (${bestResult.score}%) - ${test.name}`);
     }
 
-    console.log(`[ReadinessRunner] Test loop completed, ${testResults.length} results`);
-
-    // Calculate category scores
+    // Calculate category scores (excluding qualifying tests from scoring)
+    const nonQualifyingResults = testResults.filter((_, i) => i >= qualifyingGateCount);
     const categoryScores = {
-      tool: calculateCategoryScore(testResults, 'tool'),
-      rag: calculateCategoryScore(testResults, 'rag'),
-      reasoning: calculateCategoryScore(testResults, 'reasoning'),
-      intent: calculateCategoryScore(testResults, 'intent'),
-      browser: calculateCategoryScore(testResults, 'browser'),
+      tool: calculateCategoryScore(nonQualifyingResults as any, 'tool'),
+      rag: calculateCategoryScore(nonQualifyingResults as any, 'rag'),
+      reasoning: calculateCategoryScore(nonQualifyingResults as any, 'reasoning'),
+      intent: calculateCategoryScore(nonQualifyingResults as any, 'intent'),
+      browser: calculateCategoryScore(nonQualifyingResults as any, 'browser'),
+      multi_turn: calculateCategoryScore(nonQualifyingResults as any, 'multi_turn'),
+      boundary: calculateCategoryScore(nonQualifyingResults as any, 'boundary'),
     };
 
-    const overallScore = calculateOverallScore(categoryScores);
-    const passed = isPassing(overallScore);
+    // If disqualified, score is 0
+    const overallScore = qualifyingGatePassed ? calculateOverallScore(categoryScores) : 0;
+    const passed = qualifyingGatePassed && isPassing(overallScore);
     const failedTests = testResults
       .filter(r => !r.passed)
       .map(r => r.testId);
+    
+    // Log qualifying gate result
+    if (!qualifyingGatePassed) {
+      console.log(`[ReadinessRunner] Model ${modelId} DISQUALIFIED at: ${disqualifiedAt}`);
+    } else {
+      console.log(`[ReadinessRunner] Model ${modelId} passed qualifying gate, score: ${overallScore}%`);
+    }
 
     // Load trainability scores from profile if available
     let trainabilityScores;
     try {
       const profile = await capabilities.getProfile(modelId);
-      console.log(`[ReadinessRunner] Loading profile for ${modelId}:`, !!profile);
       if (profile && (profile as any).trainabilityScores) {
         trainabilityScores = (profile as any).trainabilityScores;
-        console.log(`[ReadinessRunner] Found trainability scores for ${modelId}:`, trainabilityScores);
-      } else {
-        console.log(`[ReadinessRunner] No trainability scores found for ${modelId}`);
       }
     } catch (error: any) {
-      console.warn(`[ReadinessRunner] Could not load trainability scores for ${modelId}:`, error?.message);
+      console.warn(`[ReadinessRunner] Could not load trainability scores: ${error?.message}`);
     }
 
-    const result: ReadinessResult = {
+    const result: ReadinessResult & { qualifyingGatePassed: boolean; disqualifiedAt: string | null } = {
       modelId,
       assessedAt: new Date().toISOString(),
       overallScore,
       passed,
+      qualifyingGatePassed,
+      disqualifiedAt,
       categoryScores,
-      testResults,
+      testResults: testResults as any,
       failedTests,
       duration: Date.now() - startTime,
       trainabilityScores,
@@ -169,151 +293,102 @@ export class ReadinessRunner {
       total: suite.length,
       currentTest: 'Completed',
       status: 'completed',
-      score: overallScore
+      score: overallScore,
+      mode: isDualMode ? 'dual' : 'single'
     });
 
     return result;
   }
 
   /**
-   * Assess ALL available models and return ranked leaderboard
+   * Configure the intent router for testing
    */
-  async assessAllModels(
-    modelIds: string[],
-    provider: 'lmstudio' | 'openai' | 'azure' = 'lmstudio'
-  ): Promise<BatchReadinessResult> {
-    const startedAt = new Date().toISOString();
-    const results: ReadinessResult[] = [];
+  private async configureRouter(
+    mainModelId: string,
+    executorModelId: string | undefined,
+    provider: 'lmstudio' | 'openai' | 'azure'
+  ): Promise<void> {
+    const isDualMode = !!executorModelId;
 
-    // Broadcast batch start
-    this.broadcast?.broadcastBatchReadinessProgress({
-      currentModel: null,
-      currentModelIndex: 0,
-      totalModels: modelIds.length,
-      status: 'running',
-      results: []
-    });
-
-    for (let i = 0; i < modelIds.length; i++) {
-      const modelId = modelIds[i];
-
-      // Broadcast current model being tested
-      this.broadcast?.broadcastBatchReadinessProgress({
-        currentModel: modelId,
-        currentModelIndex: i + 1,
-        totalModels: modelIds.length,
-        status: 'running',
-        results: results.map(r => ({
-          modelId: r.modelId,
-          score: r.overallScore,
-          certified: r.passed
-        }))
-      });
-
-      try {
-        const result = await this.assessModel(modelId, provider);
-        results.push(result);
-      } catch (error: any) {
-        // Log error but continue with other models
-        console.error(`[ReadinessRunner] Error assessing ${modelId}:`, error.message);
-        results.push({
-          modelId,
-          assessedAt: new Date().toISOString(),
-          overallScore: 0,
-          passed: false,
-          categoryScores: { tool: 0, rag: 0, reasoning: 0, intent: 0, browser: 0 },
-          testResults: [],
-          failedTests: [],
-          duration: 0,
-        });
+    await intentRouter.configure({
+      mainModelId,
+      executorModelId: executorModelId || mainModelId,
+      enableDualModel: isDualMode,
+      timeout: 60000, // 60s for tests
+      provider,
+      settings: {
+        lmstudioUrl: this.settings.lmstudioUrl,
+        openaiApiKey: this.settings.openaiApiKey,
+        azureResourceName: this.settings.azureResourceName,
+        azureApiKey: this.settings.azureApiKey,
+        azureDeploymentName: this.settings.azureDeploymentName,
+        azureApiVersion: this.settings.azureApiVersion,
       }
-    }
-
-    // Build leaderboard (sorted by score descending)
-    const leaderboard = results
-      .map((r, index) => ({
-        rank: index + 1,
-        modelId: r.modelId,
-        score: r.overallScore,
-        certified: r.passed
-      }))
-      .sort((a, b) => b.score - a.score)
-      .map((entry, index) => ({ ...entry, rank: index + 1 }));
-
-    const completedAt = new Date().toISOString();
-    const bestModel = leaderboard.length > 0 && leaderboard[0].score > 0 
-      ? leaderboard[0].modelId 
-      : null;
-
-    // Broadcast batch completion
-    this.broadcast?.broadcastBatchReadinessProgress({
-      currentModel: null,
-      currentModelIndex: modelIds.length,
-      totalModels: modelIds.length,
-      status: 'completed',
-      results: leaderboard,
-      bestModel: bestModel || undefined
     });
 
-    return {
-      startedAt,
-      completedAt,
-      results,
-      leaderboard,
-      bestModel
-    };
+    console.log(`[ReadinessRunner] Configured router: ${isDualMode ? 'dual' : 'single'} mode`);
   }
 
   /**
-   * Run a single test from the suite
+   * Run a single test using the REAL production flow
    */
   private async runSingleTest(
     test: AgenticReadinessTest,
     modelId: string,
-    provider: 'lmstudio' | 'openai' | 'azure'
-  ): Promise<ReadinessResult['testResults'][0]> {
-    console.log(`[ReadinessRunner] runSingleTest: ${test.id} - ${test.name}`);
+    isDualMode: boolean
+  ): Promise<TestRunResult> {
     const startTime = Date.now();
 
     try {
-      // Build messages
+      // Check if this is a multi-turn test
+      if (test.isMultiTurn && test.turns && test.turns.length > 0) {
+        return await this.runMultiTurnTest(test, modelId, isDualMode, startTime);
+      }
+
+      // Build messages with sandbox context
       const messages = [
-        { 
-          role: 'system', 
-          content: 'You are a helpful coding assistant with access to various tools. Use tools when appropriate to complete tasks.' 
-        },
+        { role: 'system', content: SANDBOX_CONTEXT },
         { role: 'user', content: test.prompt }
       ];
 
-      // Get all relevant tool schemas for this test
+      // Get tool schemas for this test
       const toolNames = this.getRelevantTools(test);
       const tools = getToolSchemas(toolNames);
 
-      // Call LLM
-      const response = await this.callLLM(modelId, provider, messages, tools);
+      // Route through the REAL production flow
+      const routingResult = await intentRouter.route(messages, tools);
+
       const latency = Date.now() - startTime;
 
-      // Extract tool calls from response
-      const toolCalls = response?.choices?.[0]?.message?.tool_calls || [];
-      const textResponse = response?.choices?.[0]?.message?.content || '';
+      // Extract tool calls from the routing result
+      const toolCalls = routingResult.toolCalls || [];
+      const textResponse = routingResult.finalResponse?.choices?.[0]?.message?.content || '';
 
       // Evaluate using test's evaluate function
       const evaluation = test.evaluate(textResponse, toolCalls);
 
-      const result = {
+      // Determine attribution if test failed in dual mode
+      let attribution: 'main' | 'executor' | 'both' | null = null;
+      if (!evaluation.passed && isDualMode) {
+        attribution = this.determineAttribution(test, routingResult, toolCalls);
+      }
+
+      return {
         testId: test.id,
         testName: test.name,
         category: test.category,
         passed: evaluation.passed,
         score: evaluation.score,
         details: evaluation.details,
-        latency
+        latency,
+        mode: routingResult.mode,
+        mainLatency: routingResult.latency.main,
+        executorLatency: routingResult.latency.executor,
+        toolsExecuted: toolCalls.map((tc: any) => tc.function?.name).filter(Boolean),
+        attribution
       };
-
-      console.log(`[ReadinessRunner] Test ${test.id} completed: passed=${evaluation.passed}, score=${evaluation.score}`);
-      return result;
     } catch (error: any) {
-      console.log(`[ReadinessRunner] Test ${test.id} failed with error: ${error.message}`);
+      console.error(`[ReadinessRunner] Test ${test.id} error:`, error.message);
       return {
         testId: test.id,
         testName: test.name,
@@ -321,16 +396,151 @@ export class ReadinessRunner {
         passed: false,
         score: 0,
         details: `Error: ${error.message}`,
-        latency: Date.now() - startTime
+        latency: Date.now() - startTime,
+        mode: isDualMode ? 'dual' : 'single',
+        attribution: null
       };
     }
+  }
+
+  /**
+   * Run a multi-turn conversation test
+   */
+  private async runMultiTurnTest(
+    test: AgenticReadinessTest,
+    modelId: string,
+    isDualMode: boolean,
+    startTime: number
+  ): Promise<TestRunResult> {
+    const conversationHistory: any[] = [];
+    const allToolCalls: any[] = [];
+    let lastResponse = '';
+    let lastRoutingResult: RoutingResult | null = null;
+
+    try {
+      const toolNames = this.getRelevantTools(test);
+      const tools = getToolSchemas(toolNames);
+
+      // Process each turn in the conversation
+      for (let i = 0; i < test.turns!.length; i++) {
+        const turn = test.turns![i];
+        
+        // Build messages including conversation history
+        const messages = [
+          { role: 'system', content: SANDBOX_CONTEXT },
+          ...conversationHistory,
+          { role: turn.role, content: turn.content }
+        ];
+
+        console.log(`[ReadinessRunner] Multi-turn ${test.id} - Turn ${i + 1}/${test.turns!.length}: "${turn.content.substring(0, 50)}..."`);
+
+        // Route through production flow
+        const routingResult = await intentRouter.route(messages, tools);
+        lastRoutingResult = routingResult;
+
+        // Extract response and tool calls
+        const response = routingResult.finalResponse?.choices?.[0]?.message?.content || '';
+        const turnToolCalls = routingResult.toolCalls || [];
+
+        // Add to conversation history
+        conversationHistory.push({ role: turn.role, content: turn.content });
+        if (response) {
+          conversationHistory.push({ role: 'assistant', content: response });
+        }
+
+        // Track all tool calls
+        allToolCalls.push(...turnToolCalls);
+        lastResponse = response;
+      }
+
+      const latency = Date.now() - startTime;
+
+      // Evaluate using test's evaluate function with conversation history
+      const evaluation = test.evaluate(lastResponse, allToolCalls, conversationHistory);
+
+      // Determine attribution if test failed in dual mode
+      let attribution: 'main' | 'executor' | 'both' | null = null;
+      if (!evaluation.passed && isDualMode && lastRoutingResult) {
+        attribution = this.determineAttribution(test, lastRoutingResult, allToolCalls);
+      }
+
+      return {
+        testId: test.id,
+        testName: test.name,
+        category: test.category,
+        passed: evaluation.passed,
+        score: evaluation.score,
+        details: evaluation.details + ` (${test.turns!.length} turns)`,
+        latency,
+        mode: lastRoutingResult?.mode || (isDualMode ? 'dual' : 'single'),
+        mainLatency: lastRoutingResult?.latency.main,
+        executorLatency: lastRoutingResult?.latency.executor,
+        toolsExecuted: allToolCalls.map((tc: any) => tc.function?.name).filter(Boolean),
+        iterations: test.turns!.length,
+        attribution
+      };
+    } catch (error: any) {
+      console.error(`[ReadinessRunner] Multi-turn test ${test.id} error:`, error.message);
+      return {
+        testId: test.id,
+        testName: test.name,
+        category: test.category,
+        passed: false,
+        score: 0,
+        details: `Multi-turn error: ${error.message}`,
+        latency: Date.now() - startTime,
+        mode: isDualMode ? 'dual' : 'single',
+        attribution: null
+      };
+    }
+  }
+
+  /**
+   * Determine which model caused a failure in dual-model mode
+   */
+  private determineAttribution(
+    test: AgenticReadinessTest,
+    result: RoutingResult,
+    toolCalls: any[]
+  ): 'main' | 'executor' | 'both' | null {
+    if (result.mode !== 'dual') return null;
+
+    const intent = result.intent;
+    const expectedTool = test.expectedTool;
+    const expectedNoTool = test.expectedNoTool;
+
+    // Check if main model got the intent right
+    if (expectedTool) {
+      // Main should have identified this as a tool call
+      if (intent?.action !== 'call_tool' || intent?.tool !== expectedTool) {
+        return 'main'; // Main got the intent wrong
+      }
+      // Main was right, check if executor executed correctly
+      const executedTools = toolCalls.map((tc: any) => tc.function?.name);
+      if (!executedTools.includes(expectedTool)) {
+        return 'executor'; // Executor failed to execute the right tool
+      }
+    }
+
+    if (expectedNoTool) {
+      // Should NOT have called a tool
+      if (intent?.action === 'call_tool') {
+        return 'main'; // Main incorrectly decided to call a tool
+      }
+      if (toolCalls.length > 0) {
+        return 'executor'; // Executor called a tool anyway
+      }
+    }
+
+    // Can't determine - both may have contributed
+    return 'both';
   }
 
   /**
    * Get relevant tool names for a test
    */
   private getRelevantTools(test: AgenticReadinessTest): string[] {
-    // Base set of tools that should be available for all tests
+    // Base set of tools for all tests
     const baseTools = [
       'read_file', 'write_file', 'edit_file',
       'search_files', 'list_directory',
@@ -356,51 +566,105 @@ export class ReadinessRunner {
   }
 
   /**
-   * Call LLM endpoint
+   * Assess ALL available models and return ranked leaderboard
    */
-  private async callLLM(
-    modelId: string,
-    provider: string,
-    messages: any[],
-    tools: any[]
-  ): Promise<any> {
-    let url = '';
-    const headers: any = { 'Content-Type': 'application/json' };
-    const body: any = { 
-      messages, 
-      tools: tools.length > 0 ? tools : undefined,
-      tool_choice: tools.length > 0 ? 'auto' : undefined,
-      temperature: 0, 
-      max_tokens: 1000 
-    };
+  async assessAllModels(
+    modelIds: string[],
+    options: {
+      provider?: 'lmstudio' | 'openai' | 'azure';
+      runCount?: number;
+    } = {}
+  ): Promise<BatchReadinessResult> {
+    const { provider = 'lmstudio', runCount = 1 } = options;
+    const startedAt = new Date().toISOString();
+    const results: ReadinessResult[] = [];
 
-    if (provider === 'lmstudio') {
-      url = `${this.settings.lmstudioUrl}/v1/chat/completions`;
-      body.model = modelId;
-      body.stop = COMMON_STOP_STRINGS;
-    } else if (provider === 'openai') {
-      url = 'https://api.openai.com/v1/chat/completions';
-      headers['Authorization'] = `Bearer ${this.settings.openaiApiKey}`;
-      body.model = modelId;
-    } else if (provider === 'azure') {
-      const { azureResourceName, azureDeploymentName, azureApiKey, azureApiVersion } = this.settings;
-      url = `https://${azureResourceName}.openai.azure.com/openai/deployments/${azureDeploymentName}/chat/completions?api-version=${azureApiVersion || '2024-02-01'}`;
-      headers['api-key'] = azureApiKey;
+    // Broadcast batch start
+    this.broadcast?.broadcastBatchReadinessProgress({
+      currentModel: null,
+      currentModelIndex: 0,
+      totalModels: modelIds.length,
+      status: 'running',
+      results: []
+    });
+
+    for (let i = 0; i < modelIds.length; i++) {
+      const modelId = modelIds[i];
+
+      // Broadcast current model
+      this.broadcast?.broadcastBatchReadinessProgress({
+        currentModel: modelId,
+        currentModelIndex: i + 1,
+        totalModels: modelIds.length,
+        status: 'running',
+        results: results.map(r => ({
+          modelId: r.modelId,
+          score: r.overallScore,
+          certified: r.passed
+        }))
+      });
+
+      try {
+        const result = await this.assessModel(modelId, { provider, runCount });
+        results.push(result);
+      } catch (error: any) {
+        console.error(`[ReadinessRunner] Error assessing ${modelId}:`, error.message);
+        results.push({
+          modelId,
+          assessedAt: new Date().toISOString(),
+          overallScore: 0,
+          passed: false,
+          categoryScores: { tool: 0, rag: 0, reasoning: 0, intent: 0, browser: 0 },
+          testResults: [],
+          failedTests: [],
+          duration: 0,
+        });
+      }
     }
 
-    const response = await axios.post(url, body, { headers, timeout: 120000 });
-    return response.data;
+    // Build leaderboard
+    const leaderboard = results
+      .map((r, index) => ({
+        rank: index + 1,
+        modelId: r.modelId,
+        score: r.overallScore,
+        certified: r.passed
+      }))
+      .sort((a, b) => b.score - a.score)
+      .map((entry, index) => ({ ...entry, rank: index + 1 }));
+
+    const completedAt = new Date().toISOString();
+    const bestModel = leaderboard.length > 0 && leaderboard[0].score > 0 
+      ? leaderboard[0].modelId 
+      : null;
+
+    // Broadcast completion
+    this.broadcast?.broadcastBatchReadinessProgress({
+      currentModel: null,
+      currentModelIndex: modelIds.length,
+      totalModels: modelIds.length,
+      status: 'completed',
+      results: leaderboard,
+      bestModel: bestModel || undefined
+    });
+
+    return {
+      startedAt,
+      completedAt,
+      results,
+      leaderboard,
+      bestModel
+    };
   }
 
   /**
    * Calculate running score from completed tests
    */
-  private calculateRunningScore(results: ReadinessResult['testResults']): number {
+  private calculateRunningScore(results: TestRunResult[]): number {
     if (results.length === 0) return 0;
     const totalScore = results.reduce((sum, r) => sum + r.score, 0);
-    return Math.round((totalScore / results.length) * 100);
+    return Math.round((totalScore / results.length) * 100) / 100;
   }
-
 }
 
 // ============================================================
@@ -420,4 +684,3 @@ export function createReadinessRunner(
 export function getReadinessRunner(): ReadinessRunner | null {
   return runnerInstance;
 }
-
