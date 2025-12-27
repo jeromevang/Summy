@@ -11,6 +11,7 @@ import { capabilities, ModelProfile } from './capabilities.js';
 import { getToolSchemas, buildSystemPrompt } from './tool-prompts.js';
 import { failureLog, type FailureCategory } from '../../services/failure-log.js';
 import { failureObserver } from '../../services/failure-observer.js';
+import { prostheticStore } from './learning/prosthetic-store.js';
 
 // ============================================================
 // TYPES
@@ -452,9 +453,38 @@ class IntentRouter {
 
   /**
    * Build system prompt for Main Model (reasoning, no tools)
+   * Automatically injects prosthetics from the prosthetic-store if available
    */
   private buildMainModelPrompt(): string {
-    return `You are an intent classifier for a coding assistant. Output ONLY JSON.
+    const modelId = this.config?.mainModelId || '';
+    
+    // Check for prosthetic prompt for this model
+    let prostheticSection = '';
+    const prosthetic = prostheticStore.getPrompt(modelId);
+    if (prosthetic) {
+      console.log(`[IntentRouter] Injecting prosthetic (Level ${prosthetic.level}) for ${modelId}`);
+      prostheticSection = `\n\n## MODEL-SPECIFIC GUIDANCE (Based on previous performance)\n${prosthetic.prompt}\n`;
+    }
+    
+    // Also check model capabilities for blocked/learned capabilities
+    let capabilityGuidance = '';
+    if (this.mainProfile) {
+      const blocked = this.mainProfile.blockedCapabilities || [];
+      const learned = this.mainProfile.learnedCapabilities || [];
+      const native = this.mainProfile.nativeStrengths || [];
+      
+      if (blocked.length > 0) {
+        capabilityGuidance += `\nAVOID these tools (known issues): ${blocked.join(', ')}`;
+      }
+      if (native.length > 0) {
+        capabilityGuidance += `\nSTRONG at: ${native.join(', ')}`;
+      }
+      if (learned.length > 0) {
+        capabilityGuidance += `\nIMPROVED at (with guidance): ${learned.join(', ')}`;
+      }
+    }
+    
+    const basePrompt = `You are an intent classifier for a coding assistant. Output ONLY JSON.
 
 CRITICAL: For ANY question about the codebase, project, code, functions, files, or "what does X do" - ALWAYS use rag_query!
 
@@ -469,27 +499,63 @@ Tools:
 - edit_file: Modify existing file content
 - search_files: Find files by name/pattern
 - shell_exec: Run terminal commands
+- git_status: Check git status for changed files
+- git_diff: View git differences
+- git_log: View git commit history
 
 Rules:
 1. Questions about code/project → ALWAYS call_tool with rag_query
 2. "What does this project do?" → call_tool rag_query
 3. "How does X work?" → call_tool rag_query  
 4. "Find/explain/show X" → call_tool rag_query
-5. ONLY use "respond" for pure greetings with NO code context needed (hi, hello, thanks)
+5. "Which files changed?" → call_tool git_status
+6. ONLY use "respond" for pure greetings with NO code context needed (hi, hello, thanks)
 
 Examples:
 - "What does this project do?" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"what does this project do, main purpose and features"}}
 - "How does authentication work?" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"how does authentication work"}}
+- "Which files have been changed?" → {"action":"call_tool","tool":"git_status","parameters":{}}
 - "Read config.json" → {"action":"call_tool","tool":"read_file","parameters":{"filepath":"config.json"}}
 - "Hello!" → {"action":"respond","response":"Hello! How can I help you with your code today?"}
-
+${capabilityGuidance}${prostheticSection}
 When in doubt, use rag_query. Output ONLY JSON:`;
+
+    return basePrompt;
   }
 
   /**
    * Build system prompt for Executor Model (tool execution)
+   * Automatically injects prosthetics from the prosthetic-store if available
    */
   private buildExecutorModelPrompt(enabledTools: string[]): string {
+    const modelId = this.config?.executorModelId || '';
+    
+    // Check for prosthetic prompt for executor model
+    let prostheticGuidance = '';
+    const prosthetic = prostheticStore.getPrompt(modelId);
+    if (prosthetic) {
+      console.log(`[IntentRouter] Injecting executor prosthetic (Level ${prosthetic.level}) for ${modelId}`);
+      prostheticGuidance = prosthetic.prompt;
+    }
+    
+    // Also check model capabilities
+    if (this.executorProfile) {
+      const blocked = this.executorProfile.blockedCapabilities || [];
+      if (blocked.length > 0) {
+        prostheticGuidance += `\nAVOID calling these tools (known issues): ${blocked.join(', ')}`;
+      }
+    }
+    
+    const customRules = [
+      'Read the intent JSON and call the specified tool',
+      'Use the exact parameters from the intent',
+      'Never output text - only tool calls'
+    ];
+    
+    if (prostheticGuidance) {
+      customRules.push(prostheticGuidance);
+    }
+    
     return buildSystemPrompt({
       enabledTools,
       customHeader: `You are a tool execution assistant. Your job is to translate intent into exact tool calls.
@@ -499,11 +565,7 @@ IMPORTANT:
 - Follow the schema exactly
 - Do not reason or explain - just execute
 - Output tool calls only, no text`,
-      customRules: [
-        'Read the intent JSON and call the specified tool',
-        'Use the exact parameters from the intent',
-        'Never output text - only tool calls'
-      ],
+      customRules,
       includeRiskWarnings: false
     });
   }
