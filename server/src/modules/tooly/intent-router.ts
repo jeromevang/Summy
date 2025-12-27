@@ -453,7 +453,7 @@ class IntentRouter {
 
   /**
    * Build system prompt for Main Model (reasoning, no tools)
-   * Automatically injects prosthetics from the prosthetic-store if available
+   * Automatically injects prosthetics and filters tools based on model capabilities
    */
   private buildMainModelPrompt(): string {
     const modelId = this.config?.mainModelId || '';
@@ -466,58 +466,71 @@ class IntentRouter {
       prostheticSection = `\n\n## MODEL-SPECIFIC GUIDANCE (Based on previous performance)\n${prosthetic.prompt}\n`;
     }
     
-    // Also check model capabilities for blocked/learned capabilities
-    let capabilityGuidance = '';
-    if (this.mainProfile) {
-      const blocked = this.mainProfile.blockedCapabilities || [];
-      const learned = this.mainProfile.learnedCapabilities || [];
-      const native = this.mainProfile.nativeStrengths || [];
-      
-      if (blocked.length > 0) {
-        capabilityGuidance += `\nAVOID these tools (known issues): ${blocked.join(', ')}`;
-      }
-      if (native.length > 0) {
-        capabilityGuidance += `\nSTRONG at: ${native.join(', ')}`;
-      }
-      if (learned.length > 0) {
-        capabilityGuidance += `\nIMPROVED at (with guidance): ${learned.join(', ')}`;
-      }
+    // Build capability-aware tool list
+    const blocked = this.mainProfile?.blockedCapabilities || [];
+    const learned = this.mainProfile?.learnedCapabilities || [];
+    const native = this.mainProfile?.nativeStrengths || [];
+    
+    // Define all tools with their categories
+    const allTools: Record<string, { desc: string; category: string }> = {
+      // Code Search
+      'rag_query': { desc: 'Semantic search codebase - USE FOR ANY QUESTION ABOUT CODE/PROJECT', category: 'Code Search (DEFAULT)' },
+      'find_symbol': { desc: 'Find where a symbol/function/class is defined', category: 'Code Search (DEFAULT)' },
+      'get_callers': { desc: 'Find all callers of a function', category: 'Code Search (DEFAULT)' },
+      'get_file_interface': { desc: 'Get exports/interface of a file', category: 'Code Search (DEFAULT)' },
+      'get_dependencies': { desc: 'Get dependency graph of a file', category: 'Code Search (DEFAULT)' },
+      // File Operations
+      'read_file': { desc: 'Read file by exact path', category: 'File Operations' },
+      'list_directory': { desc: 'List directory contents', category: 'File Operations' },
+      'search_files': { desc: 'Find files by pattern', category: 'File Operations' },
+      // Git Operations
+      'git_status': { desc: 'Show changed files', category: 'Git Operations' },
+      'git_diff': { desc: 'Show differences', category: 'Git Operations' },
+      'git_log': { desc: 'Show commit history', category: 'Git Operations' },
+      'git_branch': { desc: 'List/show branches', category: 'Git Operations' },
+      'git_commit': { desc: 'Commit changes (requires message)', category: 'Git Operations' },
+      'git_stash': { desc: 'Stash/unstash changes', category: 'Git Operations' },
+      // System & Package
+      'npm_scripts': { desc: 'List available npm scripts', category: 'System & Package' },
+      'npm_outdated': { desc: 'Check outdated packages', category: 'System & Package' },
+      'http_request': { desc: 'Make HTTP request', category: 'System & Package' },
+      'system_info': { desc: 'Get system information', category: 'System & Package' },
+      'env_get': { desc: 'Get environment variable', category: 'System & Package' },
+      'datetime': { desc: 'Get current date/time', category: 'System & Package' },
+      'clipboard_read': { desc: 'Read clipboard', category: 'System & Package' },
+      'clipboard_write': { desc: 'Write to clipboard', category: 'System & Package' },
+    };
+    
+    // Filter out blocked tools and build categorized list
+    const enabledTools = Object.entries(allTools)
+      .filter(([name]) => !blocked.includes(name))
+      .reduce((acc, [name, info]) => {
+        if (!acc[info.category]) acc[info.category] = [];
+        let marker = '';
+        if (native.includes(name)) marker = ' ⭐ STRONG';
+        if (learned.includes(name)) marker = ' ✓ TESTED';
+        acc[info.category].push(`- ${name}: ${info.desc}${marker}`);
+        return acc;
+      }, {} as Record<string, string[]>);
+    
+    // Build tool list string
+    let toolListStr = '';
+    for (const [category, tools] of Object.entries(enabledTools)) {
+      toolListStr += `\n### ${category}:\n${tools.join('\n')}`;
     }
     
+    // Build capability guidance
+    let capabilityGuidance = '';
+    if (blocked.length > 0) {
+      capabilityGuidance += `\n⚠️ BLOCKED (do not use): ${blocked.join(', ')}`;
+    }
+
     const basePrompt = `# Intent Classifier
 
 You classify user messages into tool calls. Output ONLY ONE line of valid JSON.
 
-## ALL AVAILABLE TOOLS:
-
-### Code Search (DEFAULT - use when unsure):
-- rag_query: Semantic search codebase - USE FOR ANY QUESTION ABOUT CODE/PROJECT
-- find_symbol: Find where a symbol/function/class is defined
-- get_callers: Find all callers of a function
-- get_file_interface: Get exports/interface of a file
-- get_dependencies: Get dependency graph of a file
-
-### File Operations:
-- read_file: Read file by exact path
-- list_directory: List directory contents
-- search_files: Find files by pattern
-
-### Git Operations:
-- git_status: Show changed files
-- git_diff: Show differences (optionally for specific file)
-- git_log: Show commit history
-- git_branch: List/show branches
-- git_commit: Commit changes (requires message)
-- git_stash: Stash/unstash changes
-
-### System & Package:
-- npm_scripts: List available npm scripts
-- npm_outdated: Check outdated packages
-- http_request: Make HTTP request (url, method, body)
-- system_info: Get system information
-- env_get: Get environment variable
-- datetime: Get current date/time
-- clipboard_read/clipboard_write: Clipboard operations
+## AVAILABLE TOOLS (for ${modelId || 'this model'}):
+${toolListStr}
 
 ## DECISION PROCESS:
 
