@@ -192,6 +192,19 @@ export class OpenAIProxy {
                             }
                         });
 
+                        // Stream immediately to show we're working
+                        if (req.isStreaming) {
+                            res.setHeader('Content-Type', 'text/event-stream');
+                            res.setHeader('Cache-Control', 'no-cache');
+                            res.setHeader('Connection', 'keep-alive');
+                            res.flushHeaders();
+                            
+                            // Send thinking indicator immediately
+                            res.write(`data: ${JSON.stringify({ 
+                                choices: [{ delta: { content: '🧠 *Thinking...*\n\n' }, index: 0 }] 
+                            })}\n\n`);
+                        }
+
                         // Route through dual-model pipeline
                         const routingResult = await intentRouter.route(messagesToSend, toolsToSend);
 
@@ -230,11 +243,7 @@ export class OpenAIProxy {
                                 return response.data;
                             };
 
-                            // Execute tools via agentic loop
-                            if (req.isStreaming) {
-                                res.setHeader('Content-Type', 'text/event-stream');
-                            }
-                            
+                            // Execute tools via agentic loop (headers already set above)
                             const { finalResponse, agenticMessages } = await executeAgenticLoop(
                                 routingResult.finalResponse, 
                                 messagesToSend, 
@@ -272,13 +281,16 @@ export class OpenAIProxy {
                         await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, routingResult.finalResponse);
 
                         if (req.isStreaming) {
-                            res.setHeader('Content-Type', 'text/event-stream');
+                            // Headers already set above, stream the content word by word
                             const content = routingResult.finalResponse?.choices?.[0]?.message?.content || '';
 
                             if (content) {
-                                res.write(`data: ${JSON.stringify({ 
-                                    choices: [{ delta: { content }, index: 0 }] 
-                                })}\n\n`);
+                                const words = content.match(/\S+\s*|\n+/g) || [content];
+                                for (const word of words) {
+                                    res.write(`data: ${JSON.stringify({ 
+                                        choices: [{ delta: { content: word }, index: 0 }] 
+                                    })}\n\n`);
+                                }
                             }
 
                             res.write(`data: ${JSON.stringify({ choices: [{ delta: {}, finish_reason: 'stop' }] })}\n\n`);
@@ -364,7 +376,18 @@ export class OpenAIProxy {
                                 parsedResponse, messagesToSend, llmCallFn, ideMappingConfig, req.sessionId, 10, res
                             );
                             await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
-                            res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: "" }, finish_reason: 'stop' }] })}\n\n`);
+                            
+                            // Stream the final response content word by word
+                            const finalContent = finalResponse?.choices?.[0]?.message?.content || '';
+                            if (finalContent) {
+                                const words = finalContent.match(/\S+\s*|\n+/g) || [finalContent];
+                                for (const word of words) {
+                                    res.write(`data: ${JSON.stringify({ 
+                                        choices: [{ delta: { content: word }, index: 0 }] 
+                                    })}\n\n`);
+                                }
+                            }
+                            res.write(`data: ${JSON.stringify({ choices: [{ delta: {}, finish_reason: 'stop' }] })}\n\n`);
                             res.write('data: [DONE]\n\n');
                             res.end();
                         } else {
@@ -429,7 +452,18 @@ export class OpenAIProxy {
                         };
                         const { finalResponse, agenticMessages } = await executeAgenticLoop(parsedResponse, messagesToSend, llmCallFn, ideMappingConfig, req.sessionId, 10, res);
                         await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
-                        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: "" }, finish_reason: 'stop' }] })}\n\n`);
+                        
+                        // Stream the final response content word by word
+                        const finalContent = finalResponse?.choices?.[0]?.message?.content || '';
+                        if (finalContent) {
+                            const words = finalContent.match(/\S+\s*|\n+/g) || [finalContent];
+                            for (const word of words) {
+                                res.write(`data: ${JSON.stringify({ 
+                                    choices: [{ delta: { content: word }, index: 0 }] 
+                                })}\n\n`);
+                            }
+                        }
+                        res.write(`data: ${JSON.stringify({ choices: [{ delta: {}, finish_reason: 'stop' }] })}\n\n`);
                         res.write('data: [DONE]\n\n');
                         res.end();
                     } else {

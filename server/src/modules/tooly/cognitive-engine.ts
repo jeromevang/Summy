@@ -386,17 +386,40 @@ export const executeAgenticLoop = async (
     // Determine initial intent from first tool call
     const initialIntent = toolCalls[0]?.function?.name || 'unknown';
     
-    // Stream immediate feedback to IDE
+    // Stream immediate feedback to IDE (headers already set in openai-proxy.ts)
     const streamToIDE = (message: string) => {
-        if (res && !res.headersSent) {
+        if (res) {
             try {
                 res.write(`data: ${JSON.stringify({
-                    choices: [{ delta: { content: message } }]
+                    choices: [{ delta: { content: message }, index: 0 }]
                 })}\n\n`);
             } catch (e) {
-                // Response might be closed
+                console.log('[AgenticLoop] Stream closed, cannot write');
             }
         }
+    };
+
+    // Tool descriptions for user-friendly feedback
+    const toolDescriptions: Record<string, string> = {
+        'rag_query': '🔍 Searching codebase...',
+        'read_file': '📄 Reading file...',
+        'list_directory': '📁 Listing directory...',
+        'search_files': '🔎 Searching files...',
+        'git_status': '📊 Checking git status...',
+        'extra_tools_git_status': '📊 Checking git status...',
+        'git_diff': '📝 Checking git diff...',
+        'git_log': '📜 Checking git log...',
+        'git_branch': '🌿 Checking branches...',
+        'git_commit': '💾 Making commit...',
+        'http_get': '🌐 Fetching URL...',
+        'http_post': '📤 Sending request...',
+        'clipboard_read': '📋 Reading clipboard...',
+        'clipboard_write': '📋 Writing to clipboard...',
+        'env_get': '⚙️ Getting environment...',
+        'find_symbol': '🔎 Finding symbol...',
+        'get_callers': '📞 Finding callers...',
+        'get_file_interface': '📜 Getting file interface...',
+        'get_dependencies': '📦 Getting dependencies...',
     };
     
     while (toolCalls.length > 0 && iterations < maxIterations) {
@@ -404,21 +427,11 @@ export const executeAgenticLoop = async (
         const toolNames = toolCalls.map((tc: any) => tc.function?.name || 'unknown').join(', ');
         console.log(`[AgenticLoop] Iteration ${iterations}: executing ${toolCalls.length} tool(s): ${toolNames}`);
         
-        // Stream what we're doing to the IDE immediately
-        if (iterations === 1) {
-            const toolDescriptions: Record<string, string> = {
-                'rag_query': '🔍 Searching codebase...',
-                'read_file': '📄 Reading file...',
-                'list_directory': '📁 Listing directory...',
-                'search_files': '🔎 Searching files...',
-                'git_status': '📊 Checking git status...',
-                'extra_tools_git_status': '📊 Checking git status...',
-                'git_diff': '📝 Checking git diff...',
-                'git_log': '📜 Checking git log...',
-            };
-            const firstTool = toolCalls[0]?.function?.name || 'unknown';
-            const description = toolDescriptions[firstTool] || `🔧 Running ${firstTool}...`;
-            streamToIDE(`*${description}*\n\n`);
+        // Stream what we're doing to the IDE on EVERY iteration
+        for (const tc of toolCalls) {
+            const toolName = tc.function?.name || 'unknown';
+            const description = toolDescriptions[toolName] || `🔧 Running ${toolName}...`;
+            streamToIDE(`${description}\n`);
         }
         
         // Add assistant message with tool_calls to conversation

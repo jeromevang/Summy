@@ -359,7 +359,7 @@ export default function Controller() {
                 {failures.slice(0, 20).map(failure => (
                   <div
                     key={failure.id}
-                    className="p-3 rounded-lg border border-gray-700 text-sm"
+                    className="p-3 rounded-lg border border-gray-700 text-sm hover:border-gray-600 transition-colors"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span>{getCategoryIcon(failure.category)}</span>
@@ -367,6 +367,29 @@ export default function Controller() {
                       <span className="text-xs text-gray-500 ml-auto">
                         {new Date(failure.timestamp).toLocaleTimeString()}
                       </span>
+                    </div>
+                    {/* Model ID - linked to model page */}
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs text-purple-400">🤖</span>
+                      <a 
+                        href={`/tooly/model/${encodeURIComponent(failure.modelId)}`}
+                        className="text-xs text-purple-400 hover:text-purple-300 hover:underline truncate max-w-[200px]"
+                        title={failure.modelId}
+                      >
+                        {failure.modelId.split('/').pop() || failure.modelId}
+                      </a>
+                      {failure.executorModelId && failure.executorModelId !== failure.modelId && (
+                        <>
+                          <span className="text-xs text-gray-500">→</span>
+                          <a 
+                            href={`/tooly/model/${encodeURIComponent(failure.executorModelId)}`}
+                            className="text-xs text-blue-400 hover:text-blue-300 hover:underline truncate max-w-[150px]"
+                            title={failure.executorModelId}
+                          >
+                            {failure.executorModelId.split('/').pop()}
+                          </a>
+                        </>
+                      )}
                     </div>
                     <p className="text-gray-400 text-xs truncate">{failure.error}</p>
                     <p className="text-gray-500 text-xs truncate mt-1">
