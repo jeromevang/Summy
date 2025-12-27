@@ -3290,10 +3290,21 @@ router.post('/controller/analyze', async (req, res) => {
     // Call controller model (should be a capable model like Qwen-32B)
     const axios = (await import('axios')).default;
     
-    console.log('[Controller] Calling controller model for analysis...');
+    // Get the currently loaded model in LM Studio
+    let controllerModel = 'gemma-3-27b-tools-i1@iq1_m';
+    try {
+      const modelsRes = await axios.get(`${lmstudioUrl}/v1/models`);
+      const loadedModels = modelsRes.data.data?.filter((m: any) => m.type === 'llm') || [];
+      if (loadedModels.length > 0) {
+        controllerModel = loadedModels[0].id;
+      }
+    } catch { }
+
+    console.log('[Controller] Calling controller model for analysis:', controllerModel);
     const response = await axios.post(
       `${lmstudioUrl}/v1/chat/completions`,
       {
+        model: controllerModel,
         messages: [
           {
             role: 'system',
@@ -3336,14 +3347,105 @@ Output your analysis as JSON with this structure:
     
     // Try to parse JSON from response
     let controllerAnalysis = null;
+    
+    // Robust JSON repair function
+    const repairJson = (str: string): string => {
+      let json = str;
+      
+      // Fix common JSON issues from LLMs
+      json = json.replace(/,\s*}/g, '}');  // Remove trailing commas in objects
+      json = json.replace(/,\s*]/g, ']');   // Remove trailing commas in arrays
+      json = json.replace(/:\s*\.(\d)/g, ': 0.$1');  // Fix .8 -> 0.8
+      json = json.replace(/:\s*,/g, ': null,');  // Fix empty values like "key": ,
+      json = json.replace(/:\s*}/g, ': null}');  // Fix empty values at end of object
+      json = json.replace(/:\s*]/g, ': null]');  // Fix empty values at end of array
+      
+      // Fix missing commas between elements (most common issue)
+      // Between strings: "..." \n "..." -> "...", "..."
+      json = json.replace(/"\s*\n\s*"/g, '", "');
+      // Between objects: } \n { -> }, {
+      json = json.replace(/}\s*\n\s*{/g, '}, {');
+      // Between object and string: } \n "..." -> }, "..."
+      json = json.replace(/}\s*\n\s*"/g, '}, "');
+      // Between array and string: ] \n "..." -> ], "..."
+      json = json.replace(/]\s*\n\s*"/g, '], "');
+      // After string, before object: "..." \n { -> "...", {
+      json = json.replace(/"\s*\n\s*{/g, '", {');
+      // After string, before array: "..." \n [ -> "...", [
+      json = json.replace(/"\s*\n\s*\[/g, '", [');
+      
+      // Remove any // comments (not valid JSON)
+      json = json.replace(/\/\/[^\n]*/g, '');
+      
+      // Fix unescaped newlines inside strings (replace with \n)
+      // This is tricky - we need to find strings and fix them
+      // Simple approach: replace actual newlines that break JSON
+      json = json.replace(/([^\\])"\s*\n\s*([^"]*?[^\\])"/g, '$1" "$2"');
+      
+      return json;
+    };
+    
     try {
-      // Find JSON in response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        controllerAnalysis = JSON.parse(jsonMatch[0]);
+      // Find JSON in response (may be wrapped in markdown code blocks)
+      let jsonStr = content;
+      
+      // Strip markdown code fences if present
+      const markdownMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (markdownMatch) {
+        jsonStr = markdownMatch[1].trim();
       }
-    } catch (parseError) {
-      console.log('[Controller] Could not parse JSON from response, returning raw');
+      
+      // Find the JSON object
+      const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        let cleanJson = repairJson(jsonMatch[0]);
+        
+        try {
+          controllerAnalysis = JSON.parse(cleanJson);
+        } catch (firstError: any) {
+          // If first parse fails, try more aggressive fixes
+          console.log('[Controller] First parse attempt failed:', firstError.message);
+          
+          // Try to find and fix the position error refers to
+          const posMatch = firstError.message.match(/position (\d+)/);
+          if (posMatch) {
+            const pos = parseInt(posMatch[1]);
+            // Look around that position for issues
+            const before = cleanJson.substring(Math.max(0, pos - 50), pos);
+            const after = cleanJson.substring(pos, pos + 50);
+            console.log('[Controller] Context around error:', before + '|ERRORHERE|' + after);
+          }
+          
+          // Fallback: try to extract just the essential fields
+          const fallbackAnalysis = {
+            diagnosis: '',
+            rootCause: '',
+            suggestedProsthetic: { level: 1, prompt: 'Model needs tool usage training', targetCategories: [] },
+            testCases: [],
+            confidence: 50,
+            priority: 'medium' as const
+          };
+          
+          // Try to extract fields with regex
+          const diagMatch = cleanJson.match(/"diagnosis"\s*:\s*"([^"]+)"/);
+          const rootMatch = cleanJson.match(/"rootCause"\s*:\s*"([^"]+)"/);
+          const confMatch = cleanJson.match(/"confidence"\s*:\s*([0-9.]+)/);
+          const prioMatch = cleanJson.match(/"priority"\s*:\s*"([^"]+)"/);
+          
+          if (diagMatch) fallbackAnalysis.diagnosis = diagMatch[1];
+          if (rootMatch) fallbackAnalysis.rootCause = rootMatch[1];
+          if (confMatch) fallbackAnalysis.confidence = parseFloat(confMatch[1]) * (parseFloat(confMatch[1]) <= 1 ? 100 : 1);
+          if (prioMatch) fallbackAnalysis.priority = prioMatch[1] as any;
+          
+          if (fallbackAnalysis.diagnosis || fallbackAnalysis.rootCause) {
+            console.log('[Controller] Using fallback extraction');
+            controllerAnalysis = fallbackAnalysis;
+          }
+        }
+      }
+    } catch (parseError: any) {
+      console.log('[Controller] Could not parse JSON from response:', parseError.message);
+      console.log('[Controller] Raw content snippet:', content.substring(0, 500));
     }
 
     res.json({
