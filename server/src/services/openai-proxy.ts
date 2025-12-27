@@ -115,8 +115,9 @@ export class OpenAIProxy {
             const mcpToolsToAdd = ideMapping.getMCPToolsToAdd(modelEnabledTools, ideMappingConfig);
 
             let toolsToSend = req.body?.tools || [];
-            // Simplified tool logic for proxying
-            if (mcpToolsToAdd.length > 0) {
+            // Only add MCP tools if user explicitly requested tools or if we detect tool-intent
+            const userRequestedTools = req.body?.tools && req.body.tools.length > 0;
+            if (userRequestedTools && mcpToolsToAdd.length > 0) {
                 const existingToolNames = new Set(toolsToSend.map((t: any) => t.function?.name).filter(Boolean));
                 for (const mcpTool of mcpToolsToAdd) {
                     if (!existingToolNames.has(mcpTool) && TOOL_SCHEMAS[mcpTool]) {
@@ -192,22 +193,13 @@ export class OpenAIProxy {
                             }
                         });
 
-                        // Stream immediately to show we're working
+                        // Set up streaming headers for dual-model
                         if (req.isStreaming) {
                             res.setHeader('Content-Type', 'text/event-stream');
                             res.setHeader('Cache-Control', 'no-cache');
                             res.setHeader('Connection', 'keep-alive');
                             res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
                             res.flushHeaders();
-                            
-                            // Send thinking indicator immediately
-                            res.write(`data: ${JSON.stringify({ 
-                                choices: [{ delta: { content: '🧠 *Thinking...*\n\n' }, index: 0 }] 
-                            })}\n\n`);
-                            // Force flush the thinking message
-                            if (typeof (res as any).flush === 'function') {
-                                (res as any).flush();
-                            }
                         }
 
                         // Route through dual-model pipeline
@@ -228,14 +220,42 @@ export class OpenAIProxy {
                         }
 
                         // Check if there are tool calls that need execution
-                        const toolCallsToExecute = routingResult.toolCalls || 
+                        const toolCallsToExecute = routingResult.toolCalls ||
                             routingResult.finalResponse?.choices?.[0]?.message?.tool_calls;
 
                         // In dual-model mode, ALWAYS execute tools locally since we're managing the agentic flow
                         if (toolCallsToExecute && toolCallsToExecute.length > 0) {
                             const toolNames = toolCallsToExecute.map((tc: any) => tc.function?.name || tc.name).join(', ');
                             addDebugEntry('request', `Dual-model: executing ${toolCallsToExecute.length} tool calls via agentic loop: ${toolNames}`, {});
-                            
+
+                            // Stream detailed thinking to IDE as content
+                            if (req.isStreaming && routingResult.phases?.[0]?.reasoning) {
+                                const reasoning = routingResult.phases[0].reasoning;
+                                const thinkingPrefix = `🤔 Main model reasoning: ${reasoning}\n\n`;
+                                const thinkingWords = thinkingPrefix.match(/\S+\s*|\n+/g) || [thinkingPrefix];
+
+                                // Stream thinking as initial content
+                                for (const word of thinkingWords) {
+                                    res.write(`data: ${JSON.stringify({
+                                        choices: [{ delta: { content: word }, index: 0 }]
+                                    })}\n\n`);
+                                }
+
+                                // Stream intent if available
+                                if (routingResult.intent) {
+                                    const intent = routingResult.intent;
+                                    const intentText = `🎯 Intent detected: ${intent.action}${intent.tool ? ` → ${intent.tool}` : ''}\n\n`;
+                                    const intentWords = intentText.match(/\S+\s*|\n+/g) || [intentText];
+
+                                    for (const word of intentWords) {
+                                        res.write(`data: ${JSON.stringify({
+                                            choices: [{ delta: { content: word }, index: 0 }]
+                                        })}\n\n`);
+                                    }
+                                }
+                            }
+
+
                             // Set up LLM call function for follow-up calls
                             const llmCallFn = async (msgs: any[]) => {
                                 const response = await axios.post(`${settings.lmstudioUrl}/v1/chat/completions`, {
@@ -248,17 +268,119 @@ export class OpenAIProxy {
                                 return response.data;
                             };
 
+                            // Create streaming wrapper that adds detailed feedback
+                            const streamingRes = req.isStreaming ? {
+                                write: (chunk: string) => {
+                                    // Parse the chunk to add context
+                                    if (chunk.includes('"content":')) {
+                                        try {
+                                            const event = JSON.parse(chunk.replace('data: ', ''));
+                                            if (event.choices?.[0]?.delta?.content) {
+                                                const content = event.choices[0].delta.content;
+                                                // Add tool execution context
+                                                if (content.includes('Reading file') || content.includes('Searching')) {
+                                                    // These are already tool messages, pass through
+                                                    res.write(chunk);
+                                                } else {
+                                                    // Add analysis context for other content
+                                                    res.write(chunk);
+                                                }
+                                            } else {
+                                                res.write(chunk);
+                                            }
+                                        } catch (e) {
+                                            res.write(chunk);
+                                        }
+                                    } else {
+                                        res.write(chunk);
+                                    }
+                                }
+                            } : undefined;
+
+                            // Create streaming LLM function for analysis phases
+                            const streamingLlmCallFn = async (msgs: any[]) => {
+                                const streamResponse = await axios.post(`${settings.lmstudioUrl}/v1/chat/completions`, {
+                                    model: settings.executorModelId || settings.lmstudioModel,
+                                    messages: msgs,
+                                    tools: [], // No tools for analysis
+                                    temperature: 0,
+                                    stream: true
+                                }, {
+                                    responseType: 'stream'
+                                });
+
+                                return new Promise((resolve, reject) => {
+                                    let fullContent = '';
+                                    let streamEnded = false;
+
+                                    const timeout = setTimeout(() => {
+                                        if (!streamEnded) {
+                                            const parsedResponse = parseStreamingResponse(fullContent);
+                                            resolve(parsedResponse);
+                                        }
+                                    }, 10000); // 10 second timeout
+
+                                    streamResponse.data.on('data', (chunk: Buffer) => {
+                                        const chunkStr = chunk.toString();
+                                        fullContent += chunkStr;
+
+                                        // Stream analysis reasoning to IDE in real-time
+                                        if (streamingRes && chunkStr.includes('data: ')) {
+                                            const lines = chunkStr.split('\n');
+                                            for (const line of lines) {
+                                                if (line.startsWith('data: ')) {
+                                                    const dataStr = line.slice(6);
+                                                    if (dataStr === '[DONE]') {
+                                                        streamEnded = true;
+                                                        clearTimeout(timeout);
+                                                        const parsedResponse = parseStreamingResponse(fullContent);
+                                                        resolve(parsedResponse);
+                                                        return;
+                                                    }
+
+                                                    try {
+                                                        const event = JSON.parse(dataStr);
+                                                        if (event.choices?.[0]?.delta?.content) {
+                                                            const content = event.choices[0].delta.content;
+                                                            // Stream analysis content directly to IDE
+                                                            streamingRes.write(`data: ${JSON.stringify({
+                                                                choices: [{ delta: { content: content }, index: 0 }]
+                                                            })}\n\n`);
+                                                        }
+                                                    } catch (e) {
+                                                        // Skip parse errors
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+
+                                    streamResponse.data.on('end', () => {
+                                        streamEnded = true;
+                                        clearTimeout(timeout);
+                                        const parsedResponse = parseStreamingResponse(fullContent);
+                                        resolve(parsedResponse);
+                                    });
+
+                                    streamResponse.data.on('error', (err) => {
+                                        clearTimeout(timeout);
+                                        reject(err);
+                                    });
+                                });
+                            };
+
                             // Execute tools via agentic loop (headers already set above)
                             const executorModel = settings.executorModelId || settings.lmstudioModel || 'unknown';
                             const { finalResponse, agenticMessages } = await executeAgenticLoop(
-                                routingResult.finalResponse, 
-                                messagesToSend, 
-                                llmCallFn, 
-                                ideMappingConfig, 
-                                req.sessionId, 
-                                10, 
-                                req.isStreaming ? res : undefined,
-                                executorModel
+                                routingResult.finalResponse,
+                                messagesToSend,
+                                llmCallFn,
+                                ideMappingConfig,
+                                req.sessionId,
+                                10,
+                                streamingRes,
+                                executorModel,
+                                streamingLlmCallFn
                             );
 
                             await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
@@ -270,8 +392,8 @@ export class OpenAIProxy {
                                     // Split by words/punctuation for natural streaming
                                     const words = finalContent.match(/\S+\s*|\n+/g) || [finalContent];
                                     for (const word of words) {
-                                        res.write(`data: ${JSON.stringify({ 
-                                            choices: [{ delta: { content: word }, index: 0 }] 
+                                        res.write(`data: ${JSON.stringify({
+                                            choices: [{ delta: { content: word }, index: 0 }]
                                         })}\n\n`);
                                     }
                                 }
@@ -279,6 +401,7 @@ export class OpenAIProxy {
                                 res.write('data: [DONE]\n\n');
                                 res.end();
                             } else {
+                                console.log(`[STREAMING] Dual-model returning JSON response at ${new Date().toISOString()}`);
                                 res.json(finalResponse);
                             }
                             return;
@@ -370,16 +493,42 @@ export class OpenAIProxy {
                     res.setHeader('Connection', 'keep-alive');
                     res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
                     res.flushHeaders();
-                    
+
                     let fullContent = '';
+                    let streamingToIDE = false; // Track if we've started streaming to IDE
+
                     response.data.on('data', (chunk: Buffer) => {
                         const chunkStr = chunk.toString();
                         fullContent += chunkStr;
-                        res.write(chunkStr);
+
+                        // Try to determine if this needs agentic processing
+                        let needsAgentic = false;
+                        try {
+                            const partialResponse = parseStreamingResponse(fullContent);
+                            needsAgentic = shouldExecuteAgentically(partialResponse, ideMappingConfig, mcpToolsToAdd);
+                        } catch (e) {
+                            // If parsing fails, assume no agentic processing needed yet
+                            needsAgentic = false;
+                        }
+
+                        if (needsAgentic) {
+                            // Need agentic processing - accumulate and don't stream yet
+                            return;
+                        } else {
+                            // No agentic processing needed - pass through streaming directly
+                            if (!streamingToIDE) {
+                                streamingToIDE = true;
+                            }
+                            res.write(chunkStr);
+                        }
                     });
+
                     response.data.on('end', async () => {
                         const parsedResponse = parseStreamingResponse(fullContent);
-                        if (shouldExecuteAgentically(parsedResponse, ideMappingConfig, mcpToolsToAdd)) {
+                        const needsAgentic = shouldExecuteAgentically(parsedResponse, ideMappingConfig, mcpToolsToAdd);
+
+                        if (needsAgentic) {
+                            // Now we need agentic processing - stop the direct streaming and do agentic loop
                             const llmCallFn = async (msgs: any[]) => {
                                 const r = await axios.post(lmstudioUrl, { ...modifiedBody, messages: msgs, stream: false });
                                 return r.data;
@@ -388,14 +537,14 @@ export class OpenAIProxy {
                                 parsedResponse, messagesToSend, llmCallFn, ideMappingConfig, req.sessionId, 10, res, settings.lmstudioModel || 'unknown'
                             );
                             await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
-                            
+
                             // Stream the final response content word by word
                             const finalContent = finalResponse?.choices?.[0]?.message?.content || '';
                             if (finalContent) {
                                 const words = finalContent.match(/\S+\s*|\n+/g) || [finalContent];
                                 for (const word of words) {
-                                    res.write(`data: ${JSON.stringify({ 
-                                        choices: [{ delta: { content: word }, index: 0 }] 
+                                    res.write(`data: ${JSON.stringify({
+                                        choices: [{ delta: { content: word }, index: 0 }]
                                     })}\n\n`);
                                 }
                             }
@@ -403,6 +552,7 @@ export class OpenAIProxy {
                             res.write('data: [DONE]\n\n');
                             res.end();
                         } else {
+                            // Already streamed directly - just save session and close
                             await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
                             res.end();
                         }
@@ -453,12 +603,11 @@ export class OpenAIProxy {
                 res.setHeader('Connection', 'keep-alive');
                 res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
                 res.flushHeaders();
-                
+
                 let fullContent = '';
                 response.data.on('data', (chunk: Buffer) => {
                     const chunkStr = chunk.toString();
                     fullContent += chunkStr;
-                    res.write(chunkStr);
                 });
                 response.data.on('end', async () => {
                     const parsedResponse = parseStreamingResponse(fullContent);
@@ -469,14 +618,14 @@ export class OpenAIProxy {
                         };
                         const { finalResponse, agenticMessages } = await executeAgenticLoop(parsedResponse, messagesToSend, llmCallFn, ideMappingConfig, req.sessionId, 10, res, actualModelId);
                         await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
-                        
+
                         // Stream the final response content word by word
                         const finalContent = finalResponse?.choices?.[0]?.message?.content || '';
                         if (finalContent) {
                             const words = finalContent.match(/\S+\s*|\n+/g) || [finalContent];
                             for (const word of words) {
-                                res.write(`data: ${JSON.stringify({ 
-                                    choices: [{ delta: { content: word }, index: 0 }] 
+                                res.write(`data: ${JSON.stringify({
+                                    choices: [{ delta: { content: word }, index: 0 }]
                                 })}\n\n`);
                             }
                         }
@@ -484,8 +633,33 @@ export class OpenAIProxy {
                         res.write('data: [DONE]\n\n');
                         res.end();
                     } else {
+                        // For regular (non-agentic) responses, stream the content properly
                         await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, parsedResponse);
+
+                        const content = parsedResponse?.choices?.[0]?.message?.content || '';
+                        console.log(`[STREAMING] Starting Azure/OpenAI streaming of ${content.length} chars at ${new Date().toISOString()}`);
+                        if (content) {
+                            // Stream content word by word like the agentic loop does
+                            const words = content.match(/\S+\s*|\n+/g) || [content];
+                            console.log(`[STREAMING] Split into ${words.length} tokens for streaming`);
+                            let tokenCount = 0;
+                            for (const word of words) {
+                                tokenCount++;
+                                const timestamp = new Date().toISOString();
+                                console.log(`[STREAMING] IDE TOKEN ${tokenCount}/${words.length}: "${word.replace(/\n/g, '\\n')}" at ${timestamp}`);
+                                res.write(`data: ${JSON.stringify({
+                                    choices: [{ delta: { content: word }, index: 0 }]
+                                })}\n\n`);
+                            }
+                            console.log(`[STREAMING] Completed streaming ${tokenCount} tokens to IDE at ${new Date().toISOString()}`);
+                        }
+
+                        // Send completion
+                        console.log(`[STREAMING] Sending completion to IDE at ${new Date().toISOString()}`);
+                        res.write(`data: ${JSON.stringify({ choices: [{ delta: {}, finish_reason: 'stop' }] })}\n\n`);
+                        res.write('data: [DONE]\n\n');
                         res.end();
+                        console.log(`[STREAMING] Azure/OpenAI streaming fully ended at ${new Date().toISOString()}`);
                     }
                 });
             } else {

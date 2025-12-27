@@ -2278,7 +2278,7 @@ router.post('/readiness/assess', async (req, res) => {
     }, wsBroadcast as any);
 
     // Run assessment with new options
-    const result = await runner.assessModel(modelId, { 
+    const result = await runner.assessModel(modelId, {
       provider: 'lmstudio',
       executorModelId: isDualMode ? executorModelId : undefined,
       runCount: Math.min(Math.max(1, runCount), 3) // Clamp to 1-3
@@ -2356,7 +2356,7 @@ router.post('/readiness/assess-all', async (req, res) => {
     // Import and create runner
     const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner.js');
     const { wsBroadcast } = await import('../index.js');
-    
+
     const runner = createReadinessRunner({
       lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
     }, wsBroadcast as any);
