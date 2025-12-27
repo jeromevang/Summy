@@ -19,7 +19,7 @@ interface ToolResult {
     success: boolean;
 }
 
-async function executeToolCall(toolCall: any): Promise<ToolResult> {
+async function executeToolCall(toolCall: any, modelId: string = 'unknown'): Promise<ToolResult> {
     const name = toolCall.function?.name || toolCall.name;
     const toolCallId = toolCall.id || `tool_${Date.now()}`;
     
@@ -275,7 +275,7 @@ async function executeToolCall(toolCall: any): Promise<ToolResult> {
                     console.log(`[AgenticLoop] ${errorMsg}`);
                     
                     failureLog.logFailure({
-                        modelId: 'cognitive-engine',
+                        modelId,
                         category: 'tool',
                         tool: name,
                         error: errorMsg,
@@ -297,7 +297,7 @@ async function executeToolCall(toolCall: any): Promise<ToolResult> {
         console.error(`[AgenticLoop] Tool ${name} failed:`, error);
         // Log failure to failure log
         failureLog.logFailure({
-            modelId: 'cognitive-engine',
+            modelId,
             category: 'tool',
             tool: name,
             error: error.message,
@@ -371,7 +371,8 @@ export const executeAgenticLoop = async (
     ideConfig: any,
     sessionId: string,
     maxIterations: number = 10,
-    res?: any
+    res?: any,
+    modelId: string = 'unknown'
 ): Promise<any> => {
     console.log('[AgenticLoop] Starting agentic execution loop');
     
@@ -445,7 +446,7 @@ export const executeAgenticLoop = async (
         // Execute all tool calls
         const toolResults: ToolResult[] = [];
         for (const toolCall of toolCalls) {
-            const result = await executeToolCall(toolCall);
+            const result = await executeToolCall(toolCall, modelId);
             toolResults.push(result);
             toolExecutions.push({
                 iteration: iterations,
