@@ -27,7 +27,8 @@ export interface ProstheticVersion {
 }
 
 export interface ProstheticEntry {
-  modelId: string;
+  modelId?: string;  // For individual model prosthetics
+  comboId?: string;  // For combo prosthetics: "mainModel-executorModel"
   prompt: string;
   level: 1 | 2 | 3 | 4;
   probesFixed: string[];
@@ -37,6 +38,7 @@ export interface ProstheticEntry {
     reasoning?: number;
     intent?: number;
     browser?: number;
+    combo_pairing?: number;  // NEW: Combo pairing improvements
   };
   createdAt: string;
   updatedAt: string;
@@ -46,10 +48,15 @@ export interface ProstheticEntry {
   currentVersion: number;
   versions: ProstheticVersion[];
   // NEW: Task-type targeting
-  targetTaskTypes?: string[]; // ['rag_heavy', 'tool_heavy', 'reasoning']
+  targetTaskTypes?: string[]; // ['rag_heavy', 'tool_heavy', 'reasoning', 'combo_coordination']
   contextSizeRange?: [number, number]; // [minTokens, maxTokens]
   // NEW: Distillation source
   learnedFromModel?: string;
+  // NEW: Combo-specific fields
+  mainModelId?: string;      // For combo prosthetics
+  executorModelId?: string;  // For combo prosthetics
+  comboScoreBefore?: number; // Score before applying prosthetic
+  comboScoreAfter?: number;  // Score after applying prosthetic
 }
 
 interface ProstheticStoreData {
@@ -92,6 +99,43 @@ class ProstheticStore {
   }
 
   /**
+   * Get prosthetic for a specific model (individual or combo)
+   */
+  getPrompt(key: string): ProstheticEntry | null {
+    return this.data.entries[key] || null;
+  }
+
+  /**
+   * Get prosthetic for an individual model
+   */
+  getForModel(modelId: string): ProstheticEntry | null {
+    return this.getPrompt(modelId);
+  }
+
+  /**
+   * Get prosthetic for a model combination
+   */
+  getForCombo(mainModelId: string, executorModelId: string): ProstheticEntry | null {
+    const comboId = `${mainModelId}-${executorModelId}`;
+    return this.getPrompt(comboId);
+  }
+
+  /**
+   * Save prosthetic for a model combination
+   */
+  saveComboPrompt(entry: Omit<ProstheticEntry, 'createdAt' | 'updatedAt' | 'successfulRuns' | 'verified' | 'currentVersion' | 'versions' | 'comboId'> & {
+    mainModelId: string;
+    executorModelId: string;
+  }): void {
+    const comboId = `${entry.mainModelId}-${entry.executorModelId}`;
+    this.savePrompt({
+      ...entry,
+      comboId,
+      modelId: undefined, // Clear individual model ID for combo prosthetics
+    });
+  }
+
+  /**
    * Save store to disk
    */
   private save(): void {
@@ -115,7 +159,13 @@ class ProstheticStore {
    * Save prosthetic prompt for a model
    */
   savePrompt(entry: Omit<ProstheticEntry, 'createdAt' | 'updatedAt' | 'successfulRuns' | 'verified' | 'currentVersion' | 'versions'>): void {
-    const existingEntry = this.data.entries[entry.modelId];
+    // Use comboId as key if provided, otherwise use modelId
+    const key = entry.comboId || entry.modelId;
+    if (!key) {
+      throw new Error('Either modelId or comboId must be provided');
+    }
+
+    const existingEntry = this.data.entries[key];
     const now = new Date().toISOString();
 
     // Handle versioning
@@ -131,7 +181,7 @@ class ProstheticStore {
     const versions = existingEntry?.versions || [];
     versions.push(newVersion);
 
-    this.data.entries[entry.modelId] = {
+    this.data.entries[key] = {
       ...entry,
       createdAt: existingEntry?.createdAt || now,
       updatedAt: now,

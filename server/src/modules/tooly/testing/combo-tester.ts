@@ -10,6 +10,7 @@ import { LMStudioClient } from '@lmstudio/sdk';
 import { intentRouter } from '../intent-router.js';
 import { wsBroadcast } from '../../../services/ws-broadcast.js';
 import { db } from '../../../services/database.js';
+import { failureLog } from '../../../services/failure-log.js';
 
 // ============================================================
 // TYPES
@@ -592,7 +593,19 @@ export class ComboTester {
         results.push(excludedScore);
         comboIndex++;
 
-        // Save excluded result to database
+          // Log combo exclusion as failure
+          failureLog.logFailure({
+            modelId: mainModel,
+            executorModelId: executorModel,
+            category: 'combo_pairing',
+            error: `Main model ${mainModel} excluded due to timeout - cannot form combo pairs`,
+            query: `Combo testing: ${mainModel}-${executorModel}`,
+            expectedBehavior: 'Main model should complete intent generation within timeout',
+            actualBehavior: 'Main model too slow, combo excluded',
+            conversationLength: 1
+          });
+
+          // Save excluded result to database
           this.saveResultToDb(excludedScore);
 
           if (this.broadcast) {
@@ -623,6 +636,27 @@ export class ComboTester {
         );
         results.push(score);
 
+        // Log combo failures to central failure log for controller analysis
+        if (score.overallScore < 50) { // Log combos that score below 50%
+          const comboId = `${mainModel}-${executorModel}`;
+          const failedTests = score.testResults.filter(r => !r.passed);
+          const failureReasons = failedTests.map(t => `${t.testName}: ${t.error || 'failed'}`).join('; ');
+
+          failureLog.logFailure({
+            modelId: mainModel,
+            executorModelId: executorModel,
+            category: 'combo_pairing',
+            error: `Combo ${comboId} scored only ${score.overallScore}% (${score.passedTests}/${score.totalTests} tests passed)`,
+            query: `Combo testing: ${comboId}`,
+            expectedBehavior: 'Better model pairing performance',
+            actualBehavior: `Main: ${score.mainScore}%, Executor: ${score.executorScore}%, Overall: ${score.overallScore}%`,
+            toolCallAttempted: failureReasons || 'Multiple test failures',
+            conversationLength: 1
+          });
+
+          console.log(`[ComboTester] Logged combo failure for ${comboId}: ${score.overallScore}%`);
+        }
+
         // Save result to database and broadcast
         this.saveResultToDb(score);
 
@@ -638,6 +672,18 @@ export class ComboTester {
         }
       } catch (error: any) {
         console.error(`[ComboTester] Error testing ${mainModel} + ${executorModel}: ${error.message}`);
+
+        // Log combo testing failure
+        failureLog.logFailure({
+          modelId: mainModel,
+          executorModelId: executorModel,
+          category: 'combo_pairing',
+          error: `Combo testing threw exception: ${error.message}`,
+          query: `Combo testing: ${mainModel}-${executorModel}`,
+          expectedBehavior: 'Combo testing should complete without errors',
+          actualBehavior: `Exception during testing: ${error.message}`,
+          conversationLength: 1
+        });
 
         // Create a failed score
         const failedScore: ComboScore = {
@@ -822,7 +868,19 @@ export class ComboTester {
         results.push(excludedScore);
         comboIndex++;
 
-        // Save excluded result to database
+          // Log combo exclusion as failure
+          failureLog.logFailure({
+            modelId: mainModel,
+            executorModelId: executorModel,
+            category: 'combo_pairing',
+            error: `Main model ${mainModel} excluded due to timeout - cannot form combo pairs`,
+            query: `Combo testing: ${mainModel}-${executorModel}`,
+            expectedBehavior: 'Main model should complete intent generation within timeout',
+            actualBehavior: 'Main model too slow, combo excluded',
+            conversationLength: 1
+          });
+
+          // Save excluded result to database
           this.saveResultToDb(excludedScore);
 
           if (this.broadcast) {
@@ -868,6 +926,19 @@ export class ComboTester {
           }
         } catch (err: any) {
           console.error(`[ComboTester] Combo failed: ${err.message}`);
+
+          // Log combo testing failure
+          failureLog.logFailure({
+            modelId: mainModel,
+            executorModelId: executorModel,
+            category: 'combo_pairing',
+            error: `Combo testing threw exception: ${err.message}`,
+            query: `Combo testing: ${mainModel}-${executorModel}`,
+            expectedBehavior: 'Combo testing should complete without errors',
+            actualBehavior: `Exception during testing: ${err.message}`,
+            conversationLength: 1
+          });
+
           const failedScore = this.createFailedScore(mainModel, executorModel);
           results.push(failedScore);
           

@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 // TYPES
 // ============================================================
 
-export type FailureCategory = 'tool' | 'rag' | 'reasoning' | 'intent' | 'browser' | 'unknown';
+export type FailureCategory = 'tool' | 'rag' | 'reasoning' | 'intent' | 'browser' | 'unknown' | 'combo_pairing';
 
 export interface FailureEntry {
   id: string;
@@ -111,7 +111,8 @@ class FailureLogService {
           reasoning: 0,
           intent: 0,
           browser: 0,
-          unknown: 0
+          unknown: 0,
+          combo_pairing: 0
         },
         failuresByModel: {}
       }
@@ -512,7 +513,8 @@ class FailureLogService {
         reasoning: 0,
         intent: 0,
         browser: 0,
-        unknown: 0
+        unknown: 0,
+        combo_pairing: 0
       },
       failuresByModel: {}
     };

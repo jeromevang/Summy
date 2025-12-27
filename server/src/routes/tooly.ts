@@ -2872,7 +2872,43 @@ router.post('/combo-test/context-sizes', async (req, res) => {
  */
 router.get('/combo-test/results', (req, res) => {
   try {
-    const results = db.getAllComboResults();
+    // Try to get results from database first
+    let results = db.getAllComboResults();
+
+    // If database is empty, try to load from combo-results.json file
+    if (!results || results.length === 0) {
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        const comboResultsPath = path.join(process.cwd(), 'combo-results.json');
+        if (fs.existsSync(comboResultsPath)) {
+          const comboData = JSON.parse(fs.readFileSync(comboResultsPath, 'utf8'));
+          if (comboData.results && Array.isArray(comboData.results)) {
+            // Convert from JSON format to database format
+            results = comboData.results.map((r: any) => ({
+              id: r.id,
+              mainModelId: r.mainModelId,
+              executorModelId: r.executorModelId,
+              overallScore: r.overallScore,
+              mainScore: r.mainScore,
+              executorScore: r.executorScore,
+              tierScores: r.tierScores,
+              categoryScores: r.categoryScores,
+              testResults: r.testResults,
+              passedCount: r.testResults ? r.testResults.filter((t: any) => t.passed).length : 0,
+              failedCount: r.testResults ? r.testResults.filter((t: any) => !t.passed).length : 0,
+              avgLatencyMs: r.avgLatencyMs || 0,
+              testedAt: r.testedAt,
+              mainExcluded: r.mainExcluded || false
+            }));
+            console.log(`[Tooly] Loaded ${results.length} combo results from JSON file`);
+          }
+        }
+      } catch (fileError: any) {
+        console.log('[Tooly] Could not load combo results from JSON file:', fileError.message);
+      }
+    }
+
     res.json({ results });
   } catch (error: any) {
     console.error('[Tooly] Failed to get combo results:', error);
@@ -3488,43 +3524,171 @@ Output your analysis as JSON with this structure:
  */
 function buildControllerPrompt(analysis: any, targetModelId?: string): string {
   const lines: string[] = [];
-  
+
   lines.push('# Failure Analysis Request\n');
-  
+
   if (targetModelId) {
     lines.push(`## Target Model: ${targetModelId}\n`);
   }
-  
-  lines.push('## Failure Patterns Detected:\n');
-  for (const pattern of analysis.unresolvedPatterns) {
-    lines.push(`### ${pattern.name} (${pattern.count} occurrences, ${pattern.severity} severity)`);
-    lines.push(`- Description: ${pattern.description}`);
-    lines.push(`- Category: ${pattern.category}`);
-    lines.push(`- First seen: ${pattern.firstSeen}`);
+
+  // Separate combo pairing failures from individual model failures
+  const comboFailures = analysis.recentFailures.filter((f: any) => f.category === 'combo_pairing');
+  const individualFailures = analysis.recentFailures.filter((f: any) => f.category !== 'combo_pairing');
+  const comboPatterns = analysis.unresolvedPatterns.filter((p: any) => p.category === 'combo_pairing');
+  const individualPatterns = analysis.unresolvedPatterns.filter((p: any) => p.category !== 'combo_pairing');
+
+  // Handle combo pairing failures first (higher priority)
+  if (comboFailures.length > 0 || comboPatterns.length > 0) {
+    lines.push('## 🚨 COMBO PAIRING FAILURES (HIGH PRIORITY)\n');
+    lines.push('These failures involve model combinations (Main + Executor) that perform poorly together.\n');
+
+    lines.push('### Combo Failure Patterns:\n');
+    for (const pattern of comboPatterns) {
+      lines.push(`#### ${pattern.name} (${pattern.count} occurrences, ${pattern.severity} severity)`);
+      lines.push(`- Description: ${pattern.description}`);
+      lines.push(`- Category: ${pattern.category}`);
+      lines.push(`- First seen: ${pattern.firstSeen}`);
+      lines.push('');
+    }
+
+    lines.push('### Recent Combo Failures:\n');
+    for (const failure of comboFailures.slice(0, 5)) {
+      lines.push(`- **${failure.modelId} + ${failure.executorModelId}**: ${failure.error}`);
+      lines.push(`  Query: "${failure.context.query.substring(0, 100)}..."`);
+      lines.push(`  Expected: "${failure.context.expectedBehavior}"`);
+      lines.push(`  Actual: "${failure.context.actualBehavior}"`);
+      lines.push('');
+    }
+
+    lines.push('### Combo-Specific Analysis Instructions:\n');
+    lines.push('- Identify WHY these model pairs fail (e.g., intent handoff issues, capability mismatch)');
+    lines.push('- Suggest prosthetic prompts that help models work better together');
+    lines.push('- Consider combo-specific training approaches');
+    lines.push('- Focus on communication protocols between Main and Executor models');
     lines.push('');
   }
-  
-  lines.push('## Recent Failure Examples:\n');
-  for (const failure of analysis.recentFailures.slice(0, 5)) {
-    lines.push(`- ${failure.category}: ${failure.error}`);
-    lines.push(`  Query: "${failure.context.query.substring(0, 100)}..."`);
-    lines.push(`  Pattern: ${failure.pattern || 'unclassified'}`);
-    lines.push('');
+
+  // Handle individual model failures
+  if (individualPatterns.length > 0) {
+    lines.push('## Individual Model Failure Patterns:\n');
+    for (const pattern of individualPatterns) {
+      lines.push(`### ${pattern.name} (${pattern.count} occurrences, ${pattern.severity} severity)`);
+      lines.push(`- Description: ${pattern.description}`);
+      lines.push(`- Category: ${pattern.category}`);
+      lines.push(`- First seen: ${pattern.firstSeen}`);
+      lines.push('');
+    }
   }
-  
+
+  if (individualFailures.length > 0) {
+    lines.push('## Recent Individual Model Failures:\n');
+    for (const failure of individualFailures.slice(0, 5)) {
+      lines.push(`- ${failure.category}: ${failure.error}`);
+      lines.push(`  Model: ${failure.modelId}`);
+      lines.push(`  Query: "${failure.context.query.substring(0, 100)}..."`);
+      lines.push(`  Pattern: ${failure.pattern || 'unclassified'}`);
+      lines.push('');
+    }
+  }
+
   lines.push('## Models Affected:\n');
   for (const model of analysis.modelSummary) {
     lines.push(`- ${model.modelId}: ${model.failureCount} failures (${model.topPatterns.join(', ')})`);
   }
-  
+
   lines.push('\n## Instructions:');
   lines.push('Analyze these failures and provide:');
-  lines.push('1. Root cause diagnosis');
+  lines.push('1. Root cause diagnosis (especially for combo pairing issues)');
   lines.push('2. A prosthetic prompt that would fix the issue');
+  lines.push('   - For combo failures: focus on inter-model communication and coordination');
+  lines.push('   - For individual failures: focus on specific capability gaps');
   lines.push('3. Test cases to verify the fix works');
-  
+  lines.push('4. Priority: Address combo pairing failures first as they affect production deployment');
+
   return lines.join('\n');
 }
+
+/**
+ * POST /api/tooly/controller/apply-combo-prosthetic
+ * Apply a prosthetic prompt for a specific model combo
+ */
+router.post('/controller/apply-combo-prosthetic', async (req, res) => {
+  try {
+    const { mainModelId, executorModelId, prosthetic, testFirst = true } = req.body;
+
+    if (!mainModelId || !executorModelId || !prosthetic) {
+      return res.status(400).json({ error: 'mainModelId, executorModelId, and prosthetic are required' });
+    }
+
+    const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
+
+    // Save the combo prosthetic
+    prostheticStore.saveComboPrompt({
+      mainModelId,
+      executorModelId,
+      prompt: prosthetic.prompt,
+      level: prosthetic.level || 1,
+      probesFixed: prosthetic.targetCategories || [],
+      categoryImprovements: prosthetic.categoryImprovements || {},
+      comboScoreBefore: prosthetic.comboScoreBefore,
+      comboScoreAfter: prosthetic.comboScoreAfter,
+      targetTaskTypes: prosthetic.targetTaskTypes || ['combo_coordination']
+    });
+
+    res.json({
+      success: true,
+      message: `Combo prosthetic applied to ${mainModelId}-${executorModelId}`,
+      comboId: `${mainModelId}-${executorModelId}`,
+      testFirst
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to apply combo prosthetic:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/controller/run-combo-teaching
+ * Run automated combo teaching cycle for a model pair
+ */
+router.post('/controller/run-combo-teaching', async (req, res) => {
+  try {
+    const { mainModelId, executorModelId, maxAttempts = 4, targetScore = 70 } = req.body;
+
+    if (!mainModelId || !executorModelId) {
+      return res.status(400).json({ error: 'mainModelId and executorModelId are required' });
+    }
+
+    const { ComboTester } = await import('../modules/tooly/testing/combo-tester.js');
+    const { ComboTeachingLoop } = await import('../modules/tooly/orchestrator/combo-teaching-loop.js');
+
+    // Create tester and teaching loop
+    const tester = new ComboTester({
+      mainModels: [mainModelId],
+      executorModels: [executorModelId],
+      lmstudioUrl: 'http://localhost:1234',
+      timeout: 60000,
+      taskTimeout: 10000
+    });
+
+    const teachingLoop = new ComboTeachingLoop(tester);
+
+    // Run teaching cycle
+    const result = await teachingLoop.runComboTeachingCycle(
+      mainModelId,
+      executorModelId,
+      { maxAttempts, targetScore }
+    );
+
+    res.json({
+      success: true,
+      result
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to run combo teaching:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 /**
  * POST /api/tooly/controller/apply-prosthetic
@@ -3532,36 +3696,67 @@ function buildControllerPrompt(analysis: any, targetModelId?: string): string {
  */
 router.post('/controller/apply-prosthetic', async (req, res) => {
   try {
-    const { modelId, prosthetic, testFirst = true } = req.body;
+    const { modelId, comboId, prosthetic, testFirst = true } = req.body;
 
-    if (!modelId || !prosthetic) {
-      return res.status(400).json({ error: 'modelId and prosthetic are required' });
+    if ((!modelId && !comboId) || !prosthetic) {
+      return res.status(400).json({ error: 'Either modelId or comboId and prosthetic are required' });
     }
 
     const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
-    
-    // Save the prosthetic
-    prostheticStore.savePrompt({
-      modelId,
-      prompt: prosthetic.prompt,
-      level: prosthetic.level || 1,
-      probesFixed: prosthetic.targetCategories || [],
-      categoryImprovements: {}
-    });
 
-    // Update model profile
-    const profile = await capabilities.getProfile(modelId);
-    if (profile) {
-      profile.systemPrompt = prosthetic.prompt;
-      profile.prostheticApplied = true;
-      await capabilities.saveProfile(profile);
+    if (comboId) {
+      // Handle combo prosthetic
+      const [mainModelId, executorModelId] = comboId.split('-');
+      if (!mainModelId || !executorModelId) {
+        return res.status(400).json({ error: 'Invalid comboId format. Expected: mainModel-executorModel' });
+      }
+
+      // Save the combo prosthetic
+      prostheticStore.saveComboPrompt({
+        mainModelId,
+        executorModelId,
+        prompt: prosthetic.prompt,
+        level: prosthetic.level || 1,
+        probesFixed: prosthetic.targetCategories || [],
+        categoryImprovements: prosthetic.categoryImprovements || {},
+        comboScoreBefore: prosthetic.comboScoreBefore,
+        comboScoreAfter: prosthetic.comboScoreAfter,
+        targetTaskTypes: prosthetic.targetTaskTypes || ['combo_coordination']
+      });
+
+      console.log(`[Controller] Applied combo prosthetic to ${comboId}`);
+
+      res.json({
+        success: true,
+        message: `Combo prosthetic applied to ${comboId}`,
+        comboId,
+        testFirst
+      });
+    } else {
+      // Handle individual model prosthetic (existing logic)
+      prostheticStore.savePrompt({
+        modelId,
+        prompt: prosthetic.prompt,
+        level: prosthetic.level || 1,
+        probesFixed: prosthetic.targetCategories || [],
+        categoryImprovements: prosthetic.categoryImprovements || {}
+      });
+
+      // Update model profile
+      const profile = await capabilities.getProfile(modelId);
+      if (profile) {
+        profile.systemPrompt = prosthetic.prompt;
+        profile.prostheticApplied = true;
+        await capabilities.saveProfile(profile);
+      }
+
+      res.json({
+        success: true,
+        message: `Prosthetic applied to ${modelId}`,
+        modelId,
+        testFirst
+      });
     }
-
-    res.json({
-      success: true,
-      message: `Prosthetic applied to ${modelId}`,
-      testFirst
-    });
   } catch (error: any) {
     console.error('[Tooly] Failed to apply prosthetic:', error);
     res.status(500).json({ error: error.message });
@@ -3579,15 +3774,57 @@ router.post('/controller/apply-prosthetic', async (req, res) => {
 router.get('/prosthetics', async (req, res) => {
   try {
     const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
-    const prosthetics = prostheticStore.listPrompts();
+    const { type } = req.query;
+
+    let prosthetics = prostheticStore.listPrompts();
+
+    // Filter by type if specified
+    if (type === 'combo') {
+      prosthetics = prosthetics.filter(p => p.comboId);
+    } else if (type === 'individual') {
+      prosthetics = prosthetics.filter(p => p.modelId && !p.comboId);
+    }
+
     const stats = prostheticStore.getStats();
-    
+
     res.json({
       prosthetics,
       stats
     });
   } catch (error: any) {
     console.error('[Tooly] Failed to list prosthetics:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/controller/combo-teaching-results
+ * Get combo teaching cycle results
+ */
+router.get('/controller/combo-teaching-results', async (req, res) => {
+  try {
+    // For now, return mock data - in a real implementation you'd store these results
+    const mockResults = [
+      {
+        success: true,
+        attempts: 2,
+        finalScore: 78,
+        comboId: 'qwen-qwen3-coder-30b-llama-3-8b-instruct',
+        mainModelId: 'qwen-qwen3-coder-30b',
+        executorModelId: 'llama-3-8b-instruct',
+        comboScoreBefore: 65,
+        comboScoreAfter: 78,
+        improvements: { overall: 13 },
+        certified: true,
+        log: ['Started teaching cycle', 'Applied level 2 prosthetic', 'Score improved from 65% to 78%']
+      }
+    ];
+
+    res.json({
+      results: mockResults
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get combo teaching results:', error);
     res.status(500).json({ error: error.message });
   }
 });
