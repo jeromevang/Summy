@@ -2741,26 +2741,26 @@ router.get('/combo-test/recommended', async (req, res) => {
 
     // Find good main model candidates (high reasoning, low tool score)
     const mainCandidates = profiles
-      .filter(p => p.scores && p.scores.reasoningScore > 60)
-      .sort((a, b) => (b.scores?.reasoningScore || 0) - (a.scores?.reasoningScore || 0))
+      .filter(p => p.probeResults && p.probeResults.reasoningScore > 60)
+      .sort((a, b) => (b.probeResults?.reasoningScore || 0) - (a.probeResults?.reasoningScore || 0))
       .slice(0, 5)
       .map(p => ({
         modelId: p.modelId,
         displayName: p.displayName,
-        reasoningScore: p.scores?.reasoningScore || 0,
-        toolScore: p.scores?.toolScore || 0,
+        reasoningScore: p.probeResults?.reasoningScore || 0,
+        toolScore: p.probeResults?.toolScore || 0,
       }));
 
     // Find good executor candidates (high tool score)
     const executorCandidates = profiles
-      .filter(p => p.scores && p.scores.toolScore > 60)
-      .sort((a, b) => (b.scores?.toolScore || 0) - (a.scores?.toolScore || 0))
+      .filter(p => p.probeResults && p.probeResults.toolScore > 60)
+      .sort((a, b) => (b.probeResults?.toolScore || 0) - (a.probeResults?.toolScore || 0))
       .slice(0, 5)
       .map(p => ({
         modelId: p.modelId,
         displayName: p.displayName,
-        toolScore: p.scores?.toolScore || 0,
-        reasoningScore: p.scores?.reasoningScore || 0,
+        toolScore: p.probeResults?.toolScore || 0,
+        reasoningScore: p.probeResults?.reasoningScore || 0,
       }));
 
     res.json({
@@ -2886,6 +2886,563 @@ router.delete('/combo-test/results', (req, res) => {
     res.json({ deleted, message: `Cleared ${deleted} combo test results` });
   } catch (error: any) {
     console.error('[Tooly] Failed to clear combo results:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// SMOKE TESTING (Quick 8-Test Assessment)
+// ============================================================
+
+import { SmokeTester } from '../modules/tooly/testing/smoke-tester.js';
+
+/**
+ * POST /api/tooly/smoke-test/:modelId
+ * Run quick smoke test for native capability assessment
+ */
+router.post('/smoke-test/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+    const { contextSize = 4096, testTrainability = true } = req.body || {};
+
+    // Get LM Studio URL from settings
+    let lmstudioUrl = 'http://localhost:1234';
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        const settings = await fs.readJson(SETTINGS_FILE);
+        lmstudioUrl = settings.lmstudioUrl || lmstudioUrl;
+      }
+    } catch { }
+
+    const tester = new SmokeTester({ lmstudioUrl });
+    const result = await tester.runSmokeTest(decodedModelId, {
+      contextSize,
+      testTrainability
+    });
+
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Tooly] Smoke test failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/smoke-test/:modelId
+ * Get saved smoke test results for a model
+ */
+router.get('/smoke-test/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+
+    const profile = await capabilities.getProfile(decodedModelId);
+    if (!profile) {
+      return res.status(404).json({ error: 'Model profile not found' });
+    }
+
+    if (!profile.smokeTestResults) {
+      return res.status(404).json({ error: 'No smoke test results found for this model' });
+    }
+
+    res.json({
+      ...profile.smokeTestResults,
+      modelId: decodedModelId
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get smoke test results:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/smoke-test
+ * Get smoke test definitions
+ */
+router.get('/smoke-test', (req, res) => {
+  try {
+    const tester = new SmokeTester();
+    const tests = tester.getTestDefinitions();
+    
+    res.json({
+      tests: tests.map(t => ({
+        id: t.id,
+        name: t.name,
+        category: t.category,
+        expectedTool: t.expectedTool,
+        expectedNoTool: t.expectedNoTool
+      })),
+      totalTests: tests.length
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get smoke test definitions:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// FAILURE LOG & CONTROLLER (Self-Improving System)
+// ============================================================
+
+import { failureLog } from '../services/failure-log.js';
+
+/**
+ * GET /api/tooly/failures
+ * Get failure log entries
+ */
+router.get('/failures', (req, res) => {
+  try {
+    const { modelId, category, pattern, resolved, limit, offset, since } = req.query;
+    
+    const failures = failureLog.getFailures({
+      modelId: modelId as string,
+      category: category as any,
+      pattern: pattern as string,
+      resolved: resolved === 'true' ? true : resolved === 'false' ? false : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+      offset: offset ? parseInt(offset as string) : undefined,
+      since: since as string
+    });
+
+    res.json({
+      failures,
+      count: failures.length,
+      stats: failureLog.getStats()
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get failures:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/failures/patterns
+ * Get failure patterns
+ */
+router.get('/failures/patterns', (req, res) => {
+  try {
+    const threshold = req.query.threshold ? parseInt(req.query.threshold as string) : 3;
+    const patterns = failureLog.getPatternsAboveThreshold(threshold);
+    
+    res.json({
+      patterns,
+      count: patterns.length
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get failure patterns:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/failures/stats
+ * Get failure statistics
+ */
+router.get('/failures/stats', (req, res) => {
+  try {
+    const stats = failureLog.getStats();
+    res.json(stats);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get failure stats:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/failures/analysis
+ * Get failure analysis summary for controller
+ */
+router.get('/failures/analysis', (req, res) => {
+  try {
+    const analysis = failureLog.getAnalysisSummary();
+    res.json(analysis);
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get failure analysis:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/failures/:modelId/clear
+ * Clear failures for a model
+ */
+router.post('/failures/:modelId/clear', (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+    const cleared = failureLog.clearForModel(decodedModelId);
+    res.json({ cleared, message: `Cleared ${cleared} failures for ${decodedModelId}` });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to clear failures:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/failures/clear-old
+ * Clear old failures
+ */
+router.post('/failures/clear-old', (req, res) => {
+  try {
+    const { daysOld = 30 } = req.body || {};
+    const cleared = failureLog.clearOld(daysOld);
+    res.json({ cleared, message: `Cleared ${cleared} failures older than ${daysOld} days` });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to clear old failures:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/failures/resolve
+ * Mark failures as resolved
+ */
+router.post('/failures/resolve', (req, res) => {
+  try {
+    const { failureIds, prostheticId } = req.body;
+    
+    if (!failureIds || !Array.isArray(failureIds)) {
+      return res.status(400).json({ error: 'failureIds array is required' });
+    }
+    if (!prostheticId) {
+      return res.status(400).json({ error: 'prostheticId is required' });
+    }
+
+    const resolved = failureLog.markResolved(failureIds, prostheticId);
+    res.json({ resolved, message: `Marked ${resolved} failures as resolved` });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to resolve failures:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// CAPABILITY MAP (Native/Learned/Blocked)
+// ============================================================
+
+/**
+ * GET /api/tooly/models/:modelId/capabilities
+ * Get capability summary for a model
+ */
+router.get('/models/:modelId/capabilities', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const decodedModelId = decodeURIComponent(modelId);
+
+    const summary = await capabilities.getCapabilitySummary(decodedModelId);
+    
+    res.json({
+      modelId: decodedModelId,
+      ...summary
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get capabilities:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PUT /api/tooly/models/:modelId/fallback
+ * Set fallback model for blocked capabilities
+ */
+router.put('/models/:modelId/fallback', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { fallbackModelId } = req.body;
+    const decodedModelId = decodeURIComponent(modelId);
+
+    if (!fallbackModelId) {
+      return res.status(400).json({ error: 'fallbackModelId is required' });
+    }
+
+    await capabilities.setFallbackModel(decodedModelId, fallbackModelId);
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to set fallback model:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/models/with-capability/:capability
+ * Get models that have a specific capability as native strength
+ */
+router.get('/models/with-capability/:capability', async (req, res) => {
+  try {
+    const { capability } = req.params;
+    const models = await capabilities.getModelsWithNativeCapability(capability);
+    
+    res.json({
+      capability,
+      models: models.map(m => ({
+        modelId: m.modelId,
+        displayName: m.displayName,
+        score: m.capabilityMap?.[capability]?.nativeScore || m.score
+      }))
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get models with capability:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================================
+// CONTROLLER (Meta-Agent Analysis)
+// ============================================================
+
+import { failureObserver } from '../services/failure-observer.js';
+
+/**
+ * GET /api/tooly/controller/status
+ * Get controller status including failure observer state
+ */
+router.get('/controller/status', (req, res) => {
+  try {
+    const observerStatus = failureObserver.getStatus();
+    const dashboardSummary = failureObserver.getDashboardSummary();
+    
+    res.json({
+      observer: observerStatus,
+      summary: dashboardSummary
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get controller status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/controller/start
+ * Start the failure observer
+ */
+router.post('/controller/start', (req, res) => {
+  try {
+    failureObserver.start();
+    res.json({ success: true, status: failureObserver.getStatus() });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to start controller:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/controller/stop
+ * Stop the failure observer
+ */
+router.post('/controller/stop', (req, res) => {
+  try {
+    failureObserver.stop();
+    res.json({ success: true, status: failureObserver.getStatus() });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to stop controller:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/tooly/controller/alerts
+ * Get recent failure alerts
+ */
+router.get('/controller/alerts', (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+    const alerts = failureObserver.getAlerts(limit);
+    res.json({ alerts });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to get alerts:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/tooly/controller/analyze
+ * Trigger controller analysis of failure patterns
+ * Expects: Qwen-32B (or similar) already loaded in LM Studio
+ */
+router.post('/controller/analyze', async (req, res) => {
+  try {
+    const { targetModelId } = req.body;
+
+    // Get failure analysis summary
+    const analysis = failureLog.getAnalysisSummary();
+
+    if (analysis.unresolvedPatterns.length === 0 && analysis.recentFailures.length === 0) {
+      return res.json({
+        success: true,
+        message: 'No failures to analyze',
+        analysis: null
+      });
+    }
+
+    // Get settings for LM Studio URL
+    let lmstudioUrl = 'http://localhost:1234';
+    try {
+      if (await fs.pathExists(SETTINGS_FILE)) {
+        const settings = await fs.readJson(SETTINGS_FILE);
+        lmstudioUrl = settings.lmstudioUrl || lmstudioUrl;
+      }
+    } catch { }
+
+    // Build analysis prompt for controller model
+    const prompt = buildControllerPrompt(analysis, targetModelId);
+
+    // Call controller model (should be a capable model like Qwen-32B)
+    const axios = (await import('axios')).default;
+    
+    console.log('[Controller] Calling controller model for analysis...');
+    const response = await axios.post(
+      `${lmstudioUrl}/v1/chat/completions`,
+      {
+        messages: [
+          {
+            role: 'system',
+            content: `You are a controller agent analyzing failure patterns in an AI coding assistant.
+Your job is to:
+1. Identify the root cause of failures
+2. Suggest prosthetic prompts to fix them
+3. Generate test cases to verify the fix
+
+Output your analysis as JSON with this structure:
+{
+  "diagnosis": "Brief explanation of the failure pattern",
+  "rootCause": "Why the model is failing",
+  "suggestedProsthetic": {
+    "level": 1-4,
+    "prompt": "The prosthetic prompt text to add to system prompt",
+    "targetCategories": ["tool", "rag", "intent", etc.]
+  },
+  "testCases": [
+    {
+      "id": "test_fix_1",
+      "prompt": "Test prompt to verify the fix",
+      "expectedTool": "tool_name or null",
+      "expectedBehavior": "What should happen"
+    }
+  ],
+  "confidence": 0-100,
+  "priority": "low" | "medium" | "high" | "critical"
+}`
+          },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.1,
+        max_tokens: 2000
+      },
+      { timeout: 120000 } // 2 minute timeout for analysis
+    );
+
+    const content = response.data.choices?.[0]?.message?.content || '';
+    
+    // Try to parse JSON from response
+    let controllerAnalysis = null;
+    try {
+      // Find JSON in response
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        controllerAnalysis = JSON.parse(jsonMatch[0]);
+      }
+    } catch (parseError) {
+      console.log('[Controller] Could not parse JSON from response, returning raw');
+    }
+
+    res.json({
+      success: true,
+      analysis: controllerAnalysis,
+      rawResponse: content,
+      failureSummary: {
+        unresolvedPatterns: analysis.unresolvedPatterns.length,
+        recentFailures: analysis.recentFailures.length,
+        modelsAffected: analysis.modelSummary.length
+      }
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Controller analysis failed:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * Build prompt for controller model
+ */
+function buildControllerPrompt(analysis: any, targetModelId?: string): string {
+  const lines: string[] = [];
+  
+  lines.push('# Failure Analysis Request\n');
+  
+  if (targetModelId) {
+    lines.push(`## Target Model: ${targetModelId}\n`);
+  }
+  
+  lines.push('## Failure Patterns Detected:\n');
+  for (const pattern of analysis.unresolvedPatterns) {
+    lines.push(`### ${pattern.name} (${pattern.count} occurrences, ${pattern.severity} severity)`);
+    lines.push(`- Description: ${pattern.description}`);
+    lines.push(`- Category: ${pattern.category}`);
+    lines.push(`- First seen: ${pattern.firstSeen}`);
+    lines.push('');
+  }
+  
+  lines.push('## Recent Failure Examples:\n');
+  for (const failure of analysis.recentFailures.slice(0, 5)) {
+    lines.push(`- ${failure.category}: ${failure.error}`);
+    lines.push(`  Query: "${failure.context.query.substring(0, 100)}..."`);
+    lines.push(`  Pattern: ${failure.pattern || 'unclassified'}`);
+    lines.push('');
+  }
+  
+  lines.push('## Models Affected:\n');
+  for (const model of analysis.modelSummary) {
+    lines.push(`- ${model.modelId}: ${model.failureCount} failures (${model.topPatterns.join(', ')})`);
+  }
+  
+  lines.push('\n## Instructions:');
+  lines.push('Analyze these failures and provide:');
+  lines.push('1. Root cause diagnosis');
+  lines.push('2. A prosthetic prompt that would fix the issue');
+  lines.push('3. Test cases to verify the fix works');
+  
+  return lines.join('\n');
+}
+
+/**
+ * POST /api/tooly/controller/apply-prosthetic
+ * Apply a prosthetic prompt suggested by the controller
+ */
+router.post('/controller/apply-prosthetic', async (req, res) => {
+  try {
+    const { modelId, prosthetic, testFirst = true } = req.body;
+
+    if (!modelId || !prosthetic) {
+      return res.status(400).json({ error: 'modelId and prosthetic are required' });
+    }
+
+    const { prostheticStore } = await import('../modules/tooly/learning/prosthetic-store.js');
+    
+    // Save the prosthetic
+    prostheticStore.savePrompt({
+      modelId,
+      prompt: prosthetic.prompt,
+      level: prosthetic.level || 1,
+      probesFixed: prosthetic.targetCategories || [],
+      categoryImprovements: {}
+    });
+
+    // Update model profile
+    const profile = await capabilities.getProfile(modelId);
+    if (profile) {
+      profile.systemPrompt = prosthetic.prompt;
+      profile.prostheticApplied = true;
+      await capabilities.saveProfile(profile);
+    }
+
+    res.json({
+      success: true,
+      message: `Prosthetic applied to ${modelId}`,
+      testFirst
+    });
+  } catch (error: any) {
+    console.error('[Tooly] Failed to apply prosthetic:', error);
     res.status(500).json({ error: error.message });
   }
 });

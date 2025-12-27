@@ -406,9 +406,10 @@ export class Indexer {
       // If the first chunk's content hash matches, file probably hasn't changed much
       // For a proper check, we'd need file-level hash tracking
       // For now, always re-index (can be optimized later)
-      this.ragDb.deleteChunksByFile(relativePath);
+      // IMPORTANT: Delete symbols FIRST (they have foreign keys to chunks)
       this.ragDb.deleteSymbolsByFile(relativePath);
       this.ragDb.deleteFileDependencies(relativePath);
+      this.ragDb.deleteChunksByFile(relativePath);
     }
     
     // Chunk the file
@@ -888,8 +889,10 @@ export class Indexer {
     this.fileWatcher.on('change', (fp) => queueChange(fp, 'change'));
     this.fileWatcher.on('add', (fp) => queueChange(fp, 'add'));
     this.fileWatcher.on('unlink', async (filePath) => {
-      // Remove from index
+      // Remove from index (symbols first, then chunks due to foreign keys)
       const relativePath = path.relative(projectPath, filePath).replace(/\\/g, '/');
+      this.ragDb.deleteSymbolsByFile(relativePath);
+      this.ragDb.deleteFileDependencies(relativePath);
       this.ragDb.deleteChunksByFile(relativePath);
       this.ragDb.deleteFileSummary(relativePath);
     });

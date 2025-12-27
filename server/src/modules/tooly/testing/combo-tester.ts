@@ -7,7 +7,7 @@
 
 import axios from 'axios';
 import { LMStudioClient } from '@lmstudio/sdk';
-import { IntentRouter, intentRouter } from '../intent-router.js';
+import { intentRouter } from '../intent-router.js';
 import { wsBroadcast } from '../../../services/ws-broadcast.js';
 import { db } from '../../../services/database.js';
 
@@ -372,7 +372,6 @@ export class ComboTester {
       
       await client.llm.load(mainModelId, {
         config: { contextLength: contextSize },
-        noHup: true,
       });
       
       wsBroadcast.broadcastModelLoading(mainModelId, 'loaded', 'Main model ready');
@@ -385,7 +384,6 @@ export class ComboTester {
         
         await client.llm.load(executorModelId, {
           config: { contextLength: contextSize },
-          noHup: true,
         });
         
         wsBroadcast.broadcastModelLoading(executorModelId, 'loaded', 'Executor model ready');

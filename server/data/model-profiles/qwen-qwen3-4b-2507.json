@@ -2,12 +2,227 @@
   "modelId": "qwen/qwen3-4b-2507",
   "displayName": "qwen/qwen3-4b-2507",
   "provider": "lmstudio",
-  "testedAt": "2025-12-23T02:22:31.404Z",
-  "testVersion": 1,
-  "score": 0,
+  "testedAt": "2025-12-26T23:49:24.057Z",
+  "testVersion": 2,
+  "score": 61,
   "toolFormat": "openai",
-  "capabilities": {},
-  "enabledTools": [],
+  "capabilities": {
+    "read_file": {
+      "supported": true,
+      "score": 80,
+      "testsPassed": 3,
+      "testsFailed": 1,
+      "avgLatency": 462,
+      "lastTested": "2025-12-26T23:49:24.057Z"
+    },
+    "write_file": {
+      "supported": true,
+      "score": 87,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 1120.5,
+      "lastTested": "2025-12-26T23:49:24.057Z"
+    },
+    "list_directory": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 1,
+      "testsFailed": 0,
+      "avgLatency": 413,
+      "lastTested": "2025-12-26T23:49:24.057Z"
+    },
+    "search_files": {
+      "supported": false,
+      "score": 50,
+      "testsPassed": 1,
+      "testsFailed": 1,
+      "avgLatency": 415,
+      "lastTested": "2025-12-26T23:49:24.057Z"
+    },
+    "rag_query": {
+      "supported": true,
+      "score": 100,
+      "testsPassed": 2,
+      "testsFailed": 0,
+      "avgLatency": 713,
+      "lastTested": "2025-12-26T23:49:24.057Z"
+    },
+    "none": {
+      "supported": false,
+      "score": 0,
+      "testsPassed": 0,
+      "testsFailed": 1,
+      "avgLatency": 1592,
+      "lastTested": "2025-12-26T23:49:24.057Z"
+    },
+    "probe": {
+      "supported": false,
+      "score": 8,
+      "testsPassed": 1,
+      "testsFailed": 7,
+      "avgLatency": 1891.75,
+      "lastTested": "2025-12-26T23:49:24.057Z"
+    }
+  },
+  "enabledTools": [
+    "read_file",
+    "write_file",
+    "list_directory",
+    "rag_query"
+  ],
   "systemPrompt": "## CRITICAL BEHAVIOR REQUIREMENTS\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Tool Selection\n- Only call tools when the task requires external action\n- Choose the most specific tool for the task (read_file for one file, search_files for searching)\n- Provide complete and accurate arguments to tools\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n### MANDATORY CONSTRAINTS\n- You MUST follow the above rules without exception\n- Failure to use RAG before file reads is a critical error\n- Unnecessary tool calls for knowledge questions waste resources\n\n\n",
-  "prostheticApplied": true
+  "prostheticApplied": true,
+  "testResults": [
+    {
+      "testId": "read_file_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-af8dwbwocuptrbni1tg4gj\",\"object\":\"chat.completion\",\"created\":1766792940,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"244784789\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"config.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":190,\"completion_tokens\":20,\"total_tokens\":210},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-4b-2507\"}"
+    },
+    {
+      "testId": "read_file_nested",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-yh047zjflqrq1gle4f29cm\",\"object\":\"chat.completion\",\"created\":1766792940,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"118925590\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"src/utils/helpers.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":189,\"completion_tokens\":22,\"total_tokens\":211},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-4b-2507\"}"
+    },
+    {
+      "testId": "write_file_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-x943x28npobju2s936qlc\",\"object\":\"chat.completion\",\"created\":1766792941,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"640246694\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"hello.js\\\",\\\"content\\\":\\\"console.log(\\\\\\\"Hello World\\\\\\\")\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":221,\"completion_tokens\":31,\"total_tokens\":252},\"stats\":{},\"system_fingerpr"
+    },
+    {
+      "testId": "list_directory_basic",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-ggv5ygygclgp2fml5olj2j\",\"object\":\"chat.completion\",\"created\":1766792942,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"924210769\",\"function\":{\"name\":\"list_directory\",\"arguments\":\"{\\\"path\\\":\\\"src\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":183,\"completion_tokens\":19,\"total_tokens\":202},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-4b-2507\"}"
+    },
+    {
+      "testId": "search_files_basic",
+      "passed": true,
+      "score": 99,
+      "response": "{\"id\":\"chatcmpl-dk7y38r382ascm2pmwlw2e\",\"object\":\"chat.completion\",\"created\":1766792942,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"459898785\",\"function\":{\"name\":\"search_files\",\"arguments\":\"{\\\"directory\\\":\\\".\\\",\\\"pattern\\\":\\\"*.ts\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":228,\"completion_tokens\":23,\"total_tokens\":251},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-4b-2507\"}"
+    },
+    {
+      "testId": "reasoning_multi_step",
+      "passed": false,
+      "score": 20,
+      "response": "{\"id\":\"chatcmpl-rec91optrqtdshtana2b45\",\"object\":\"chat.completion\",\"created\":1766792943,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"783787601\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"project/src/auth/auth.py\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":200,\"completion_tokens\":23,\"total_tokens\":223},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-4b-2507\"}"
+    },
+    {
+      "testId": "reasoning_conditional",
+      "passed": true,
+      "score": 75,
+      "response": "{\"id\":\"chatcmpl-611gk99gcao8i3v0fi26u9\",\"object\":\"chat.completion\",\"created\":1766792943,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I need to check if a file called \\\"README.md\\\" exists and either read it or create one with basic project info. Since I don't have direct file system access, I'll simulate this process by checking for the file and creating it if it doesn't exist.\\n\\n\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"206015173\",\"function\":{\"name\""
+    },
+    {
+      "testId": "rag_priority",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-smgp8ofozwyu6zimyok9\",\"object\":\"chat.completion\",\"created\":1766792945,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"789198216\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"how does the user authentication flow work\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":372,\"completion_tokens\":31,\"total_tokens\":403},\"stats\":{},\"system_fingerprint\""
+    },
+    {
+      "testId": "rag_vs_read",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-h348zrkj79a5bs78rmmp\",\"object\":\"chat.completion\",\"created\":1766792945,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"858396948\",\"function\":{\"name\":\"rag_query\",\"arguments\":\"{\\\"query\\\":\\\"explain the database schema used in this project\\\",\\\"limit\\\":5}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":370,\"completion_tokens\":32,\"total_tokens\":402},\"stats\":{},\"system_finger"
+    },
+    {
+      "testId": "intent_question_no_tool",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-cnmjyfp3i8ucgqywyzpne\",\"object\":\"chat.completion\",\"created\":1766792946,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"TypeScript is a programming language that builds on top of JavaScript. It adds static typing to JavaScript, which means that you can define the types of variables, function parameters, and return values at the time of declaration. This helps catch errors at compile time rather than at runtime, improving code quality and"
+    },
+    {
+      "testId": "intent_file_read",
+      "passed": true,
+      "score": 100,
+      "response": "{\"id\":\"chatcmpl-g2e5catl9wu6ors5amnple\",\"object\":\"chat.completion\",\"created\":1766792948,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"type\":\"function\",\"id\":\"335259998\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"package.json\\\"}\"}}]},\"logprobs\":null,\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":180,\"completion_tokens\":20,\"total_tokens\":200},\"stats\":{},\"system_fingerprint\":\"qwen/qwen3-4b-2507\"}"
+    },
+    {
+      "testId": "intent_search_needed",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-6fx11ty6foie9czsvsgjk8\",\"object\":\"chat.completion\",\"created\":1766792948,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I don't have specific information about the login component's location without more context or source files. Could you provide additional details, such as the project structure or file names? If you'd like, I can help search for relevant files if you provide the appropriate directory and pattern.\",\"tool_calls\":[]},\"log"
+    },
+    {
+      "testId": "14.1",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-rl7tbn67pqj34at8wmmpa\",\"object\":\"chat.completion\",\"created\":1766792948,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The `package.json` file is a fundamental configuration file in JavaScript projects, especially those using **Node.js** and **npm** (Node Package Manager). Its primary purpose is to **manage and define the dependencies, scripts, metadata, and configuration** of a project.\\n\\n### Key Purposes of `package.json`:\\n\\n1. **Pr"
+    },
+    {
+      "testId": "14.2",
+      "passed": false,
+      "score": 0,
+      "error": "toolCalls.some is not a function"
+    },
+    {
+      "testId": "14.3",
+      "passed": false,
+      "score": 0,
+      "error": "toolCalls.some is not a function"
+    },
+    {
+      "testId": "14.4",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-ya7z7wp9x8dp85vsd2217p\",\"object\":\"chat.completion\",\"created\":1766792953,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Here's a simple function to validate an email address using basic regex patterns:\\n\\n```python\\nimport re\\n\\ndef validate_email(email):\\n    \\\"\\\"\\\"\\n    Validates an email address using a basic regex pattern.\\n    \\n    Args:\\n        email (str): The email address to validate\\n        \\n    Returns:\\n        bool: Tru"
+    },
+    {
+      "testId": "14.5",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-mlrjofnilcb3892j6j9ol\",\"object\":\"chat.completion\",\"created\":1766792956,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"A **README file** is a standard document included in software projects, especially in open-source or publicly shared code repositories. It serves as a user-friendly introduction to the project and helps others understand its purpose, usage, and structure. A typical README file contains the following key sections:\\n\\n---"
+    },
+    {
+      "testId": "14.6",
+      "passed": true,
+      "score": 60,
+      "response": "{\"id\":\"chatcmpl-374rm918o999uvtlk5etsw\",\"object\":\"chat.completion\",\"created\":1766792959,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"**An Extremely Detailed, Comprehensive Explanation of What a Variable Is in Programming**\\n\\nIn the world of programming, one of the most fundamental and essential concepts is the **variable**. A variable is a named storage location in a computer’s memory that holds a value, which can be changed during the execution of"
+    },
+    {
+      "testId": "14.7",
+      "passed": false,
+      "score": 0,
+      "response": "{\"id\":\"chatcmpl-lmu7lx08rw9f3wdrvs9gnh\",\"object\":\"chat.completion\",\"created\":1766792961,\"model\":\"qwen/qwen3-4b-2507\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Sure! Here are five common programming languages:\\n\\n1. **Python** – Known for its simplicity and readability, widely used in web development, data science, artificial intelligence, and automation.\\n\\n2. **JavaScript** – Primarily used for web development, enabling interactive features on websites and running in browse"
+    },
+    {
+      "testId": "14.8",
+      "passed": false,
+      "score": 0,
+      "error": "toolCalls.some is not a function"
+    }
+  ],
+  "trainabilityScores": {
+    "systemPromptCompliance": 8,
+    "instructionPersistence": 8,
+    "correctionAcceptance": 8,
+    "overallTrainability": 8
+  },
+  "contextLatency": {
+    "testedContextSizes": [
+      2048,
+      4096,
+      8192,
+      16384,
+      32768,
+      65536
+    ],
+    "latencies": {
+      "2048": 420,
+      "4096": 420,
+      "8192": 416,
+      "16384": 413,
+      "32768": 410,
+      "65536": 414
+    },
+    "maxUsableContext": 65536,
+    "recommendedContext": 65536,
+    "modelMaxContext": 262144,
+    "minLatency": 410,
+    "isInteractiveSpeed": true,
+    "speedRating": "excellent"
+  },
+  "contextLength": 65536
 }

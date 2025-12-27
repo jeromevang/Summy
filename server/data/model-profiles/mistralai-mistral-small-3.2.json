@@ -1836,5 +1836,36 @@
     "instructionPersistence": 14,
     "correctionAcceptance": 64,
     "overallTrainability": 29
-  }
+  },
+  "smokeTestResults": {
+    "testedAt": "2025-12-26T23:09:59.240Z",
+    "passed": false,
+    "score": 13,
+    "nativeCapabilities": [
+      "intent"
+    ],
+    "trainableCapabilities": [],
+    "blockedCapabilities": [
+      "rag",
+      "tool",
+      "multi_step",
+      "param_extraction",
+      "format",
+      "browser",
+      "reasoning"
+    ]
+  },
+  "nativeStrengths": [
+    "intent"
+  ],
+  "learnedCapabilities": [],
+  "blockedCapabilities": [
+    "rag",
+    "tool",
+    "multi_step",
+    "param_extraction",
+    "format",
+    "browser",
+    "reasoning"
+  ]
 }

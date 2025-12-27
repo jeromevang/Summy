@@ -89,6 +89,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   🧪 Combo
                 </Link>
                 <Link
+                  to="/tooly/controller"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === '/tooly/controller'
+                      ? 'bg-[#2d2d2d] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
+                  }`}
+                  title="Self-Improving System Controller"
+                >
+                  🎮 Controller
+                </Link>
+                <Link
                   to="/rag"
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     location.pathname === '/rag'

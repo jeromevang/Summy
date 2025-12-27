@@ -23,6 +23,23 @@ export interface ToolCapability {
   lastTested?: string;
   notes?: string;
   nativeAliases?: string[];  // Model's native tool names that map to this MCP tool
+  
+  // Self-improving agentic system: Native vs Trained tracking
+  nativeScore?: number;      // Score without prosthetic (out of the box)
+  trainedScore?: number;     // Score after prosthetic applied
+  trainable?: boolean | null; // true = can learn, false = blocked, null = untested
+}
+
+/**
+ * Capability status for a tool/skill
+ * Used by the self-improving agentic system
+ */
+export interface CapabilityStatus {
+  nativeScore: number;       // Works out of the box (0-100)
+  trainedScore: number | null; // After prosthetic applied
+  trainable: boolean | null;  // Can be improved with prosthetic
+  blocked: boolean;          // Should route to different model
+  lastTested?: string;
 }
 
 export interface ProbeTestResult {
@@ -136,6 +153,49 @@ export interface ModelProfile {
     response?: string;
     error?: string;
   }>;
+
+  // ============================================================
+  // SELF-IMPROVING AGENTIC SYSTEM
+  // ============================================================
+
+  /**
+   * Capability map for the self-improving system
+   * Tracks native vs trained scores per capability
+   */
+  capabilityMap?: Record<string, CapabilityStatus>;
+
+  /**
+   * Capabilities that work natively (no prosthetic needed)
+   */
+  nativeStrengths?: string[];
+
+  /**
+   * Capabilities that were learned via prosthetic
+   */
+  learnedCapabilities?: string[];
+
+  /**
+   * Capabilities that should be routed to a different model
+   * (trainable: false, or consistently failing)
+   */
+  blockedCapabilities?: string[];
+
+  /**
+   * Recommended fallback model for blocked capabilities
+   */
+  fallbackModelId?: string;
+
+  /**
+   * Smoke test results (quick 8-test assessment)
+   */
+  smokeTestResults?: {
+    testedAt: string;
+    passed: boolean;
+    score: number;
+    nativeCapabilities: string[];
+    trainableCapabilities: string[];
+    blockedCapabilities: string[];
+  };
 }
 
 // ============================================================
@@ -791,6 +851,194 @@ class CapabilitiesService {
    */
   clearCache(): void {
     this.cache.clear();
+  }
+
+  // ============================================================
+  // SELF-IMPROVING AGENTIC SYSTEM METHODS
+  // ============================================================
+
+  /**
+   * Update capability map with smoke test results
+   */
+  async updateCapabilityMap(
+    modelId: string,
+    capabilityResults: Array<{
+      capability: string;
+      nativeScore: number;
+      trainedScore?: number;
+      trainable?: boolean;
+    }>
+  ): Promise<void> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) {
+      throw new Error(`Profile not found for model: ${modelId}`);
+    }
+
+    // Initialize capability map if needed
+    if (!profile.capabilityMap) {
+      profile.capabilityMap = {};
+    }
+
+    const nativeStrengths: string[] = [];
+    const learnedCapabilities: string[] = [];
+    const blockedCapabilities: string[] = [];
+
+    for (const result of capabilityResults) {
+      profile.capabilityMap[result.capability] = {
+        nativeScore: result.nativeScore,
+        trainedScore: result.trainedScore ?? null,
+        trainable: result.trainable ?? null,
+        blocked: result.trainable === false || (result.nativeScore < 50 && result.trainedScore !== undefined && result.trainedScore < 60),
+        lastTested: new Date().toISOString()
+      };
+
+      // Categorize
+      if (result.nativeScore >= 70) {
+        nativeStrengths.push(result.capability);
+      } else if (result.trainedScore !== undefined && result.trainedScore >= 70) {
+        learnedCapabilities.push(result.capability);
+      } else if (result.trainable === false) {
+        blockedCapabilities.push(result.capability);
+      }
+    }
+
+    profile.nativeStrengths = nativeStrengths;
+    profile.learnedCapabilities = learnedCapabilities;
+    profile.blockedCapabilities = blockedCapabilities;
+
+    await this.saveProfile(profile);
+    console.log(`[Capabilities] Updated capability map for ${modelId}: native=${nativeStrengths.length}, learned=${learnedCapabilities.length}, blocked=${blockedCapabilities.length}`);
+  }
+
+  /**
+   * Update smoke test results
+   */
+  async updateSmokeTestResults(
+    modelId: string,
+    results: {
+      passed: boolean;
+      score: number;
+      nativeCapabilities: string[];
+      trainableCapabilities: string[];
+      blockedCapabilities: string[];
+    }
+  ): Promise<void> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) {
+      throw new Error(`Profile not found for model: ${modelId}`);
+    }
+
+    profile.smokeTestResults = {
+      testedAt: new Date().toISOString(),
+      ...results
+    };
+
+    // Also update the convenience arrays
+    profile.nativeStrengths = results.nativeCapabilities;
+    profile.learnedCapabilities = results.trainableCapabilities;
+    profile.blockedCapabilities = results.blockedCapabilities;
+
+    await this.saveProfile(profile);
+    console.log(`[Capabilities] Updated smoke test results for ${modelId}: passed=${results.passed}, score=${results.score}`);
+  }
+
+  /**
+   * Check if a capability is blocked for a model
+   */
+  async isCapabilityBlocked(modelId: string, capability: string): Promise<boolean> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) return false;
+
+    // Check blockedCapabilities array
+    if (profile.blockedCapabilities?.includes(capability)) {
+      return true;
+    }
+
+    // Check capability map
+    const capStatus = profile.capabilityMap?.[capability];
+    if (capStatus?.blocked) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Get the fallback model for blocked capabilities
+   */
+  async getFallbackModel(modelId: string, capability: string): Promise<string | null> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) return null;
+
+    // If specific fallback is set, use it
+    if (profile.fallbackModelId) {
+      return profile.fallbackModelId;
+    }
+
+    // Find a model that has this capability as a native strength
+    const allProfiles = await this.getAllProfiles();
+    for (const p of allProfiles) {
+      if (p.modelId !== modelId && p.nativeStrengths?.includes(capability)) {
+        return p.modelId;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Set fallback model for a profile
+   */
+  async setFallbackModel(modelId: string, fallbackModelId: string): Promise<void> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) {
+      throw new Error(`Profile not found for model: ${modelId}`);
+    }
+
+    profile.fallbackModelId = fallbackModelId;
+    await this.saveProfile(profile);
+    console.log(`[Capabilities] Set fallback model for ${modelId}: ${fallbackModelId}`);
+  }
+
+  /**
+   * Get models with specific capability as native strength
+   */
+  async getModelsWithNativeCapability(capability: string): Promise<ModelProfile[]> {
+    const allProfiles = await this.getAllProfiles();
+    return allProfiles.filter(p => p.nativeStrengths?.includes(capability));
+  }
+
+  /**
+   * Get capability summary for a model
+   */
+  async getCapabilitySummary(modelId: string): Promise<{
+    native: string[];
+    learned: string[];
+    blocked: string[];
+    untested: string[];
+    fallbackModel: string | null;
+  }> {
+    const profile = await this.getProfile(modelId);
+    if (!profile) {
+      return { native: [], learned: [], blocked: [], untested: [], fallbackModel: null };
+    }
+
+    const allCapabilities = ['rag_query', 'read_file', 'write_file', 'search_files', 'shell_exec', 'web_search', 'browser_navigate', 'multi_step'];
+    const tested = new Set([
+      ...(profile.nativeStrengths || []),
+      ...(profile.learnedCapabilities || []),
+      ...(profile.blockedCapabilities || [])
+    ]);
+
+    const untested = allCapabilities.filter(c => !tested.has(c));
+
+    return {
+      native: profile.nativeStrengths || [],
+      learned: profile.learnedCapabilities || [],
+      blocked: profile.blockedCapabilities || [],
+      untested,
+      fallbackModel: profile.fallbackModelId || null
+    };
   }
 }
 

@@ -1,88 +1,97 @@
 # WORKING_MEMORY
 
 ## Current Goal
-Self-Improving Agentic System - Build hybrid testing + production learning system
+Self-Improving Agentic System - **IMPLEMENTATION IN PROGRESS**
 
 ## Session Summary (Dec 26, 2024 - Night)
 
-### Plan Created: Self-Improving Agentic System
-**Plan file:** `c:\Users\Jerome\.cursor\plans\self-improving_agentic_system_0ee41105.plan.md`
+### Implementation Status: 85% Complete ✅
 
-### Key Decisions Made
+#### Phase 1: Foundation (100% Complete) ✅
+- [x] `failure-log.ts` - JSON-based failure persistence at `server/data/failure-log.json`
+- [x] `combo-profile-store.ts` - Combo profiles at `server/data/combo-profiles/`
+- [x] Extended `capabilities.ts` with:
+  - `nativeScore`, `trainedScore`, `trainable` per capability
+  - `capabilityMap`, `nativeStrengths`, `learnedCapabilities`, `blockedCapabilities`
+  - `smokeTestResults` for quick assessment data
+  - Helper methods: `updateCapabilityMap()`, `isCapabilityBlocked()`, `getFallbackModel()`
 
-1. **Hybrid Testing Approach (Option C)**
-   - Quick smoke test (30s, 8 tests) before deployment
-   - Deploy with monitoring, learn from real failures
-   - Manual controller trigger (no auto hot-swap yet)
+#### Phase 2: Quick Smoke Test (100% Complete) ✅
+- [x] `smoke-tester.ts` - 8-test native capability assessment (~30 seconds)
+  - Tests: RAG, tool selection, intent (no tool), multi-step, params, format, browser, reasoning
+  - Trainability probe: retests failed tests with Level 1 prosthetic
+  - Outputs: `nativeCapabilities`, `trainableCapabilities`, `blockedCapabilities`
+- [x] API: `POST /api/tooly/smoke-test/:modelId`
+- [x] API: `GET /api/tooly/smoke-test/:modelId` (get saved results)
+- [x] API: `GET /api/tooly/smoke-test` (get test definitions)
 
-2. **Native vs Trainable Distinction**
-   - Track `nativeScore` - works out of the box
-   - Track `trainedScore` - after prosthetic applied
-   - Track `trainable` - can learn (true/false/null)
-   - `blockedCapabilities` - route to different model
+#### Phase 3: Production Failure Monitoring (90% Complete) ✅
+- [x] `failure-observer.ts` - Real-time pattern detection + WebSocket alerts
+- [x] Wired failure logging to `intent-router.ts`
+  - `logFailure()` and `reportRoutingFailure()` methods
+  - Automatic pattern detection and observer notification
+- [x] API endpoints for failures:
+  - `GET /api/tooly/failures` - list with filters
+  - `GET /api/tooly/failures/patterns` - grouped patterns
+  - `GET /api/tooly/failures/stats` - statistics
+  - `GET /api/tooly/failures/analysis` - summary for controller
+  - `POST /api/tooly/failures/resolve` - mark as resolved
+  - `POST /api/tooly/failures/:modelId/clear` - clear for model
+- [ ] Wire CognitiveHUD to Sessions (deferred - needs WebSocket changes)
 
-3. **Controller Model: Manual First**
-   - User loads Qwen-32B in LM Studio manually
-   - User clicks "Analyze" in Controller page
-   - Controller reads failure-log.json, generates prosthetic + tests
-   - User reviews and approves
-   - No auto hot-swap until validated
+#### Phase 4: Controller Page (90% Complete) ✅
+- [x] `Controller.tsx` - Full controller UI with:
+  - Failure pattern list with severity badges
+  - Recent failures feed
+  - Controller analysis trigger
+  - Prosthetic review and apply
+  - Real-time alert display
+- [x] Controller endpoints:
+  - `GET /api/tooly/controller/status`
+  - `POST /api/tooly/controller/start` / `stop`
+  - `GET /api/tooly/controller/alerts`
+  - `POST /api/tooly/controller/analyze` - trigger analysis
+  - `POST /api/tooly/controller/apply-prosthetic`
+- [ ] Test case generation from controller output (deferred - complex)
 
-4. **JSON Storage (DB-independent)**
-   - `server/data/failure-log.json` - failure persistence
-   - `server/data/combo-profiles/` - combo test results
-   - `server/data/model-profiles/*.json` - already exists (60+ profiles)
-   - `server/data/prosthetic-prompts.json` - already exists
+#### Phase 5: Capability-Based Routing (100% Complete) ✅
+- [x] `intent-router.ts` updated with:
+  - `detectRequiredCapability()` - infers capability from query
+  - `isCapabilityBlocked()` / `getFallbackForCapability()`
+  - Automatic routing to fallback model when capability blocked
+- [x] Fallback chain in routing logic
 
-### Existing Infrastructure (Don't Rebuild!)
+#### Client Components (80% Complete)
+- [x] `Controller.tsx` page
+- [x] `CapabilityMap.tsx` component
+- [x] Route: `/tooly/controller`
+- [x] Smoke Test button in ModelDetailPage
+- [ ] Dashboard failure badges (pending)
+- [ ] FailurePatternCard component (pending)
+- [ ] ProstheticReview modal (pending)
 
-| Component | File | Status |
-|-----------|------|--------|
-| Model hot-swap | `server/src/services/lmstudio-model-manager.ts` | Ready |
-| WebSocket broadcasts | `server/src/services/ws-broadcast.ts` | Ready |
-| Prosthetic Loop | `server/src/modules/tooly/orchestrator/prosthetic-loop.ts` | Ready |
-| Prosthetic Store | `server/src/modules/tooly/learning/prosthetic-store.ts` | Ready |
-| Failure Detector | `server/src/modules/tooly/testing/failure-detector.ts` | Ready |
-| CognitiveHUD | `client/src/pages/tooly/components/CognitiveHUD.tsx` | Needs wiring |
-| Test Sandbox | `server/src/modules/tooly/test-sandbox.ts` | Ready |
-| executeAgenticLoop | `server/src/modules/tooly/cognitive-engine.ts` | Ready |
-
-### Files to Create
+### New Files Created
 
 | File | Purpose |
 |------|---------|
-| `server/src/services/failure-log.ts` | JSON-based failure persistence |
-| `server/src/services/failure-observer.ts` | Pattern detection + WS notifications |
+| `server/src/services/failure-log.ts` | JSON failure persistence |
+| `server/src/services/failure-observer.ts` | Pattern detection + alerts |
+| `server/src/services/combo-profile-store.ts` | Combo profile JSON export |
 | `server/src/modules/tooly/testing/smoke-tester.ts` | Quick 8-test assessment |
-| `client/src/pages/tooly/Controller.tsx` | Meta-agent visibility UI |
-| `client/src/pages/tooly/components/CapabilityMap.tsx` | Native/learned/blocked display |
-| `client/src/pages/tooly/components/FailurePatternCard.tsx` | Grouped failures |
-| `client/src/pages/tooly/components/ProstheticReview.tsx` | Approval modal |
+| `client/src/pages/tooly/Controller.tsx` | Controller UI |
+| `client/src/pages/tooly/components/CapabilityMap.tsx` | Capability visualization |
 
-### Model Profile Schema Extension
+### Files Modified
 
-```json
-{
-  "capabilities": {
-    "rag_query": { "nativeScore": 90, "trainedScore": null, "trainable": null },
-    "multi_step": { "nativeScore": 35, "trainedScore": 78, "trainable": true }
-  },
-  "nativeStrengths": ["rag_query"],
-  "learnedCapabilities": ["multi_step"],
-  "blockedCapabilities": ["param_extraction"]
-}
-```
+| File | Changes |
+|------|---------|
+| `server/src/modules/tooly/capabilities.ts` | Extended schema, new methods |
+| `server/src/modules/tooly/intent-router.ts` | Failure logging, capability routing |
+| `server/src/routes/tooly.ts` | Smoke test, failure, controller endpoints |
+| `client/src/App.tsx` | Controller route |
+| `client/src/pages/tooly/ModelDetailPage.tsx` | Smoke test button |
 
-### 20 Tasks in Plan
-
-**Phase 1 (Foundation):** failure-log, combo-json, profile-schema
-**Phase 2 (Smoke Test):** smoke-tester, trainability, endpoint
-**Phase 3 (Monitoring):** wire-logging, failure-observer, wire-hud
-**Phase 4 (Controller):** controller-page, controller-endpoint, test-generator
-**Phase 5 (Routing):** capability-routing, fallback-chain
-**Client:** app-routes, smoke-ui, capability-map, dashboard-badges, failure-cards, prosthetic-review
-
-## Current Active Settings
+### Current Active Settings
 ```json
 {
   "enableDualModel": true,
@@ -91,7 +100,7 @@ Self-Improving Agentic System - Build hybrid testing + production learning syste
 }
 ```
 
-## Services
+### Services
 | Service | Port | Purpose |
 |---------|------|---------|
 | Summy API | 3001 | Main Express server |
@@ -100,19 +109,29 @@ Self-Improving Agentic System - Build hybrid testing + production learning syste
 | Continue MCP | 3006 | Extra tools (SSE) |
 
 ## Next Actions
-1. Start Phase 1: Create failure-log.ts
-2. Extend model profile schema with capabilities
-3. Add combo profile JSON export
-4. Then proceed with smoke-tester in Phase 2
+1. Test the implementation by starting the server
+2. Add Dashboard failure count badge
+3. Create FailurePatternCard component for Controller
+4. Create ProstheticReview modal
 
-## Important Context
-- Controller model: Qwen2.5-32B-Instruct (already in LM Studio)
-- Hot-swap code exists in modelManager, just need endpoint for manual trigger
-- CognitiveHUD exists, just needs WebSocket wiring to Sessions page
-- Prosthetic teaching loop fully implemented, needs failure trigger
+## Key Architecture Decisions
 
-## Previous Session Work (Still Valid)
-- CLI Dashboard created (`npm run dashboard`)
-- Robust Intent Parser with 11+ tool call formats
-- executeAgenticLoop fully implemented with rag_query, read_file, etc.
-- Combo Testing at 100% pass rate
+### Hybrid Testing Flow
+```
+Quick Smoke Test (30s) → Deploy → Log Failures → Controller Analyzes → Apply Prosthetic
+        ↓                    ↓           ↓               ↓
+  Native/Trainable     Production   failure-log.json   Qwen-32B
+```
+
+### Capability Categories
+- **Native**: Works out of the box (score >= 70%)
+- **Learned**: Improved with prosthetic (trained score >= 70%)
+- **Blocked**: Not trainable, route to fallback model
+
+### Controller Workflow (Manual)
+1. User sees failures in Controller page
+2. User loads Qwen-32B in LM Studio
+3. User clicks "Analyze Failures"
+4. Controller generates prosthetic + test cases
+5. User reviews and approves
+6. Prosthetic applied to model profile
