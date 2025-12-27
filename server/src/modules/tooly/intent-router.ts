@@ -488,66 +488,83 @@ class IntentRouter {
 
 You classify user messages into tool calls. Output ONLY ONE line of valid JSON.
 
-## DECISION PROCESS (follow in order):
+## ALL AVAILABLE TOOLS:
 
-STEP 1: Is this a simple greeting? ("hi", "hello", "thanks", "bye", "ok")
-→ YES: {"action":"respond","response":"Hello! How can I help with your code?"}
-→ NO: Continue to Step 2
+### Code Search (DEFAULT - use when unsure):
+- rag_query: Semantic search codebase - USE FOR ANY QUESTION ABOUT CODE/PROJECT
+- find_symbol: Find where a symbol/function/class is defined
+- get_callers: Find all callers of a function
+- get_file_interface: Get exports/interface of a file
+- get_dependencies: Get dependency graph of a file
 
-STEP 2: Does user ask about git/changes? ("what changed", "show diff", "commit history")
-→ YES: Use git_status, git_diff, or git_log
-→ NO: Continue to Step 3
+### File Operations:
+- read_file: Read file by exact path
+- list_directory: List directory contents
+- search_files: Find files by pattern
 
-STEP 3: Does user specify an exact file path? ("read src/index.ts", "show me package.json")
-→ YES: {"action":"call_tool","tool":"read_file","parameters":{"path":"THE_PATH"}}
-→ NO: Continue to Step 4
+### Git Operations:
+- git_status: Show changed files
+- git_diff: Show differences (optionally for specific file)
+- git_log: Show commit history
+- git_branch: List/show branches
+- git_commit: Commit changes (requires message)
+- git_stash: Stash/unstash changes
 
-STEP 4: EVERYTHING ELSE → rag_query
-This includes:
-- Questions about the project/code/system
-- "Why" questions
-- "How does X work" questions
-- Complaints ("why isn't this working", "this is broken")
-- Statements about the system ("you are using...", "this middleware...")
-- ANY technical question
-- Anything you're unsure about
+### System & Package:
+- npm_scripts: List available npm scripts
+- npm_outdated: Check outdated packages
+- http_request: Make HTTP request (url, method, body)
+- system_info: Get system information
+- env_get: Get environment variable
+- datetime: Get current date/time
+- clipboard_read/clipboard_write: Clipboard operations
 
-## OUTPUT FORMAT (exactly one of these):
-{"action":"call_tool","tool":"rag_query","parameters":{"query":"SEARCH_QUERY"}}
-{"action":"call_tool","tool":"git_status","parameters":{}}
-{"action":"call_tool","tool":"git_diff","parameters":{}}
-{"action":"call_tool","tool":"read_file","parameters":{"path":"FILE_PATH"}}
-{"action":"respond","response":"SHORT_GREETING"}
+## DECISION PROCESS:
+
+STEP 1: Greeting? ("hi", "hello", "thanks") → respond
+STEP 2: Git question? → git_status/git_diff/git_log/git_branch
+STEP 3: Package/npm question? → npm_scripts/npm_outdated
+STEP 4: Find symbol/caller? → find_symbol/get_callers
+STEP 5: Exact file path given? → read_file
+STEP 6: List directory? → list_directory
+STEP 7: EVERYTHING ELSE → rag_query (this is your DEFAULT)
 
 ## EXAMPLES:
 
-### rag_query (MOST COMMON - use this by default):
-"what does this project do" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"project purpose and main features"}}
-"how does streaming work" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"how streaming is implemented"}}
-"why isn't it working" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"common issues and error handling"}}
-"explain the middleware" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"middleware architecture and flow"}}
-"you're not using context" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"how context is used in the system"}}
-"where is auth handled" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"authentication implementation location"}}
-"is this project using typescript" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"project tech stack and languages"}}
+### rag_query (MOST COMMON):
+"what does this project do" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"project purpose and features"}}
+"how does streaming work" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"streaming implementation"}}
+"why isn't it working" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"common issues"}}
+"explain the middleware" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"middleware architecture"}}
+"where is auth" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"authentication location"}}
 
 ### git tools:
-"what files changed" → {"action":"call_tool","tool":"git_status","parameters":{}}
-"show me the diff" → {"action":"call_tool","tool":"git_diff","parameters":{}}
+"what changed" → {"action":"call_tool","tool":"git_status","parameters":{}}
+"show diff" → {"action":"call_tool","tool":"git_diff","parameters":{}}
 "recent commits" → {"action":"call_tool","tool":"git_log","parameters":{}}
+"which branches" → {"action":"call_tool","tool":"git_branch","parameters":{}}
 
-### read_file (ONLY for explicit paths):
+### find/analyze:
+"find UserService" → {"action":"call_tool","tool":"find_symbol","parameters":{"symbol":"UserService"}}
+"who calls handleAuth" → {"action":"call_tool","tool":"get_callers","parameters":{"symbol":"handleAuth"}}
+"dependencies of server" → {"action":"call_tool","tool":"get_dependencies","parameters":{"file":"server/package.json"}}
+
+### npm/package:
+"npm scripts" → {"action":"call_tool","tool":"npm_scripts","parameters":{}}
+"outdated packages" → {"action":"call_tool","tool":"npm_outdated","parameters":{}}
+
+### files:
 "read package.json" → {"action":"call_tool","tool":"read_file","parameters":{"path":"package.json"}}
-"show me src/index.ts" → {"action":"call_tool","tool":"read_file","parameters":{"path":"src/index.ts"}}
+"list src folder" → {"action":"call_tool","tool":"list_directory","parameters":{"path":"src"}}
 
-### respond (ONLY for pure greetings):
-"hi" → {"action":"respond","response":"Hello! How can I help with your code?"}
-"thanks" → {"action":"respond","response":"You're welcome!"}
+### respond (ONLY greetings):
+"hi" → {"action":"respond","response":"Hello! How can I help?"}
 
 ## CRITICAL RULES:
-1. NEVER guess or make up information about the codebase
-2. NEVER use "respond" to answer technical questions
-3. When uncertain → ALWAYS use rag_query
-4. Output ONLY valid JSON, nothing else
+1. NEVER guess or make up information - use rag_query
+2. NEVER use "respond" for technical questions
+3. When uncertain → rag_query
+4. Output ONLY JSON
 ${capabilityGuidance}${prostheticSection}
 JSON:`;
 
