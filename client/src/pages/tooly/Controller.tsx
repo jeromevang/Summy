@@ -39,6 +39,45 @@ interface FailureAlert {
   timestamp: string;
 }
 
+interface ComboProsthetic {
+  comboId: string;
+  mainModelId: string;
+  executorModelId: string;
+  prompt: string;
+  level: number;
+  verified: boolean;
+  comboScoreBefore?: number;
+  comboScoreAfter?: number;
+  createdAt: string;
+  successfulRuns: number;
+}
+
+interface ComboResult {
+  id: string;
+  mainModelId: string;
+  executorModelId: string;
+  overallScore: number;
+  mainScore: number;
+  executorScore: number;
+  testedAt: string;
+}
+
+interface ComboTeachingResult {
+  success: boolean;
+  attempts: number;
+  finalScore: number;
+  comboId: string;
+  mainModelId: string;
+  executorModelId: string;
+  comboScoreBefore: number;
+  comboScoreAfter: number;
+  improvements: {
+    overall: number;
+  };
+  certified: boolean;
+  log: string[];
+}
+
 interface ControllerAnalysis {
   diagnosis: string;
   rootCause: string;
@@ -88,6 +127,10 @@ export default function Controller() {
   const [error, setError] = useState<string | null>(null);
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
   const [showProstheticReview, setShowProstheticReview] = useState(false);
+  const [comboProsthetics, setComboProsthetics] = useState<ComboProsthetic[]>([]);
+  const [comboTeachingResults, setComboTeachingResults] = useState<ComboTeachingResult[]>([]);
+  const [comboResults, setComboResults] = useState<ComboResult[]>([]);
+  const [teachingCombos, setTeachingCombos] = useState(false);
 
   // Load data
   useEffect(() => {
@@ -101,10 +144,13 @@ export default function Controller() {
       setLoading(true);
       
       // Load all data in parallel
-      const [statusRes, patternsRes, failuresRes] = await Promise.all([
+      const [statusRes, patternsRes, failuresRes, comboProstheticsRes, comboTeachingRes, comboResultsRes] = await Promise.all([
         fetch(`${API_BASE}/controller/status`),
         fetch(`${API_BASE}/failures/patterns`),
-        fetch(`${API_BASE}/failures?resolved=false&limit=50`)
+        fetch(`${API_BASE}/failures?resolved=false&limit=50`),
+        fetch(`${API_BASE}/prosthetics?type=combo`),
+        fetch(`${API_BASE}/controller/combo-teaching-results`),
+        fetch(`${API_BASE}/combo-test/results?limit=20`)
       ]);
 
       if (statusRes.ok) {
@@ -122,6 +168,24 @@ export default function Controller() {
       if (failuresRes.ok) {
         const data = await failuresRes.json();
         setFailures(data.failures || []);
+      }
+
+      if (comboProstheticsRes.ok) {
+        const data = await comboProstheticsRes.json();
+        setComboProsthetics(data.prosthetics || []);
+      }
+
+      if (comboTeachingRes.ok) {
+        const data = await comboTeachingRes.json();
+        setComboTeachingResults(data.results || []);
+      }
+
+      if (comboResultsRes.ok) {
+        const data = await comboResultsRes.json();
+        console.log('[Controller] Loaded combo results:', data.results?.length || 0);
+        setComboResults(data.results || []);
+      } else {
+        console.log('[Controller] Failed to load combo results:', comboResultsRes.status);
       }
 
       setError(null);
@@ -201,6 +265,35 @@ export default function Controller() {
     }
   };
 
+  const runComboTeaching = async (mainModelId: string, executorModelId: string) => {
+    try {
+      setTeachingCombos(true);
+      const res = await fetch(`${API_BASE}/controller/run-combo-teaching`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mainModelId,
+          executorModelId,
+          maxAttempts: 4,
+          targetScore: 70
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        alert(`Combo teaching ${data.result.success ? 'successful' : 'failed'}! Final score: ${data.result.finalScore}%`);
+        loadData();
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to run combo teaching');
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setTeachingCombos(false);
+    }
+  };
+
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical': return 'text-red-400 bg-red-900/30 border-red-500/50';
@@ -217,6 +310,7 @@ export default function Controller() {
       case 'reasoning': return '🧠';
       case 'intent': return '💭';
       case 'browser': return '🌐';
+      case 'combo_pairing': return '🤝';
       default: return '❓';
     }
   };
@@ -404,6 +498,113 @@ export default function Controller() {
 
         {/* Right: Analysis & Alerts */}
         <div className="col-span-1 space-y-4">
+          {/* Combo Learning Section */}
+          <div className="bg-gray-900 rounded-lg border border-blue-500/50 p-4">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              🤝 Combo Learning
+              <span className="text-sm font-normal text-gray-500">({comboProsthetics.length} prosthetics, {comboTeachingResults.length} results)</span>
+            </h2>
+
+            {/* Combo Prosthetics */}
+            {comboProsthetics.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-300 mb-2">Active Combo Prosthetics</h3>
+                <div className="space-y-2">
+                  {comboProsthetics.slice(0, 3).map(prosthetic => (
+                    <div key={prosthetic.comboId} className="p-2 bg-gray-800 rounded border border-gray-700">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium text-blue-400">
+                          {prosthetic.mainModelId} → {prosthetic.executorModelId}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          prosthetic.verified ? 'bg-green-900/50 text-green-300' : 'bg-yellow-900/50 text-yellow-300'
+                        }`}>
+                          Level {prosthetic.level} {prosthetic.verified ? '✓' : '?'}
+                        </span>
+                      </div>
+                      {prosthetic.comboScoreBefore !== undefined && prosthetic.comboScoreAfter !== undefined && (
+                        <div className="text-xs text-gray-400">
+                          Score: {prosthetic.comboScoreBefore}% → {prosthetic.comboScoreAfter}%
+                          <span className="text-green-400 ml-1">
+                            (+{prosthetic.comboScoreAfter - prosthetic.comboScoreBefore}%)
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Combo Teaching Results */}
+            {comboTeachingResults.length > 0 && (
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-300 mb-2">Recent Teaching Cycles</h3>
+                <div className="space-y-2">
+                  {comboTeachingResults.slice(0, 3).map(result => (
+                    <div key={result.comboId} className="p-2 bg-gray-800 rounded border border-gray-700">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium text-purple-400">
+                          {result.mainModelId} ↔ {result.executorModelId}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded ${
+                          result.success ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'
+                        }`}>
+                          {result.success ? '✓' : '✗'} {result.finalScore}%
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {result.comboScoreBefore}% → {result.comboScoreAfter}%
+                        <span className={`ml-1 ${result.improvements.overall >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          ({result.improvements.overall >= 0 ? '+' : ''}{result.improvements.overall}%)
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {result.attempts} attempts • {result.certified ? 'Certified' : 'Needs work'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Combo Teaching Controls */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-300 mb-2">Available Combos for Teaching ({comboResults.length})</h3>
+              {comboResults.length === 0 ? (
+                <div className="text-xs text-gray-500 text-center py-2">
+                  No combo test results available. Run combo tests first.
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {comboResults.slice(0, 5).map(combo => (
+                    <div key={combo.id} className="flex items-center justify-between p-2 bg-gray-800 rounded border border-gray-700">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-blue-400 truncate">
+                          {combo.mainModelId.split('/').pop()} ↔ {combo.executorModelId.split('/').pop()}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Score: {combo.overallScore}% (🧠{combo.mainScore}% 🔧{combo.executorScore}%)
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => runComboTeaching(combo.mainModelId, combo.executorModelId)}
+                        disabled={teachingCombos}
+                        className="ml-2 px-2 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs font-medium disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {teachingCombos ? (
+                          <span className="animate-spin text-xs">⏳</span>
+                        ) : (
+                          <span>🎓</span>
+                        )}
+                        Teach
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
           {/* Analysis Results */}
           {analysis && (
             <div className="bg-gray-900 rounded-lg border border-purple-500/50 p-4">
