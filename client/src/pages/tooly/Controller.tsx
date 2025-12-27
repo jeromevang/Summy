@@ -13,6 +13,28 @@ import React, { useState, useEffect } from 'react';
 import { FailurePatternCard, type FailurePattern } from './components/FailurePatternCard';
 import ProstheticReview from './components/ProstheticReview';
 
+// Tooltip component
+const Tooltip: React.FC<{ children: React.ReactNode; content: string }> = ({ children, content }) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <div
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      >
+        {children}
+      </div>
+      {show && (
+        <div className="absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg bottom-full left-1/2 transform -translate-x-1/2 mb-1 whitespace-nowrap">
+          {content}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Types
 interface FailureEntry {
   id: string;
@@ -333,36 +355,40 @@ export default function Controller() {
           <div className="flex items-center gap-2 text-sm">
             <span className={`w-2 h-2 rounded-full ${observerStatus?.running ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} />
             <span className="text-gray-400">Observer</span>
-            <button
-              onClick={toggleObserver}
-              className={`px-3 py-1 rounded text-xs font-medium ${
-                observerStatus?.running 
-                  ? 'bg-red-900/50 text-red-300 hover:bg-red-900/70' 
-                  : 'bg-green-900/50 text-green-300 hover:bg-green-900/70'
-              }`}
-            >
-              {observerStatus?.running ? 'Stop' : 'Start'}
-            </button>
+            <Tooltip content={observerStatus?.running ? "Stop monitoring for model failures and performance issues" : "Start monitoring for model failures and performance issues"}>
+              <button
+                onClick={toggleObserver}
+                className={`px-3 py-1 rounded text-xs font-medium ${
+                  observerStatus?.running
+                    ? 'bg-red-900/50 text-red-300 hover:bg-red-900/70'
+                    : 'bg-green-900/50 text-green-300 hover:bg-green-900/70'
+                }`}
+              >
+                {observerStatus?.running ? 'Stop' : 'Start'}
+              </button>
+            </Tooltip>
           </div>
 
           {/* Analyze Button */}
-          <button
-            onClick={runAnalysis}
-            disabled={analyzing}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium disabled:opacity-50 flex items-center gap-2"
-          >
-            {analyzing ? (
-              <>
-                <span className="animate-spin">⏳</span>
-                Analyzing...
-              </>
-            ) : (
-              <>
-                <span>🔬</span>
-                Analyze Failures
-              </>
-            )}
-          </button>
+          <Tooltip content="Run AI analysis on failure patterns to generate prosthetic prompts that can fix model weaknesses">
+            <button
+              onClick={runAnalysis}
+              disabled={analyzing}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium disabled:opacity-50 flex items-center gap-2"
+            >
+              {analyzing ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <span>🔬</span>
+                  Analyze Failures
+                </>
+              )}
+            </button>
+          </Tooltip>
         </div>
       </div>
 
@@ -370,7 +396,9 @@ export default function Controller() {
       {error && (
         <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg text-red-300">
           ⚠️ {error}
-          <button onClick={() => setError(null)} className="ml-2 text-red-400 hover:text-red-300">×</button>
+          <Tooltip content="Dismiss this error message">
+            <button onClick={() => setError(null)} className="ml-2 text-red-400 hover:text-red-300">×</button>
+          </Tooltip>
         </div>
       )}
 
@@ -587,18 +615,20 @@ export default function Controller() {
                           Score: {combo.overallScore}% (🧠{combo.mainScore}% 🔧{combo.executorScore}%)
                         </div>
                       </div>
-                      <button
-                        onClick={() => runComboTeaching(combo.mainModelId, combo.executorModelId)}
-                        disabled={teachingCombos}
-                        className="ml-2 px-2 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs font-medium disabled:opacity-50 flex items-center gap-1"
-                      >
-                        {teachingCombos ? (
-                          <span className="animate-spin text-xs">⏳</span>
-                        ) : (
-                          <span>🎓</span>
-                        )}
-                        Teach
-                      </button>
+                      <Tooltip content={`Run automated teaching cycle for this model pair. Tests performance, identifies issues, generates combo-specific prosthetic prompts, and verifies improvement.`}>
+                        <button
+                          onClick={() => runComboTeaching(combo.mainModelId, combo.executorModelId)}
+                          disabled={teachingCombos}
+                          className="ml-2 px-2 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs font-medium disabled:opacity-50 flex items-center gap-1"
+                        >
+                          {teachingCombos ? (
+                            <span className="animate-spin text-xs">⏳</span>
+                          ) : (
+                            <span>🎓</span>
+                          )}
+                          Teach
+                        </button>
+                      </Tooltip>
                     </div>
                   ))}
                 </div>
@@ -652,12 +682,14 @@ export default function Controller() {
                       {analysis.suggestedProsthetic.prompt.substring(0, 300)}...
                     </p>
                     <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={() => setShowProstheticReview(true)}
-                        className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-medium"
-                      >
-                        📝 Review & Apply
-                      </button>
+                      <Tooltip content="Review the suggested prosthetic prompt, make modifications if needed, then apply it to improve model performance">
+                        <button
+                          onClick={() => setShowProstheticReview(true)}
+                          className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-medium"
+                        >
+                          📝 Review & Apply
+                        </button>
+                      </Tooltip>
                     </div>
                   </div>
                 )}

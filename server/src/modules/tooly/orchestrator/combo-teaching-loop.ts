@@ -13,9 +13,11 @@
  * if lower levels don't improve combo performance.
  */
 
-import { ComboTester, type ComboScore } from '../testing/combo-tester.js';
+import { ComboTester, type ComboScore, COMBO_TEST_CASES } from '../testing/combo-tester.js';
 import { prostheticStore } from '../learning/prosthetic-store.js';
 import { failureLog } from '../../../services/failure-log.js';
+import { LMStudioClient } from '@lmstudio/sdk';
+import { intentRouter } from '../intent-router.js';
 
 // ============================================================
 // TYPES
@@ -97,6 +99,213 @@ export class ComboTeachingLoop {
   }
 
   /**
+   * Load both Main and Executor models for teaching and keep them loaded
+   */
+  private async ensureDualModelsLoaded(mainModelId: string, executorModelId: string): Promise<void> {
+    const client = new LMStudioClient();
+    const contextSize = 4096; // Smaller context for dual-model
+
+    try {
+      // Get currently loaded models
+      const loadedModels = await client.llm.listLoaded();
+      const loadedIds = loadedModels.map(m => m.identifier);
+
+      // Check if both models are already loaded
+      const mainLoaded = loadedIds.some(id => id.includes(mainModelId) || mainModelId.includes(id));
+      const executorLoaded = loadedIds.some(id => id.includes(executorModelId) || executorModelId.includes(id));
+
+      if (mainLoaded && executorLoaded) {
+        console.log(`[ComboTeachingLoop] Both models already loaded: ${mainModelId} + ${executorModelId}`);
+        return;
+      }
+
+      // Unload all models first to ensure clean slate
+      console.log(`[ComboTeachingLoop] Unloading ${loadedModels.length} model(s) for combo teaching...`);
+      for (const model of loadedModels) {
+        try {
+          await client.llm.unload(model.identifier);
+          console.log(`[ComboTeachingLoop] Unloaded: ${model.identifier}`);
+        } catch (e: any) {
+          console.log(`[ComboTeachingLoop] Could not unload ${model.identifier}: ${e.message}`);
+        }
+      }
+
+      // Load Main model first
+      console.log(`[ComboTeachingLoop] Loading Main model: ${mainModelId} (ctx: ${contextSize})`);
+      await client.llm.load(mainModelId, {
+        config: { contextLength: contextSize },
+      });
+      console.log(`[ComboTeachingLoop] Main model loaded: ${mainModelId}`);
+
+      // Load Executor model (if different from main)
+      if (executorModelId !== mainModelId) {
+        console.log(`[ComboTeachingLoop] Loading Executor model: ${executorModelId} (ctx: ${contextSize})`);
+        await client.llm.load(executorModelId, {
+          config: { contextLength: contextSize },
+        });
+        console.log(`[ComboTeachingLoop] Executor model loaded: ${executorModelId}`);
+      }
+
+      // Verify both are loaded
+      const finalLoaded = await client.llm.listLoaded();
+      console.log(`[ComboTeachingLoop] Models now loaded: ${finalLoaded.map(m => m.identifier).join(', ')}`);
+
+    } catch (error: any) {
+      console.error(`[ComboTeachingLoop] Failed to load models: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test a specific combo pair without loading/unloading models
+   */
+  private async testSpecificCombo(mainModelId: string, executorModelId: string): Promise<ComboScore> {
+    const testResults: any[] = [];
+    const latencies: number[] = [];
+    const taskTimeout = 10000;
+
+    console.log(`[ComboTeachingLoop] Testing combo: ${mainModelId} + ${executorModelId}`);
+
+    // Test each case
+    for (let i = 0; i < COMBO_TEST_CASES.length; i++) {
+      const test = COMBO_TEST_CASES[i];
+      console.log(`[ComboTeachingLoop] Running test ${i + 1}/${COMBO_TEST_CASES.length}: ${test.name}`);
+
+      try {
+        const messages = [
+          { role: 'system', content: 'You are a coding assistant working on a test project.\n\nPROJECT LOCATION: server/data/test-project/\n\nPROJECT STRUCTURE:\n- node-api/          Express API with authentication\n  - src/index.ts     Main entry point\n  - src/middleware/auth.middleware.ts   JWT validation\n  - src/services/auth.service.ts        User auth logic\n  - src/routes/users.ts, products.ts    API routes\n- react-web/         React frontend\n  - src/context/AuthContext.tsx         Auth state provider\n  - src/hooks/useAuth.ts                Auth hook\n  - src/components/LoginForm.tsx        Login UI\n- java-service/      Spring-style Java backend\n- react-native-app/  Mobile app navigation, screens\n- mendix-widget/     Pluggable widget with data binding\n- shared-utils/      TypeScript utilities (validation, formatting)\n\nUse the available tools when appropriate. The project uses TypeScript, React, and Express.' },
+          { role: 'user', content: test.prompt },
+        ];
+
+        const tools = [
+          {
+            type: 'function',
+            function: {
+              name: 'read_file',
+              description: 'Read the contents of a file',
+              parameters: {
+                type: 'object',
+                properties: {
+                  filepath: { type: 'string', description: 'Path to the file' },
+                },
+                required: ['filepath'],
+              },
+            },
+          },
+          {
+            type: 'function',
+            function: {
+              name: 'rag_query',
+              description: 'Search the codebase semantically',
+              parameters: {
+                type: 'object',
+                properties: {
+                  query: { type: 'string', description: 'Search query' },
+                },
+                required: ['query'],
+              },
+            },
+          },
+        ];
+
+        const startTime = Date.now();
+        const result = await intentRouter.route(messages, tools);
+        const latency = Date.now() - startTime;
+
+        // Analyze result
+        const mainContent = result.mainResponse?.choices?.[0]?.message?.content || '';
+        const intent = result.intent;
+        const executorToolCalls = result.toolCalls?.map((tc: any) => tc.function?.name).filter(Boolean) || [];
+
+        const mainOutputValid = !!intent && !!intent.action;
+        const mainAction = intent?.action || null;
+        const mainTool = intent?.tool || null;
+
+        let passed = false;
+        if (test.expectedAction === 'call_tool') {
+          passed = mainAction === 'call_tool' &&
+                   mainTool === test.expectedTool &&
+                   executorToolCalls.includes(test.expectedTool!);
+        } else if (test.expectedAction === 'respond') {
+          passed = mainAction === 'respond' && executorToolCalls.length === 0;
+        } else if (test.expectedAction === 'ask_clarification') {
+          passed = (mainAction === 'respond' || mainAction === 'ask_clarification') &&
+                   executorToolCalls.length === 0;
+        }
+
+        testResults.push({
+          testId: test.id,
+          testName: test.name,
+          category: test.category,
+          difficulty: test.difficulty,
+          passed,
+          mainOutputValid,
+          mainAction,
+          mainTool,
+          executorCalled: result.mode === 'dual' && !!result.executorResponse,
+          executorToolCalls,
+          latencyMs: latency,
+          mainLatencyMs: result.latency?.main || 0,
+          executorLatencyMs: result.latency?.executor || 0,
+          timedOut: false,
+        });
+
+        latencies.push(latency);
+
+      } catch (error: any) {
+        console.log(`[ComboTeachingLoop] Test failed: ${error.message}`);
+        testResults.push({
+          testId: test.id,
+          testName: test.name,
+          category: test.category,
+          difficulty: test.difficulty,
+          passed: false,
+          mainOutputValid: false,
+          mainAction: null,
+          mainTool: null,
+          executorCalled: false,
+          executorToolCalls: [],
+          latencyMs: taskTimeout,
+          error: error.message,
+          timedOut: true,
+        });
+      }
+    }
+
+    // Use the same scoring logic as the combo tester
+    const passedTests = testResults.filter(r => r.passed).length;
+    const totalTests = testResults.length;
+    const overallScore = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+
+    return {
+      mainModelId,
+      executorModelId,
+      totalTests,
+      passedTests,
+      categoryScores: testResults.map(r => ({
+        category: r.category,
+        difficulty: r.difficulty,
+        score: r.passed ? 100 : 0,
+        passed: r.passed,
+        latencyMs: r.latencyMs,
+      })),
+      tierScores: [],
+      mainScore: overallScore,
+      executorScore: overallScore,
+      mainCorrectCount: passedTests,
+      executorSuccessCount: passedTests,
+      intentAccuracy: overallScore,
+      executionSuccess: overallScore,
+      avgLatencyMs: latencies.length > 0 ? Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length) : 0,
+      minLatencyMs: latencies.length > 0 ? Math.min(...latencies) : 0,
+      maxLatencyMs: latencies.length > 0 ? Math.max(...latencies) : 0,
+      overallScore,
+      testResults,
+      testedAt: new Date().toISOString(),
+    };
+  }
+
+  /**
    * Run the full combo teaching cycle for a model pair
    */
   async runComboTeachingCycle(
@@ -130,16 +339,25 @@ export class ComboTeachingLoop {
       });
     }
 
-    log.push('Running initial combo assessment...');
-    const initialResults = await this.tester.testAllCombos();
+    // Load both models for the teaching session and keep them loaded
+    log.push(`Loading Main model: ${mainModelId} and Executor model: ${executorModelId}`);
+    await this.ensureDualModelsLoaded(mainModelId, executorModelId);
 
-    // Find the specific combo result
-    const initialComboResult = initialResults.find(
-      r => r.mainModelId === mainModelId && r.executorModelId === executorModelId
-    );
+    // Configure router for this specific combo
+    await intentRouter.configure({
+      mainModelId,
+      executorModelId,
+      enableDualModel: true,
+      timeout: 60000,
+      provider: 'lmstudio',
+      settings: { lmstudioUrl: lmstudioUrl }
+    });
+
+    log.push('Running initial combo assessment with pre-loaded models...');
+    const initialComboResult = await this.testSpecificCombo(mainModelId, executorModelId);
 
     if (!initialComboResult) {
-      throw new Error(`Could not find combo result for ${comboId}`);
+      throw new Error(`Failed to test combo ${comboId}`);
     }
 
     const startingScore = initialComboResult.overallScore;
@@ -224,15 +442,11 @@ export class ComboTeachingLoop {
         });
       }
 
-      log.push('Re-testing combo to verify improvement...');
-      const verificationResults = await this.tester.testAllCombos();
-
-      const verificationComboResult = verificationResults.find(
-        r => r.mainModelId === mainModelId && r.executorModelId === executorModelId
-      );
+      log.push('Re-testing combo with pre-loaded models to verify improvement...');
+      const verificationComboResult = await this.testSpecificCombo(mainModelId, executorModelId);
 
       if (!verificationComboResult) {
-        log.push('Warning: Could not find verification combo result');
+        log.push('Warning: Could not verify combo improvement');
         continue;
       }
 
