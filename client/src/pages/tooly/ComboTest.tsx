@@ -919,6 +919,7 @@ export const ComboTest: React.FC = () => {
           </div>
         )}
 
+
         {/* Model Selection */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Main Models */}
@@ -1104,6 +1105,7 @@ export const ComboTest: React.FC = () => {
 
         {/* Progress */}
         {isRunning && renderProgress()}
+
 
         {/* Results */}
         {renderResults()}

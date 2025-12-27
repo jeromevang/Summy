@@ -4068,5 +4068,40 @@ router.get('/distillation/best-teacher/:capability', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/tooly/stream/:modelId
+ * Stream response from OpenRouter model
+ */
+router.post('/stream/:modelId', async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { messages, tools = [] } = req.body;
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array required' });
+    }
+
+    // Configure router for streaming
+    const settings = await loadServerSettings();
+    await intentRouter.configure({
+      provider: 'openrouter',
+      enableDualModel: false, // Single model streaming
+      timeout: 30000,
+      settings: {
+        openrouterApiKey: settings.openrouterApiKey
+      }
+    });
+
+    // Stream the response
+    await intentRouter.streamResponse(modelId, messages, tools, res);
+
+  } catch (error: any) {
+    console.error('[Tooly] Streaming failed:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+
 export default router;
 

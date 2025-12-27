@@ -434,26 +434,21 @@ class ModelDiscoveryService {
       const models = response.data.data || [];
       console.log(`[ModelDiscovery] Found ${models.length} OpenRouter models`);
 
-      // Filter to free models only and those with function calling support
-      const freeFunctionCallingModels = models.filter((model: any) => {
+      // Filter to free models only (function calling will be simulated client-side)
+      const freeModels = models.filter((model: any) => {
         // Check if model is free (pricing info indicates free tier)
         const isFree = model.pricing?.prompt === '0' && model.pricing?.completion === '0';
-
-        // Check if model supports function calling (has tools in capabilities)
-        const supportsTools = model.capabilities?.includes('tools') ||
-                             model.description?.toLowerCase().includes('function') ||
-                             model.description?.toLowerCase().includes('tool');
 
         // Check if model has reasonable context length
         const hasContext = model.context_length && model.context_length >= 4096;
 
-        return isFree && (supportsTools || hasContext);
+        return isFree && hasContext;
       });
 
-      console.log(`[ModelDiscovery] Filtered to ${freeFunctionCallingModels.length} free function-calling models`);
+      console.log(`[ModelDiscovery] Filtered to ${freeModels.length} free models (function calling simulated client-side)`);
 
       // Convert to our format and sort by "ranking" (using model popularity metrics)
-      const discoveredModels: DiscoveredModel[] = freeFunctionCallingModels
+      const discoveredModels: DiscoveredModel[] = freeModels
         .map((model: any) => {
           // Extract provider from model ID (e.g., "openai/gpt-4o" -> "OpenAI")
           const provider = model.id.split('/')[0];
@@ -515,6 +510,44 @@ class ModelDiscoveryService {
     };
 
     return rankings[modelId] || rankings['default'];
+  }
+
+  /**
+   * Health check for OpenRouter models
+   */
+  async checkOpenRouterModelHealth(modelId: string, apiKey?: string): Promise<{
+    available: boolean;
+    latency?: number;
+    error?: string;
+  }> {
+    if (!apiKey) {
+      return { available: false, error: 'No API key provided' };
+    }
+
+    try {
+      const startTime = Date.now();
+      const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+        model: modelId,
+        messages: [{ role: 'user', content: 'Hello' }],
+        max_tokens: 10
+      }, {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'http://localhost:5173',
+          'X-Title': 'Summy AI Platform'
+        },
+        timeout: 10000
+      });
+
+      const latency = Date.now() - startTime;
+      return { available: true, latency };
+    } catch (error: any) {
+      return {
+        available: false,
+        error: error.response?.data?.error?.message || error.message
+      };
+    }
   }
 
   /**

@@ -44,6 +44,21 @@ export const getRoleBadge = (role?: string) => {
   }
 };
 
+export const getProviderBadge = (provider: string) => {
+  switch (provider) {
+    case 'openrouter':
+      return <span className="px-2 py-0.5 text-xs rounded-full bg-orange-500/20 text-orange-400">🚀 OpenRouter</span>;
+    case 'lmstudio':
+      return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400">💻 LM Studio</span>;
+    case 'openai':
+      return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">🌐 OpenAI</span>;
+    case 'azure':
+      return <span className="px-2 py-0.5 text-xs rounded-full bg-sky-500/20 text-sky-400">☁️ Azure</span>;
+    default:
+      return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-500/20 text-gray-400">{provider}</span>;
+  }
+};
+
 export const ModelCard: React.FC<ModelCardProps> = ({
   model,
   isSelected,
@@ -85,8 +100,8 @@ export const ModelCard: React.FC<ModelCardProps> = ({
               <p className="text-white font-medium">{model.displayName}</p>
               {getRoleBadge(model.role)}
             </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span>{model.provider}</span>
+            <div className="flex items-center gap-2 text-xs">
+              {getProviderBadge(model.provider)}
               {model.quantization && (
                 <>
                   <span>•</span>

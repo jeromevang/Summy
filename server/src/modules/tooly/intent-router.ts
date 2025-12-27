@@ -89,6 +89,34 @@ class IntentRouter {
   private config: RouterConfig | null = null;
   private mainProfile: ModelProfile | null = null;
   private executorProfile: ModelProfile | null = null;
+  private openrouterRateLimiter = new Map<string, { count: number; resetTime: number }>();
+
+  /**
+   * Check and enforce OpenRouter rate limits
+   * OpenRouter has generous limits but we should be respectful
+   */
+  private async checkOpenRouterRateLimit(): Promise<void> {
+    const now = Date.now();
+    const windowMs = 60000; // 1 minute window
+    const maxRequests = 50; // Conservative limit (OpenRouter allows much higher)
+
+    const key = 'openrouter_global';
+    const current = this.openrouterRateLimiter.get(key) || { count: 0, resetTime: now + windowMs };
+
+    if (now > current.resetTime) {
+      // Reset window
+      this.openrouterRateLimiter.set(key, { count: 1, resetTime: now + windowMs });
+    } else if (current.count >= maxRequests) {
+      // Rate limit exceeded
+      const waitMs = current.resetTime - now;
+      console.log(`[IntentRouter] OpenRouter rate limit hit, waiting ${waitMs}ms`);
+      await new Promise(resolve => setTimeout(resolve, waitMs));
+      this.openrouterRateLimiter.set(key, { count: 1, resetTime: now + windowMs });
+    } else {
+      // Increment counter
+      this.openrouterRateLimiter.set(key, { count: current.count + 1, resetTime: current.resetTime });
+    }
+  }
 
   /**
    * Configure the router with models
@@ -836,6 +864,152 @@ IMPORTANT:
   }
 
   /**
+   * Call the LLM with streaming support for OpenRouter
+   */
+  private async callModelStreaming(
+    modelId: string,
+    messages: any[],
+    tools: any[],
+    res: any, // Express response for streaming
+    timeout: number = 30000
+  ): Promise<any> {
+    if (!this.config) {
+      throw new Error('IntentRouter not configured');
+    }
+
+    // Setup streaming headers for SSE
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+    res.flushHeaders();
+
+    let url: string;
+    let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    let body: any = {
+      model: modelId,
+      messages,
+      temperature: 0,
+      stream: true // Enable streaming
+    };
+
+    if (tools && tools.length > 0) {
+      body.tools = tools;
+      body.tool_choice = 'auto';
+    }
+
+    switch (this.config.provider) {
+      case 'openrouter':
+        await this.checkOpenRouterRateLimit();
+        url = 'https://openrouter.ai/api/v1/chat/completions';
+        headers['Authorization'] = `Bearer ${this.config.settings.openrouterApiKey}`;
+        headers['HTTP-Referer'] = 'http://localhost:5173';
+        headers['X-Title'] = 'Summy AI Platform';
+        break;
+
+      default:
+        throw new Error(`Streaming not supported for provider: ${this.config.provider}`);
+    }
+
+    try {
+      const response = await axios.post(url, body, {
+        headers,
+        responseType: 'stream',
+        timeout
+      });
+
+      let fullContent = '';
+      let toolCalls: any[] = [];
+
+      return new Promise((resolve, reject) => {
+        response.data.on('data', (chunk: Buffer) => {
+          const chunkStr = chunk.toString();
+
+          // Handle SSE data
+          if (chunkStr.includes('data: ')) {
+            const lines = chunkStr.split('\n');
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const dataStr = line.slice(6);
+
+                if (dataStr === '[DONE]') {
+                  // End of stream
+                  res.write('data: [DONE]\n\n');
+                  res.end();
+                  resolve({ fullContent, toolCalls });
+                  return;
+                }
+
+                try {
+                  const event = JSON.parse(dataStr);
+
+                  // Forward the streaming chunk to the client
+                  if (event.choices?.[0]?.delta?.content) {
+                    const content = event.choices[0].delta.content;
+                    fullContent += content;
+
+                    // Send to client
+                    res.write(`data: ${JSON.stringify({
+                      choices: [{
+                        delta: { content },
+                        index: 0,
+                        finish_reason: null
+                      }]
+                    })}\n\n`);
+                  }
+
+                  // Handle tool calls
+                  if (event.choices?.[0]?.delta?.tool_calls) {
+                    const toolCallDelta = event.choices[0].delta.tool_calls;
+                    toolCalls.push(...toolCallDelta);
+                  }
+
+                  // Check for finish reason
+                  if (event.choices?.[0]?.finish_reason) {
+                    res.write(`data: ${JSON.stringify({
+                      choices: [{
+                        delta: {},
+                        index: 0,
+                        finish_reason: event.choices[0].finish_reason
+                      }]
+                    })}\n\n`);
+                  }
+
+                } catch (e) {
+                  // Skip parse errors for incomplete chunks
+                }
+              }
+            }
+          }
+        });
+
+        response.data.on('end', () => {
+          res.write('data: [DONE]\n\n');
+          res.end();
+          resolve({ fullContent, toolCalls });
+        });
+
+        response.data.on('error', (err: any) => {
+          res.write(`data: ${JSON.stringify({
+            error: { message: err.message }
+          })}\n\n`);
+          res.write('data: [DONE]\n\n');
+          res.end();
+          reject(err);
+        });
+      });
+
+    } catch (error: any) {
+      res.write(`data: ${JSON.stringify({
+        error: { message: error.message }
+      })}\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+      throw error;
+    }
+  }
+
+  /**
    * Call a model with timeout
    */
   private async callModel(
@@ -878,6 +1052,7 @@ IMPORTANT:
         break;
 
       case 'openrouter':
+        await this.checkOpenRouterRateLimit();
         url = 'https://openrouter.ai/api/v1/chat/completions';
         headers['Authorization'] = `Bearer ${this.config.settings.openrouterApiKey}`;
         headers['HTTP-Referer'] = 'http://localhost:5173'; // Required by OpenRouter
@@ -894,6 +1069,19 @@ IMPORTANT:
     });
 
     return response.data;
+  }
+
+  /**
+   * Stream response from OpenRouter model
+   */
+  async streamResponse(
+    modelId: string,
+    messages: any[],
+    tools: any[],
+    res: any,
+    timeout: number = 30000
+  ): Promise<void> {
+    return this.callModelStreaming(modelId, messages, tools, res, timeout);
   }
 
   /**
