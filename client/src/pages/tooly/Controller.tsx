@@ -10,19 +10,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { FailurePatternCard, type FailurePattern } from './components/FailurePatternCard';
+import ProstheticReview from './components/ProstheticReview';
 
 // Types
-interface FailurePattern {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  count: number;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  firstSeen: string;
-  lastSeen: string;
-}
-
 interface FailureEntry {
   id: string;
   timestamp: string;
@@ -96,6 +87,7 @@ export default function Controller() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
+  const [showProstheticReview, setShowProstheticReview] = useState(false);
 
   // Load data
   useEffect(() => {
@@ -166,7 +158,12 @@ export default function Controller() {
 
       if (res.ok) {
         const data = await res.json();
-        setAnalysis(data.analysis);
+        if (data.analysis) {
+          setAnalysis(data.analysis);
+        } else if (data.rawResponse) {
+          // If we only got raw response, show it as an error
+          setError('Analysis returned unparsed response - controller model may need adjustment');
+        }
       } else {
         const data = await res.json();
         setError(data.error || 'Analysis failed');
@@ -329,30 +326,16 @@ export default function Controller() {
             ) : (
               <div className="space-y-2">
                 {patterns.map(pattern => (
-                  <div
+                  <FailurePatternCard
                     key={pattern.id}
-                    onClick={() => setSelectedPattern(pattern.id === selectedPattern ? null : pattern.id)}
-                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                      selectedPattern === pattern.id
-                        ? 'border-purple-500 bg-purple-900/20'
-                        : 'border-gray-700 hover:border-gray-600'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{getCategoryIcon(pattern.category)} {pattern.name}</span>
-                      <span className={`px-2 py-0.5 rounded text-xs ${getSeverityColor(pattern.severity)}`}>
-                        {pattern.count}
-                      </span>
-                    </div>
-                    {selectedPattern === pattern.id && (
-                      <div className="mt-2 text-sm text-gray-400">
-                        <p>{pattern.description}</p>
-                        <p className="mt-1 text-xs text-gray-500">
-                          Last seen: {new Date(pattern.lastSeen).toLocaleString()}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                    pattern={pattern}
+                    isSelected={selectedPattern === pattern.id}
+                    onSelect={(id) => setSelectedPattern(id)}
+                    onAnalyze={() => {
+                      setSelectedPattern(pattern.id);
+                      runAnalysis();
+                    }}
+                  />
                 ))}
               </div>
             )}
@@ -446,13 +429,10 @@ export default function Controller() {
                     </p>
                     <div className="flex gap-2 mt-3">
                       <button
-                        onClick={() => {
-                          const modelId = prompt('Enter model ID to apply prosthetic to:');
-                          if (modelId) applyProsthetic(modelId);
-                        }}
-                        className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 rounded text-sm font-medium"
+                        onClick={() => setShowProstheticReview(true)}
+                        className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-medium"
                       >
-                        Apply Prosthetic
+                        📝 Review & Apply
                       </button>
                     </div>
                   </div>
@@ -504,6 +484,49 @@ export default function Controller() {
           </div>
         </div>
       </div>
+
+      {/* Prosthetic Review Modal */}
+      {showProstheticReview && analysis && (
+        <ProstheticReview
+          analysis={{
+            ...analysis,
+            affectedPatterns: patterns.map(p => p.name).slice(0, 5)
+          }}
+          onApprove={async (modelId, modifications) => {
+            try {
+              const res = await fetch(`${API_BASE}/controller/apply-prosthetic`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  modelId,
+                  prosthetic: {
+                    ...analysis.suggestedProsthetic,
+                    ...modifications
+                  },
+                  testFirst: true
+                })
+              });
+
+              if (res.ok) {
+                setShowProstheticReview(false);
+                setAnalysis(null);
+                loadData();
+                alert('Prosthetic applied successfully!');
+              } else {
+                const data = await res.json();
+                setError(data.error || 'Failed to apply prosthetic');
+              }
+            } catch (err: any) {
+              setError(err.message);
+            }
+          }}
+          onReject={(reason) => {
+            console.log('Prosthetic rejected:', reason);
+            setShowProstheticReview(false);
+          }}
+          onClose={() => setShowProstheticReview(false)}
+        />
+      )}
     </div>
   );
 }

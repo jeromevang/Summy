@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "fail_1766795305015_fffddd6c",
+      "timestamp": "2025-12-27T00:28:25.015Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "file_glob_search",
+      "error": "Tool 'file_glob_search' is not implemented in the agentic loop. Available tools: rag_query, rag_status, rag_index, read_file, list_directory, search_files",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"pattern\":\"server/src/modules/tooly/status-streamer.ts\"}",
+        "queryHash": "ac989090",
+        "expectedBehavior": "Tool should be implemented or model should use available tools",
+        "actualBehavior": "Tool file_glob_search not found",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766795308334_14ab803a",
+      "timestamp": "2025-12-27T00:28:28.334Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "ls",
+      "error": "Tool 'ls' is not implemented in the agentic loop. Available tools: rag_query, rag_status, rag_index, read_file, list_directory, search_files",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"dirPath\":\"server/src/modules/tooly\"}",
+        "queryHash": "ac989090",
+        "expectedBehavior": "Tool should be implemented or model should use available tools",
+        "actualBehavior": "Tool ls not found",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766795309267_2590254c",
+      "timestamp": "2025-12-27T00:28:29.267Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "file_glob_search",
+      "error": "Tool 'file_glob_search' is not implemented in the agentic loop. Available tools: rag_query, rag_status, rag_index, read_file, list_directory, search_files",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"pattern\":\"**/status-streamer.ts\"}",
+        "queryHash": "ac989090",
+        "expectedBehavior": "Tool should be implemented or model should use available tools",
+        "actualBehavior": "Tool file_glob_search not found",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766795313121_896aef38",
+      "timestamp": "2025-12-27T00:28:33.121Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "file_glob_search",
+      "error": "Tool 'file_glob_search' is not implemented in the agentic loop. Available tools: rag_query, rag_status, rag_index, read_file, list_directory, search_files",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"pattern\":\"status-streamer*\"}",
+        "queryHash": "ac989090",
+        "expectedBehavior": "Tool should be implemented or model should use available tools",
+        "actualBehavior": "Tool file_glob_search not found",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766796451502_1c623db1",
+      "timestamp": "2025-12-27T00:47:31.502Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "extra_tools_git_status",
+      "error": "Tool 'extra_tools_git_status' is not implemented in the agentic loop. Available tools: rag_query, rag_status, rag_index, read_file, list_directory, search_files",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{}",
+        "queryHash": "99914b93",
+        "expectedBehavior": "Tool should be implemented or model should use available tools",
+        "actualBehavior": "Tool extra_tools_git_status not found",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766796885273_a86c7874",
+      "timestamp": "2025-12-27T00:54:45.273Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "extra_tools_git_status",
+      "error": "Tool 'extra_tools_git_status' is not implemented in the agentic loop. Available tools: rag_query, rag_status, rag_index, read_file, list_directory, search_files",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{}",
+        "queryHash": "99914b93",
+        "expectedBehavior": "Tool should be implemented or model should use available tools",
+        "actualBehavior": "Tool extra_tools_git_status not found",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    }
+  ],
+  "patterns": {
+    "TOOL_SUPPRESSION": {
+      "id": "TOOL_SUPPRESSION",
+      "name": "Tool Not Called When Needed",
+      "description": "Model should call a tool but responds with text instead",
+      "category": "tool",
+      "count": 6,
+      "firstSeen": "2025-12-27T00:28:25.015Z",
+      "lastSeen": "2025-12-27T00:54:45.273Z",
+      "examples": [
+        "fail_1766795305015_fffddd6c",
+        "fail_1766795308334_14ab803a",
+        "fail_1766795309267_2590254c",
+        "fail_1766795313121_896aef38",
+        "fail_1766796451502_1c623db1",
+        "fail_1766796885273_a86c7874"
+      ],
+      "severity": "high"
+    }
+  },
+  "stats": {
+    "totalFailures": 6,
+    "resolvedFailures": 0,
+    "lastUpdated": "2025-12-27T00:54:45.274Z",
+    "failuresByCategory": {
+      "tool": 6,
+      "rag": 0,
+      "reasoning": 0,
+      "intent": 0,
+      "browser": 0,
+      "unknown": 0
+    },
+    "failuresByModel": {
+      "cognitive-engine": 6
+    }
+  }
+}

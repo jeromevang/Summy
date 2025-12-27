@@ -54,12 +54,19 @@ type ProxyMode = 'passthrough' | 'summy' | 'tooly' | 'full';
 // DASHBOARD COMPONENT
 // ============================================================
 
+interface FailureStats {
+  unresolvedCount: number;
+  criticalPatterns: number;
+  modelsAffected: number;
+}
+
 const Dashboard: React.FC = () => {
   const [serverStatus, setServerStatus] = useState<ServerStatus | null>(null);
   const [summyStatus, setSummyStatus] = useState<ModuleStatus>({ enabled: true, stats: {} });
   const [toolyStatus, setToolyStatus] = useState<ModuleStatus>({ enabled: true, stats: {} });
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [proxyMode, setProxyMode] = useState<ProxyMode>('full');
+  const [failureStats, setFailureStats] = useState<FailureStats>({ unresolvedCount: 0, criticalPatterns: 0, modelsAffected: 0 });
   const [loading, setLoading] = useState(true);
 
   // Fetch data on mount
@@ -134,6 +141,21 @@ const Dashboard: React.FC = () => {
           ...prev,
           stats: { ...prev.stats, sessions: sessions.length }
         }));
+      }
+
+      // Fetch failure stats from Controller
+      try {
+        const failuresRes = await fetch('/api/tooly/controller/status');
+        if (failuresRes.ok) {
+          const failureData = await failuresRes.json();
+          setFailureStats({
+            unresolvedCount: failureData.summary?.unresolvedFailures || 0,
+            criticalPatterns: failureData.summary?.criticalPatterns || 0,
+            modelsAffected: failureData.summary?.modelsAffected || 0
+          });
+        }
+      } catch (e) {
+        // Controller endpoint might not be available
       }
 
     } catch (error) {
@@ -215,6 +237,38 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Failure Alert Banner */}
+      {failureStats.unresolvedCount > 0 && (
+        <Link
+          to="/tooly/controller"
+          className="block bg-gradient-to-r from-red-900/40 to-orange-900/40 border border-red-500/50 rounded-xl p-4 hover:border-red-400 transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="text-3xl">🚨</div>
+              <div>
+                <h3 className="text-white font-semibold">Self-Improving System Needs Attention</h3>
+                <p className="text-red-300 text-sm">
+                  {failureStats.unresolvedCount} unresolved failure{failureStats.unresolvedCount !== 1 ? 's' : ''} detected
+                  {failureStats.criticalPatterns > 0 && (
+                    <span className="text-orange-300 ml-2">
+                      • {failureStats.criticalPatterns} critical pattern{failureStats.criticalPatterns !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="text-2xl font-bold text-red-400">{failureStats.unresolvedCount}</div>
+                <div className="text-xs text-gray-400">failures</div>
+              </div>
+              <span className="text-gray-400">→</span>
+            </div>
+          </div>
+        </Link>
+      )}
 
       {/* Module Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -117,8 +117,12 @@ async function executeToolCall(toolCall: any): Promise<ToolResult> {
                 }
             }
 
+            // Aliases for list_directory
+            case 'ls':
+            case 'list_dir':
+            case 'list_files':
             case 'list_directory': {
-                const dirPath = args.path || args.directory || '.';
+                const dirPath = args.path || args.directory || args.dirPath || '.';
                 try {
                     const entries = await fs.readdir(dirPath, { withFileTypes: true });
                     const formatted = entries.map(e => 
@@ -130,9 +134,14 @@ async function executeToolCall(toolCall: any): Promise<ToolResult> {
                 }
             }
 
+            // Aliases for search_files
+            case 'file_glob_search':
+            case 'glob_search':
+            case 'find_files':
+            case 'grep':
             case 'search_files': {
-                const pattern = args.pattern || args.query;
-                const searchPath = args.path || '.';
+                const pattern = args.pattern || args.query || args.glob;
+                const searchPath = args.path || args.directory || '.';
                 // Basic grep-like search using find
                 try {
                     const { exec } = await import('child_process');
@@ -153,26 +162,135 @@ async function executeToolCall(toolCall: any): Promise<ToolResult> {
             }
 
             // ============================================================
-            // FALLBACK - Tool not implemented
+            // GIT TOOLS
+            // ============================================================
+            case 'extra_tools_git_status':
+            case 'git_status': {
+                try {
+                    const { exec } = await import('child_process');
+                    const { promisify } = await import('util');
+                    const execAsync = promisify(exec);
+                    
+                    const { stdout } = await execAsync('git status --porcelain', { maxBuffer: 1024 * 1024 });
+                    if (!stdout.trim()) {
+                        return { toolCallId, name, result: 'Working directory clean - no uncommitted changes.', success: true };
+                    }
+                    
+                    // Parse git status output
+                    const lines = stdout.trim().split('\n');
+                    const modified: string[] = [];
+                    const added: string[] = [];
+                    const deleted: string[] = [];
+                    const untracked: string[] = [];
+                    
+                    for (const line of lines) {
+                        const status = line.substring(0, 2);
+                        const file = line.substring(3);
+                        if (status.includes('M')) modified.push(file);
+                        else if (status.includes('A')) added.push(file);
+                        else if (status.includes('D')) deleted.push(file);
+                        else if (status === '??') untracked.push(file);
+                    }
+                    
+                    let result = `Git Status:\n`;
+                    if (modified.length) result += `\nModified (${modified.length}):\n${modified.map(f => `  - ${f}`).join('\n')}`;
+                    if (added.length) result += `\nAdded (${added.length}):\n${added.map(f => `  - ${f}`).join('\n')}`;
+                    if (deleted.length) result += `\nDeleted (${deleted.length}):\n${deleted.map(f => `  - ${f}`).join('\n')}`;
+                    if (untracked.length) result += `\nUntracked (${untracked.length}):\n${untracked.map(f => `  - ${f}`).join('\n')}`;
+                    
+                    return { toolCallId, name, result, success: true };
+                } catch (e: any) {
+                    return { toolCallId, name, result: `Git error: ${e.message}`, success: false };
+                }
+            }
+
+            case 'extra_tools_git_diff':
+            case 'git_diff': {
+                try {
+                    const { exec } = await import('child_process');
+                    const { promisify } = await import('util');
+                    const execAsync = promisify(exec);
+                    
+                    const file = args.file || args.path || '';
+                    const cmd = file ? `git diff --stat ${file}` : 'git diff --stat';
+                    const { stdout } = await execAsync(cmd, { maxBuffer: 1024 * 1024 });
+                    return { toolCallId, name, result: stdout || 'No differences', success: true };
+                } catch (e: any) {
+                    return { toolCallId, name, result: `Git error: ${e.message}`, success: false };
+                }
+            }
+
+            case 'extra_tools_git_log':
+            case 'git_log': {
+                try {
+                    const { exec } = await import('child_process');
+                    const { promisify } = await import('util');
+                    const execAsync = promisify(exec);
+                    
+                    const limit = args.limit || args.count || 10;
+                    const { stdout } = await execAsync(`git log --oneline -n ${limit}`, { maxBuffer: 1024 * 1024 });
+                    return { toolCallId, name, result: stdout || 'No commits found', success: true };
+                } catch (e: any) {
+                    return { toolCallId, name, result: `Git error: ${e.message}`, success: false };
+                }
+            }
+
+            // ============================================================
+            // FALLBACK - Try MCP/Continue-Tools server for unknown tools
             // ============================================================
             default: {
-                const errorMsg = `Tool '${name}' is not implemented in the agentic loop. Available tools: rag_query, rag_status, rag_index, read_file, list_directory, search_files`;
-                // Log failure to failure log
-                failureLog.logFailure({
-                    modelId: 'cognitive-engine',
-                    category: 'tool',
-                    tool: name,
-                    error: errorMsg,
-                    query: JSON.stringify(args),
-                    expectedBehavior: 'Tool should be implemented or model should use available tools',
-                    actualBehavior: `Tool ${name} not found`
-                });
-                return {
-                    toolCallId,
-                    name,
-                    result: errorMsg,
-                    success: false
-                };
+                // Try to call the continue-tools MCP server for unknown tools
+                try {
+                    const axios = (await import('axios')).default;
+                    const continueToolsUrl = 'http://localhost:3006';
+                    
+                    // Strip 'extra_tools_' prefix if present
+                    const mcpToolName = name.replace(/^extra_tools_/, '');
+                    
+                    console.log(`[AgenticLoop] Forwarding unknown tool '${name}' to continue-tools as '${mcpToolName}'`);
+                    
+                    const response = await axios.post(
+                        `${continueToolsUrl}/tools/${mcpToolName}`,
+                        args,
+                        { timeout: 30000 }
+                    );
+                    
+                    // Extract text from MCP response format
+                    const content = response.data?.content;
+                    let result = '';
+                    if (Array.isArray(content)) {
+                        result = content.map((c: any) => c.text || c).join('\n');
+                    } else if (typeof content === 'string') {
+                        result = content;
+                    } else {
+                        result = JSON.stringify(response.data, null, 2);
+                    }
+                    
+                    console.log(`[AgenticLoop] Tool '${mcpToolName}' executed via continue-tools`);
+                    return { toolCallId, name, result, success: true };
+                    
+                } catch (mcpError: any) {
+                    // MCP call failed - log as failure
+                    const errorMsg = `Tool '${name}' not available. Tried agentic loop and continue-tools server. Error: ${mcpError.message}`;
+                    console.log(`[AgenticLoop] ${errorMsg}`);
+                    
+                    failureLog.logFailure({
+                        modelId: 'cognitive-engine',
+                        category: 'tool',
+                        tool: name,
+                        error: errorMsg,
+                        query: JSON.stringify(args),
+                        expectedBehavior: 'Tool should be available in agentic loop or MCP server',
+                        actualBehavior: `Tool ${name} not found anywhere`
+                    });
+                    
+                    return {
+                        toolCallId,
+                        name,
+                        result: errorMsg,
+                        success: false
+                    };
+                }
             }
         }
     } catch (error: any) {
@@ -268,9 +386,40 @@ export const executeAgenticLoop = async (
     // Determine initial intent from first tool call
     const initialIntent = toolCalls[0]?.function?.name || 'unknown';
     
+    // Stream immediate feedback to IDE
+    const streamToIDE = (message: string) => {
+        if (res && !res.headersSent) {
+            try {
+                res.write(`data: ${JSON.stringify({
+                    choices: [{ delta: { content: message } }]
+                })}\n\n`);
+            } catch (e) {
+                // Response might be closed
+            }
+        }
+    };
+    
     while (toolCalls.length > 0 && iterations < maxIterations) {
         iterations++;
-        console.log(`[AgenticLoop] Iteration ${iterations}: executing ${toolCalls.length} tool(s)`);
+        const toolNames = toolCalls.map((tc: any) => tc.function?.name || 'unknown').join(', ');
+        console.log(`[AgenticLoop] Iteration ${iterations}: executing ${toolCalls.length} tool(s): ${toolNames}`);
+        
+        // Stream what we're doing to the IDE immediately
+        if (iterations === 1) {
+            const toolDescriptions: Record<string, string> = {
+                'rag_query': '🔍 Searching codebase...',
+                'read_file': '📄 Reading file...',
+                'list_directory': '📁 Listing directory...',
+                'search_files': '🔎 Searching files...',
+                'git_status': '📊 Checking git status...',
+                'extra_tools_git_status': '📊 Checking git status...',
+                'git_diff': '📝 Checking git diff...',
+                'git_log': '📜 Checking git log...',
+            };
+            const firstTool = toolCalls[0]?.function?.name || 'unknown';
+            const description = toolDescriptions[firstTool] || `🔧 Running ${firstTool}...`;
+            streamToIDE(`*${description}*\n\n`);
+        }
         
         // Add assistant message with tool_calls to conversation
         const assistantMessage = {
@@ -293,19 +442,9 @@ export const executeAgenticLoop = async (
                 success: result.success
             });
             
-            // Stream tool execution updates to client if response is available
-            // Use a subtle thinking indicator instead of tool status
-            if (res && !res.headersSent && toolResults.indexOf(result) === 0) {
-                try {
-                    // Only show thinking indicator for first tool, don't clutter output
-                    res.write(`data: ${JSON.stringify({
-                        choices: [{
-                            delta: { content: `🔍 *Searching codebase...*\n\n` }
-                        }]
-                    })}\n\n`);
-                } catch (e) {
-                    // Response might be closed
-                }
+            // Stream tool completion for multi-iteration loops
+            if (iterations > 1) {
+                streamToIDE(`*✓ ${result.name} complete*\n`);
             }
         }
         
@@ -347,6 +486,31 @@ export const executeAgenticLoop = async (
     
     if (iterations >= maxIterations) {
         console.warn(`[AgenticLoop] Hit max iterations (${maxIterations})`);
+        
+        // If we hit max iterations and still have tool calls (no content), 
+        // force the LLM to give a final response
+        const lastContent = currentResponse.choices?.[0]?.message?.content;
+        if (!lastContent || lastContent.length < 50) {
+            console.log('[AgenticLoop] Forcing final response after max iterations');
+            try {
+                // Add a system message asking for a final summary
+                messages.push({
+                    role: 'user',
+                    content: 'Please provide a final summary response based on what you have learned so far. Do not call any more tools.'
+                });
+                currentResponse = await llmCallFn(messages);
+            } catch (e) {
+                // If this fails, construct a fallback response
+                currentResponse = {
+                    choices: [{
+                        message: {
+                            role: 'assistant',
+                            content: 'I was unable to complete the analysis within the allowed iterations. Please try a more specific query.'
+                        }
+                    }]
+                };
+            }
+        }
     }
     
     return {
