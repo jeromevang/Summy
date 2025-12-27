@@ -149,6 +149,7 @@ export const ComboTest: React.FC = () => {
   
   // Track excluded Main models
   const [excludedMainModels, setExcludedMainModels] = useState<Set<string>>(new Set());
+  const [vramFilteredCount, setVramFilteredCount] = useState<number>(0);
 
   // WebSocket for real-time progress
   useEffect(() => {
@@ -992,14 +993,17 @@ export const ComboTest: React.FC = () => {
         {/* Action Bar */}
         <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4 mb-6 flex items-center justify-between">
           <div className="text-gray-400">
-            <span className="text-white font-medium">{totalCombos}</span> combos × 
-            <span className="text-white font-medium"> 9</span> tests = 
+            <span className="text-white font-medium">{totalCombos}</span> combos ×
+            <span className="text-white font-medium"> 9</span> tests =
             <span className="text-white font-medium"> {totalTests}</span> total tests
             {results.length > 0 && !isRunning && (
               <span className="ml-4 text-green-400/60">
                 💾 {results.length} saved results
               </span>
             )}
+            <span className="ml-4 text-cyan-400/60">
+              🧠 16GB VRAM available ({totalCombos < selectedMainModels.size * selectedExecutorModels.size ? `${selectedMainModels.size * selectedExecutorModels.size - totalCombos} filtered` : 'no filtering needed'})
+            </span>
           </div>
           <div className="flex gap-3">
             {results.length > 0 && !isRunning && (

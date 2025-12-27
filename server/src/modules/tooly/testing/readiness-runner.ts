@@ -566,6 +566,41 @@ export class ReadinessRunner {
   }
 
   /**
+   * Unload models after assessment to free VRAM
+   */
+  private async unloadModelsAfterAssessment(): Promise<void> {
+    try {
+      // Get the LM Studio client and unload models
+      const { LMStudioClient } = await import('@lmstudio/sdk');
+      const client = new LMStudioClient();
+
+      // List loaded models
+      const loadedModels = await client.models.listLoaded();
+
+      if (loadedModels.length > 0) {
+        console.log(`[ReadinessRunner] Found ${loadedModels.length} loaded models to unload`);
+
+        // Unload each loaded model
+        for (const model of loadedModels) {
+          try {
+            console.log(`[ReadinessRunner] Unloading model: ${model.identifier}`);
+            await client.models.unload(model.identifier);
+          } catch (unloadError: any) {
+            console.warn(`[ReadinessRunner] Failed to unload ${model.identifier}:`, unloadError.message);
+          }
+        }
+
+        console.log('[ReadinessRunner] Model unloading completed');
+      } else {
+        console.log('[ReadinessRunner] No loaded models found to unload');
+      }
+    } catch (error: any) {
+      console.error('[ReadinessRunner] Error during model unloading:', error.message);
+      // Don't throw - unloading failure shouldn't break the assessment process
+    }
+  }
+
+  /**
    * Assess ALL available models and return ranked leaderboard
    */
   async assessAllModels(
@@ -619,6 +654,14 @@ export class ReadinessRunner {
           failedTests: [],
           duration: 0,
         });
+      }
+
+      // Unload models after each assessment to free VRAM
+      try {
+        console.log(`[ReadinessRunner] Unloading models after assessing ${modelId}`);
+        await this.unloadModelsAfterAssessment();
+      } catch (unloadError: any) {
+        console.warn(`[ReadinessRunner] Failed to unload models after ${modelId}:`, unloadError.message);
       }
     }
 

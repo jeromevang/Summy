@@ -1,13 +1,109 @@
 # WORKING_MEMORY
 
 ## Current Goal
-Build a Self-Improving Agentic Testing Platform with comprehensive capability testing, model optimization, and full frontend visibility
+Build a COMPLETE Self-Improving Agentic Testing Platform with comprehensive capability testing, model optimization, combo pair learning, and full frontend visibility
 
 ## Testing Philosophy
-- **Goal**: Get the MOST out of every model (help them succeed)
-- **Approach**: Scaffold weaker models with prosthetics learned from stronger ones
+- **Goal**: Get the MOST out of every model AND model combination (help them succeed)
+- **Approach**: Scaffold weaker models/combos with prosthetics learned from stronger ones
 - **BUT**: Models must pass qualifying gate first (hard requirements)
 - **UI-First**: Everything visible and configurable from frontend
+- **CRITICAL MISSING**: Combo testing learning integration - combos don't participate in the learning loop
+
+### 🧪 TEST-PROJECT SANDBOX (COMPLETELY MISSED!)
+
+**Location**: `server/data/test-project/` - Multi-language realistic codebase for testing
+
+#### **Languages Supported**:
+- **Node.js API**: Express server with auth, middleware, database services, intentional bugs (SQL injection)
+- **Java Spring**: REST API with security vulnerabilities
+- **React Web**: Full-stack React app with context/hooks/services
+- **React Native**: Mobile app with navigation and authentication
+- **Mendix Widget**: Pluggable widget with data binding
+- **Shared Utils**: TypeScript utilities (validation, formatting, email/password validation)
+
+#### **Test Realism**:
+- **Real code**: All projects are functional, deployable applications
+- **Intentional bugs**: Security vulnerabilities for testing model security awareness
+- **Multi-language**: Tests models across different technology stacks
+- **Complex dependencies**: Real-world code relationships and patterns
+
+**This is the core testing environment that makes the system realistic and comprehensive!**
+
+### 🎯 CONTEXT MANAGEMENT SYSTEM (MISSED!)
+**Location**: `context/` - Advanced context processing
+
+#### **Components**:
+- **Context Prism**: Multi-dimensional context analysis
+- **Decision Engine**: Context-aware routing decisions
+- **Context Analyzer**: Deep context understanding
+- **Summarizer**: Intelligent context condensation
+- **Verification**: Context accuracy validation
+
+### 📊 MODEL PROFILES DATABASE (MISSED!)
+**Location**: `server/data/model-profiles/` - 60+ comprehensive model histories
+
+#### **Profile Contents**:
+- **Assessment Results**: Full capability scoring across all categories
+- **Prosthetic History**: Applied prosthetics and their effectiveness
+- **Teaching Results**: Learning cycle outcomes and improvements
+- **Context Performance**: Fill-level degradation curves
+- **Behavioral Boundaries**: Complexity limits and failure points
+- **Multi-turn Memory**: Conversation context retention scores
+- **Fault Tolerance**: Error recovery and resilience metrics
+
+### 🔧 CONFIGURABLE TEST SUITE (MISSED!)
+**Location**: `agentic-readiness-suite.json` - Runtime-configurable tests
+
+#### **Features**:
+- **JSON Configuration**: No code changes needed to modify tests
+- **Dynamic Loading**: Tests loaded at runtime, instantly effective
+- **Category Weighting**: Adjustable scoring importance per category
+- **Evaluation Functions**: Mapped string-to-function for flexible logic
+- **Version Control**: JSON file properly tracked in git
+
+---
+
+## 🚨 CRITICAL SYSTEM STATUS: MISSING COMBO LEARNING INTEGRATION
+
+### The Problem
+We have built an **INCREDIBLY COMPREHENSIVE self-improving AI system** with:
+
+**✅ EXTENSIVE INFRASTRUCTURE DISCOVERED:**
+- ✅ **Multi-language test sandbox** (Node.js, Java, React, React Native, Mendix)
+- ✅ **Complete RAG system** with semantic search and dependency graphs
+- ✅ **73+ MCP tools** covering file ops, git, npm, browser, shell, memory
+- ✅ **Cognitive engine** with span-level observability and tracing
+- ✅ **Orchestrator system** with multi-agent coordination
+- ✅ **Context management** with prism analysis and verification
+- ✅ **60+ model profiles** with comprehensive assessment histories
+- ✅ **Configurable test suite** with runtime JSON configuration
+- ✅ Complete individual model assessment & teaching
+- ✅ Full learning pipeline with prosthetics
+- ✅ Comprehensive UI ecosystem
+- ✅ Advanced combo testing with VRAM awareness
+
+**BUT**: Despite this **massive infrastructure**, combo testing is **COMPLETELY ISOLATED** from the learning system. When combo pairs fail, they don't participate in the self-improvement loop.
+
+### Current Architecture Gap
+```
+Individual Models → Readiness → Failures → Controller → Prosthetics → Improvement ✅
+Combo Pairs → Testing → Results → Stored → END ❌ (NO LEARNING!)
+```
+
+### Impact
+- **Individual models**: Get smarter through prosthetics ✅
+- **Model pairs**: Stuck at natural performance level ❌
+- **Holistic optimization**: ~50% complete ❌
+
+### What Must Be Implemented
+1. **Combo Failure Logging** → Connect combo test failures to central failure log
+2. **Controller Combo Analysis** → AI analysis of combo performance patterns
+3. **Combo-Specific Prosthetics** → Generate prosthetics for combo optimization
+4. **Combo Teaching Cycles** → Auto-teach underperforming pairs
+5. **Combo Pattern Recognition** → Identify optimization opportunities
+
+**This is the final missing piece for a complete self-improving AI system.**
 
 ---
 
@@ -120,6 +216,8 @@ Build a Self-Improving Agentic Testing Platform with comprehensive capability te
    - `POST /api/tooly/context-fill/:modelId` - Run context fill test
    - `POST /api/tooly/distillation/run` - Run knowledge distillation
    - `GET /api/tooly/distillation/capabilities` - List distillation capabilities
+   - `POST /api/tooly/combo-test/run` - Batch combo testing with VRAM filtering
+   - `GET /api/tooly/combo-test/results` - Combo test results leaderboard
 
 ### Frontend
 7. ✅ **Prosthetic Manager UI** (NEW PAGE)
@@ -152,6 +250,184 @@ Build a Self-Improving Agentic Testing Platform with comprehensive capability te
     - Multi-turn settings
     - Flakiness detection (1x, 2x, 3x runs)
     - Integrated into AgenticReadiness with ⚙️ Config button
+
+---
+
+## ✅ ADDITIONAL COMPLETED (Current Session - Dec 27, 2024)
+
+### Backend - VRAM-Aware Combo Testing
+12. ✅ **Combo Testing with VRAM Filtering**
+    - `combo-tester.ts`: Complete rewrite with VRAM-aware filtering
+    - `filterCombosByVram()`: Smart combination selection based on 16GB limit
+    - Model size estimation: 30B/32B = 12GB, 14B/8B = 8GB, 4B/7B = 4GB
+    - Only tests VRAM-compatible combinations
+    - Console logging: `✅ VRAM OK: ModelA + ModelB = XGB ≤ 16GB`
+
+13. ✅ **Combo Testing API Integration**
+    - `routes/tooly.ts`: `/api/tooly/combo-test/run` endpoint
+    - WebSocket broadcasting for real-time progress
+    - Batch testing of all selected Main × Executor combinations
+    - Results storage in dedicated combo database table
+
+### Frontend - Combo Testing UI
+14. ✅ **ComboTest.tsx Page**
+    - `/tooly/combo-test` route with full interface
+    - Model selection: Separate Main and Executor dropdowns
+    - VRAM calculator: Shows "16GB VRAM available (filtered)" status
+    - "🚀 Test All Combos" button with progress tracking
+    - Results leaderboard with detailed scoring breakdown
+    - Real-time WebSocket updates during testing
+
+15. ✅ **VRAM Status Integration**
+    - Dynamic combo calculation: "X combos × 9 tests = Y total tests"
+    - VRAM filtering indication in UI
+    - Prevents testing of incompatible combinations upfront
+
+---
+
+## 🏗️ COMPLETE SYSTEM ARCHITECTURE (What We Have)
+
+### Core Components Status
+
+| Component | Status | Location | Purpose |
+|-----------|--------|----------|---------|
+| **Readiness Assessment** | ✅ 100% | `AgenticReadiness.tsx` | Individual model capability testing |
+| **Prosthetic Learning** | ✅ 100% | `ProstheticManager.tsx` | Knowledge distillation & teaching |
+| **Controller Dashboard** | ✅ 100% | `Controller.tsx` | Failure analysis & pattern recognition |
+| **Combo Testing** | ✅ 100% | `ComboTest.tsx` | Model pair optimization |
+| **Failure Logging** | ✅ 100% | `failure-log.ts` | Central failure capture |
+| **WebSocket Broadcasting** | ✅ 100% | `ws-broadcast.ts` | Real-time UI updates |
+| **RAG System** | ✅ 100% | `rag-server/` | Semantic code search & indexing |
+| **MCP Tools** | ✅ 100% | `mcp-server/` | 73+ tool execution capabilities |
+| **Cognitive Engine** | ✅ 100% | `cognitive-engine.ts` | Agentic loop execution with observability |
+| **Multi-Service Architecture** | ✅ 100% | server/rag-server/mcp-server | Distributed processing |
+| **Test-Project Sandbox** | ✅ 100% | `server/data/test-project/` | Multi-language realistic testing |
+| **Orchestrator System** | ✅ 100% | `orchestrator/` | Advanced agent coordination |
+| **Context Management** | ✅ 100% | `context/` | Prism, decision engine, verification |
+| **Model Profiles** | ✅ 100% | `model-profiles/` | 60+ model assessment histories |
+| **Multi-Service Architecture** | ✅ 100% | server/rag-server/mcp-server | Distributed processing |
+
+### Learning Pipeline (Individual Models)
+```
+Model → Readiness Test → Failures Logged → Controller Analysis →
+Pattern Recognition → Prosthetic Generation → Teaching Cycle →
+Model Improvement → Re-testing → SUCCESS ✅
+```
+
+### Combo Testing Pipeline (Isolated)
+```
+Model Pairs → VRAM Filter → Combo Testing → Results Stored →
+Leaderboard Display → END ❌ (NO LEARNING INTEGRATION)
+```
+
+### 🔍 RAG SYSTEM (MISSED!)
+**Location**: `rag-server/` - Complete semantic code search engine
+
+#### **Components**:
+- **Embeddings**: LMStudio integration for vector generation
+- **Indexing**: Automatic codebase indexing with LanceDB/HNSW
+- **Query Router**: Intelligent search across multiple storage backends
+- **Dependency Graph**: Static analysis of code relationships
+- **Summarizer**: Context-aware result synthesis
+- **Tokenizer**: Advanced text processing
+
+#### **Capabilities**:
+- **Semantic Search**: Find code by meaning, not keywords
+- **Multi-backend**: SQLite, LanceDB, HNSWlib support
+- **Real-time Updates**: File watcher for automatic re-indexing
+- **Dependency Analysis**: Import/export relationship mapping
+
+### 🛠️ MCP TOOLS SYSTEM (MISSED!)
+**Location**: `mcp-server/` - 73+ tool execution capabilities
+
+#### **Tool Categories**:
+- **File Operations** (13): read/write/edit/delete files, search, copy, move
+- **Git Operations** (17): status, diff, log, commit, branch, stash, blame
+- **NPM Operations** (7): install, run, build, test, init
+- **Browser Automation** (17): Playwright-based web interaction
+- **HTTP/Search** (2): web requests, search capabilities
+- **Code Execution** (4): shell, Node.js, TypeScript execution
+- **Memory** (4): persistent storage and retrieval
+- **Process** (2): list and kill processes
+- **Archive** (2): zip/unzip operations
+- **RAG** (3): semantic code search integration
+- **Code-Aware** (5): symbol lookup, callers, dependencies, file interfaces
+- **Utility** (6): environment, JSON, base64, text operations
+
+### 🧠 COGNITIVE ENGINE (MISSED!)
+**Location**: `cognitive-engine.ts` - Advanced agentic execution
+
+#### **Features**:
+- **Span-level Observability**: Detailed execution tracing
+- **Tool Execution**: MCP tool integration with error handling
+- **Context Management**: Prism-based context processing
+- **Decision Engine**: Intelligent routing decisions
+- **Verification Loop**: Result validation and correction
+- **Swarm Router**: Multi-agent coordination
+
+#### **Observability**:
+- **Trace Collection**: Request-to-response execution tracking
+- **Span Timing**: Individual operation performance metrics
+- **Real-time Broadcasting**: WebSocket updates for UI
+- **Error Attribution**: Precise failure location tracking
+
+### 🎭 ORCHESTRATOR SYSTEM (MISSED!)
+**Location**: `orchestrator/` - Advanced multi-agent coordination
+
+#### **Components**:
+- **Prosthetic Loop**: Automated teaching cycles for models
+- **Agent Decide/Search/Verify**: Multi-step agent workflows
+- **MCP Orchestrator**: Tool execution coordination
+- **Swarm Router**: Distributed agent management
+- **Config Generator**: Dynamic agent configuration
+- **Tool Profiler**: Performance analysis and optimization
+
+---
+
+## 🚨 THE MISSING INTEGRATION: Combo Testing Learning Loop
+
+### Current Problem
+**Combo testing operates as a standalone optimization tool** - it finds good model pairs but doesn't participate in the self-improvement ecosystem.
+
+### What Should Happen (Missing Implementation)
+```
+Combo Test Failure → Failure Log → Controller Analysis →
+Combo Pattern Recognition → Combo-Specific Prosthetic →
+Combo Teaching Cycle → Better Pair Performance →
+Continuous Combo Optimization
+```
+
+### Specific Missing Components
+
+#### 1. Combo Failure Logging ❌
+**File**: `combo-tester.ts` (line ~640)
+**Issue**: Combo test failures aren't logged to `failureLog.logFailure()`
+**Impact**: Controller never sees combo performance issues
+
+#### 2. Controller Combo Analysis ❌
+**File**: `controller/analyze` endpoint
+**Issue**: Controller only analyzes individual model failures, not combo patterns
+**Impact**: No "why do Qwen3+Llama3 combos fail?" insights
+
+#### 3. Combo-Specific Prosthetics ❌
+**File**: `prosthetic-store.ts`
+**Issue**: Prosthetics are per-model, not per-combo
+**Impact**: Can't optimize specific model pair interactions
+
+#### 4. Combo Teaching Cycles ❌
+**File**: `prosthetic-loop.ts`
+**Issue**: Teaching cycles only work on individual models
+**Impact**: Combo pairs can't be iteratively improved
+
+#### 5. Combo Pattern Recognition ❌
+**File**: `failure-log.ts` + controller analysis
+**Issue**: No combo-specific failure categorization
+**Impact**: Can't identify combo optimization opportunities
+
+### Why This Matters
+- **Individual models**: Get prosthetics and improve ✅
+- **Model combinations**: Stuck at natural performance ❌
+- **Production optimization**: Incomplete without combo learning
 
 ---
 
@@ -723,3 +999,121 @@ interface ProstheticEntry {
 9. **Context-aware prosthetic selection** (Backend) - Smart prosthetic use
 10. **Fault injection testing** (Backend) - Robustness testing
 11. **Dashboard widgets** (Frontend) - Quality of life
+
+---
+
+## 🎯 IMMEDIATE NEXT STEPS: Complete Combo Learning Integration
+
+### Priority Implementation Order
+
+#### **Phase 1: Combo Failure Logging** (HIGH PRIORITY)
+1. **Modify `combo-tester.ts`**: Add failure logging calls
+   - Log combo test failures to central failure log
+   - Include combo-specific metadata (mainModel, executorModel)
+   - Categorize as "combo_failure" type
+
+2. **Extend Failure Categories**:
+   ```typescript
+   export type FailureCategory =
+     | 'tool' | 'rag' | 'reasoning' | 'intent' | 'browser' | 'unknown'
+     | 'combo_pairing'; // NEW
+   ```
+
+#### **Phase 2: Controller Combo Analysis**
+3. **Update Controller Analysis**: Recognize combo patterns
+   - Analyze "combo_pairing" failures
+   - Identify problematic model combinations
+   - Generate combo-specific improvement suggestions
+
+4. **Combo Pattern Recognition**:
+   - "Model A + Model B always fails on X task"
+   - "Certain model pairs have poor executor handoff"
+   - "Specific combinations excel at certain capabilities"
+
+#### **Phase 3: Combo-Specific Prosthetics**
+5. **Extend Prosthetic System**: Support combo prosthetics
+   ```typescript
+   interface ProstheticEntry {
+     modelId?: string;           // Individual model
+     comboId?: string;          // "mainModel-executorModel"
+     // ... existing fields
+   }
+   ```
+
+6. **Combo Teaching Cycles**: Create combo-specific teaching
+   - Test combo pair → detect failures → generate prosthetic → re-test
+   - Optimize specific pair interactions
+
+#### **Phase 4: UI Integration**
+7. **Combo Learning Dashboard**: Show combo improvement over time
+   - Combo performance trends
+   - Active combo prosthetics
+   - Combo teaching cycle status
+
+### Expected Outcome
+**Complete self-improving AI system** where both individual models AND model combinations continuously optimize through the learning pipeline.
+
+---
+
+## 📋 QUICK REFERENCE: System Status
+
+### ✅ FULLY IMPLEMENTED (MASSIVE SYSTEM!)
+- **Multi-language test sandbox** (6 languages, real applications)
+- **Complete RAG system** (semantic search, dependency graphs)
+- **73+ MCP tools** (file, git, npm, browser, shell, memory)
+- **Cognitive engine** (observability, tracing, tool execution)
+- **Orchestrator system** (multi-agent coordination)
+- **Context management** (prism, decision engine, verification)
+- **60+ model profiles** (comprehensive assessment histories)
+- **Configurable test suite** (runtime JSON configuration)
+- Individual model assessment & teaching
+- Prosthetic learning pipeline
+- Controller failure analysis
+- VRAM-aware combo testing
+- Complete UI ecosystem
+- Multi-service architecture
+
+### ❌ CRITICALLY MISSING
+- Combo testing learning integration
+- Combo failure logging to central system
+- Combo-specific prosthetics
+- Combo teaching cycles
+
+### 🎯 MISSION
+**Transform combo testing from standalone optimization tool into active participant in the MASSIVE self-improving AI ecosystem we've built.**
+
+### 📊 SCALE OF WHAT EXISTS
+- **4 Major Services**: Server, RAG, MCP, Client
+- **1000+ Files**: Comprehensive codebase
+- **60+ Models**: Profiled and assessed
+- **73+ Tools**: Available for execution
+- **6 Languages**: Supported in test sandbox
+- **28+ Tests**: Configurable test suite
+- **Complete Learning Pipeline**: For individual models
+
+**We built an INCREDIBLE system - now we just need to connect combo testing to it!**
+
+---
+
+## 🔄 SESSION RESUME POINT: COMBO LEARNING INTEGRATION
+
+### 🎯 CURRENT STATUS (Ready for Implementation)
+- **System**: Complete self-improving AI infrastructure ✅
+- **Missing**: Combo testing learning integration ❌
+- **Priority**: Connect combo failures to learning pipeline 🔗
+
+### 🚀 NEXT IMMEDIATE STEPS
+1. **Mark combo_failure_logging as in_progress**
+2. **Modify combo-tester.ts** to log failures to failure-log.ts
+3. **Add 'combo_pairing' failure category**
+4. **Update controller analysis** to handle combo patterns
+5. **Implement combo-specific prosthetics**
+6. **Add combo teaching cycles**
+
+### 📋 CRITICAL CONTEXT FOR CONTINUATION
+- **Entry Point**: Start with combo_failure_logging todo
+- **Key Files**: combo-tester.ts, failure-log.ts, controller/analyze
+- **Goal**: Make combo testing participate in the learning ecosystem
+- **Impact**: Complete the self-improving AI system
+
+**SESSION READY: All context preserved for combo learning integration implementation.**

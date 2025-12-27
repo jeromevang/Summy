@@ -76,6 +76,16 @@ interface TestResult {
   attribution?: 'main' | 'executor' | 'loop';
 }
 
+interface CombinationCheckResult {
+  vramOk: boolean;
+  compatibilityOk: boolean;
+  setupOk: boolean;
+  vramMessage: string;
+  compatibilityMessage: string;
+  setupMessage: string;
+  overallOk: boolean;
+}
+
 interface ReadinessResult {
   modelId: string;
   executorModelId?: string;
@@ -685,6 +695,7 @@ export const AgenticReadiness: React.FC = () => {
   const [isTeaching, setIsTeaching] = useState(false);
   const [teachingLog, setTeachingLog] = useState<string[]>([]);
   const [showObservability, setShowObservability] = useState(false);
+  const [combinationCheck, setCombinationCheck] = useState<CombinationCheckResult | null>(null);
 
   // ============================================================
   // DATA FETCHING
@@ -856,6 +867,49 @@ export const AgenticReadiness: React.FC = () => {
       setIsLoading(false);
       setAutoTeachRequested(false);
     }
+  };
+
+  const checkCombination = async (mainModelId: string, executorModelId: string) => {
+    if (!hardware) return;
+
+    const mainModel = models.find(m => m.id === mainModelId);
+    const executorModel = models.find(m => m.id === executorModelId);
+
+    if (!mainModel || !executorModel) return;
+
+    // VRAM Check
+    const mainVram = mainModel.estimatedVramGB;
+    const execVram = executorModel.estimatedVramGB;
+    const totalVram = mainVram + execVram;
+    const availableVram = hardware.availableVramGB;
+    const vramOk = totalVram <= availableVram;
+    const vramMessage = vramOk
+      ? `${totalVram.toFixed(1)}GB fits in ${availableVram.toFixed(1)}GB available`
+      : `${totalVram.toFixed(1)}GB exceeds ${availableVram.toFixed(1)}GB available`;
+
+    // Compatibility Check (basic for now - can be enhanced)
+    const compatibilityOk = mainModelId !== executorModelId; // Different models
+    const compatibilityMessage = compatibilityOk
+      ? 'Different models selected for main/executor roles'
+      : 'Main and executor models should be different';
+
+    // Setup Check
+    const setupOk = !!mainModelId && !!executorModelId;
+    const setupMessage = setupOk
+      ? 'Both models configured'
+      : 'Missing model configuration';
+
+    const overallOk = vramOk && compatibilityOk && setupOk;
+
+    setCombinationCheck({
+      vramOk,
+      compatibilityOk,
+      setupOk,
+      vramMessage,
+      compatibilityMessage,
+      setupMessage,
+      overallOk
+    });
   };
 
   const runBatchAssessment = async () => {
@@ -1229,9 +1283,9 @@ export const AgenticReadiness: React.FC = () => {
                 </div>
               </div>
 
-              {/* VRAM Calculator */}
+              {/* VRAM Calculator & Combo Validation */}
               {hardware && selectedModelId && executorModelId && (
-                <div className="mt-4 p-4 bg-gray-700/30 rounded-lg">
+                <div className="mt-4 p-4 bg-gray-700/30 rounded-lg space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-gray-400">Combined VRAM Estimate:</span>
                     {(() => {
@@ -1248,6 +1302,44 @@ export const AgenticReadiness: React.FC = () => {
                       );
                     })()}
                   </div>
+
+                  {/* Check Combination Button */}
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-600/50">
+                    <span className="text-gray-400 text-sm">Compatibility Check:</span>
+                    <button
+                      onClick={() => checkCombination(selectedModelId, executorModelId)}
+                      disabled={isLoading}
+                      className="px-4 py-2 bg-blue-600/80 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+                    >
+                      <span>🔍</span>
+                      Check Combination
+                    </button>
+                  </div>
+
+                  {/* Combination Check Results */}
+                  {combinationCheck && (
+                    <div className="pt-2 border-t border-gray-600/50">
+                      <div className="text-xs space-y-1">
+                        <div className={`flex items-center gap-2 ${combinationCheck.vramOk ? 'text-green-400' : 'text-red-400'}`}>
+                          <span>{combinationCheck.vramOk ? '✓' : '✗'}</span>
+                          <span>VRAM: {combinationCheck.vramMessage}</span>
+                        </div>
+                        <div className={`flex items-center gap-2 ${combinationCheck.compatibilityOk ? 'text-green-400' : 'text-yellow-400'}`}>
+                          <span>{combinationCheck.compatibilityOk ? '✓' : '⚠'}</span>
+                          <span>Compatibility: {combinationCheck.compatibilityMessage}</span>
+                        </div>
+                        <div className={`flex items-center gap-2 ${combinationCheck.setupOk ? 'text-green-400' : 'text-red-400'}`}>
+                          <span>{combinationCheck.setupOk ? '✓' : '✗'}</span>
+                          <span>Setup: {combinationCheck.setupMessage}</span>
+                        </div>
+                      </div>
+                      {combinationCheck.overallOk && (
+                        <div className="mt-2 text-green-400 text-xs font-medium">
+                          ✅ This combination looks good to test!
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1387,6 +1479,12 @@ export const AgenticReadiness: React.FC = () => {
                 className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
               >
                 Test + Auto-Teach
+              </button>
+              <button
+                onClick={() => navigate('/tooly/combo-test')}
+                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium rounded-lg hover:from-amber-400 hover:to-orange-400 transition-colors"
+              >
+                🏆 Combo Leaderboard
               </button>
             </div>
           </div>
