@@ -7,7 +7,7 @@
   "azureApiVersion": "2024-02-01",
   "lmstudioUrl": "http://localhost:1234",
   "lmstudioModel": "gemma-3-27b-tools-i1@iq1_m",
-  "defaultCompressionMode": 1,
+  "defaultCompressionMode": 0,
   "defaultKeepRecent": 5,
   "defaultContextLength": 8192,
   "proxyMode": "both",
