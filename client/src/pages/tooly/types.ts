@@ -195,7 +195,7 @@ export interface IntentProgress {
 }
 
 // Provider types
-export type ProviderFilter = 'all' | 'lmstudio' | 'openai' | 'azure';
+export type ProviderFilter = 'all' | 'lmstudio' | 'openai' | 'azure' | 'openrouter';
 export type TestMode = 'quick' | 'keep_on_success' | 'manual';
 export type ProxyMode = 'passthrough' | 'summy' | 'tooly' | 'both';
 
@@ -203,6 +203,7 @@ export interface AvailableProviders {
   lmstudio: boolean;
   openai: boolean;
   azure: boolean;
+  openrouter: boolean;
 }
 
 // Expanded sections for V1 detail view

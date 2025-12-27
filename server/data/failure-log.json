@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "fail_1766841499564_fdf29a0e",
+      "timestamp": "2025-12-27T13:18:19.564Z",
+      "modelId": "meta-llama/llama-3.3-70b-instruct:free",
+      "executorModelId": "qwen/qwen3-4b:free",
+      "category": "combo_pairing",
+      "error": "Combo meta-llama/llama-3.3-70b-instruct:free-qwen/qwen3-4b:free scored only 36% (0/8 tests passed)",
+      "errorType": "unknown",
+      "context": {
+        "query": "Combo testing: meta-llama/llama-3.3-70b-instruct:free-qwen/qwen3-4b:free",
+        "queryHash": "e3e77878",
+        "expectedBehavior": "Better model pairing performance",
+        "actualBehavior": "Main: 0%, Executor: 100%, Overall: 36%",
+        "toolCallAttempted": "Single Tool: failed; Tool Selection: failed; Parameter Extraction: failed; Multi-Tool Sequence: failed; Reasoning Required: failed",
+        "conversationLength": 1
+      },
+      "resolved": false
+    }
+  ],
+  "patterns": {},
+  "stats": {
+    "totalFailures": 1,
+    "resolvedFailures": 0,
+    "lastUpdated": "2025-12-27T13:18:19.565Z",
+    "failuresByCategory": {
+      "tool": 0,
+      "rag": 0,
+      "reasoning": 0,
+      "intent": 0,
+      "browser": 0,
+      "unknown": 0,
+      "combo_pairing": 1
+    },
+    "failuresByModel": {
+      "meta-llama/llama-3.3-70b-instruct:free": 1
+    }
+  }
+}

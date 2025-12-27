@@ -43,6 +43,7 @@ export interface ModelDiscoveryResult {
   lmstudio: DiscoveredModel[];
   openai: DiscoveredModel[];
   azure: DiscoveredModel[];
+  openrouter: DiscoveredModel[];
   lastUpdated: string;
 }
 
@@ -83,17 +84,20 @@ class ModelDiscoveryService {
     azureResourceName?: string;
     azureApiKey?: string;
     azureDeploymentName?: string;
+    openrouterApiKey?: string;
   }): Promise<ModelDiscoveryResult> {
-    const [lmstudio, openai, azure] = await Promise.all([
+    const [lmstudio, openai, azure, openrouter] = await Promise.all([
       this.discoverLMStudio(settings.lmstudioUrl),
       this.discoverOpenAI(settings.openaiApiKey),
-      this.discoverAzure(settings)
+      this.discoverAzure(settings),
+      this.discoverOpenRouter(settings.openrouterApiKey)
     ]);
 
     return {
       lmstudio,
       openai,
       azure,
+      openrouter,
       lastUpdated: new Date().toISOString()
     };
   }
@@ -367,7 +371,7 @@ class ModelDiscoveryService {
   /**
    * Check if a specific provider is available
    */
-  async checkProviderAvailability(provider: 'lmstudio' | 'openai' | 'azure', settings: any): Promise<boolean> {
+  async checkProviderAvailability(provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any): Promise<boolean> {
     try {
       switch (provider) {
         case 'lmstudio':
@@ -388,6 +392,17 @@ class ModelDiscoveryService {
           // For Azure, just check if we have the config - actual validation happens at request time
           return true;
 
+        case 'openrouter':
+          if (!settings.openrouterApiKey) return false;
+          const orResponse = await axios.get('https://openrouter.ai/api/v1/models', {
+            headers: {
+              'Authorization': `Bearer ${settings.openrouterApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            timeout: 5000
+          });
+          return orResponse.status === 200;
+
         default:
           return false;
       }
@@ -397,20 +412,128 @@ class ModelDiscoveryService {
   }
 
   /**
+   * Discover models from OpenRouter API
+   */
+  async discoverOpenRouter(apiKey?: string): Promise<DiscoveredModel[]> {
+    if (!apiKey) {
+      console.log('[ModelDiscovery] No OpenRouter API key provided');
+      return [];
+    }
+
+    try {
+      console.log('[ModelDiscovery] Discovering OpenRouter models...');
+
+      const response = await axios.get('https://openrouter.ai/api/v1/models', {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000
+      });
+
+      const models = response.data.data || [];
+      console.log(`[ModelDiscovery] Found ${models.length} OpenRouter models`);
+
+      // Filter to free models only and those with function calling support
+      const freeFunctionCallingModels = models.filter((model: any) => {
+        // Check if model is free (pricing info indicates free tier)
+        const isFree = model.pricing?.prompt === '0' && model.pricing?.completion === '0';
+
+        // Check if model supports function calling (has tools in capabilities)
+        const supportsTools = model.capabilities?.includes('tools') ||
+                             model.description?.toLowerCase().includes('function') ||
+                             model.description?.toLowerCase().includes('tool');
+
+        // Check if model has reasonable context length
+        const hasContext = model.context_length && model.context_length >= 4096;
+
+        return isFree && (supportsTools || hasContext);
+      });
+
+      console.log(`[ModelDiscovery] Filtered to ${freeFunctionCallingModels.length} free function-calling models`);
+
+      // Convert to our format and sort by "ranking" (using model popularity metrics)
+      const discoveredModels: DiscoveredModel[] = freeFunctionCallingModels
+        .map((model: any) => {
+          // Extract provider from model ID (e.g., "openai/gpt-4o" -> "OpenAI")
+          const provider = model.id.split('/')[0];
+          const providerName = provider === 'openai' ? 'OpenAI' :
+                              provider === 'anthropic' ? 'Anthropic' :
+                              provider === 'meta' ? 'Meta' :
+                              provider === 'google' ? 'Google' :
+                              provider.charAt(0).toUpperCase() + provider.slice(1);
+
+          return {
+            id: model.id,
+            displayName: model.name || model.id.split('/').pop() || model.id,
+            provider: 'openrouter' as const,
+            status: 'untested',
+            maxContextLength: model.context_length,
+            trainedForToolUse: model.capabilities?.includes('tools'),
+            vision: model.capabilities?.includes('vision'),
+            sizeBytes: undefined, // OpenRouter doesn't provide this
+            quantization: undefined, // OpenRouter doesn't provide this
+            // Add ranking score based on model name popularity
+            score: this.getModelRankingScore(model.id)
+          };
+        })
+        .sort((a: DiscoveredModel, b: DiscoveredModel) => (b.score || 0) - (a.score || 0)); // Sort by ranking score descending
+
+      console.log(`[ModelDiscovery] Returning ${discoveredModels.length} OpenRouter models sorted by ranking`);
+      return discoveredModels;
+
+    } catch (error: any) {
+      console.error('[ModelDiscovery] Failed to discover OpenRouter models:', error.message);
+      return [];
+    }
+  }
+
+  /**
+   * Get ranking score for model based on known popularity/popularity
+   */
+  private getModelRankingScore(modelId: string): number {
+    const rankings: Record<string, number> = {
+      // GPT-4 level models
+      'openai/gpt-4o': 100,
+      'openai/gpt-4o-mini': 95,
+      'anthropic/claude-3.5-sonnet': 98,
+      'anthropic/claude-3-haiku': 90,
+      'openai/gpt-4-turbo': 85,
+      'openai/gpt-4': 80,
+
+      // GPT-3.5 level
+      'openai/gpt-3.5-turbo': 70,
+
+      // Other popular models
+      'meta/llama-3.1-70b-instruct': 75,
+      'meta/llama-3.1-8b-instruct': 65,
+      'google/gemini-pro': 60,
+      'google/gemini-flash': 55,
+
+      // Default score for unknown models
+      'default': 20
+    };
+
+    return rankings[modelId] || rankings['default'];
+  }
+
+  /**
    * Get quick status without full discovery
    */
   async getQuickStatus(settings: any): Promise<{
     lmstudio: boolean;
     openai: boolean;
     azure: boolean;
+    openrouter: boolean;
   }> {
-    const [lmstudio, openai, azure] = await Promise.all([
+    const [lmstudio, openai, azure, openrouter] = await Promise.all([
       this.checkProviderAvailability('lmstudio', settings),
       this.checkProviderAvailability('openai', settings),
-      this.checkProviderAvailability('azure', settings)
+      this.checkProviderAvailability('azure', settings),
+      this.checkProviderAvailability('openrouter', settings)
     ]);
 
-    return { lmstudio, openai, azure };
+    return { lmstudio, openai, azure, openrouter };
   }
 }
 

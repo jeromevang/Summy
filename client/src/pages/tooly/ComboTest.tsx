@@ -271,7 +271,12 @@ export const ComboTest: React.FC = () => {
   const fetchModels = async () => {
     setIsLoadingModels(true);
     try {
-      const response = await fetch('/api/tooly/models?provider=lmstudio');
+      // Try OpenRouter first since that's what the user configured, fallback to LM Studio
+      let response = await fetch('/api/tooly/models?provider=openrouter');
+      if (!response.ok) {
+        console.log('OpenRouter models not available, trying LM Studio...');
+        response = await fetch('/api/tooly/models?provider=lmstudio');
+      }
       if (!response.ok) throw new Error('Failed to fetch models');
       const data = await response.json();
       // Sort models by size (smallest first)

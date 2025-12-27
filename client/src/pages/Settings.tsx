@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface ServerSettings {
-  provider: 'openai' | 'azure' | 'lmstudio';
+  provider: 'openai' | 'azure' | 'lmstudio' | 'openrouter';
   openaiModel: string;
   azureResourceName: string;
   azureDeploymentName: string;
@@ -10,6 +10,8 @@ interface ServerSettings {
   azureApiVersion: string;
   lmstudioUrl: string;
   lmstudioModel: string;
+  openrouterApiKey: string;
+  openrouterModel: string;
   defaultCompressionMode: 0 | 1 | 2 | 3;
   defaultKeepRecent: number;
   modules?: {
@@ -35,6 +37,8 @@ const Settings: React.FC = () => {
     azureApiVersion: '2024-02-01',
     lmstudioUrl: 'http://localhost:1234',
     lmstudioModel: '',
+    openrouterApiKey: '',
+    openrouterModel: '',
     defaultCompressionMode: 1,
     defaultKeepRecent: 5
   });
@@ -43,6 +47,8 @@ const Settings: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [lmstudioStatus, setLmstudioStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
   const [lmstudioError, setLmstudioError] = useState<string>('');
+  const [openrouterStatus, setOpenrouterStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
+  const [openrouterError, setOpenrouterError] = useState<string>('');
   
   // Azure connection test
   const [azureStatus, setAzureStatus] = useState<'idle' | 'testing' | 'connected' | 'failed'>('idle');
@@ -128,6 +134,25 @@ const Settings: React.FC = () => {
     }
   };
 
+  const handleTestOpenRouter = async () => {
+    setOpenrouterStatus('testing');
+    setOpenrouterError('');
+
+    try {
+      const response = await axios.post('http://localhost:3001/api/test-openrouter');
+
+      if (response.data.success) {
+        setOpenrouterStatus('connected');
+      } else {
+        setOpenrouterStatus('failed');
+        setOpenrouterError(response.data.error || 'Connection failed');
+      }
+    } catch (error: any) {
+      setOpenrouterStatus('failed');
+      setOpenrouterError(error.response?.data?.error || error.message);
+    }
+  };
+
   const handleTestAzure = async () => {
     setAzureStatus('testing');
     setAzureError('');
@@ -179,11 +204,12 @@ const Settings: React.FC = () => {
                 Select which LLM provider to use for IDE requests. Use model name <code className="bg-[#1a1a1a] px-1 rounded text-purple-400">localproxy</code> in your IDE to always route to LM Studio.
               </p>
               
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { value: 'openai', label: 'OpenAI', icon: '🌐', desc: 'GPT-4, GPT-4o, etc.' },
                   { value: 'azure', label: 'Azure OpenAI', icon: '☁️', desc: 'Azure-hosted models' },
                   { value: 'lmstudio', label: 'LM Studio', icon: '💻', desc: 'Local models' },
+                  { value: 'openrouter', label: 'OpenRouter', icon: '🚀', desc: 'Free multi-provider models' },
                 ].map(provider => (
                   <button
                     key={provider.value}
@@ -423,6 +449,67 @@ const Settings: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* OpenRouter Configuration - only show when OpenRouter is selected */}
+            {settings.provider === 'openrouter' && (
+              <div className="border border-orange-500/30 rounded-lg p-4 bg-orange-500/5">
+                <h4 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                  <span className="text-2xl">🚀</span> OpenRouter Configuration
+                </h4>
+                <p className="text-sm text-gray-400 mb-4">
+                  Configure your OpenRouter API key in the server .env file. Only free models will be shown. Model selection and management is done in the Model Hub.
+                </p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                      OpenRouter API Key Status
+                    </label>
+                    <div className="flex gap-2">
+                      <div className={`flex-1 bg-[#0d0d0d] border rounded-lg px-4 py-2 text-white ${
+                        settings.openrouterApiKey ? 'border-green-500/30 text-green-400' : 'border-[#3d3d3d] text-gray-500'
+                      }`}>
+                        {settings.openrouterApiKey ? '✅ Configured' : 'Not set'}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleTestOpenRouter}
+                        disabled={openrouterStatus === 'testing' || !settings.openrouterApiKey}
+                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                          openrouterStatus === 'testing'
+                            ? 'bg-gray-600 text-gray-300 cursor-wait'
+                            : openrouterStatus === 'connected'
+                              ? 'bg-green-600 hover:bg-green-700 text-white'
+                              : openrouterStatus === 'failed'
+                                ? 'bg-red-600 hover:bg-red-700 text-white'
+                                : !settings.openrouterApiKey
+                                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                  : 'bg-orange-600 hover:bg-orange-700 text-white'
+                        }`}
+                      >
+                        {openrouterStatus === 'testing' ? 'Testing...'
+                          : openrouterStatus === 'connected' ? '✓ Connected'
+                          : openrouterStatus === 'failed' ? '✗ Retry'
+                          : 'Test Connection'}
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">
+                      ⚠️ The API key is read from <code className="bg-[#1a1a1a] px-1 rounded text-orange-400">server/.env</code> as OPENROUTER_API_KEY
+                    </p>
+                    {openrouterError && (
+                      <p className="mt-2 text-sm text-red-400">
+                        ❌ {openrouterError}
+                      </p>
+                    )}
+                    {openrouterStatus === 'connected' && (
+                      <p className="mt-2 text-sm text-green-400">
+                        ✓ Connected to OpenRouter. Go to <a href="/tooly" className="underline text-orange-400 hover:text-orange-300">Model Hub</a> to select and manage free models.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Default Compression Settings */}
             <div>
