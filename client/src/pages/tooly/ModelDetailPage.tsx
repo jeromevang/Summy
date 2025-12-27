@@ -61,6 +61,18 @@ interface ModelProfile {
   failureProfile?: Record<string, any>;
   trainabilityScores?: Record<string, number>;
   optimalSettings?: Record<string, any>;
+  contextPerformance?: {
+    testedAt: string;
+    results: Array<{
+      fillLevel: number;
+      tokensUsed: number;
+      qualityScore: number;
+      latencyMs: number;
+      degradationFromBaseline: number;
+    }>;
+    effectiveMaxContext: number;
+    degradationCurve: number[];
+  };
 }
 
 interface TestProgress {
@@ -582,6 +594,82 @@ export const ModelDetailPage: React.FC = () => {
               <div className="flex-1 flex items-center justify-center">
                 <p className="text-gray-600 text-xs text-center">
                   Run Standard or Deep<br />test to measure
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Context Degradation Chart */}
+          <div className="bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4 flex flex-col">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-gray-400">📉 Context Degradation</span>
+              {profile.contextPerformance?.effectiveMaxContext && (
+                <span className={`text-xs px-1.5 py-0.5 rounded ${
+                  profile.contextPerformance.effectiveMaxContext > 16000 ? 'bg-green-500/20 text-green-400' :
+                  profile.contextPerformance.effectiveMaxContext > 8000 ? 'bg-amber-500/20 text-amber-400' :
+                    'bg-red-500/20 text-red-400'
+                }`}>
+                  {profile.contextPerformance.effectiveMaxContext >= 1024
+                    ? `${(profile.contextPerformance.effectiveMaxContext / 1024).toFixed(0)}K`
+                    : profile.contextPerformance.effectiveMaxContext} max
+                </span>
+              )}
+            </div>
+            {profile.contextPerformance?.results && profile.contextPerformance.results.length > 0 ? (
+              <div className="flex-1 flex flex-col justify-end min-h-[100px]">
+                <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1">
+                  <span>25%</span>
+                  <span>90%</span>
+                </div>
+                <div className="h-[70px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={profile.contextPerformance.results
+                        .sort((a, b) => a.fillLevel - b.fillLevel)
+                        .map(r => ({
+                          fill: `${r.fillLevel}%`,
+                          quality: r.qualityScore,
+                          degradation: r.degradationFromBaseline
+                        }))
+                      }
+                      margin={{ top: 5, right: 5, bottom: 0, left: 5 }}
+                    >
+                      <defs>
+                        <linearGradient id="degradationGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <XAxis
+                        dataKey="fill"
+                        tick={{ fontSize: 9, fill: '#666' }}
+                        axisLine={{ stroke: '#2d2d2d' }}
+                        tickLine={false}
+                      />
+                      <YAxis hide domain={[0, 100]} />
+                      <Tooltip
+                        contentStyle={{ background: '#1a1a1a', border: '1px solid #2d2d2d', fontSize: 11 }}
+                        formatter={(v: number, name: string) => [
+                          `${v.toFixed(1)}${name === 'degradation' ? '%' : ''}`,
+                          name === 'quality' ? 'Quality Score' : 'Degradation'
+                        ]}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="quality"
+                        stroke="#f59e0b"
+                        strokeWidth={2}
+                        dot={{ fill: '#f59e0b', strokeWidth: 2, r: 3 }}
+                        isAnimationActive={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-gray-600 text-xs text-center">
+                  Run Context Fill<br />test to measure
                 </p>
               </div>
             )}
