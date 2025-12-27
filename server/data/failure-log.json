@@ -378,6 +378,96 @@
       },
       "resolved": false,
       "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766800207890_9fa75dec",
+      "timestamp": "2025-12-27T01:50:07.890Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "diff_files",
+      "error": "Tool 'diff_files' not available. Tried agentic loop and continue-tools server. Error: Request failed with status code 404",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"file1\":\"WORKING_MEMORY.md\",\"file2\":\"C:/Users/Jerome/GLOBAL_MEMORY.md\"}",
+        "queryHash": "437f68fb",
+        "expectedBehavior": "Tool should be available in agentic loop or MCP server",
+        "actualBehavior": "Tool diff_files not found anywhere",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766800270082_29f920ce",
+      "timestamp": "2025-12-27T01:51:10.082Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "diff_files",
+      "error": "Tool 'diff_files' not available. Tried agentic loop and continue-tools server. Error: Request failed with status code 404",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"file1\":\"WORKING_MEMORY.md\",\"file2\":\".gitignore\"}",
+        "queryHash": "437f68fb",
+        "expectedBehavior": "Tool should be available in agentic loop or MCP server",
+        "actualBehavior": "Tool diff_files not found anywhere",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766800451657_043e0308",
+      "timestamp": "2025-12-27T01:54:11.657Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "run_python",
+      "error": "Tool 'run_python' not available. Tried agentic loop and continue-tools server. Error: Request failed with status code 404",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"code\":\"import os\\nfrom pathlib import Path\\n\\n# Check if the file exists in the project root\\nfile_path = Path(\\\"server/src/modules/tooly/status-streamer.ts\\\")\\nprint(f\\\"File exists: {file_path.exists()}\\\")\"}",
+        "queryHash": "ec62c339",
+        "expectedBehavior": "Tool should be available in agentic loop or MCP server",
+        "actualBehavior": "Tool run_python not found anywhere",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766800453041_89591177",
+      "timestamp": "2025-12-27T01:54:13.041Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "memory_retrieve",
+      "error": "Tool 'memory_retrieve' not available. Tried agentic loop and continue-tools server. Error: Request failed with status code 404",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"key\":\"file_exists: server/src/modules/tooly/status-streamer.ts\"}",
+        "queryHash": "ac989090",
+        "expectedBehavior": "Tool should be available in agentic loop or MCP server",
+        "actualBehavior": "Tool memory_retrieve not found anywhere",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766800454805_86472a00",
+      "timestamp": "2025-12-27T01:54:14.805Z",
+      "modelId": "cognitive-engine",
+      "category": "tool",
+      "tool": "process_list",
+      "error": "Tool 'process_list' not available. Tried agentic loop and continue-tools server. Error: Request failed with status code 404",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"filter\":\"server/src/modules/tooly/status-streamer.ts\"}",
+        "queryHash": "ac989090",
+        "expectedBehavior": "Tool should be available in agentic loop or MCP server",
+        "actualBehavior": "Tool process_list not found anywhere",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
     }
   ],
   "patterns": {
@@ -386,9 +476,9 @@
       "name": "Tool Not Called When Needed",
       "description": "Model should call a tool but responds with text instead",
       "category": "tool",
-      "count": 21,
+      "count": 26,
       "firstSeen": "2025-12-27T00:28:25.015Z",
-      "lastSeen": "2025-12-27T01:24:50.203Z",
+      "lastSeen": "2025-12-27T01:54:14.805Z",
       "examples": [
         "fail_1766795305015_fffddd6c",
         "fail_1766795308334_14ab803a",
@@ -405,11 +495,11 @@
     }
   },
   "stats": {
-    "totalFailures": 21,
+    "totalFailures": 26,
     "resolvedFailures": 0,
-    "lastUpdated": "2025-12-27T01:24:50.203Z",
+    "lastUpdated": "2025-12-27T01:54:14.806Z",
     "failuresByCategory": {
-      "tool": 21,
+      "tool": 26,
       "rag": 0,
       "reasoning": 0,
       "intent": 0,
@@ -417,7 +507,7 @@
       "unknown": 0
     },
     "failuresByModel": {
-      "cognitive-engine": 21
+      "cognitive-engine": 26
     }
   }
 }

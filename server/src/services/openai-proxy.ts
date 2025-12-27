@@ -197,12 +197,17 @@ export class OpenAIProxy {
                             res.setHeader('Content-Type', 'text/event-stream');
                             res.setHeader('Cache-Control', 'no-cache');
                             res.setHeader('Connection', 'keep-alive');
+                            res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
                             res.flushHeaders();
                             
                             // Send thinking indicator immediately
                             res.write(`data: ${JSON.stringify({ 
                                 choices: [{ delta: { content: '🧠 *Thinking...*\n\n' }, index: 0 }] 
                             })}\n\n`);
+                            // Force flush the thinking message
+                            if (typeof (res as any).flush === 'function') {
+                                (res as any).flush();
+                            }
                         }
 
                         // Route through dual-model pipeline
@@ -244,6 +249,7 @@ export class OpenAIProxy {
                             };
 
                             // Execute tools via agentic loop (headers already set above)
+                            const executorModel = settings.executorModelId || settings.lmstudioModel || 'unknown';
                             const { finalResponse, agenticMessages } = await executeAgenticLoop(
                                 routingResult.finalResponse, 
                                 messagesToSend, 
@@ -251,7 +257,8 @@ export class OpenAIProxy {
                                 ideMappingConfig, 
                                 req.sessionId, 
                                 10, 
-                                req.isStreaming ? res : undefined
+                                req.isStreaming ? res : undefined,
+                                executorModel
                             );
 
                             await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
@@ -359,6 +366,11 @@ export class OpenAIProxy {
 
                 if (req.isStreaming) {
                     res.setHeader('Content-Type', 'text/event-stream');
+                    res.setHeader('Cache-Control', 'no-cache');
+                    res.setHeader('Connection', 'keep-alive');
+                    res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+                    res.flushHeaders();
+                    
                     let fullContent = '';
                     response.data.on('data', (chunk: Buffer) => {
                         const chunkStr = chunk.toString();
@@ -373,7 +385,7 @@ export class OpenAIProxy {
                                 return r.data;
                             };
                             const { finalResponse, agenticMessages } = await executeAgenticLoop(
-                                parsedResponse, messagesToSend, llmCallFn, ideMappingConfig, req.sessionId, 10, res
+                                parsedResponse, messagesToSend, llmCallFn, ideMappingConfig, req.sessionId, 10, res, settings.lmstudioModel || 'unknown'
                             );
                             await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
                             
@@ -437,6 +449,11 @@ export class OpenAIProxy {
 
             if (req.isStreaming) {
                 res.setHeader('Content-Type', 'text/event-stream');
+                res.setHeader('Cache-Control', 'no-cache');
+                res.setHeader('Connection', 'keep-alive');
+                res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+                res.flushHeaders();
+                
                 let fullContent = '';
                 response.data.on('data', (chunk: Buffer) => {
                     const chunkStr = chunk.toString();
@@ -450,7 +467,7 @@ export class OpenAIProxy {
                             const r = await axios({ method: 'POST', url, headers, data: { ...modifiedBody, messages: msgs, stream: false } });
                             return r.data;
                         };
-                        const { finalResponse, agenticMessages } = await executeAgenticLoop(parsedResponse, messagesToSend, llmCallFn, ideMappingConfig, req.sessionId, 10, res);
+                        const { finalResponse, agenticMessages } = await executeAgenticLoop(parsedResponse, messagesToSend, llmCallFn, ideMappingConfig, req.sessionId, 10, res, actualModelId);
                         await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
                         
                         // Stream the final response content word by word
