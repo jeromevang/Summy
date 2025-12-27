@@ -1,6 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+// Tooltip component
+const Tooltip: React.FC<{ children: React.ReactNode; content: string }> = ({ children, content }) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <div
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      >
+        {children}
+      </div>
+      {show && (
+        <div className="absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg bottom-full left-1/2 transform -translate-x-1/2 mb-1 whitespace-nowrap">
+          {content}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ============================================================
 // TYPES
 // ============================================================
@@ -204,12 +226,14 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <button
-          onClick={fetchDashboardData}
-          className="px-3 py-1.5 text-sm bg-[#2d2d2d] text-gray-300 rounded-lg hover:bg-[#3d3d3d] transition-colors"
-        >
-          ↻ Refresh
-        </button>
+        <Tooltip content="Reload dashboard data from all services">
+          <button
+            onClick={fetchDashboardData}
+            className="px-3 py-1.5 text-sm bg-[#2d2d2d] text-gray-300 rounded-lg hover:bg-[#3d3d3d] transition-colors"
+          >
+            ↻ Refresh
+          </button>
+        </Tooltip>
       </div>
 
       {/* Proxy Status */}

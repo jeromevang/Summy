@@ -7,6 +7,28 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
+// Tooltip component
+const Tooltip: React.FC<{ children: React.ReactNode; content: string }> = ({ children, content }) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <div
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      >
+        {children}
+      </div>
+      {show && (
+        <div className="absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg bottom-full left-1/2 transform -translate-x-1/2 mb-1 whitespace-nowrap">
+          {content}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ============================================================
 // TYPES
 // ============================================================
@@ -870,18 +892,22 @@ export const ComboTest: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium text-amber-400">🧠 Main Model Candidates</h2>
               <div className="flex gap-2">
-                <button
-                  onClick={selectAllMain}
-                  className="text-xs text-gray-400 hover:text-white"
-                >
-                  Select All
-                </button>
-                <button
-                  onClick={() => setSelectedMainModels(new Set())}
-                  className="text-xs text-gray-400 hover:text-white"
-                >
-                  Clear
-                </button>
+                <Tooltip content="Select all available Main models for combo testing">
+                  <button
+                    onClick={selectAllMain}
+                    className="text-xs text-gray-400 hover:text-white"
+                  >
+                    Select All
+                  </button>
+                </Tooltip>
+                <Tooltip content="Clear all Main model selections">
+                  <button
+                    onClick={() => setSelectedMainModels(new Set())}
+                    className="text-xs text-gray-400 hover:text-white"
+                  >
+                    Clear
+                  </button>
+                </Tooltip>
               </div>
             </div>
             
@@ -932,18 +958,22 @@ export const ComboTest: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium text-orange-400">🔧 Executor Model Candidates</h2>
               <div className="flex gap-2">
-                <button
-                  onClick={selectAllExecutor}
-                  className="text-xs text-gray-400 hover:text-white"
-                >
-                  Select All
-                </button>
-                <button
-                  onClick={() => setSelectedExecutorModels(new Set())}
-                  className="text-xs text-gray-400 hover:text-white"
-                >
-                  Clear
-                </button>
+                <Tooltip content="Select all available Executor models for combo testing">
+                  <button
+                    onClick={selectAllExecutor}
+                    className="text-xs text-gray-400 hover:text-white"
+                  >
+                    Select All
+                  </button>
+                </Tooltip>
+                <Tooltip content="Clear all Executor model selections">
+                  <button
+                    onClick={() => setSelectedExecutorModels(new Set())}
+                    className="text-xs text-gray-400 hover:text-white"
+                  >
+                    Clear
+                  </button>
+                </Tooltip>
               </div>
             </div>
             
@@ -1007,30 +1037,34 @@ export const ComboTest: React.FC = () => {
           </div>
           <div className="flex gap-3">
             {results.length > 0 && !isRunning && (
-              <button
-                onClick={async () => {
-                  if (confirm('Clear all saved combo test results?')) {
-                    try {
-                      await fetch('/api/tooly/combo-test/results', { method: 'DELETE' });
-                      setResults([]);
-                      setSelectedCombo(null);
-                    } catch (err) {
-                      console.error('Failed to clear results:', err);
+              <Tooltip content="Delete all saved combo test results from the database">
+                <button
+                  onClick={async () => {
+                    if (confirm('Clear all saved combo test results?')) {
+                      try {
+                        await fetch('/api/tooly/combo-test/results', { method: 'DELETE' });
+                        setResults([]);
+                        setSelectedCombo(null);
+                      } catch (err) {
+                        console.error('Failed to clear results:', err);
+                      }
                     }
-                  }
-                }}
-                className="px-4 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                🗑️ Clear Results
-              </button>
+                  }}
+                  className="px-4 py-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  🗑️ Clear Results
+                </button>
+              </Tooltip>
             )}
-            <button
-              onClick={runAllCombos}
-              disabled={isRunning || selectedMainModels.size === 0 || selectedExecutorModels.size === 0}
-              className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-lg hover:from-amber-400 hover:to-orange-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isRunning ? '🔄 Testing...' : '🚀 Test All Combos'}
-            </button>
+            <Tooltip content="Test all selected Main + Executor model combinations (8 tests per combo, may take 10-30 minutes)">
+              <button
+                onClick={runAllCombos}
+                disabled={isRunning || selectedMainModels.size === 0 || selectedExecutorModels.size === 0}
+                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold rounded-lg hover:from-amber-400 hover:to-orange-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isRunning ? '🔄 Testing...' : '🚀 Test All Combos'}
+              </button>
+            </Tooltip>
           </div>
         </div>
 

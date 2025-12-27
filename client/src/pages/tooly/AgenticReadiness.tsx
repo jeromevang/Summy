@@ -17,6 +17,28 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import { TestConfigPanel } from './components/TestConfigPanel';
 import type { TestConfig } from './components/TestConfigPanel';
 
+// Tooltip component
+const Tooltip: React.FC<{ children: React.ReactNode; content: string }> = ({ children, content }) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <div
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      >
+        {children}
+      </div>
+      {show && (
+        <div className="absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg bottom-full left-1/2 transform -translate-x-1/2 mb-1 whitespace-nowrap">
+          {content}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ============================================================
 // TYPES
 // ============================================================
@@ -1205,27 +1227,33 @@ export const AgenticReadiness: React.FC = () => {
 
             {/* Actions */}
             <div className="flex gap-3 flex-wrap">
-              <button
-                onClick={() => runAssessment('single', false)}
-                disabled={isLoading || !selectedModelId}
-                className="px-6 py-3 bg-cyan-500 text-black font-bold rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"
-              >
-                {isLoading ? 'Running...' : 'Run Assessment'}
-              </button>
-              <button
-                onClick={() => runAssessment('single', true)}
-                disabled={isLoading || !selectedModelId}
-                className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
-              >
-                Assess + Auto-Teach
-              </button>
-              <button
-                onClick={() => setShowConfigPanel(true)}
-                className="px-4 py-3 bg-gray-800 border border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-700 hover:border-gray-500 transition-colors"
-                title="Test Configuration"
-              >
-                ⚙️ Config
-              </button>
+              <Tooltip content="Run comprehensive agentic capability assessment on the selected model (28 tests, ~5-10 minutes)">
+                <button
+                  onClick={() => runAssessment('single', false)}
+                  disabled={isLoading || !selectedModelId}
+                  className="px-6 py-3 bg-cyan-500 text-black font-bold rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? 'Running...' : 'Run Assessment'}
+                </button>
+              </Tooltip>
+              <Tooltip content="Run assessment and automatically apply AI-generated prosthetics to fix any failures (may take 15-30 minutes)">
+                <button
+                  onClick={() => runAssessment('single', true)}
+                  disabled={isLoading || !selectedModelId}
+                  className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
+                >
+                  Assess + Auto-Teach
+                </button>
+              </Tooltip>
+              <Tooltip content="Configure test settings: timeouts, test categories, flakiness detection, and context window testing">
+                <button
+                  onClick={() => setShowConfigPanel(true)}
+                  className="px-4 py-3 bg-gray-800 border border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-700 hover:border-gray-500 transition-colors"
+                  title="Test Configuration"
+                >
+                  ⚙️ Config
+                </button>
+              </Tooltip>
             </div>
           </div>
         )}
@@ -1466,26 +1494,32 @@ export const AgenticReadiness: React.FC = () => {
             )}
 
             <div className="flex gap-3">
-              <button
-                onClick={() => runAssessment('dual', false)}
-                disabled={isLoading || !selectedModelId || !executorModelId}
-                className="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold rounded-lg hover:from-purple-400 hover:to-blue-400 transition-colors disabled:opacity-50"
-              >
-                {isLoading ? 'Running...' : 'Test Dual Mode'}
-              </button>
-              <button
-                onClick={() => runAssessment('dual', true)}
-                disabled={isLoading || !selectedModelId || !executorModelId}
-                className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
-              >
-                Test + Auto-Teach
-              </button>
-              <button
-                onClick={() => navigate('/tooly/combo-test')}
-                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium rounded-lg hover:from-amber-400 hover:to-orange-400 transition-colors"
-              >
-                🏆 Combo Leaderboard
-              </button>
+              <Tooltip content="Test the selected Main + Executor model combination (28 tests, ~5-10 minutes)">
+                <button
+                  onClick={() => runAssessment('dual', false)}
+                  disabled={isLoading || !selectedModelId || !executorModelId}
+                  className="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold rounded-lg hover:from-purple-400 hover:to-blue-400 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? 'Running...' : 'Test Dual Mode'}
+                </button>
+              </Tooltip>
+              <Tooltip content="Test dual model combination and automatically apply prosthetics to improve coordination between models">
+                <button
+                  onClick={() => runAssessment('dual', true)}
+                  disabled={isLoading || !selectedModelId || !executorModelId}
+                  className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
+                >
+                  Test + Auto-Teach
+                </button>
+              </Tooltip>
+              <Tooltip content="View detailed combo testing results and compare different model pair performances">
+                <button
+                  onClick={() => navigate('/tooly/combo-test')}
+                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium rounded-lg hover:from-amber-400 hover:to-orange-400 transition-colors"
+                >
+                  🏆 Combo Leaderboard
+                </button>
+              </Tooltip>
             </div>
           </div>
         )}
