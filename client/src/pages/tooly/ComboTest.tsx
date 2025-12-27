@@ -103,6 +103,11 @@ interface ComboScore {
   mainExcluded?: boolean;    // True if Main model was excluded due to timeout
   mainTimedOut?: boolean;    // True if Main model specifically was too slow
   executorTimedOut?: boolean; // True if Executor model specifically was too slow
+
+  // Qualifying gate results
+  qualifyingGatePassed?: boolean;
+  disqualifiedAt?: string | null;
+  qualifyingResults?: ComboTestResult[];
 }
 
 // Category display info
@@ -132,6 +137,7 @@ interface ComboTestProgress {
   testIndex: number;
   totalTests: number;
   status: 'running' | 'completed' | 'failed' | 'timeout';
+  phase?: 'qualifying' | 'full_test'; // Which phase we're in
 }
 
 interface ContextSizeResult {
@@ -449,6 +455,15 @@ export const ComboTest: React.FC = () => {
           <div className="flex items-center gap-3 mb-2">
             <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
             <span className="text-white font-medium">Currently Testing:</span>
+            {progress.phase && (
+              <span className={`ml-2 px-2 py-0.5 rounded text-xs font-medium ${
+                progress.phase === 'qualifying'
+                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                  : 'bg-green-500/20 text-green-400 border border-green-500/30'
+              }`}>
+                {progress.phase === 'qualifying' ? '🔍 Qualifying Gate' : '🧪 Full Tests'}
+              </span>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4 mt-3">
             <div>
@@ -542,6 +557,7 @@ export const ComboTest: React.FC = () => {
                 <th className="pb-3 pr-4">#</th>
                 <th className="pb-3 pr-4">Main Model</th>
                 <th className="pb-3 pr-4">Executor Model</th>
+                <th className="pb-3 pr-4 text-center" title="Qualifying Gate Status">🔍</th>
                 <th className="pb-3 pr-4 text-center" title="Main (Intent) / Executor (Tools)">🧠/🔧</th>
                 <th className="pb-3 pr-4 text-right">Score</th>
                 <th className="pb-3 pr-4 text-right text-green-400/70">Simple</th>
@@ -583,6 +599,19 @@ export const ComboTest: React.FC = () => {
                         }`}>
                           {index + 1}
                         </span>
+                      )}
+                    </td>
+                    <td className="py-3 pr-4 text-center">
+                      {result.qualifyingGatePassed === false ? (
+                        <Tooltip content={`❌ Failed qualifying gate at ${result.disqualifiedAt}`}>
+                          <span className="text-red-400 font-bold">❌</span>
+                        </Tooltip>
+                      ) : result.qualifyingGatePassed === true ? (
+                        <Tooltip content="✅ Passed qualifying gate, ran full tests">
+                          <span className="text-green-400 font-bold">✅</span>
+                        </Tooltip>
+                      ) : (
+                        <span className="text-gray-500">-</span>
                       )}
                     </td>
                     <td className="py-3 pr-4">

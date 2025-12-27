@@ -291,6 +291,9 @@ CREATE TABLE IF NOT EXISTS combo_test_results (
   failed_count INTEGER DEFAULT 0,
   main_excluded INTEGER DEFAULT 0,
   tested_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  qualifying_gate_passed INTEGER, -- 0=false, 1=true, NULL=not run
+  disqualified_at TEXT, -- 'qualifying_gate' if disqualified
+  qualifying_results TEXT, -- JSON: ComboTestResult[] from qualifying gate
   UNIQUE(main_model_id, executor_model_id)
 );
 CREATE INDEX IF NOT EXISTS idx_combo_results_main ON combo_test_results(main_model_id);
