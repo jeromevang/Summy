@@ -3,6 +3,202 @@ import { decisionEngine } from './context/decision-engine.js';
 import { verificationLoop } from './context/verification.js';
 import { swarmRouter } from './orchestrator/swarm-router.js';
 import { wsBroadcast } from '../../services/ws-broadcast.js';
+import { ragClient } from '../../services/rag-client.js';
+import { failureLog } from '../../services/failure-log.js';
+import fs from 'fs/promises';
+import path from 'path';
+
+// ============================================================
+// TOOL EXECUTOR - Handles actual tool execution
+// ============================================================
+
+interface ToolResult {
+    toolCallId: string;
+    name: string;
+    result: string;
+    success: boolean;
+}
+
+async function executeToolCall(toolCall: any): Promise<ToolResult> {
+    const name = toolCall.function?.name || toolCall.name;
+    const toolCallId = toolCall.id || `tool_${Date.now()}`;
+    
+    let args: any = {};
+    try {
+        const argsStr = toolCall.function?.arguments || toolCall.arguments || '{}';
+        args = typeof argsStr === 'string' ? JSON.parse(argsStr) : argsStr;
+    } catch (e) {
+        return {
+            toolCallId,
+            name,
+            result: `Failed to parse tool arguments: ${e}`,
+            success: false
+        };
+    }
+
+    console.log(`[AgenticLoop] Executing tool: ${name}`, args);
+
+    try {
+        switch (name) {
+            // ============================================================
+            // RAG TOOLS
+            // ============================================================
+            case 'rag_query': {
+                const queryResult = await ragClient.query(args.query, {
+                    limit: args.limit || args.topK || 5,
+                    fileTypes: args.fileTypes,
+                    paths: args.paths
+                });
+                
+                if (!queryResult || queryResult.results.length === 0) {
+                    return {
+                        toolCallId,
+                        name,
+                        result: 'No relevant code found for your query.',
+                        success: true
+                    };
+                }
+
+                // Format results like the MCP server does
+                let output = `Found ${queryResult.results.length} relevant code snippets (latency: ${queryResult.latency}ms):\n\n`;
+                for (let i = 0; i < queryResult.results.length; i++) {
+                    const r = queryResult.results[i];
+                    output += `--- Result ${i + 1} (score: ${(r.score * 100).toFixed(1)}%) ---\n`;
+                    output += `File: ${r.filePath}:${r.startLine}-${r.endLine}\n`;
+                    if (r.symbolName) {
+                        output += `Symbol: ${r.symbolName} (${r.symbolType})\n`;
+                    }
+                    output += `\`\`\`${r.language}\n${r.snippet}\n\`\`\`\n\n`;
+                }
+                
+                return { toolCallId, name, result: output, success: true };
+            }
+
+            case 'rag_status': {
+                const stats = await ragClient.getStats();
+                if (!stats) {
+                    return { toolCallId, name, result: 'RAG server not available', success: false };
+                }
+                return {
+                    toolCallId,
+                    name,
+                    result: JSON.stringify(stats, null, 2),
+                    success: true
+                };
+            }
+
+            case 'rag_index': {
+                const projectPath = args.projectPath || args.path;
+                if (!projectPath) {
+                    return { toolCallId, name, result: 'projectPath is required', success: false };
+                }
+                const indexResult = await ragClient.startIndexing(projectPath);
+                return {
+                    toolCallId,
+                    name,
+                    result: indexResult.message,
+                    success: indexResult.success
+                };
+            }
+
+            // ============================================================
+            // FILE TOOLS (basic support)
+            // ============================================================
+            case 'read_file': {
+                const filePath = args.path || args.file_path || args.filePath;
+                if (!filePath) {
+                    return { toolCallId, name, result: 'path is required', success: false };
+                }
+                try {
+                    const content = await fs.readFile(filePath, 'utf-8');
+                    return { toolCallId, name, result: content, success: true };
+                } catch (e: any) {
+                    return { toolCallId, name, result: `Failed to read file: ${e.message}`, success: false };
+                }
+            }
+
+            case 'list_directory': {
+                const dirPath = args.path || args.directory || '.';
+                try {
+                    const entries = await fs.readdir(dirPath, { withFileTypes: true });
+                    const formatted = entries.map(e => 
+                        `${e.isDirectory() ? '[DIR]' : '[FILE]'} ${e.name}`
+                    ).join('\n');
+                    return { toolCallId, name, result: formatted, success: true };
+                } catch (e: any) {
+                    return { toolCallId, name, result: `Failed to list directory: ${e.message}`, success: false };
+                }
+            }
+
+            case 'search_files': {
+                const pattern = args.pattern || args.query;
+                const searchPath = args.path || '.';
+                // Basic grep-like search using find
+                try {
+                    const { exec } = await import('child_process');
+                    const { promisify } = await import('util');
+                    const execAsync = promisify(exec);
+                    
+                    // Use findstr on Windows, grep on Unix
+                    const isWindows = process.platform === 'win32';
+                    const cmd = isWindows
+                        ? `findstr /S /I /N "${pattern}" "${searchPath}\\*"`
+                        : `grep -r -n -i "${pattern}" "${searchPath}" 2>/dev/null | head -50`;
+                    
+                    const { stdout } = await execAsync(cmd, { maxBuffer: 1024 * 1024 });
+                    return { toolCallId, name, result: stdout || 'No matches found', success: true };
+                } catch (e: any) {
+                    return { toolCallId, name, result: e.stdout || 'No matches found', success: true };
+                }
+            }
+
+            // ============================================================
+            // FALLBACK - Tool not implemented
+            // ============================================================
+            default: {
+                const errorMsg = `Tool '${name}' is not implemented in the agentic loop. Available tools: rag_query, rag_status, rag_index, read_file, list_directory, search_files`;
+                // Log failure to failure log
+                failureLog.logFailure({
+                    modelId: 'cognitive-engine',
+                    category: 'tool',
+                    tool: name,
+                    error: errorMsg,
+                    query: JSON.stringify(args),
+                    expectedBehavior: 'Tool should be implemented or model should use available tools',
+                    actualBehavior: `Tool ${name} not found`
+                });
+                return {
+                    toolCallId,
+                    name,
+                    result: errorMsg,
+                    success: false
+                };
+            }
+        }
+    } catch (error: any) {
+        console.error(`[AgenticLoop] Tool ${name} failed:`, error);
+        // Log failure to failure log
+        failureLog.logFailure({
+            modelId: 'cognitive-engine',
+            category: 'tool',
+            tool: name,
+            error: error.message,
+            query: JSON.stringify(args),
+            expectedBehavior: 'Tool should execute successfully',
+            actualBehavior: `Tool execution failed: ${error.message}`
+        });
+        return {
+            toolCallId,
+            name,
+            result: `Tool execution failed: ${error.message}`,
+            success: false
+        };
+    }
+}
+
+// ============================================================
+// SHOULD EXECUTE AGENTICALLY
+// ============================================================
 
 export const shouldExecuteAgentically = (response: any, ideConfig: any, mcpToolsToAdd: any[]): boolean => {
     // Check if any tool calls are present in the response
@@ -59,14 +255,106 @@ export const executeAgenticLoop = async (
     maxIterations: number = 10,
     res?: any
 ): Promise<any> => {
-    // Full implementation would be here. For now returning a structured result.
-    // This is a complex function, likely was already implemented in the original file.
+    console.log('[AgenticLoop] Starting agentic execution loop');
+    
+    let currentResponse = initialResponse;
+    let messages = [...initialMessages];
+    const toolExecutions: any[] = [];
+    let iterations = 0;
+    
+    // Get initial tool calls
+    let toolCalls = currentResponse.choices?.[0]?.message?.tool_calls || [];
+    
+    // Determine initial intent from first tool call
+    const initialIntent = toolCalls[0]?.function?.name || 'unknown';
+    
+    while (toolCalls.length > 0 && iterations < maxIterations) {
+        iterations++;
+        console.log(`[AgenticLoop] Iteration ${iterations}: executing ${toolCalls.length} tool(s)`);
+        
+        // Add assistant message with tool_calls to conversation
+        const assistantMessage = {
+            role: 'assistant',
+            content: currentResponse.choices?.[0]?.message?.content || null,
+            tool_calls: toolCalls
+        };
+        messages.push(assistantMessage);
+        
+        // Execute all tool calls
+        const toolResults: ToolResult[] = [];
+        for (const toolCall of toolCalls) {
+            const result = await executeToolCall(toolCall);
+            toolResults.push(result);
+            toolExecutions.push({
+                iteration: iterations,
+                tool: result.name,
+                args: toolCall.function?.arguments,
+                result: result.result.substring(0, 500), // Truncate for logging
+                success: result.success
+            });
+            
+            // Stream tool execution updates to client if response is available
+            // Use a subtle thinking indicator instead of tool status
+            if (res && !res.headersSent && toolResults.indexOf(result) === 0) {
+                try {
+                    // Only show thinking indicator for first tool, don't clutter output
+                    res.write(`data: ${JSON.stringify({
+                        choices: [{
+                            delta: { content: `🔍 *Searching codebase...*\n\n` }
+                        }]
+                    })}\n\n`);
+                } catch (e) {
+                    // Response might be closed
+                }
+            }
+        }
+        
+        // Add tool results as tool messages
+        for (const result of toolResults) {
+            messages.push({
+                role: 'tool',
+                tool_call_id: result.toolCallId,
+                content: result.result
+            });
+        }
+        
+        // Call LLM again with tool results
+        console.log(`[AgenticLoop] Calling LLM with ${messages.length} messages`);
+        try {
+            currentResponse = await llmCallFn(messages);
+        } catch (error: any) {
+            console.error('[AgenticLoop] LLM call failed:', error.message);
+            // Return what we have so far
+            return {
+                finalResponse: currentResponse,
+                toolExecutions,
+                iterations,
+                agenticMessages: messages,
+                initialIntent,
+                error: error.message
+            };
+        }
+        
+        // Check for new tool calls
+        toolCalls = currentResponse.choices?.[0]?.message?.tool_calls || [];
+        
+        // If model responded with content and no more tool calls, we're done
+        if (toolCalls.length === 0) {
+            const content = currentResponse.choices?.[0]?.message?.content;
+            console.log(`[AgenticLoop] Complete after ${iterations} iterations. Final response length: ${content?.length || 0}`);
+        }
+    }
+    
+    if (iterations >= maxIterations) {
+        console.warn(`[AgenticLoop] Hit max iterations (${maxIterations})`);
+    }
+    
     return {
-        finalResponse: initialResponse,
-        toolExecutions: [],
-        iterations: 0,
-        agenticMessages: [],
-        initialIntent: 'unknown'
+        finalResponse: currentResponse,
+        toolExecutions,
+        iterations,
+        agenticMessages: messages,
+        initialIntent
     };
 };
 

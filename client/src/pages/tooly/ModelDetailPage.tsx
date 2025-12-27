@@ -271,6 +271,36 @@ export const ModelDetailPage: React.FC = () => {
     }
   };
 
+  const handleRunSmokeTest = async () => {
+    if (!decodedModelId) return;
+
+    try {
+      setTestProgress({ isRunning: true, status: 'Running smoke test...' });
+      setActiveTab('testing');
+
+      const response = await fetch(`/api/tooly/smoke-test/${encodeURIComponent(decodedModelId)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ testTrainability: true })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Show result notification
+        console.log('Smoke test complete:', result);
+        // Refresh profile to show updated capability map
+        fetchProfile();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Smoke test failed');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Smoke test failed');
+    } finally {
+      setTestProgress({ isRunning: false });
+    }
+  };
+
   const handleClearResults = async () => {
     if (!decodedModelId || testProgress.isRunning) return;
 
@@ -437,14 +467,23 @@ export const ModelDetailPage: React.FC = () => {
                   ⏹ Cancel Test
                 </button>
               ) : (
-                <button
-                  onClick={() => handleRunTests('standard')}
-                  className="px-4 py-1.5 bg-gradient-to-r from-purple-600 to-purple-500 
-                           hover:from-purple-500 hover:to-purple-400 
-                           text-white font-medium rounded text-sm shadow-lg"
-                >
-                  🚀 Run Tests
-                </button>
+                <>
+                  <button
+                    onClick={handleRunSmokeTest}
+                    className="px-3 py-1.5 bg-yellow-600/20 text-yellow-400 hover:bg-yellow-600/30 rounded text-sm font-medium"
+                    title="Quick 30-second capability check"
+                  >
+                    💨 Smoke
+                  </button>
+                  <button
+                    onClick={() => handleRunTests('standard')}
+                    className="px-4 py-1.5 bg-gradient-to-r from-purple-600 to-purple-500 
+                             hover:from-purple-500 hover:to-purple-400 
+                             text-white font-medium rounded text-sm shadow-lg"
+                  >
+                    🚀 Run Tests
+                  </button>
+                </>
               )}
             </div>
           </div>

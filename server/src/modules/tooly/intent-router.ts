@@ -9,6 +9,8 @@
 import axios from 'axios';
 import { capabilities, ModelProfile } from './capabilities.js';
 import { getToolSchemas, buildSystemPrompt } from './tool-prompts.js';
+import { failureLog, type FailureCategory } from '../../services/failure-log.js';
+import { failureObserver } from '../../services/failure-observer.js';
 
 // ============================================================
 // TYPES
@@ -24,6 +26,8 @@ export interface IntentSchema {
     reasoning?: string;
     priority?: 'low' | 'normal' | 'high';
     context?: string;
+    response?: string;    // Response text when action is 'respond'
+    question?: string;    // Question text when action is 'ask_clarification'
   };
 }
 
@@ -179,6 +183,7 @@ class IntentRouter {
 
   /**
    * Route a request through the appropriate model(s)
+   * Now includes capability-based routing for blocked capabilities
    */
   async route(
     messages: any[],
@@ -189,6 +194,84 @@ class IntentRouter {
 
     if (!this.config) {
       throw new Error('IntentRouter not configured');
+    }
+
+    // Check for blocked capabilities and get fallback if needed
+    const userMessage = messages.find(m => m.role === 'user')?.content || '';
+    const requiredCapability = this.detectRequiredCapability(userMessage);
+    
+    if (requiredCapability && this.config.mainModelId) {
+      const isBlocked = await this.isCapabilityBlocked(requiredCapability);
+      if (isBlocked) {
+        const fallbackModelId = await this.getFallbackForCapability(requiredCapability);
+        if (fallbackModelId) {
+          console.log(`[IntentRouter] Capability ${requiredCapability} is blocked, routing to fallback: ${fallbackModelId}`);
+          // Temporarily switch to fallback model for this request
+          const originalMainModel = this.config.mainModelId;
+          this.config.mainModelId = fallbackModelId;
+          
+          try {
+            const result = await this.routeInternal(messages, tools, originalRequest, startTime);
+            result.phases.unshift({
+              phase: 'planning' as const,
+              systemPrompt: `Routed to fallback model for ${requiredCapability}`,
+              model: fallbackModelId,
+              latencyMs: 0,
+              reasoning: `Original model ${originalMainModel} has ${requiredCapability} blocked`
+            });
+            return result;
+          } finally {
+            this.config.mainModelId = originalMainModel;
+          }
+        }
+      }
+    }
+
+    return this.routeInternal(messages, tools, originalRequest, startTime);
+  }
+
+  /**
+   * Detect what capability is required for a query
+   */
+  private detectRequiredCapability(query: string): string | null {
+    const q = query.toLowerCase();
+    
+    if (q.includes('search') || q.includes('find') || q.includes('explore')) {
+      return 'rag';
+    }
+    if (q.includes('read') || q.includes('show') || q.includes('contents of')) {
+      return 'read_file';
+    }
+    if (q.includes('write') || q.includes('create file') || q.includes('save')) {
+      return 'write_file';
+    }
+    if (q.includes('run') || q.includes('execute') || q.includes('shell')) {
+      return 'shell_exec';
+    }
+    if (q.includes('web') || q.includes('internet') || q.includes('google')) {
+      return 'browser';
+    }
+    if (q.includes('multi') || q.includes('first') || q.includes('then')) {
+      return 'multi_step';
+    }
+
+    return null;
+  }
+
+  /**
+   * Internal routing logic (extracted for fallback support)
+   */
+  private async routeInternal(
+    messages: any[],
+    tools?: any[],
+    originalRequest?: any,
+    startTime?: number
+  ): Promise<RoutingResult> {
+    const actualStartTime = startTime || Date.now();
+
+    // Early exit if no config
+    if (!this.config) {
+      throw new Error('IntentRouter not configured. Call configure() first.');
     }
 
     // Single model mode: just pass through
@@ -212,7 +295,7 @@ class IntentRouter {
         finalResponse: response,
         toolCalls: response?.choices?.[0]?.message?.tool_calls,
         latency: {
-          total: Date.now() - startTime
+          total: Date.now() - actualStartTime
         },
         phases: [{
           phase: 'response',
@@ -308,7 +391,7 @@ class IntentRouter {
         finalResponse: properResponse,
         latency: {
           main: mainLatency,
-          total: Date.now() - startTime
+          total: Date.now() - actualStartTime
         },
         phases,
         intent
@@ -360,7 +443,7 @@ class IntentRouter {
       latency: {
         main: mainLatency,
         executor: executorLatency,
-        total: Date.now() - startTime
+        total: Date.now() - actualStartTime
       },
       phases,
       intent
@@ -371,26 +454,36 @@ class IntentRouter {
    * Build system prompt for Main Model (reasoning, no tools)
    */
   private buildMainModelPrompt(): string {
-    return `You are an intent classifier. Analyze the user message and output ONLY a JSON intent.
+    return `You are an intent classifier for a coding assistant. Output ONLY JSON.
+
+CRITICAL: For ANY question about the codebase, project, code, functions, files, or "what does X do" - ALWAYS use rag_query!
 
 Format:
 {"action":"call_tool","tool":"TOOL_NAME","parameters":{...}}
-{"action":"respond","response":"Your helpful response here"}
-{"action":"ask_clarification","question":"What specific clarification is needed"}
+{"action":"respond","response":"text"}
 
-Common tools: read_file, write_file, edit_file, rag_query, git_status, shell_exec
+Tools:
+- rag_query: Use for ANY question about the code/project (what does X do, how does Y work, explain Z, find X)
+- read_file: Read a specific file by path
+- write_file: Create or overwrite a file
+- edit_file: Modify existing file content
+- search_files: Find files by name/pattern
+- shell_exec: Run terminal commands
 
 Rules:
-- Use "call_tool" when the user wants to interact with files, search code, or run commands
-- Use "respond" for greetings, general questions, explanations (include your response in the JSON)
-- Use "ask_clarification" when the request is too vague to act on
+1. Questions about code/project → ALWAYS call_tool with rag_query
+2. "What does this project do?" → call_tool rag_query
+3. "How does X work?" → call_tool rag_query  
+4. "Find/explain/show X" → call_tool rag_query
+5. ONLY use "respond" for pure greetings with NO code context needed (hi, hello, thanks)
 
 Examples:
+- "What does this project do?" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"what does this project do, main purpose and features"}}
+- "How does authentication work?" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"how does authentication work"}}
 - "Read config.json" → {"action":"call_tool","tool":"read_file","parameters":{"filepath":"config.json"}}
 - "Hello!" → {"action":"respond","response":"Hello! How can I help you with your code today?"}
-- "Fix the bug" → {"action":"ask_clarification","question":"Which file and function has the bug? What error are you seeing?"}
 
-Output ONLY the JSON:`;
+When in doubt, use rag_query. Output ONLY JSON:`;
   }
 
   /**
@@ -765,6 +858,98 @@ IMPORTANT:
     const toolCalls = executorResponse?.choices?.[0]?.message?.tool_calls || [];
 
     return { executorResponse, toolCalls, latencyMs };
+  }
+
+  /**
+   * Log a failure to the failure log service
+   * Called by proxy/cognitive-engine when a tool call fails
+   */
+  logFailure(params: {
+    modelId: string;
+    executorModelId?: string;
+    category: FailureCategory;
+    tool?: string;
+    error: string;
+    query: string;
+    expectedBehavior?: string;
+    actualBehavior?: string;
+    toolCallAttempted?: string;
+    conversationLength?: number;
+  }): void {
+    try {
+      const entry = failureLog.logFailure({
+        modelId: params.modelId,
+        executorModelId: params.executorModelId,
+        category: params.category,
+        tool: params.tool,
+        error: params.error,
+        query: params.query,
+        expectedBehavior: params.expectedBehavior,
+        actualBehavior: params.actualBehavior,
+        toolCallAttempted: params.toolCallAttempted,
+        conversationLength: params.conversationLength
+      });
+
+      // Notify the observer of the new failure
+      failureObserver.onFailureLogged(entry);
+    } catch (error) {
+      console.error('[IntentRouter] Failed to log failure:', error);
+    }
+  }
+
+  /**
+   * Report a routing failure (intent parsing, tool call format, etc.)
+   */
+  reportRoutingFailure(params: {
+    query: string;
+    error: string;
+    intent?: IntentSchema;
+    phase?: 'planning' | 'execution';
+  }): void {
+    if (!this.config) return;
+
+    let category: FailureCategory = 'unknown';
+    const error = params.error.toLowerCase();
+
+    if (error.includes('tool') || error.includes('format')) {
+      category = 'tool';
+    } else if (error.includes('intent') || error.includes('parse')) {
+      category = 'intent';
+    } else if (error.includes('rag')) {
+      category = 'rag';
+    } else if (error.includes('reasoning') || error.includes('multi')) {
+      category = 'reasoning';
+    }
+
+    this.logFailure({
+      modelId: params.phase === 'execution' 
+        ? (this.config.executorModelId || this.config.mainModelId || 'unknown')
+        : (this.config.mainModelId || 'unknown'),
+      executorModelId: this.config.executorModelId,
+      category,
+      tool: params.intent?.tool,
+      error: params.error,
+      query: params.query,
+      expectedBehavior: params.intent?.tool ? `Call ${params.intent.tool}` : undefined,
+      actualBehavior: params.phase === 'execution' ? 'Tool call failed' : 'Intent parsing failed',
+      toolCallAttempted: params.intent ? JSON.stringify(params.intent) : undefined
+    });
+  }
+
+  /**
+   * Check if a capability is blocked for the current main model
+   */
+  async isCapabilityBlocked(capability: string): Promise<boolean> {
+    if (!this.config?.mainModelId) return false;
+    return capabilities.isCapabilityBlocked(this.config.mainModelId, capability);
+  }
+
+  /**
+   * Get fallback model for a blocked capability
+   */
+  async getFallbackForCapability(capability: string): Promise<string | null> {
+    if (!this.config?.mainModelId) return null;
+    return capabilities.getFallbackModel(this.config.mainModelId, capability);
   }
 }
 

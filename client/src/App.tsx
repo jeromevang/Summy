@@ -9,6 +9,7 @@ import { ModelDetailPage } from './pages/tooly/ModelDetailPage';
 import { OptimalSetup } from './pages/tooly/OptimalSetup';
 import { AgenticReadiness } from './pages/tooly/AgenticReadiness';
 import { ComboTest } from './pages/tooly/ComboTest';
+import Controller from './pages/tooly/Controller';
 import Debug from './pages/Debug';
 import RAG from './pages/RAG';
 import Layout from './components/Layout';
@@ -59,6 +60,7 @@ function App() {
             <Route path="/tooly/optimal-setup" element={<OptimalSetup />} />
             <Route path="/tooly/readiness" element={<AgenticReadiness />} />
             <Route path="/tooly/combo-test" element={<ComboTest />} />
+            <Route path="/tooly/controller" element={<Controller />} />
             <Route path="/rag" element={<RAG />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/debug" element={<Debug />} />

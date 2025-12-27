@@ -209,29 +209,75 @@ export class OpenAIProxy {
                             console.error('Failed to log dual-model result:', e);
                         }
 
-                        // Update session and return the response
+                        // Check if there are tool calls that need execution
+                        const toolCallsToExecute = routingResult.toolCalls || 
+                            routingResult.finalResponse?.choices?.[0]?.message?.tool_calls;
+
+                        // In dual-model mode, ALWAYS execute tools locally since we're managing the agentic flow
+                        if (toolCallsToExecute && toolCallsToExecute.length > 0) {
+                            const toolNames = toolCallsToExecute.map((tc: any) => tc.function?.name || tc.name).join(', ');
+                            addDebugEntry('request', `Dual-model: executing ${toolCallsToExecute.length} tool calls via agentic loop: ${toolNames}`, {});
+                            
+                            // Set up LLM call function for follow-up calls
+                            const llmCallFn = async (msgs: any[]) => {
+                                const response = await axios.post(`${settings.lmstudioUrl}/v1/chat/completions`, {
+                                    model: settings.executorModelId || settings.lmstudioModel,
+                                    messages: msgs,
+                                    tools: toolsToSend,
+                                    temperature: 0,
+                                    stream: false
+                                });
+                                return response.data;
+                            };
+
+                            // Execute tools via agentic loop
+                            if (req.isStreaming) {
+                                res.setHeader('Content-Type', 'text/event-stream');
+                            }
+                            
+                            const { finalResponse, agenticMessages } = await executeAgenticLoop(
+                                routingResult.finalResponse, 
+                                messagesToSend, 
+                                llmCallFn, 
+                                ideMappingConfig, 
+                                req.sessionId, 
+                                10, 
+                                req.isStreaming ? res : undefined
+                            );
+
+                            await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, finalResponse, agenticMessages);
+
+                            if (req.isStreaming) {
+                                // Stream the final response content word by word for natural feel
+                                const finalContent = finalResponse?.choices?.[0]?.message?.content || '';
+                                if (finalContent) {
+                                    // Split by words/punctuation for natural streaming
+                                    const words = finalContent.match(/\S+\s*|\n+/g) || [finalContent];
+                                    for (const word of words) {
+                                        res.write(`data: ${JSON.stringify({ 
+                                            choices: [{ delta: { content: word }, index: 0 }] 
+                                        })}\n\n`);
+                                    }
+                                }
+                                res.write(`data: ${JSON.stringify({ choices: [{ delta: {}, finish_reason: 'stop' }] })}\n\n`);
+                                res.write('data: [DONE]\n\n');
+                                res.end();
+                            } else {
+                                res.json(finalResponse);
+                            }
+                            return;
+                        }
+
+                        // No tool calls or tools shouldn't be executed - return response directly
                         await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, routingResult.finalResponse);
 
-                        // For streaming, we need to format as SSE
                         if (req.isStreaming) {
                             res.setHeader('Content-Type', 'text/event-stream');
                             const content = routingResult.finalResponse?.choices?.[0]?.message?.content || '';
-                            const toolCalls = routingResult.finalResponse?.choices?.[0]?.message?.tool_calls;
 
-                            // Stream the content
                             if (content) {
                                 res.write(`data: ${JSON.stringify({ 
                                     choices: [{ delta: { content }, index: 0 }] 
-                                })}\n\n`);
-                            }
-
-                            // Stream tool calls if present
-                            if (toolCalls && toolCalls.length > 0) {
-                                res.write(`data: ${JSON.stringify({ 
-                                    choices: [{ 
-                                        delta: { tool_calls: toolCalls },
-                                        index: 0 
-                                    }] 
                                 })}\n\n`);
                             }
 
