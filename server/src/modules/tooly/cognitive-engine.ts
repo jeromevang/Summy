@@ -19,7 +19,125 @@ interface ToolResult {
     success: boolean;
 }
 
-async function executeToolCall(toolCall: any, modelId: string = 'unknown'): Promise<ToolResult> {
+// ============================================================
+// SPAN-LEVEL OBSERVABILITY
+// ============================================================
+
+interface Span {
+    spanId: string;
+    parentSpanId?: string;
+    traceId: string;
+    operation: string;
+    startTime: number;
+    endTime?: number;
+    durationMs?: number;
+    status: 'running' | 'success' | 'error';
+    attributes: Record<string, any>;
+}
+
+interface Trace {
+    traceId: string;
+    requestId: string;
+    modelId: string;
+    startTime: number;
+    endTime?: number;
+    spans: Span[];
+}
+
+let activeTraces: Map<string, Trace> = new Map();
+
+function generateId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+export function startTrace(requestId: string, modelId: string): string {
+    const traceId = generateId();
+    const trace: Trace = {
+        traceId,
+        requestId,
+        modelId,
+        startTime: Date.now(),
+        spans: []
+    };
+    activeTraces.set(traceId, trace);
+    wsBroadcast.broadcast('trace_start', { traceId, requestId, modelId, startTime: trace.startTime });
+    return traceId;
+}
+
+export function startSpan(traceId: string, operation: string, parentSpanId?: string, attributes: Record<string, any> = {}): string {
+    const trace = activeTraces.get(traceId);
+    if (!trace) {
+        console.warn(`[Observability] No trace found for ${traceId}`);
+        return '';
+    }
+    
+    const spanId = generateId();
+    const span: Span = {
+        spanId,
+        parentSpanId,
+        traceId,
+        operation,
+        startTime: Date.now(),
+        status: 'running',
+        attributes
+    };
+    
+    trace.spans.push(span);
+    wsBroadcast.broadcast('span_start', { traceId, spanId, operation, parentSpanId, attributes });
+    return spanId;
+}
+
+export function endSpan(traceId: string, spanId: string, status: 'success' | 'error' = 'success', attributes: Record<string, any> = {}): void {
+    const trace = activeTraces.get(traceId);
+    if (!trace) return;
+    
+    const span = trace.spans.find(s => s.spanId === spanId);
+    if (!span) return;
+    
+    span.endTime = Date.now();
+    span.durationMs = span.endTime - span.startTime;
+    span.status = status;
+    span.attributes = { ...span.attributes, ...attributes };
+    
+    wsBroadcast.broadcast('span_end', { 
+        traceId, 
+        spanId, 
+        operation: span.operation,
+        durationMs: span.durationMs, 
+        status, 
+        attributes: span.attributes 
+    });
+}
+
+export function endTrace(traceId: string): Trace | undefined {
+    const trace = activeTraces.get(traceId);
+    if (!trace) return undefined;
+    
+    trace.endTime = Date.now();
+    const totalDuration = trace.endTime - trace.startTime;
+    
+    wsBroadcast.broadcast('trace_end', { 
+        traceId, 
+        requestId: trace.requestId,
+        modelId: trace.modelId,
+        totalDurationMs: totalDuration,
+        spanCount: trace.spans.length,
+        spans: trace.spans.map(s => ({
+            operation: s.operation,
+            durationMs: s.durationMs,
+            status: s.status
+        }))
+    });
+    
+    activeTraces.delete(traceId);
+    return trace;
+}
+
+export function getActiveTrace(traceId: string): Trace | undefined {
+    return activeTraces.get(traceId);
+}
+
+async function executeToolCall(toolCall: any, modelId: string = 'unknown', traceId?: string, parentSpanId?: string): Promise<ToolResult> {
     const name = toolCall.function?.name || toolCall.name;
     const toolCallId = toolCall.id || `tool_${Date.now()}`;
     
@@ -36,6 +154,12 @@ async function executeToolCall(toolCall: any, modelId: string = 'unknown'): Prom
         };
     }
 
+    // Start span for tool execution
+    const spanId = traceId ? startSpan(traceId, `tool:${name}`, parentSpanId, { 
+        tool: name, 
+        args: Object.keys(args) 
+    }) : '';
+    
     console.log(`[AgenticLoop] Executing tool: ${name}`, args);
 
     try {
@@ -305,6 +429,10 @@ async function executeToolCall(toolCall: any, modelId: string = 'unknown'): Prom
             expectedBehavior: 'Tool should execute successfully',
             actualBehavior: `Tool execution failed: ${error.message}`
         });
+        // End span with error
+        if (traceId && spanId) {
+            endSpan(traceId, spanId, 'error', { error: error.message });
+        }
         return {
             toolCallId,
             name,
@@ -312,6 +440,24 @@ async function executeToolCall(toolCall: any, modelId: string = 'unknown'): Prom
             success: false
         };
     }
+}
+
+// Helper to wrap tool result with span end
+function toolResultWithSpan(
+    traceId: string | undefined, 
+    spanId: string, 
+    toolCallId: string, 
+    name: string, 
+    result: string, 
+    success: boolean
+): ToolResult {
+    if (traceId && spanId) {
+        endSpan(traceId, spanId, success ? 'success' : 'error', { 
+            resultLength: result.length,
+            success 
+        });
+    }
+    return { toolCallId, name, result, success };
 }
 
 // ============================================================
@@ -376,6 +522,10 @@ export const executeAgenticLoop = async (
 ): Promise<any> => {
     console.log('[AgenticLoop] Starting agentic execution loop');
     
+    // Start trace for full loop
+    const traceId = startTrace(sessionId, modelId);
+    const loopSpanId = startSpan(traceId, 'agentic_loop', undefined, { maxIterations });
+    
     let currentResponse = initialResponse;
     let messages = [...initialMessages];
     const toolExecutions: any[] = [];
@@ -428,6 +578,12 @@ export const executeAgenticLoop = async (
         const toolNames = toolCalls.map((tc: any) => tc.function?.name || 'unknown').join(', ');
         console.log(`[AgenticLoop] Iteration ${iterations}: executing ${toolCalls.length} tool(s): ${toolNames}`);
         
+        // Start iteration span
+        const iterSpanId = startSpan(traceId, `iteration:${iterations}`, loopSpanId, { 
+            toolCount: toolCalls.length, 
+            tools: toolNames 
+        });
+        
         // Stream what we're doing to the IDE on EVERY iteration
         for (const tc of toolCalls) {
             const toolName = tc.function?.name || 'unknown';
@@ -446,7 +602,7 @@ export const executeAgenticLoop = async (
         // Execute all tool calls
         const toolResults: ToolResult[] = [];
         for (const toolCall of toolCalls) {
-            const result = await executeToolCall(toolCall, modelId);
+            const result = await executeToolCall(toolCall, modelId, traceId, iterSpanId);
             toolResults.push(result);
             toolExecutions.push({
                 iteration: iterations,
@@ -472,11 +628,17 @@ export const executeAgenticLoop = async (
         }
         
         // Call LLM again with tool results
+        const llmSpanId = startSpan(traceId, 'llm_call', iterSpanId, { messageCount: messages.length });
         console.log(`[AgenticLoop] Calling LLM with ${messages.length} messages`);
         try {
             currentResponse = await llmCallFn(messages);
+            endSpan(traceId, llmSpanId, 'success', { hasToolCalls: !!(currentResponse.choices?.[0]?.message?.tool_calls?.length) });
         } catch (error: any) {
             console.error('[AgenticLoop] LLM call failed:', error.message);
+            endSpan(traceId, llmSpanId, 'error', { error: error.message });
+            endSpan(traceId, iterSpanId, 'error');
+            endSpan(traceId, loopSpanId, 'error', { iterations });
+            endTrace(traceId);
             // Return what we have so far
             return {
                 finalResponse: currentResponse,
@@ -484,9 +646,13 @@ export const executeAgenticLoop = async (
                 iterations,
                 agenticMessages: messages,
                 initialIntent,
-                error: error.message
+                error: error.message,
+                traceId
             };
         }
+        
+        // End iteration span
+        endSpan(traceId, iterSpanId, 'success');
         
         // Check for new tool calls
         toolCalls = currentResponse.choices?.[0]?.message?.tool_calls || [];
@@ -527,12 +693,18 @@ export const executeAgenticLoop = async (
         }
     }
     
+    // End the loop span and trace
+    endSpan(traceId, loopSpanId, 'success', { iterations, toolExecutionCount: toolExecutions.length });
+    const trace = endTrace(traceId);
+    
     return {
         finalResponse: currentResponse,
         toolExecutions,
         iterations,
         agenticMessages: messages,
-        initialIntent
+        initialIntent,
+        traceId,
+        trace
     };
 };
 

@@ -100,6 +100,21 @@ export interface AgenticReadinessStatus {
   failedTests: string[];
   prostheticApplied: boolean;
   prostheticLevel?: 1 | 2 | 3 | 4;
+  // Qualifying gate & dual-model support
+  qualifyingGatePassed?: boolean;
+  disqualifiedAt?: string;
+  mode?: 'single' | 'dual';
+  executorModelId?: string;
+  testResults?: Array<{
+    testId: string;
+    testName: string;
+    category: string;
+    passed: boolean;
+    score: number;
+    details: string;
+    latency: number;
+    attribution?: 'main' | 'executor' | 'loop';
+  }>;
 }
 
 export interface ModelProfile {

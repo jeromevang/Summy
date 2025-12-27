@@ -127,7 +127,7 @@ export class ProstheticLoop {
     });
     this.log(log, 'Running initial assessment...');
 
-    initialResult = await this.runner.assessModel(modelId, provider);
+    initialResult = await this.runner.assessModel(modelId, { provider });
     currentResult = initialResult;
 
     this.log(log, `Initial score: ${initialResult.overallScore}%`);
@@ -193,7 +193,7 @@ export class ProstheticLoop {
       this.log(log, 'Re-running assessment...');
       this.broadcast?.broadcastTeachingVerify({ modelId, attempt: attempts, phase: 'verifying' });
 
-      const newResult = await this.runner.assessModel(modelId, provider);
+      const newResult = await this.runner.assessModel(modelId, { provider });
 
       // Track which probes were fixed
       const previouslyFailed = new Set(currentResult.failedTests);
