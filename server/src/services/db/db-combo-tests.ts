@@ -20,6 +20,11 @@ export interface ComboTestRecord {
   failedCount: number;
   mainExcluded: boolean;
   testedAt: string;
+
+  // Qualifying gate fields
+  qualifyingGatePassed?: boolean;
+  disqualifiedAt?: string | null;
+  qualifyingResults?: any[];
 }
 
 export class DBComboTests extends DBBase {
@@ -35,8 +40,9 @@ export class DBComboTests extends DBBase {
       INSERT INTO combo_test_results (
         id, main_model_id, executor_model_id, overall_score, main_score, executor_score,
         tier_scores, category_scores, test_results, avg_latency_ms,
-        passed_count, failed_count, main_excluded, tested_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        passed_count, failed_count, main_excluded, tested_at,
+        qualifying_gate_passed, disqualified_at, qualifying_results
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(main_model_id, executor_model_id) DO UPDATE SET
         overall_score = excluded.overall_score,
         main_score = excluded.main_score,
@@ -48,6 +54,9 @@ export class DBComboTests extends DBBase {
         passed_count = excluded.passed_count,
         failed_count = excluded.failed_count,
         main_excluded = excluded.main_excluded,
+        qualifying_gate_passed = excluded.qualifying_gate_passed,
+        disqualified_at = excluded.disqualified_at,
+        qualifying_results = excluded.qualifying_results,
         tested_at = excluded.tested_at
     `, [
       id,
@@ -63,7 +72,10 @@ export class DBComboTests extends DBBase {
       result.passedCount,
       result.failedCount,
       result.mainExcluded ? 1 : 0,
-      testedAt
+      testedAt,
+      result.qualifyingGatePassed,
+      result.disqualifiedAt,
+      JSON.stringify(result.qualifyingResults)
     ]);
 
     return { ...result, id, testedAt };
@@ -171,7 +183,10 @@ export class DBComboTests extends DBBase {
       passedCount: row.passed_count || 0,
       failedCount: row.failed_count || 0,
       mainExcluded: row.main_excluded === 1,
-      testedAt: row.tested_at
+      testedAt: row.tested_at,
+      qualifyingGatePassed: row.qualifying_gate_passed === null ? undefined : row.qualifying_gate_passed === 1,
+      disqualifiedAt: row.disqualified_at,
+      qualifyingResults: row.qualifying_results ? JSON.parse(row.qualifying_results) : undefined
     };
   }
 }

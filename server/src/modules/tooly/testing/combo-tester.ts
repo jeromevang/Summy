@@ -108,6 +108,11 @@ export interface ComboScore {
   mainExcluded?: boolean;   // True if Main model was excluded due to timeout
   mainTimedOut?: boolean;   // True if Main model specifically was too slow
   executorTimedOut?: boolean; // True if Executor model specifically was too slow
+
+  // Qualifying gate results
+  qualifyingGatePassed?: boolean; // True if passed qualifying gate
+  disqualifiedAt?: string | null; // Where combo was disqualified
+  qualifyingResults?: ComboTestResult[]; // Results from qualifying gate tests
 }
 
 export interface ComboTestConfig {
@@ -157,6 +162,49 @@ PROJECT STRUCTURE:
 - shared-utils/      Shared utilities (validation, formatting)
 
 Use the available tools when appropriate. The project uses TypeScript, React, and Express.`;
+
+// ============================================================
+// COMBO QUALIFYING GATE (CQG) - FAST PRELIMINARY CHECK
+// MUST ALL PASS before running full combo test battery
+// ============================================================
+
+export const COMBO_QUALIFYING_GATE: ComboTestCase[] = [
+  {
+    id: 'CQG-1',
+    name: 'Format Compatibility',
+    category: 'suppress', // Reusing categories for simplicity
+    difficulty: 'simple',
+    prompt: 'Read the file node-api/package.json',
+    expectedAction: 'call_tool',
+    expectedTool: 'read_file',
+    verifyParam: 'filepath',
+    verifyContains: 'package.json',
+  },
+  {
+    id: 'CQG-2',
+    name: 'Basic Handoff',
+    category: 'single_tool',
+    difficulty: 'simple',
+    prompt: 'List all files in the node-api/src directory',
+    expectedAction: 'call_tool',
+    expectedTool: 'list_directory',
+    verifyParam: 'directory',
+    verifyContains: 'node-api/src',
+  },
+  {
+    id: 'CQG-3',
+    name: 'Tool Response Processing',
+    category: 'tool_select',
+    difficulty: 'simple',
+    prompt: 'What is the current directory structure? Show me what files are in the project root.',
+    expectedAction: 'call_tool',
+    expectedTool: 'list_directory',
+  },
+];
+
+// ============================================================
+// FULL COMBO TEST BATTERY (runs after qualifying gate passes)
+// ============================================================
 
 export const COMBO_TEST_CASES: ComboTestCase[] = [
   // ============================================================
@@ -327,8 +375,11 @@ export class ComboTester {
         passedCount: score.passedTests,
         failedCount: score.totalTests - score.passedTests,
         mainExcluded: score.mainExcluded || false,
+        qualifyingGatePassed: score.qualifyingGatePassed,
+        disqualifiedAt: score.disqualifiedAt,
+        qualifyingResults: score.qualifyingResults,
       });
-      console.log(`[ComboTester] Saved result: ${score.mainModelId} + ${score.executorModelId} = ${score.overallScore}%`);
+      console.log(`[ComboTester] Saved result: ${score.mainModelId} + ${score.executorModelId} = ${score.overallScore}% ${score.qualifyingGatePassed === false ? '(FAILED QG)' : score.qualifyingGatePassed === true ? '(PASSED QG)' : ''}`);
     } catch (err: any) {
       console.error(`[ComboTester] Failed to save result to DB: ${err.message}`);
     }
@@ -1422,6 +1473,99 @@ export class ComboTester {
       },
     });
 
+    // ============================================================
+    // PHASE 1: COMBO QUALIFYING GATE - FAST PRELIMINARY CHECK
+    // ============================================================
+
+    console.log(`[ComboTester] Running Combo Qualifying Gate for ${mainModelId} + ${executorModelId}`);
+
+    let qualifyingGatePassed = true;
+    const qualifyingResults: ComboTestResult[] = [];
+
+    for (let i = 0; i < COMBO_QUALIFYING_GATE.length; i++) {
+      const test = COMBO_QUALIFYING_GATE[i];
+
+      // Broadcast qualifying gate progress
+      if (this.broadcast) {
+        this.broadcast('combo_test_progress', {
+          currentMain: mainModelId,
+          currentExecutor: executorModelId,
+          currentTest: `Qualifying: ${test.name}`,
+          comboIndex,
+          totalCombos,
+          testIndex: i + 1,
+          totalTests: COMBO_QUALIFYING_GATE.length,
+          status: 'running',
+        } as ComboTestProgress);
+      }
+
+      console.log(`[ComboTester] Qualifying test ${i + 1}/${COMBO_QUALIFYING_GATE.length}: ${test.name}`);
+
+      const result = await this.runSingleTest(test, false);
+      qualifyingResults.push(result);
+
+      if (!result.passed) {
+        console.log(`[ComboTester] ❌ Combo Qualifying Gate FAILED at ${test.id}: ${test.name}`);
+        qualifyingGatePassed = false;
+
+        // Log qualifying gate failure
+        failureLog.logFailure({
+          modelId: mainModelId,
+          executorModelId: executorModelId,
+          category: 'combo_pairing',
+          error: `Combo Qualifying Gate failed at ${test.id}: ${test.name}`,
+          query: `Combo qualifying gate: ${mainModelId}-${executorModelId}`,
+          expectedBehavior: test.expectedTool ? `Call ${test.expectedTool}` : 'Respond appropriately',
+          actualBehavior: result.error || 'Failed qualifying test',
+          conversationLength: 1
+        });
+
+        break; // Fail fast - no need to run more qualifying tests
+      }
+    }
+
+    if (!qualifyingGatePassed) {
+      console.log(`[ComboTester] ❌ Combo ${mainModelId} + ${executorModelId} DISQUALIFIED - failed qualifying gate`);
+
+      // Return a disqualified score
+      return {
+        mainModelId,
+        executorModelId,
+        totalTests: COMBO_QUALIFYING_GATE.length,
+        passedTests: qualifyingResults.filter(r => r.passed).length,
+        categoryScores: [],
+        tierScores: [
+          { tier: 'simple', score: 0, categories: [] },
+          { tier: 'medium', score: 0, categories: [] },
+          { tier: 'complex', score: 0, categories: [] },
+        ],
+        mainScore: 0,
+        executorScore: 0,
+        mainCorrectCount: 0,
+        executorSuccessCount: 0,
+        intentAccuracy: 0,
+        executionSuccess: 0,
+        avgLatencyMs: 0,
+        minLatencyMs: 0,
+        maxLatencyMs: 0,
+        overallScore: 0,
+        testResults: qualifyingResults,
+        testedAt: new Date().toISOString(),
+        skippedTests: 0,
+        timedOutTests: qualifyingResults.filter(r => r.timedOut).length,
+        mainTimedOut: false,
+        executorTimedOut: false,
+        qualifyingGatePassed: false,
+        disqualifiedAt: 'qualifying_gate',
+      };
+    }
+
+    console.log(`[ComboTester] ✅ Combo Qualifying Gate PASSED for ${mainModelId} + ${executorModelId}`);
+
+    // ============================================================
+    // PHASE 2: FULL COMBO TEST BATTERY
+    // ============================================================
+
     // Run each test case
     for (let i = 0; i < COMBO_TEST_CASES.length; i++) {
       const test = COMBO_TEST_CASES[i];
@@ -1564,11 +1708,16 @@ export class ComboTester {
     const mainTimedOutFlag = testResults.some(r => r.mainTimedOut);
     const executorTimedOutFlag = testResults.some(r => r.executorTimedOut && !r.mainTimedOut);
 
+    // Combine qualifying results with full test results
+    const allTestResults = [...qualifyingResults, ...testResults];
+    const totalTests = COMBO_QUALIFYING_GATE.length + COMBO_TEST_CASES.length;
+    const totalPassed = qualifyingResults.filter(r => r.passed).length + passedTests;
+
     const score: ComboScore = {
       mainModelId,
       executorModelId,
-      totalTests: COMBO_TEST_CASES.length,
-      passedTests,
+      totalTests,
+      passedTests: totalPassed,
       categoryScores,
       tierScores,
       mainScore,
@@ -1581,12 +1730,15 @@ export class ComboTester {
       minLatencyMs: latencies.length > 0 ? Math.min(...latencies) : 0,
       maxLatencyMs: latencies.length > 0 ? Math.max(...latencies) : 0,
       overallScore,
-      testResults,
+      testResults: allTestResults,
       testedAt: new Date().toISOString(),
       skippedTests: skippedCount,
       timedOutTests: timedOutCount,
       mainTimedOut: mainTimedOutFlag,
       executorTimedOut: executorTimedOutFlag,
+      qualifyingGatePassed: true,
+      disqualifiedAt: null,
+      qualifyingResults,
     };
 
     // Log tier breakdown with split scores
