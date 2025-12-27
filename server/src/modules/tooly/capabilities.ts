@@ -120,7 +120,7 @@ export interface AgenticReadinessStatus {
 export interface ModelProfile {
   modelId: string;
   displayName: string;
-  provider: 'lmstudio' | 'openai' | 'azure';
+  provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
   testedAt: string;
   testVersion: number;
   score: number;           // Overall score 0-100

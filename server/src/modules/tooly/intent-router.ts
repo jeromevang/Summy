@@ -45,7 +45,7 @@ export interface RouterConfig {
   executorModelId?: string;
   enableDualModel: boolean;
   timeout: number;          // Default 30000ms
-  provider: 'lmstudio' | 'openai' | 'azure';
+  provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
   settings: {
     lmstudioUrl?: string;
     openaiApiKey?: string;
@@ -53,6 +53,7 @@ export interface RouterConfig {
     azureApiKey?: string;
     azureDeploymentName?: string;
     azureApiVersion?: string;
+    openrouterApiKey?: string;
   };
 }
 
@@ -145,7 +146,7 @@ class IntentRouter {
    * Auto-select models based on probe results
    * Returns best Main and Executor models from available profiles
    */
-  async autoSelectModels(provider: 'lmstudio' | 'openai' | 'azure'): Promise<{ mainModel?: string; executorModel?: string }> {
+  async autoSelectModels(provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter'): Promise<{ mainModel?: string; executorModel?: string }> {
     const profiles = await capabilities.getAllProfiles();
     const providerProfiles = profiles.filter(p => p.provider === provider);
 
@@ -874,6 +875,13 @@ IMPORTANT:
         const { azureResourceName, azureDeploymentName, azureApiKey, azureApiVersion } = this.config.settings;
         url = `https://${azureResourceName}.openai.azure.com/openai/deployments/${azureDeploymentName}/chat/completions?api-version=${azureApiVersion || '2024-02-01'}`;
         headers['api-key'] = azureApiKey!;
+        break;
+
+      case 'openrouter':
+        url = 'https://openrouter.ai/api/v1/chat/completions';
+        headers['Authorization'] = `Bearer ${this.config.settings.openrouterApiKey}`;
+        headers['HTTP-Referer'] = 'http://localhost:5173'; // Required by OpenRouter
+        headers['X-Title'] = 'Summy AI Platform'; // Required by OpenRouter
         break;
 
       default:

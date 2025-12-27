@@ -111,6 +111,35 @@ router.post('/test-lmstudio', async (req, res) => {
     }
 });
 
+router.post('/test-openrouter', async (req, res) => {
+    try {
+        const settings = await loadServerSettings();
+        const apiKey = settings.openrouterApiKey;
+
+        if (!apiKey) {
+            return res.status(400).json({ success: false, error: 'OpenRouter API key not configured in .env file' });
+        }
+
+        const response = await axios.get('https://openrouter.ai/api/v1/models', {
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 10000
+        });
+
+        // Check if we got models back
+        const models = response.data?.data || [];
+        if (models.length === 0) {
+            return res.status(500).json({ success: false, error: 'No models returned' });
+        }
+
+        res.json({ success: true, models: models.length });
+    } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // ============================================================
 // SANDBOX & PROSTHETIC
 // ============================================================

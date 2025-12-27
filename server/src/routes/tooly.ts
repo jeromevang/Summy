@@ -8,6 +8,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { LMStudioClient } from '@lmstudio/sdk';
+import { loadServerSettings } from '../services/settings-service.js';
 import { modelDiscovery } from '../services/model-discovery.js';
 import { analytics } from '../services/analytics.js';
 import { db } from '../services/database.js';
@@ -40,26 +41,20 @@ const router = Router();
  * GET /api/tooly/models
  * Discover available models from providers
  * Query params:
- *   - provider: 'all' | 'lmstudio' | 'openai' | 'azure' (default: 'all')
+ *   - provider: 'all' | 'lmstudio' | 'openai' | 'azure' | 'openrouter' (default: 'all')
  */
 router.get('/models', async (req, res) => {
   try {
     const providerFilter = (req.query.provider as string) || 'all';
     let settings: any = {};
 
-    try {
-      if (await fs.pathExists(SETTINGS_FILE)) {
-        settings = await fs.readJson(SETTINGS_FILE);
-        console.log(`[Tooly] Loaded settings, lmstudioUrl: ${settings.lmstudioUrl}`);
-      }
-    } catch (err: any) {
-      console.log(`[Tooly] Error loading settings: ${err.message}`);
-    }
+    settings = await loadServerSettings();
 
     // Discover models based on filter
     let lmstudioModels: any[] = [];
     let openaiModels: any[] = [];
     let azureModels: any[] = [];
+    let openrouterModels: any[] = [];
 
     // Fetch from selected providers
     if (providerFilter === 'all' || providerFilter === 'lmstudio') {
@@ -79,19 +74,33 @@ router.get('/models', async (req, res) => {
       });
     }
 
+    if (providerFilter === 'all' || providerFilter === 'openrouter') {
+      console.log(`[Tooly] Discovering OpenRouter models`);
+      openrouterModels = await modelDiscovery.discoverOpenRouter(settings.openrouterApiKey);
+    }
+
     // Combine filtered models
     const models = [
       ...lmstudioModels,
       ...openaiModels,
-      ...azureModels
+      ...azureModels,
+      ...openrouterModels
     ];
 
-    console.log(`[Tooly] Discovered models (filter: ${providerFilter}): LMStudio=${lmstudioModels.length}, OpenAI=${openaiModels.length}, Azure=${azureModels.length}`);
+    console.log(`[Tooly] Discovered models (filter: ${providerFilter}): LMStudio=${lmstudioModels.length}, OpenAI=${openaiModels.length}, Azure=${azureModels.length}, OpenRouter=${openrouterModels.length}`);
 
     // Check which providers are actually available (not just based on filter results)
     const lmstudioAvailable = settings.lmstudioUrl ? true : false;
     const openaiAvailable = !!process.env.OPENAI_API_KEY;
     const azureAvailable = !!(settings.azureResourceName && settings.azureApiKey);
+    const openrouterAvailable = !!settings.openrouterApiKey;
+
+    console.log('[Tooly] Providers status:', {
+      lmstudio: lmstudioAvailable,
+      openai: openaiAvailable,
+      azure: azureAvailable,
+      openrouter: openrouterAvailable
+    });
 
     res.json({
       models,
@@ -99,7 +108,8 @@ router.get('/models', async (req, res) => {
       providers: {
         lmstudio: lmstudioAvailable,
         openai: openaiAvailable,
-        azure: azureAvailable
+        azure: azureAvailable,
+        openrouter: openrouterAvailable
       },
       filter: providerFilter
     });

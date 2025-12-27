@@ -1,5 +1,5 @@
 {
-  "provider": "lmstudio",
+  "provider": "openrouter",
   "openaiModel": "gpt-4o-mini",
   "azureResourceName": "",
   "azureDeploymentName": "",
@@ -21,5 +21,6 @@
     "tooly": {
       "enabled": true
     }
-  }
+  },
+  "openrouterApiKey": "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"
 }

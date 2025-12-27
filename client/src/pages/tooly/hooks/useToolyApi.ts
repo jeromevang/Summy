@@ -15,7 +15,7 @@ interface UseToolyApiParams {
   // State setters
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setModels: React.Dispatch<React.SetStateAction<DiscoveredModel[]>>;
-  setAvailableProviders: React.Dispatch<React.SetStateAction<{ lmstudio: boolean; openai: boolean; azure: boolean }>>;
+  setAvailableProviders: React.Dispatch<React.SetStateAction<{ lmstudio: boolean; openai: boolean; azure: boolean; openrouter: boolean }>>;
   setTests: React.Dispatch<React.SetStateAction<any[]>>;
   setCustomTests: React.Dispatch<React.SetStateAction<any[]>>;
   setBuiltInTests: React.Dispatch<React.SetStateAction<any[]>>;

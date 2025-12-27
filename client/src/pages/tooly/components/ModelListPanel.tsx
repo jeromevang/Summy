@@ -80,6 +80,11 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
 }) => {
   const navigate = useNavigate();
   const lmstudioModels = models.filter(m => m.provider === 'lmstudio');
+
+  // Filter models based on provider filter
+  const filteredModels = providerFilter === 'all'
+    ? models
+    : models.filter(m => m.provider === providerFilter);
   const [showModeDialog, setShowModeDialog] = useState(false);
   const [selectedTestMode, setSelectedTestMode] = useState<TestAllMode>('standard');
 
@@ -277,6 +282,9 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
                 <option value="azure" disabled={!availableProviders.azure}>
                   Azure {availableProviders.azure ? '' : '(not configured)'}
                 </option>
+                <option value="openrouter" disabled={!availableProviders.openrouter}>
+                  🚀 OpenRouter {availableProviders.openrouter ? '(Free)' : '(no key)'}
+                </option>
               </select>
             </div>
             
@@ -444,7 +452,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
         </p>
       ) : (
         <div className="space-y-2 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#3d3d3d] scrollbar-track-transparent">
-          {models.map((model) => (
+          {filteredModels.map((model) => (
             <ModelCard
               key={model.id}
               model={model}
@@ -454,6 +462,25 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
               onClick={() => onSelectModel(model.id)}
             />
           ))}
+        </div>
+      )}
+
+      {/* Empty state for filtered models */}
+      {filteredModels.length === 0 && !loading && (
+        <div className="text-center py-8">
+          <div className="text-gray-500 mb-2">🚫</div>
+          <div className="text-gray-400 text-sm">
+            {providerFilter === 'all'
+              ? 'No models available'
+              : `No ${providerFilter === 'openrouter' ? 'OpenRouter' : providerFilter} models found`}
+          </div>
+          <div className="text-gray-500 text-xs mt-1">
+            {providerFilter === 'openrouter'
+              ? 'Make sure OpenRouter is configured in Settings'
+              : providerFilter === 'lmstudio'
+                ? 'Make sure LM Studio is running on localhost:1234'
+                : `Check your ${providerFilter} configuration`}
+          </div>
         </div>
       )}
     </div>

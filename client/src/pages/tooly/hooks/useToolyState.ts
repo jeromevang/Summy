@@ -236,7 +236,7 @@ export function useToolyState(): ToolyState {
     return (saved as ProviderFilter) || 'all';
   });
   const [availableProviders, setAvailableProviders] = useState<AvailableProviders>({
-    lmstudio: false, openai: false, azure: false
+    lmstudio: false, openai: false, azure: false, openrouter: false
   });
   const [testMode, setTestMode] = useState<TestMode>(() => {
     const saved = localStorage.getItem('tooly_testMode');
