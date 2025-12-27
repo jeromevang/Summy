@@ -831,7 +831,7 @@ export const AgenticReadiness: React.FC = () => {
         autoTeach,
         runCount
       };
-      
+
       if (mode === 'dual') {
         body.executorModelId = executorModelId;
       }

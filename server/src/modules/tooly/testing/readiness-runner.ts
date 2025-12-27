@@ -132,10 +132,10 @@ export class ReadinessRunner {
       runCount?: number; // For flakiness detection (default 1, max 3)
     } = {}
   ): Promise<ReadinessResult> {
-    const { 
-      provider = 'lmstudio', 
+    const {
+      provider = 'lmstudio',
       executorModelId,
-      runCount = 1 
+      runCount = 1
     } = options;
     
     const startTime = Date.now();
@@ -196,7 +196,7 @@ export class ReadinessRunner {
         qualifyingGatePassed = false;
         disqualifiedAt = test.name;
         console.log(`[ReadinessRunner] ❌ DISQUALIFIED at ${test.name} - stopping early`);
-        
+
         this.broadcast?.broadcastReadinessProgress({
           modelId,
           current: i + 1,
@@ -210,7 +210,7 @@ export class ReadinessRunner {
           phase: 'qualifying',
           attribution: bestResult.attribution
         });
-        
+
         // Fast fail - stop testing
         break;
       }

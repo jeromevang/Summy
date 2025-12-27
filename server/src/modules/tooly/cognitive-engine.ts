@@ -173,7 +173,7 @@ async function executeToolCall(toolCall: any, modelId: string = 'unknown', trace
                     fileTypes: args.fileTypes,
                     paths: args.paths
                 });
-                
+
                 if (!queryResult || queryResult.results.length === 0) {
                     return {
                         toolCallId,
@@ -194,7 +194,7 @@ async function executeToolCall(toolCall: any, modelId: string = 'unknown', trace
                     }
                     output += `\`\`\`${r.language}\n${r.snippet}\n\`\`\`\n\n`;
                 }
-                
+
                 return { toolCallId, name, result: output, success: true };
             }
 
@@ -518,7 +518,8 @@ export const executeAgenticLoop = async (
     sessionId: string,
     maxIterations: number = 10,
     res?: any,
-    modelId: string = 'unknown'
+    modelId: string = 'unknown',
+    streamingLlmCallFn?: (messages: any[]) => Promise<any>
 ): Promise<any> => {
     console.log('[AgenticLoop] Starting agentic execution loop');
     
@@ -579,18 +580,36 @@ export const executeAgenticLoop = async (
         console.log(`[AgenticLoop] Iteration ${iterations}: executing ${toolCalls.length} tool(s): ${toolNames}`);
         
         // Start iteration span
-        const iterSpanId = startSpan(traceId, `iteration:${iterations}`, loopSpanId, { 
-            toolCount: toolCalls.length, 
-            tools: toolNames 
+        const iterSpanId = startSpan(traceId, `iteration:${iterations}`, loopSpanId, {
+            toolCount: toolCalls.length,
+            tools: toolNames
         });
-        
-        // Stream what we're doing to the IDE on EVERY iteration
-        for (const tc of toolCalls) {
-            const toolName = tc.function?.name || 'unknown';
-            const description = toolDescriptions[toolName] || `🔧 Running ${toolName}...`;
-            streamToIDE(`${description}\n`);
+
+        // Stream detailed tool execution to IDE as content
+        if (res) {
+            for (const tc of toolCalls) {
+                const toolName = tc.function?.name || 'unknown';
+                const args = tc.function?.arguments || '{}';
+                let parsedArgs;
+                try {
+                    parsedArgs = JSON.parse(args);
+                } catch (e) {
+                    parsedArgs = { raw: args };
+                }
+
+                // Stream tool execution details
+                const toolDetails = `\n🔧 Executing: ${toolName}\n`;
+                const argsDetails = `📝 Arguments: ${JSON.stringify(parsedArgs, null, 2)}\n\n`;
+                const detailsWords = (toolDetails + argsDetails).match(/\S+\s*|\n+/g) || [toolDetails + argsDetails];
+
+                for (const word of detailsWords) {
+                    res.write(`data: ${JSON.stringify({
+                        choices: [{ delta: { content: word }, index: 0 }]
+                    })}\n\n`);
+                }
+            }
         }
-        
+
         // Add assistant message with tool_calls to conversation
         const assistantMessage = {
             role: 'assistant',
@@ -611,7 +630,46 @@ export const executeAgenticLoop = async (
                 result: result.result.substring(0, 500), // Truncate for logging
                 success: result.success
             });
-            
+
+            // Stream tool results to IDE
+            if (res && result.success) {
+                let resultPreview = '';
+                if (result.name === 'rag_query') {
+                    // Show RAG results summary
+                    const lines = result.result.split('\n');
+                    const resultCount = (result.result.match(/--- Result \d+:/g) || []).length;
+                    resultPreview = `📊 Found ${resultCount} relevant code snippets\n\n`;
+                } else if (result.name === 'read_file') {
+                    // Show file content summary
+                    const lines = result.result.split('\n').length;
+                    resultPreview = `📄 Read ${lines} lines from file\n\n`;
+                } else if (result.name === 'search_files') {
+                    // Show search results summary
+                    const matchCount = (result.result.match(/Found \d+ matches/g) || []).length;
+                    resultPreview = `🔎 Found ${matchCount} file matches\n\n`;
+                } else {
+                    // Generic success
+                    resultPreview = `✅ ${result.name} completed\n\n`;
+                }
+
+                const resultWords = resultPreview.match(/\S+\s*|\n+/g) || [resultPreview];
+                for (const word of resultWords) {
+                    res.write(`data: ${JSON.stringify({
+                        choices: [{ delta: { content: word }, index: 0 }]
+                    })}\n\n`);
+                }
+            } else if (res && !result.success) {
+                // Stream tool failure
+                const failureText = `❌ ${result.name} failed: ${result.result.substring(0, 100)}\n\n`;
+                const failureWords = failureText.match(/\S+\s*|\n+/g) || [failureText];
+
+                for (const word of failureWords) {
+                    res.write(`data: ${JSON.stringify({
+                        choices: [{ delta: { content: word }, index: 0 }]
+                    })}\n\n`);
+                }
+            }
+
             // Stream tool completion for multi-iteration loops
             if (iterations > 1) {
                 streamToIDE(`*✓ ${result.name} complete*\n`);
@@ -627,11 +685,29 @@ export const executeAgenticLoop = async (
             });
         }
         
-        // Call LLM again with tool results
+
+        // Stream analysis phase start to IDE
+        if (res) {
+            const analysisText = `🧠 Analyzing tool results...\n\n`;
+            const analysisWords = analysisText.match(/\S+\s*|\n+/g) || [analysisText];
+
+            for (const word of analysisWords) {
+                res.write(`data: ${JSON.stringify({
+                    choices: [{ delta: { content: word }, index: 0 }]
+                })}\n\n`);
+            }
+        }
+
+        // Call LLM again with tool results - STREAM THIS IF WE HAVE A RESPONSE STREAM
         const llmSpanId = startSpan(traceId, 'llm_call', iterSpanId, { messageCount: messages.length });
-        console.log(`[AgenticLoop] Calling LLM with ${messages.length} messages`);
         try {
-            currentResponse = await llmCallFn(messages);
+            if (streamingLlmCallFn) {
+                // Use streaming version that shows detailed analysis
+                currentResponse = await streamingLlmCallFn(messages);
+            } else {
+                // Regular call
+                currentResponse = await llmCallFn(messages);
+            }
             endSpan(traceId, llmSpanId, 'success', { hasToolCalls: !!(currentResponse.choices?.[0]?.message?.tool_calls?.length) });
         } catch (error: any) {
             console.error('[AgenticLoop] LLM call failed:', error.message);

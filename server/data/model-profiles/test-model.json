@@ -9,5 +9,38 @@
   "capabilities": {},
   "enabledTools": [],
   "systemPrompt": "## CRITICAL BEHAVIOR REQUIREMENTS\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Tool Selection\n- Only call tools when the task requires external action\n- Choose the most specific tool for the task (read_file for one file, search_files for searching)\n- Provide complete and accurate arguments to tools\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n### Browser/Web\n- Use web_search for current information from the internet\n- Use browser_navigate or browser_fetch_content to visit URLs\n- Use browser_click to interact with page elements\n\n### MANDATORY CONSTRAINTS\n- You MUST follow the above rules without exception\n- Failure to use RAG before file reads is a critical error\n- Unnecessary tool calls for knowledge questions waste resources\n\n\n",
-  "prostheticApplied": true
+  "prostheticApplied": true,
+  "agenticReadiness": {
+    "certified": false,
+    "score": 0,
+    "assessedAt": "2025-12-27T09:28:37.351Z",
+    "categoryScores": {
+      "tool": 0,
+      "rag": 0,
+      "reasoning": 0,
+      "intent": 0,
+      "browser": 0,
+      "multi_turn": 0,
+      "boundary": 0
+    },
+    "failedTests": [
+      "QG-1"
+    ],
+    "prostheticApplied": false,
+    "qualifyingGatePassed": false,
+    "mode": "single",
+    "testResults": [
+      {
+        "testId": "QG-1",
+        "testName": "Tool Format Valid",
+        "category": "qualifying",
+        "passed": false,
+        "score": 0,
+        "details": "Error: Request failed with status code 400",
+        "latency": 9,
+        "mode": "single",
+        "attribution": null
+      }
+    ]
+  }
 }

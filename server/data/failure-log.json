@@ -72,6 +72,91 @@
       },
       "resolved": false,
       "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766828733479_da102efa",
+      "timestamp": "2025-12-27T09:45:33.479Z",
+      "modelId": "mistralai/ministral-3-3b",
+      "category": "tool",
+      "tool": "rag_query",
+      "error": "res is not defined",
+      "errorType": "unknown",
+      "context": {
+        "query": "{\"query\":\"authentication middleware, user service, and login components implementation and flow\",\"limit\":5}",
+        "queryHash": "83ca490a",
+        "expectedBehavior": "Tool should execute successfully",
+        "actualBehavior": "Tool execution failed: res is not defined",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766828737231_f96ef752",
+      "timestamp": "2025-12-27T09:45:37.231Z",
+      "modelId": "mistralai/ministral-3-3b",
+      "category": "tool",
+      "tool": "rag_query",
+      "error": "res is not defined",
+      "errorType": "unknown",
+      "context": {
+        "query": "{\"query\":\"middleware with auth or authentication in its name\",\"limit\":3}",
+        "queryHash": "83ca490a",
+        "expectedBehavior": "Tool should execute successfully",
+        "actualBehavior": "Tool execution failed: res is not defined",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766828737233_1178d69f",
+      "timestamp": "2025-12-27T09:45:37.233Z",
+      "modelId": "mistralai/ministral-3-3b",
+      "category": "tool",
+      "tool": "rag_query",
+      "error": "res is not defined",
+      "errorType": "unknown",
+      "context": {
+        "query": "{\"query\":\"user service implementation, user logic, or auth service\",\"limit\":3}",
+        "queryHash": "83ca490a",
+        "expectedBehavior": "Tool should execute successfully",
+        "actualBehavior": "Tool execution failed: res is not defined",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766828737234_13ae03f4",
+      "timestamp": "2025-12-27T09:45:37.234Z",
+      "modelId": "mistralai/ministral-3-3b",
+      "category": "tool",
+      "tool": "rag_query",
+      "error": "res is not defined",
+      "errorType": "unknown",
+      "context": {
+        "query": "{\"query\":\"login endpoint, login function, or authenticate method\",\"limit\":3}",
+        "queryHash": "83ca490a",
+        "expectedBehavior": "Tool should execute successfully",
+        "actualBehavior": "Tool execution failed: res is not defined",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766828743607_d7d21da7",
+      "timestamp": "2025-12-27T09:45:43.607Z",
+      "modelId": "mistralai/ministral-3-3b",
+      "category": "tool",
+      "tool": "rag_query",
+      "error": "res is not defined",
+      "errorType": "unknown",
+      "context": {
+        "query": "{\"query\":\"authenticate.*|jwt.*|token.*|middleware.*|AuthService|UserService\",\"limit\":5}",
+        "queryHash": "83ca490a",
+        "expectedBehavior": "Tool should execute successfully",
+        "actualBehavior": "Tool execution failed: res is not defined",
+        "conversationLength": 1
+      },
+      "resolved": false
     }
   ],
   "patterns": {
@@ -93,11 +178,11 @@
     }
   },
   "stats": {
-    "totalFailures": 4,
+    "totalFailures": 9,
     "resolvedFailures": 0,
-    "lastUpdated": "2025-12-27T09:14:27.643Z",
+    "lastUpdated": "2025-12-27T09:45:43.608Z",
     "failuresByCategory": {
-      "tool": 4,
+      "tool": 9,
       "rag": 0,
       "reasoning": 0,
       "intent": 0,
@@ -105,7 +190,7 @@
       "unknown": 0
     },
     "failuresByModel": {
-      "mistralai/ministral-3-3b": 4
+      "mistralai/ministral-3-3b": 9
     }
   }
 }
