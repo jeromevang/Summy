@@ -484,41 +484,72 @@ class IntentRouter {
       }
     }
     
-    const basePrompt = `You are an intent classifier for a coding assistant. Output ONLY JSON.
+    const basePrompt = `# Intent Classifier
 
-CRITICAL: For ANY question about the codebase, project, code, functions, files, or "what does X do" - ALWAYS use rag_query!
+You classify user messages into tool calls. Output ONLY ONE line of valid JSON.
 
-Format:
-{"action":"call_tool","tool":"TOOL_NAME","parameters":{...}}
-{"action":"respond","response":"text"}
+## DECISION PROCESS (follow in order):
 
-Tools:
-- rag_query: Use for ANY question about the code/project (what does X do, how does Y work, explain Z, find X)
-- read_file: Read a specific file by path
-- write_file: Create or overwrite a file
-- edit_file: Modify existing file content
-- search_files: Find files by name/pattern
-- shell_exec: Run terminal commands
-- git_status: Check git status for changed files
-- git_diff: View git differences
-- git_log: View git commit history
+STEP 1: Is this a simple greeting? ("hi", "hello", "thanks", "bye", "ok")
+→ YES: {"action":"respond","response":"Hello! How can I help with your code?"}
+→ NO: Continue to Step 2
 
-Rules:
-1. Questions about code/project → ALWAYS call_tool with rag_query
-2. "What does this project do?" → call_tool rag_query
-3. "How does X work?" → call_tool rag_query  
-4. "Find/explain/show X" → call_tool rag_query
-5. "Which files changed?" → call_tool git_status
-6. ONLY use "respond" for pure greetings with NO code context needed (hi, hello, thanks)
+STEP 2: Does user ask about git/changes? ("what changed", "show diff", "commit history")
+→ YES: Use git_status, git_diff, or git_log
+→ NO: Continue to Step 3
 
-Examples:
-- "What does this project do?" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"what does this project do, main purpose and features"}}
-- "How does authentication work?" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"how does authentication work"}}
-- "Which files have been changed?" → {"action":"call_tool","tool":"git_status","parameters":{}}
-- "Read config.json" → {"action":"call_tool","tool":"read_file","parameters":{"filepath":"config.json"}}
-- "Hello!" → {"action":"respond","response":"Hello! How can I help you with your code today?"}
+STEP 3: Does user specify an exact file path? ("read src/index.ts", "show me package.json")
+→ YES: {"action":"call_tool","tool":"read_file","parameters":{"path":"THE_PATH"}}
+→ NO: Continue to Step 4
+
+STEP 4: EVERYTHING ELSE → rag_query
+This includes:
+- Questions about the project/code/system
+- "Why" questions
+- "How does X work" questions
+- Complaints ("why isn't this working", "this is broken")
+- Statements about the system ("you are using...", "this middleware...")
+- ANY technical question
+- Anything you're unsure about
+
+## OUTPUT FORMAT (exactly one of these):
+{"action":"call_tool","tool":"rag_query","parameters":{"query":"SEARCH_QUERY"}}
+{"action":"call_tool","tool":"git_status","parameters":{}}
+{"action":"call_tool","tool":"git_diff","parameters":{}}
+{"action":"call_tool","tool":"read_file","parameters":{"path":"FILE_PATH"}}
+{"action":"respond","response":"SHORT_GREETING"}
+
+## EXAMPLES:
+
+### rag_query (MOST COMMON - use this by default):
+"what does this project do" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"project purpose and main features"}}
+"how does streaming work" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"how streaming is implemented"}}
+"why isn't it working" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"common issues and error handling"}}
+"explain the middleware" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"middleware architecture and flow"}}
+"you're not using context" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"how context is used in the system"}}
+"where is auth handled" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"authentication implementation location"}}
+"is this project using typescript" → {"action":"call_tool","tool":"rag_query","parameters":{"query":"project tech stack and languages"}}
+
+### git tools:
+"what files changed" → {"action":"call_tool","tool":"git_status","parameters":{}}
+"show me the diff" → {"action":"call_tool","tool":"git_diff","parameters":{}}
+"recent commits" → {"action":"call_tool","tool":"git_log","parameters":{}}
+
+### read_file (ONLY for explicit paths):
+"read package.json" → {"action":"call_tool","tool":"read_file","parameters":{"path":"package.json"}}
+"show me src/index.ts" → {"action":"call_tool","tool":"read_file","parameters":{"path":"src/index.ts"}}
+
+### respond (ONLY for pure greetings):
+"hi" → {"action":"respond","response":"Hello! How can I help with your code?"}
+"thanks" → {"action":"respond","response":"You're welcome!"}
+
+## CRITICAL RULES:
+1. NEVER guess or make up information about the codebase
+2. NEVER use "respond" to answer technical questions
+3. When uncertain → ALWAYS use rag_query
+4. Output ONLY valid JSON, nothing else
 ${capabilityGuidance}${prostheticSection}
-When in doubt, use rag_query. Output ONLY JSON:`;
+JSON:`;
 
     return basePrompt;
   }
