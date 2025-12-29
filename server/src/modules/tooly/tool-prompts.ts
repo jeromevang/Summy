@@ -512,7 +512,7 @@ export const TOOL_SCHEMAS: Record<string, OpenAIToolSchema> = {
     type: 'function',
     function: {
       name: 'rag_query',
-      description: 'PREFERRED FOR CODE SEARCH: Semantic AI-powered search that finds relevant code by meaning in a single call. Use this FIRST for any code search task like "find X", "where is Y", "how does Z work". Returns code snippets with file paths, line numbers, symbols, and relevance scores. Much more efficient than multiple grep calls.',
+      description: '🚨 REQUIRED FIRST STEP 🚨: For ANY question about code, functionality, or codebase exploration, you MUST call rag_query FIRST. This is the ONLY semantic search tool. Examples: "what does this do?", "how does X work?", "find Y", "where is Z?", "search for function". Returns relevant code with context. DO NOT use other tools first.',
       parameters: {
         type: 'object',
         properties: {
@@ -681,7 +681,7 @@ export const TOOL_SCHEMAS: Record<string, OpenAIToolSchema> = {
     type: 'function',
     function: {
       name: 'list_directory',
-      description: 'Get a detailed listing of files and directories in a specified path',
+      description: 'List files and directories in a specific path. Use this to explore directory structure.',
       parameters: {
         type: 'object',
         properties: {
@@ -695,7 +695,7 @@ export const TOOL_SCHEMAS: Record<string, OpenAIToolSchema> = {
     type: 'function',
     function: {
       name: 'search_files',
-      description: 'Recursively search for files matching a pattern. For semantic code understanding, use rag_query first - it is more efficient. Use search_files only for exact pattern/regex matching.',
+      description: 'Use for exact filename/wildcard matching like "*.ts" or "test_*.js". NOT for semantic search - use rag_query first. This tool searches for files by pattern, not content.',
       parameters: {
         type: 'object',
         properties: {

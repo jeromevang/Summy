@@ -88,7 +88,7 @@ interface ModelInfo {
 interface ModelProfile {
   modelId: string;
   displayName: string;
-  provider: 'lmstudio' | 'openai' | 'azure';
+  provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
   testedAt: string;
   score: number;
   enabledTools: string[];
@@ -120,7 +120,7 @@ interface ModelProfile {
 interface DiscoveredModel {
   id: string;
   displayName: string;
-  provider: 'lmstudio' | 'openai' | 'azure';
+  provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
   status: 'tested' | 'untested' | 'failed' | 'known_good';
   score?: number;
   toolScore?: number;
@@ -241,12 +241,12 @@ const Tooly: React.FC = () => {
   };
   const [loading, setLoading] = useState(true);
   const [testingModel, setTestingModel] = useState<string | null>(null);
-  const [providerFilter, setProviderFilter] = useState<'all' | 'lmstudio' | 'openai' | 'azure'>(() => {
+  const [providerFilter, setProviderFilter] = useState<'all' | 'lmstudio' | 'openai' | 'azure' | 'openrouter'>(() => {
     const saved = localStorage.getItem('tooly_providerFilter');
-    return (saved as 'all' | 'lmstudio' | 'openai' | 'azure') || 'all';
+    return (saved as 'all' | 'lmstudio' | 'openai' | 'azure' | 'openrouter') || 'all';
   });
-  const [availableProviders, setAvailableProviders] = useState<{ lmstudio: boolean; openai: boolean; azure: boolean }>({
-    lmstudio: false, openai: false, azure: false
+  const [availableProviders, setAvailableProviders] = useState<{ lmstudio: boolean; openai: boolean; azure: boolean; openrouter: boolean }>({
+    lmstudio: false, openai: false, azure: false, openrouter: false
   });
   const [testMode, setTestMode] = useState<'quick' | 'keep_on_success' | 'manual'>(() => {
     const saved = localStorage.getItem('tooly_testMode');
@@ -1219,7 +1219,7 @@ const Tooly: React.FC = () => {
               className="w-full bg-[#1a1a1a] border border-[#3d3d3d] rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
             >
               <option value="">Select model...</option>
-              {models.filter(m => m.provider === 'lmstudio').map((m) => (
+              {models.filter(m => m.provider === 'lmstudio' || m.provider === 'openrouter').map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.displayName} {m.maxContextLength ? `(${Math.round(m.maxContextLength / 1024)}K)` : ''}
                 </option>
@@ -1248,7 +1248,7 @@ const Tooly: React.FC = () => {
                 className="w-full bg-[#1a1a1a] border border-[#3d3d3d] rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none"
               >
                 <option value="">Select model...</option>
-                {models.filter(m => m.provider === 'lmstudio').map((m) => (
+                {models.filter(m => m.provider === 'lmstudio' || m.provider === 'openrouter').map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.displayName} {m.maxContextLength ? `(${Math.round(m.maxContextLength / 1024)}K)` : ''}
                   </option>
@@ -1438,6 +1438,9 @@ const Tooly: React.FC = () => {
                         </option>
                         <option value="azure" disabled={!availableProviders.azure}>
                           Azure {availableProviders.azure ? '' : '(not configured)'}
+                        </option>
+                        <option value="openrouter" disabled={!availableProviders.openrouter}>
+                          OpenRouter {availableProviders.openrouter ? '' : '(no key)'}
                         </option>
                       </select>
                     </div>

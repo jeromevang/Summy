@@ -153,7 +153,7 @@ function loadTestSuite(): { suite: AgenticReadinessTest[], config: TestSuiteConf
         version: "1.0.0",
         description: "Empty fallback suite",
         threshold: 70,
-        categoryWeights: { tool: 0.3, rag: 0.25, reasoning: 0.2, intent: 0.15, browser: 0.1 },
+        categoryWeights: { tool: 0.3, rag: 0.25, reasoning: 0.2, intent: 0.15, browser: 0.1, multi_turn: 0.0, boundary: 0.0, fault_injection: 0.0 },
         tests: []
       }
     };
@@ -867,8 +867,8 @@ function evaluateToolResultMemory(response: any, toolCalls: any[], conversationH
 /**
  * BB-1/BB-2: Model can handle N-tool chains
  */
-function evaluateToolChain(response: any, toolCalls: any[], expectedChainLength?: number): ProbeEvaluation {
-  const chainLength = expectedChainLength || 2;
+function evaluateToolChain(response: any, toolCalls: any[], conversationHistory?: any[]): ProbeEvaluation {
+  const chainLength = 2; // Default expected chain length
   const actualLength = toolCalls?.length || 0;
   const text = typeof response === 'string' ? response : response?.choices?.[0]?.message?.content || '';
   
@@ -921,7 +921,7 @@ function evaluateDecisionNesting(response: any, toolCalls: any[]): ProbeEvaluati
 /**
  * FI-1 to FI-3: Model handles errors and edge cases gracefully
  */
-function evaluateFaultRecovery(response: any, toolCalls: any[], faultType: string): ProbeEvaluation {
+function evaluateFaultRecovery(response: any, toolCalls: any[], conversationHistory?: any[]): ProbeEvaluation {
   const text = typeof response === 'string' ? response : response?.choices?.[0]?.message?.content || '';
   const textLower = text.toLowerCase();
   
@@ -931,7 +931,21 @@ function evaluateFaultRecovery(response: any, toolCalls: any[], faultType: strin
   const suggestsAlternative = textLower.match(/alternative|instead|try|suggest|perhaps|maybe|check|verify|consider/);
   const noHallucination = !textLower.match(/here is the content|the file contains|i found the following|the function does/);
   
-  // Specific fault type handling
+  // Generic fault recovery evaluation (works for any fault type)
+  if (acknowledgesError && noHallucination) {
+    if (suggestsAlternative) {
+      return { passed: true, score: 1.0, details: 'Correctly handled error and suggested alternatives' };
+    }
+    return { passed: true, score: 0.8, details: 'Correctly acknowledged error' };
+  }
+  if (!noHallucination) {
+    return { passed: false, score: 0, details: 'Hallucinated response to error condition' };
+  }
+  return { passed: false, score: 0.2, details: 'Did not properly acknowledge error' };
+}
+
+// Legacy switch statement (commented out)
+  /*
   switch (faultType) {
     case 'file_not_found':
       // Model should acknowledge file doesn't exist, not hallucinate content
@@ -975,7 +989,7 @@ function evaluateFaultRecovery(response: any, toolCalls: any[], faultType: strin
         return { passed: true, score: 0.7, details: 'Handled error gracefully' };
       }
   }
-  
+
   // If tool was called and we have some response, partial credit
   if (toolCalls && toolCalls.length > 0) {
     return { passed: false, score: 0.3, details: 'Attempted operation but did not handle error gracefully' };

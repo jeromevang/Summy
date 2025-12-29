@@ -161,6 +161,7 @@ export const ComboTest: React.FC = () => {
   // State
   const [models, setModels] = useState<Model[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(true);
+  const [availableProviders, setAvailableProviders] = useState<{[key: string]: boolean}>({});
   const [selectedMainModels, setSelectedMainModels] = useState<Set<string>>(new Set());
   const [selectedExecutorModels, setSelectedExecutorModels] = useState<Set<string>>(new Set());
   
@@ -271,21 +272,22 @@ export const ComboTest: React.FC = () => {
   const fetchModels = async () => {
     setIsLoadingModels(true);
     try {
-      // Try OpenRouter first since that's what the user configured, fallback to LM Studio
-      let response = await fetch('/api/tooly/models?provider=openrouter');
-      if (!response.ok) {
-        console.log('OpenRouter models not available, trying LM Studio...');
-        response = await fetch('/api/tooly/models?provider=lmstudio');
-      }
+      // Fetch ALL models from all providers for hybrid combo testing
+      const response = await fetch('/api/tooly/models?provider=all');
       if (!response.ok) throw new Error('Failed to fetch models');
       const data = await response.json();
-      // Sort models by size (smallest first)
+      // Sort models by provider then by display name
       const sortedModels = (data.models || []).sort((a: Model, b: Model) => {
-        const sizeA = a.sizeBytes || 0;
-        const sizeB = b.sizeBytes || 0;
-        return sizeA - sizeB;
+        // Sort by provider first (lmstudio, openai, openrouter, azure)
+        const providerOrder = { lmstudio: 1, openai: 2, openrouter: 3, azure: 4 };
+        const providerA = providerOrder[a.provider] || 99;
+        const providerB = providerOrder[b.provider] || 99;
+        if (providerA !== providerB) return providerA - providerB;
+        // Then sort by display name
+        return a.displayName.localeCompare(b.displayName);
       });
       setModels(sortedModels);
+      setAvailableProviders(data.providers);
     } catch (err: any) {
       setError(err.message);
     } finally {

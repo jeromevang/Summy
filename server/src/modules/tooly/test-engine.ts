@@ -134,9 +134,17 @@ export class TestEngine {
     let contextLatency;
     if (!options.skipPreflight) {
       if (['standard', 'deep', 'optimization'].includes(mode)) {
-        try { contextLatency = await probeEngine.runContextLatencyProfile(modelId, provider, settings, 30000); } catch { }
+        try {
+          // Use shorter timeout for OpenRouter to avoid rate limits
+          const latencyTimeout = provider === 'openrouter' ? 20000 : 30000;
+          contextLatency = await probeEngine.runContextLatencyProfile(modelId, provider, settings, latencyTimeout);
+        } catch { }
       } else {
-        try { await probeEngine.runQuickLatencyCheck(modelId, provider, settings, 15000); } catch { }
+        try {
+          // Use shorter timeout for OpenRouter
+          const quickTimeout = provider === 'openrouter' ? 10000 : 15000;
+          await probeEngine.runQuickLatencyCheck(modelId, provider, settings, quickTimeout);
+        } catch { }
       }
     }
 
@@ -155,6 +163,11 @@ export class TestEngine {
       this.broadcastProgress(modelId, completed, totalCount, test, res.score);
       const refinement = this.analyzeAliasRefinement(res, test);
       if (refinement) aliasRefinements.push(refinement);
+
+      // Add small delay for OpenRouter to avoid rate limits
+      if (provider === 'openrouter') {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
 
     for (const probe of probesToRun) {
@@ -163,6 +176,11 @@ export class TestEngine {
       results.push(res);
       completed++;
       this.broadcastProgress(modelId, completed, totalCount, probe, res.score);
+
+      // Add small delay for OpenRouter to avoid rate limits
+      if (provider === 'openrouter') {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
     }
 
     const metrics = calculateLatencyMetrics(results);

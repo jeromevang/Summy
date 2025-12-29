@@ -4,73 +4,9 @@
   "provider": "lmstudio",
   "testedAt": "2025-12-22T23:29:58.170Z",
   "testVersion": 17,
-  "score": 100,
+  "score": 0.6444557823129251,
   "toolFormat": "openai_tools",
   "capabilities": {
-    "file_read": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 2,
-      "testsFailed": 0,
-      "avgLatency": 2683,
-      "lastTested": "2025-12-19T16:47:54.475Z"
-    },
-    "file_write": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1189,
-      "lastTested": "2025-12-19T16:47:54.475Z"
-    },
-    "file_patch": {
-      "supported": true,
-      "score": 99,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 1462,
-      "lastTested": "2025-12-19T16:47:54.475Z"
-    },
-    "file_list": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 796,
-      "lastTested": "2025-12-19T16:47:54.475Z"
-    },
-    "file_search": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 900,
-      "lastTested": "2025-12-19T16:47:54.475Z"
-    },
-    "create_new_file": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 837,
-      "lastTested": "2025-12-19T16:47:54.475Z"
-    },
-    "folder_create": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 826,
-      "lastTested": "2025-12-19T16:47:54.475Z"
-    },
-    "folder_delete": {
-      "supported": true,
-      "score": 100,
-      "testsPassed": 1,
-      "testsFailed": 0,
-      "avgLatency": 761,
-      "lastTested": "2025-12-19T16:47:54.475Z"
-    },
     "git_status": {
       "supported": false,
       "score": 45,
@@ -410,14 +346,6 @@
     }
   },
   "enabledTools": [
-    "file_read",
-    "file_write",
-    "file_patch",
-    "file_list",
-    "file_search",
-    "create_new_file",
-    "folder_create",
-    "folder_delete",
     "git_diff",
     "git_log",
     "git_commit",
@@ -607,5 +535,539 @@
     "correctionAcceptance": 8,
     "overallTrainability": 8
   },
-  "isBaseline": false
+  "isBaseline": false,
+  "agenticReadiness": {
+    "certified": false,
+    "score": 0.6444557823129251,
+    "assessedAt": "2025-12-28T09:39:48.985Z",
+    "categoryScores": {
+      "tool": 0.96,
+      "rag": 0.375,
+      "reasoning": 0.24285714285714285,
+      "intent": 0.5666666666666667,
+      "browser": 1,
+      "multi_turn": 0.7999999999999999,
+      "boundary": 0.5666666666666667
+    },
+    "failedTests": [
+      "AR-7",
+      "AR-8",
+      "AR-10",
+      "AR-11",
+      "AR-12",
+      "AR-13",
+      "AR-15",
+      "ER-1",
+      "BB-3",
+      "FI-1",
+      "FI-2"
+    ],
+    "prostheticApplied": false,
+    "qualifyingGatePassed": true,
+    "mode": "single",
+    "testResults": [
+      {
+        "testId": "QG-1",
+        "testName": "Tool Format Valid",
+        "category": "qualifying",
+        "passed": true,
+        "score": 1,
+        "details": "Valid tool call format with correct tool",
+        "latency": 7382,
+        "mode": "single",
+        "toolsExecuted": [
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "QG-2",
+        "testName": "Instruction Following",
+        "category": "qualifying",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly followed instruction to list directory",
+        "latency": 1252,
+        "mode": "single",
+        "toolsExecuted": [
+          "list_directory"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "QG-3",
+        "testName": "Context Coherence",
+        "category": "qualifying",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly verified context before answering",
+        "latency": 1357,
+        "mode": "single",
+        "toolsExecuted": [
+          "list_directory"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "QG-4",
+        "testName": "Basic Reasoning",
+        "category": "qualifying",
+        "passed": true,
+        "score": 0.6,
+        "details": "Showed reasoning but should explore codebase first",
+        "latency": 3799,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "QG-5",
+        "testName": "State Transition",
+        "category": "qualifying",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly read file to extract information",
+        "latency": 1319,
+        "mode": "single",
+        "toolsExecuted": [
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-1",
+        "testName": "Basic Tool Emit",
+        "category": "tool",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly called read_file with correct path",
+        "latency": 1205,
+        "mode": "single",
+        "toolsExecuted": [
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-2",
+        "testName": "Multi-Tool Selection",
+        "category": "tool",
+        "passed": true,
+        "score": 0.8,
+        "details": "Used search_files",
+        "latency": 1436,
+        "mode": "single",
+        "toolsExecuted": [
+          "search_files"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-3",
+        "testName": "Tool Suppression",
+        "category": "tool",
+        "passed": true,
+        "score": 1,
+        "details": "Answered without unnecessary tool calls",
+        "latency": 2480,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "AR-4",
+        "testName": "Argument Validation",
+        "category": "tool",
+        "passed": true,
+        "score": 1,
+        "details": "Correct path and content arguments",
+        "latency": 1601,
+        "mode": "single",
+        "toolsExecuted": [
+          "write_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-5",
+        "testName": "Near-Identical Tool Choice",
+        "category": "tool",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly chose read_file for single file",
+        "latency": 1308,
+        "mode": "single",
+        "toolsExecuted": [
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-6",
+        "testName": "RAG-First Behavior",
+        "category": "rag",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly used rag_query FIRST",
+        "latency": 2902,
+        "mode": "single",
+        "toolsExecuted": [
+          "rag_query"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-7",
+        "testName": "RAG Before File Read",
+        "category": "rag",
+        "passed": false,
+        "score": 0,
+        "details": "Read files without RAG context",
+        "latency": 1417,
+        "mode": "single",
+        "toolsExecuted": [
+          "search_files"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-8",
+        "testName": "RAG Result Synthesis",
+        "category": "rag",
+        "passed": false,
+        "score": 0,
+        "details": "Did not use RAG for exploration",
+        "latency": 3092,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "AR-9",
+        "testName": "RAG Chaining",
+        "category": "rag",
+        "passed": true,
+        "score": 0.5,
+        "details": "Partial approach - used one but not both",
+        "latency": 10151,
+        "mode": "single",
+        "toolsExecuted": [
+          "search_files",
+          "read_file",
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-10",
+        "testName": "Multi-Step Planning",
+        "category": "reasoning",
+        "passed": false,
+        "score": 0,
+        "details": "Should use multiple tools for multi-step task",
+        "latency": 5277,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "AR-11",
+        "testName": "Conditional Logic",
+        "category": "reasoning",
+        "passed": false,
+        "score": 0,
+        "details": "Did not check conditions before acting",
+        "latency": 1340,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "AR-12",
+        "testName": "Context Continuity",
+        "category": "reasoning",
+        "passed": false,
+        "score": 0,
+        "details": "Did not gather context for reasoning",
+        "latency": 2710,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "AR-13",
+        "testName": "Edge Case Awareness",
+        "category": "reasoning",
+        "passed": false,
+        "score": 0,
+        "details": "Did not investigate for edge cases",
+        "latency": 2930,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "AR-14",
+        "testName": "Question vs Action",
+        "category": "intent",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly answered without tools",
+        "latency": 3727,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "AR-15",
+        "testName": "Implicit File Read",
+        "category": "intent",
+        "passed": false,
+        "score": 0,
+        "details": "Did not attempt to read the file first",
+        "latency": 2423,
+        "mode": "single",
+        "toolsExecuted": [
+          "edit_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-16",
+        "testName": "Search Intent Detection",
+        "category": "intent",
+        "passed": true,
+        "score": 0.7,
+        "details": "Used search but query may be imprecise",
+        "latency": 1360,
+        "mode": "single",
+        "toolsExecuted": [
+          "search_files"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-17",
+        "testName": "Web Search",
+        "category": "browser",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly used web_search for current info",
+        "latency": 1630,
+        "mode": "single",
+        "toolsExecuted": [
+          "web_search"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-18",
+        "testName": "Page Navigation",
+        "category": "browser",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly navigated to Python docs",
+        "latency": 1886,
+        "mode": "single",
+        "toolsExecuted": [
+          "browser_fetch_content"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-19",
+        "testName": "Content Extraction",
+        "category": "browser",
+        "passed": true,
+        "score": 1,
+        "details": "Fetched web content for extraction",
+        "latency": 1650,
+        "mode": "single",
+        "toolsExecuted": [
+          "url_fetch_content"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "AR-20",
+        "testName": "Browser Interaction",
+        "category": "browser",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly navigated and clicked",
+        "latency": 2091,
+        "mode": "single",
+        "toolsExecuted": [
+          "browser_navigate",
+          "browser_click"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "ER-1",
+        "testName": "File Not Found Recovery",
+        "category": "reasoning",
+        "passed": false,
+        "score": 0,
+        "details": "Did not handle file not found scenario",
+        "latency": 1281,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "ER-2",
+        "testName": "Tool Failure Recovery",
+        "category": "reasoning",
+        "passed": true,
+        "score": 1,
+        "details": "Explained failure and suggested alternatives",
+        "latency": 2767,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "ER-3",
+        "testName": "Graceful Degradation",
+        "category": "reasoning",
+        "passed": true,
+        "score": 0.7,
+        "details": "Explored codebase but may not handle scale",
+        "latency": 1500,
+        "mode": "single",
+        "toolsExecuted": [
+          "search_files"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "MT-1",
+        "testName": "Context Retention",
+        "category": "multi_turn",
+        "passed": true,
+        "score": 0.7,
+        "details": "Re-read file to answer (memory not retained)",
+        "latency": 1425,
+        "mode": "single",
+        "toolsExecuted": [
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "MT-2",
+        "testName": "Reference Resolution",
+        "category": "multi_turn",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly resolved \"that file\" to auth file",
+        "latency": 1355,
+        "mode": "single",
+        "toolsExecuted": [
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "MT-3",
+        "testName": "Tool Result Memory",
+        "category": "multi_turn",
+        "passed": true,
+        "score": 0.7,
+        "details": "Read a file but may not be from previous list",
+        "latency": 1138,
+        "mode": "single",
+        "toolsExecuted": [
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "BB-1",
+        "testName": "Tool Chain Length 2",
+        "category": "boundary",
+        "passed": true,
+        "score": 0.5,
+        "details": "Executed 1/2 tools in chain",
+        "latency": 4919,
+        "mode": "single",
+        "toolsExecuted": [
+          "rag_query"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "BB-2",
+        "testName": "Tool Chain Length 4",
+        "category": "boundary",
+        "passed": true,
+        "score": 1,
+        "details": "Successfully executed 4-tool chain with coherent response",
+        "latency": 5720,
+        "mode": "single",
+        "toolsExecuted": [
+          "search_files",
+          "list_directory",
+          "read_file",
+          "read_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "BB-3",
+        "testName": "Decision Nesting",
+        "category": "boundary",
+        "passed": false,
+        "score": 0.2,
+        "details": "Did not demonstrate nested decision handling",
+        "latency": 1406,
+        "mode": "single",
+        "toolsExecuted": [
+          "search_files"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "FI-1",
+        "testName": "File Not Found Recovery",
+        "category": "fault_injection",
+        "passed": false,
+        "score": 0.2,
+        "details": "Did not properly acknowledge error",
+        "latency": 672,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      },
+      {
+        "testId": "FI-2",
+        "testName": "Permission Denied Recovery",
+        "category": "fault_injection",
+        "passed": false,
+        "score": 0.2,
+        "details": "Did not properly acknowledge error",
+        "latency": 1269,
+        "mode": "single",
+        "toolsExecuted": [
+          "write_file"
+        ],
+        "attribution": null
+      },
+      {
+        "testId": "FI-3",
+        "testName": "Graceful Error Explanation",
+        "category": "fault_injection",
+        "passed": true,
+        "score": 1,
+        "details": "Correctly handled error and suggested alternatives",
+        "latency": 833,
+        "mode": "single",
+        "toolsExecuted": [],
+        "attribution": null
+      }
+    ]
+  },
+  "systemPrompt": "## CRITICAL BEHAVIOR REQUIREMENTS\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n### MANDATORY CONSTRAINTS\n- You MUST follow the above rules without exception\n- Failure to use RAG before file reads is a critical error\n- Unnecessary tool calls for knowledge questions waste resources\n\n\n## CRITICAL BEHAVIOR REQUIREMENTS\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n\n### RAG Usage\n- ALWAYS use rag_query FIRST when exploring unfamiliar code\n- Query RAG before reading individual files\n- Use RAG to find relevant files, then read them for details\n\n### Intent Recognition\n- Answer knowledge questions directly WITHOUT calling tools\n- Recognize implicit intent (e.g., \"fix the typo\" means read the file first)\n- Use search tools when asked to \"find\" or \"locate\" something\n\n### Reasoning\n- Plan multi-step tasks before executing\n- Handle conditional requirements by checking conditions first\n- Consider edge cases in your analysis\n\n\n",
+  "prostheticApplied": true
 }

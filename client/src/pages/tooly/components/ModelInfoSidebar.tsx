@@ -155,7 +155,7 @@ export const ModelInfoSidebar: React.FC<ModelInfoSidebarProps> = ({
       setFetchingInfo(true);
       try {
         const encodedId = encodeURIComponent(profile.modelId);
-        const res = await fetch(`/api/tooly/models/${encodedId}/info`);
+        const res = await fetch(`http://localhost:3001/api/tooly/models/${encodedId}/info`);
         if (res.ok) {
           const data = await res.json();
           setExtendedInfo(data);

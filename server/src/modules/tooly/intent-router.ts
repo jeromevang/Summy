@@ -12,6 +12,7 @@ import { getToolSchemas, buildSystemPrompt } from './tool-prompts.js';
 import { failureLog, type FailureCategory } from '../../services/failure-log.js';
 import { failureObserver } from '../../services/failure-observer.js';
 import { prostheticStore } from './learning/prosthetic-store.js';
+import { executeAgenticLoop, shouldExecuteAgentically } from './cognitive-engine.js';
 
 // ============================================================
 // TYPES
@@ -89,34 +90,6 @@ class IntentRouter {
   private config: RouterConfig | null = null;
   private mainProfile: ModelProfile | null = null;
   private executorProfile: ModelProfile | null = null;
-  private openrouterRateLimiter = new Map<string, { count: number; resetTime: number }>();
-
-  /**
-   * Check and enforce OpenRouter rate limits
-   * OpenRouter has generous limits but we should be respectful
-   */
-  private async checkOpenRouterRateLimit(): Promise<void> {
-    const now = Date.now();
-    const windowMs = 60000; // 1 minute window
-    const maxRequests = 50; // Conservative limit (OpenRouter allows much higher)
-
-    const key = 'openrouter_global';
-    const current = this.openrouterRateLimiter.get(key) || { count: 0, resetTime: now + windowMs };
-
-    if (now > current.resetTime) {
-      // Reset window
-      this.openrouterRateLimiter.set(key, { count: 1, resetTime: now + windowMs });
-    } else if (current.count >= maxRequests) {
-      // Rate limit exceeded
-      const waitMs = current.resetTime - now;
-      console.log(`[IntentRouter] OpenRouter rate limit hit, waiting ${waitMs}ms`);
-      await new Promise(resolve => setTimeout(resolve, waitMs));
-      this.openrouterRateLimiter.set(key, { count: 1, resetTime: now + windowMs });
-    } else {
-      // Increment counter
-      this.openrouterRateLimiter.set(key, { count: current.count + 1, resetTime: current.resetTime });
-    }
-  }
 
   /**
    * Configure the router with models
@@ -258,6 +231,26 @@ class IntentRouter {
     }
 
     return this.routeInternal(messages, tools, originalRequest, startTime);
+  }
+
+  /**
+   * Determine which provider to use for a given model ID
+   */
+  private determineProviderForModel(modelId: string): string {
+    // Check if it's an OpenRouter model
+    if (modelId.startsWith('allenai/') || modelId.startsWith('xiaomi/') ||
+        modelId.startsWith('mistralai/') || modelId.startsWith('nvidia/') ||
+        modelId.includes(':free') || modelId.includes('/')) {
+      return 'openrouter';
+    }
+
+    // Check if it's an LM Studio model
+    if (modelId.startsWith('lmstudio/') || modelId.startsWith('local')) {
+      return 'lmstudio';
+    }
+
+    // Default to the configured provider
+    return this.config?.provider || 'lmstudio';
   }
 
   /**
@@ -873,6 +866,18 @@ IMPORTANT:
     res: any, // Express response for streaming
     timeout: number = 30000
   ): Promise<any> {
+    // Temporarily disabled - basic fallback
+    throw new Error('Streaming not implemented');
+  }
+
+  /*
+  private async callModelStreaming_ORIGINAL(
+    modelId: string,
+    messages: any[],
+    tools: any[],
+    res: any, // Express response for streaming
+    timeout: number = 30000
+  ): Promise<any> {
     if (!this.config) {
       throw new Error('IntentRouter not configured');
     }
@@ -900,7 +905,6 @@ IMPORTANT:
 
     switch (this.config.provider) {
       case 'openrouter':
-        await this.checkOpenRouterRateLimit();
         url = 'https://openrouter.ai/api/v1/chat/completions';
         headers['Authorization'] = `Bearer ${this.config.settings.openrouterApiKey}`;
         headers['HTTP-Referer'] = 'http://localhost:5173';
@@ -911,15 +915,21 @@ IMPORTANT:
         throw new Error(`Streaming not supported for provider: ${this.config.provider}`);
     }
 
-    try {
-      const response = await axios.post(url, body, {
-        headers,
-        responseType: 'stream',
-        timeout
-      });
+    const response = await axios.post(url, body, {
+      headers,
+      responseType: 'stream',
+      timeout
+    });
 
-      let fullContent = '';
-      let toolCalls: any[] = [];
+    let fullContent = '';
+    let toolCalls: any[] = [];
+    let accumulatedToolCalls: { [index: number]: any } = {};
+    let hasToolCalls = false;
+    let messagesForToolExecution = messages;
+    let bodyForToolExecution = body;
+    let headersForToolExecution = headers;
+    let urlForToolExecution = url;
+    let timeoutForToolExecution = timeout;
 
       return new Promise((resolve, reject) => {
         response.data.on('data', (chunk: Buffer) => {
@@ -933,11 +943,19 @@ IMPORTANT:
                 const dataStr = line.slice(6);
 
                 if (dataStr === '[DONE]') {
-                  // End of stream
-                  res.write('data: [DONE]\n\n');
-                  res.end();
-                  resolve({ fullContent, toolCalls });
-                  return;
+                  // End of stream - but check if we need to execute tool calls first
+                  if (hasToolCalls) {
+                    console.log('[IntentRouter] [DONE] received but tool calls pending - will execute agentically');
+                    // Don't end the response yet - let the 'end' handler deal with it
+                    resolve({ fullContent, toolCalls });
+                    return;
+                  } else {
+                    // Normal end of stream
+                    res.write('data: [DONE]\n\n');
+                    res.end();
+                    resolve({ fullContent, toolCalls });
+                    return;
+                  }
                 }
 
                 try {
@@ -958,19 +976,51 @@ IMPORTANT:
                     })}\n\n`);
                   }
 
-                  // Handle tool calls
+                  // Handle tool calls - accumulate deltas
                   if (event.choices?.[0]?.delta?.tool_calls) {
-                    const toolCallDelta = event.choices[0].delta.tool_calls;
-                    toolCalls.push(...toolCallDelta);
+                    const toolCallDeltas = event.choices[0].delta.tool_calls;
+                    for (const delta of toolCallDeltas) {
+                      const index = delta.index || 0;
+                      if (!accumulatedToolCalls[index]) {
+                        accumulatedToolCalls[index] = { index };
+                      }
+
+                      // Accumulate function data
+                      if (delta.function) {
+                        if (!accumulatedToolCalls[index].function) {
+                          accumulatedToolCalls[index].function = {};
+                        }
+                        if (delta.function.name) {
+                          accumulatedToolCalls[index].function.name = delta.function.name;
+                        }
+                        if (delta.function.arguments) {
+                          accumulatedToolCalls[index].function.arguments = (accumulatedToolCalls[index].function.arguments || '') + delta.function.arguments;
+                        }
+                      }
+
+                      // Copy other properties
+                      if (delta.id) accumulatedToolCalls[index].id = delta.id;
+                      if (delta.type) accumulatedToolCalls[index].type = delta.type;
+                    }
                   }
 
                   // Check for finish reason
                   if (event.choices?.[0]?.finish_reason) {
+                    const finishReason = event.choices[0].finish_reason;
+
+                    // If finish_reason is tool_calls, mark for later execution and don't send finish_reason yet
+                    if (finishReason === 'tool_calls') {
+                      console.log('[IntentRouter] Detected tool_calls finish_reason, will execute agentically');
+                      hasToolCalls = true;
+                      // Don't send finish_reason to client yet - agentic loop will handle the response
+                      return;
+                    }
+
                     res.write(`data: ${JSON.stringify({
                       choices: [{
                         delta: {},
                         index: 0,
-                        finish_reason: event.choices[0].finish_reason
+                        finish_reason: finishReason
                       }]
                     })}\n\n`);
                   }
@@ -983,10 +1033,174 @@ IMPORTANT:
           }
         });
 
-        response.data.on('end', () => {
-          res.write('data: [DONE]\n\n');
-          res.end();
-          resolve({ fullContent, toolCalls });
+        response.data.on('end', async () => {
+          try {
+            console.log(`[IntentRouter] Stream ended, hasToolCalls: ${hasToolCalls}`);
+            // If we detected tool_calls finish_reason, get the complete response
+            if (hasToolCalls) {
+              console.log('[IntentRouter] Executing tool calls agentically');
+              try {
+                const completeResponse = await axios.post(urlForToolExecution, {
+                  ...bodyForToolExecution,
+                  stream: false // Get complete response
+                }, { headers: headersForToolExecution, timeout: timeoutForToolExecution });
+
+                const completeData = completeResponse.data;
+                if (completeData.choices?.[0]?.message?.tool_calls) {
+                  // Execute tool calls using agentic loop
+                  const mockResponse = {
+                    choices: [{
+                      message: {
+                        content: fullContent,
+                        tool_calls: completeData.choices[0].message.tool_calls
+                      }
+                    }]
+                  };
+
+                  // Import required functions
+                  const { ideMapping } = await import('../../services/ide-mapping.js');
+
+                  // Get IDE config for agentic execution
+                  const parsedModel = ideMapping.parseModelIDE(modelId);
+                  const ideMappingConfig = await ideMapping.loadIDEMapping(parsedModel.ide);
+
+                  // Create LLM call function for agentic loop
+                  const llmCallFn = async (msgs: any[]) => {
+                    const r = await axios.post(urlForToolExecution, {
+                      ...bodyForToolExecution,
+                      messages: msgs,
+                      stream: false
+                    }, { headers: headersForToolExecution, timeout: timeoutForToolExecution });
+                    return r.data;
+                  };
+
+                  // Execute agentic loop
+                  const { finalResponse, agenticMessages } = await executeAgenticLoop(
+                    mockResponse,
+                    messagesForToolExecution,
+                    llmCallFn,
+                    ideMappingConfig,
+                    `intent-router-${Date.now()}`,
+                    10,
+                    res,
+                    modelId
+                  );
+
+                  // Send the final response content
+                  const finalContent = finalResponse?.choices?.[0]?.message?.content || '';
+                  if (finalContent) {
+                    res.write(`data: ${JSON.stringify({
+                      choices: [{
+                        delta: { content: finalContent },
+                        index: 0,
+                        finish_reason: null
+                      }]
+                    })}\n\n`);
+                  }
+
+                  // Send completion
+                  res.write(`data: ${JSON.stringify({
+                    choices: [{
+                      delta: {},
+                      index: 0,
+                      finish_reason: 'stop'
+                    }]
+                  })}\n\n`);
+
+                  res.write('data: [DONE]\n\n');
+                  res.end();
+                  resolve({ fullContent: finalContent, toolCalls: [], agenticMessages });
+                  return;
+                }
+              } catch (error) {
+                console.error('[IntentRouter] Failed to get complete tool call response:', error);
+                // Fall through to regular completion
+              }
+            }
+
+            // Convert accumulated tool calls to array (for cases where they were streamed)
+            const completeToolCalls = Object.values(accumulatedToolCalls);
+
+            // Check if we need to execute tool calls agentically
+            const mockResponse = {
+              choices: [{
+                message: {
+                  content: fullContent,
+                  tool_calls: completeToolCalls
+                }
+              }]
+            };
+
+            // If there are tool calls, execute them using agentic loop
+            if (completeToolCalls && completeToolCalls.length > 0) {
+              console.log(`[IntentRouter] Executing ${toolCalls.length} tool calls via agentic loop`);
+
+              // Import required functions
+              const { ideMapping } = await import('../../services/ide-mapping.js');
+
+              // Get IDE config for agentic execution
+              const parsedModel = ideMapping.parseModelIDE(modelId);
+              const ideMappingConfig = await ideMapping.loadIDEMapping(parsedModel.ide);
+
+              // Create LLM call function for agentic loop
+              const llmCallFn = async (msgs: any[]) => {
+                const r = await axios.post(url, {
+                  ...body,
+                  messages: msgs,
+                  stream: false
+                }, { headers, timeout });
+                return r.data;
+              };
+
+              // Execute agentic loop
+              const { finalResponse, agenticMessages } = await executeAgenticLoop(
+                mockResponse,
+                messages,
+                llmCallFn,
+                ideMappingConfig,
+                `intent-router-${Date.now()}`, // sessionId
+                10, // maxIterations
+                res, // stream to client
+                modelId
+              );
+
+              // Stream the final response content word by word
+              const finalContent = finalResponse?.choices?.[0]?.message?.content || '';
+              if (finalContent) {
+                const words = finalContent.split(' ');
+                for (const word of words) {
+                  if (word.trim()) {
+                    res.write(`data: ${JSON.stringify({
+                      choices: [{
+                        delta: { content: word + ' ' },
+                        index: 0,
+                        finish_reason: null
+                      }]
+                    })}\n\n`);
+                    // Small delay to simulate streaming
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                  }
+                }
+              }
+
+              res.write('data: [DONE]\n\n');
+              res.end();
+              resolve({ fullContent: finalContent, toolCalls: [], agenticMessages });
+            } else {
+              // No tool calls, just end the stream
+              res.write('data: [DONE]\n\n');
+              res.end();
+              resolve({ fullContent, toolCalls: completeToolCalls });
+            }
+          } catch (error: any) {
+            console.error('[IntentRouter] Error in agentic execution:', error);
+            res.write(`data: ${JSON.stringify({
+              error: { message: error.message }
+            })}\n\n`);
+            res.write('data: [DONE]\n\n');
+            res.end();
+            reject(error);
+          }
         });
 
         response.data.on('error', (err: any) => {
@@ -1008,6 +1222,7 @@ IMPORTANT:
       throw error;
     }
   }
+  */
 
   /**
    * Call a model with timeout
@@ -1035,7 +1250,10 @@ IMPORTANT:
       body.tool_choice = 'auto';
     }
 
-    switch (this.config.provider) {
+    // Determine provider based on model ID for hybrid setups
+    const provider = this.determineProviderForModel(modelId);
+
+    switch (provider) {
       case 'lmstudio':
         url = `${this.config.settings.lmstudioUrl}/v1/chat/completions`;
         break;
@@ -1052,7 +1270,6 @@ IMPORTANT:
         break;
 
       case 'openrouter':
-        await this.checkOpenRouterRateLimit();
         url = 'https://openrouter.ai/api/v1/chat/completions';
         headers['Authorization'] = `Bearer ${this.config.settings.openrouterApiKey}`;
         headers['HTTP-Referer'] = 'http://localhost:5173'; // Required by OpenRouter
@@ -1060,7 +1277,7 @@ IMPORTANT:
         break;
 
       default:
-        throw new Error(`Unknown provider: ${this.config.provider}`);
+        throw new Error(`Unknown provider for model ${modelId}: ${provider}`);
     }
 
     const response = await axios.post(url, body, {

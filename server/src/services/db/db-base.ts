@@ -22,6 +22,11 @@ CREATE TABLE IF NOT EXISTS sessions (
   compression TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_sessions_created ON sessions(created_at);
+-- PERFORMANCE: Add indexes for session queries
+CREATE INDEX IF NOT EXISTS idx_sessions_model ON sessions(model);
+CREATE INDEX IF NOT EXISTS idx_sessions_provider ON sessions(provider);
+CREATE INDEX IF NOT EXISTS idx_sessions_updated ON sessions(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sessions_model_created ON sessions(model, created_at DESC);
 
 -- Analytics
 CREATE TABLE IF NOT EXISTS analytics (
@@ -39,6 +44,11 @@ CREATE TABLE IF NOT EXISTS analytics (
 );
 CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON analytics(timestamp);
 CREATE INDEX IF NOT EXISTS idx_analytics_type ON analytics(type);
+-- PERFORMANCE: Add composite indexes for analytics queries
+CREATE INDEX IF NOT EXISTS idx_analytics_model_timestamp ON analytics(model, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_analytics_type_success ON analytics(type, success);
+CREATE INDEX IF NOT EXISTS idx_analytics_provider_timestamp ON analytics(provider, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_analytics_success_timestamp ON analytics(success, timestamp DESC);
 
 -- Execution Logs
 CREATE TABLE IF NOT EXISTS execution_logs (
@@ -58,6 +68,11 @@ CREATE TABLE IF NOT EXISTS execution_logs (
 CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON execution_logs(timestamp);
 CREATE INDEX IF NOT EXISTS idx_logs_tool ON execution_logs(tool);
 CREATE INDEX IF NOT EXISTS idx_logs_status ON execution_logs(status);
+-- PERFORMANCE: Add composite indexes for common query patterns
+CREATE INDEX IF NOT EXISTS idx_logs_session_timestamp ON execution_logs(session_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_logs_model_tool ON execution_logs(model, tool);
+CREATE INDEX IF NOT EXISTS idx_logs_session_tool ON execution_logs(session_id, tool);
+CREATE INDEX IF NOT EXISTS idx_logs_status_duration ON execution_logs(status, duration_ms);
 
 -- File Backups
 CREATE TABLE IF NOT EXISTS file_backups (
@@ -202,6 +217,11 @@ CREATE TABLE IF NOT EXISTS test_history (
   failed_count INTEGER,
   timestamp TEXT DEFAULT CURRENT_TIMESTAMP
 );
+-- PERFORMANCE: Add indexes for test history queries
+CREATE INDEX IF NOT EXISTS idx_test_history_model_id ON test_history(model_id);
+CREATE INDEX IF NOT EXISTS idx_test_history_model_timestamp ON test_history(model_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_test_history_mode ON test_history(test_mode);
+CREATE INDEX IF NOT EXISTS idx_test_history_timestamp ON test_history(timestamp DESC);
 
 -- Global user preferences (memory)
 CREATE TABLE IF NOT EXISTS memory_global (
@@ -299,6 +319,11 @@ CREATE TABLE IF NOT EXISTS combo_test_results (
 CREATE INDEX IF NOT EXISTS idx_combo_results_main ON combo_test_results(main_model_id);
 CREATE INDEX IF NOT EXISTS idx_combo_results_executor ON combo_test_results(executor_model_id);
 CREATE INDEX IF NOT EXISTS idx_combo_results_score ON combo_test_results(overall_score DESC);
+-- PERFORMANCE: Add composite indexes for common query patterns
+CREATE INDEX IF NOT EXISTS idx_combo_results_main_executor_score ON combo_test_results(main_model_id, executor_model_id, overall_score DESC);
+CREATE INDEX IF NOT EXISTS idx_combo_results_qualifying ON combo_test_results(qualifying_gate_passed, overall_score DESC);
+CREATE INDEX IF NOT EXISTS idx_combo_results_excluded ON combo_test_results(main_excluded, overall_score DESC);
+CREATE INDEX IF NOT EXISTS idx_combo_results_tested_at ON combo_test_results(tested_at DESC);
 `;
 
 export class DBBase {

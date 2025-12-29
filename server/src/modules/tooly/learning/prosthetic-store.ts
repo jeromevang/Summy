@@ -148,12 +148,6 @@ class ProstheticStore {
     }
   }
 
-  /**
-   * Get prosthetic prompt for a model
-   */
-  getPrompt(modelId: string): ProstheticEntry | null {
-    return this.data.entries[modelId] || null;
-  }
 
   /**
    * Save prosthetic prompt for a model
@@ -366,6 +360,24 @@ export function buildProstheticPrompt(
     lines.push('- Only call tools when the task requires external action');
     lines.push('- Choose the most specific tool for the task (read_file for one file, search_files for searching)');
     lines.push('- Provide complete and accurate arguments to tools');
+
+    // Check for tool hallucination specifically
+    const hallucinatedTools = failedTests
+      .filter(test => test.category === 'tool' && test.details.includes('non-existent'))
+      .map(test => test.details.match(/non-existent tool: (\w+)/)?.[1])
+      .filter(Boolean);
+
+    if (hallucinatedTools.length > 0) {
+      if (level >= 2) {
+        lines.push('- 🚨 CRITICAL: NEVER call non-existent tools');
+        lines.push('- 🚨 Only use tools from your provided tool list');
+        lines.push(`- 🚨 Avoid hallucinated tools like: ${hallucinatedTools.slice(0, 3).join(', ')}`);
+      } else {
+        lines.push('- Never call tools that don\'t exist in your tool list');
+        lines.push('- If a tool you want doesn\'t exist, use the closest available alternative');
+      }
+    }
+
     lines.push('');
   }
 

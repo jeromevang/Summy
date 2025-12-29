@@ -4,7 +4,7 @@ import { COMMON_STOP_STRINGS } from './probe-utils.js';
 export class ProbeBase {
     protected async callLLM(
         modelId: string,
-        provider: 'lmstudio' | 'openai' | 'azure',
+        provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter',
         messages: any[],
         tools: any[] | undefined,
         settings: any,
@@ -46,6 +46,14 @@ export class ProbeBase {
                 headers['api-key'] = azureApiKey;
                 break;
 
+            case 'openrouter':
+                url = 'https://openrouter.ai/api/v1/chat/completions';
+                headers['Authorization'] = `Bearer ${settings.openrouterApiKey}`;
+                headers['HTTP-Referer'] = 'https://summy.ai';
+                headers['X-Title'] = 'Summy AI';
+                body.model = modelId;
+                break;
+
             default:
                 throw new Error(`Unknown provider: ${provider}`);
         }
@@ -60,7 +68,7 @@ export class ProbeBase {
 
     protected async callLLMNoTools(
         modelId: string,
-        provider: 'lmstudio' | 'openai' | 'azure',
+        provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter',
         messages: any[],
         settings: any,
         timeout: number

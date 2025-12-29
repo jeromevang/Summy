@@ -434,21 +434,32 @@ class ModelDiscoveryService {
       const models = response.data.data || [];
       console.log(`[ModelDiscovery] Found ${models.length} OpenRouter models`);
 
-      // Filter to free models only (function calling will be simulated client-side)
-      const freeModels = models.filter((model: any) => {
-        // Check if model is free (pricing info indicates free tier)
-        const isFree = model.pricing?.prompt === '0' && model.pricing?.completion === '0';
+      // Filter to models with reasonable context length and tool support
+      const filteredModels = models.filter((model: any) => {
+        // Check if model has reasonable context length (minimal requirement)
+        // OpenRouter models might not have context_length field, so we'll be more lenient
+        const hasContext = !model.context_length || model.context_length >= 2048;
 
-        // Check if model has reasonable context length
-        const hasContext = model.context_length && model.context_length >= 4096;
+        // Check if model supports function calling (tools)
+        // OpenRouter models might not have capabilities field, so we'll assume they support tools
+        const supportsTools = true;
 
-        return isFree && hasContext;
+        return hasContext && supportsTools;
       });
 
-      console.log(`[ModelDiscovery] Filtered to ${freeModels.length} free models (function calling simulated client-side)`);
+      console.log(`[ModelDiscovery] Found ${models.length} total OpenRouter models`);
+      console.log(`[ModelDiscovery] Filtered to ${filteredModels.length} models (context >= 2048, supports tools)`);
+      if (filteredModels.length === 0 && models.length > 0) {
+        console.log(`[ModelDiscovery] DEBUG: First few models:`, models.slice(0, 3).map(m => ({
+          id: m.id,
+          pricing: m.pricing,
+          context_length: m.context_length,
+          capabilities: m.capabilities
+        })));
+      }
 
       // Convert to our format and sort by "ranking" (using model popularity metrics)
-      const discoveredModels: DiscoveredModel[] = freeModels
+      const discoveredModels: DiscoveredModel[] = filteredModels
         .map((model: any) => {
           // Extract provider from model ID (e.g., "openai/gpt-4o" -> "OpenAI")
           const provider = model.id.split('/')[0];
@@ -472,6 +483,8 @@ class ModelDiscoveryService {
             score: this.getModelRankingScore(model.id)
           };
         })
+        // Remove duplicates by model ID to prevent React key collisions
+        .filter((model, index, arr) => arr.findIndex(m => m.id === model.id) === index)
         .sort((a: DiscoveredModel, b: DiscoveredModel) => (b.score || 0) - (a.score || 0)); // Sort by ranking score descending
 
       console.log(`[ModelDiscovery] Returning ${discoveredModels.length} OpenRouter models sorted by ranking`);

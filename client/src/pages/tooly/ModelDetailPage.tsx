@@ -47,7 +47,7 @@ interface SystemMetrics {
 interface ModelProfile {
   modelId: string;
   displayName: string;
-  provider: 'lmstudio' | 'openai' | 'azure';
+  provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
   testedAt: string;
   score: number;
   role?: 'main' | 'executor' | 'both' | 'none';
@@ -163,7 +163,7 @@ export const ModelDetailPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/tooly/models/${encodeURIComponent(decodedModelId)}`);
+      const response = await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(decodedModelId)}`);
       if (!response.ok) throw new Error('Failed to fetch model');
 
       const data = await response.json();
@@ -185,7 +185,7 @@ export const ModelDetailPage: React.FC = () => {
   const fetchBaselineComparison = useCallback(async () => {
     if (!decodedModelId) return;
     try {
-      const response = await fetch(`/api/tooly/baseline/compare/${encodeURIComponent(decodedModelId)}`);
+      const response = await fetch(`http://localhost:3001/api/tooly/baseline/compare/${encodeURIComponent(decodedModelId)}`);
       if (response.ok) {
         const data = await response.json();
         setBaselineComparison(data);
@@ -200,7 +200,7 @@ export const ModelDetailPage: React.FC = () => {
   const handleRefreshBaseline = async () => {
     setIsRefreshingBaseline(true);
     try {
-      const response = await fetch('/api/tooly/baseline/generate', { method: 'POST' });
+      const response = await fetch('http://localhost:3001/api/tooly/baseline/generate', { method: 'POST' });
       if (response.ok) {
         await fetchBaselineComparison();
       }
@@ -233,7 +233,7 @@ export const ModelDetailPage: React.FC = () => {
       setTestProgress({ isRunning: true, status: 'Starting...' });
       setActiveTab('testing');
 
-      const url = new URL(`/api/tooly/models/${encodeURIComponent(decodedModelId)}/test`, window.location.origin);
+      const url = new URL(`http://localhost:3001/api/tooly/models/${encodeURIComponent(decodedModelId)}/test`);
       url.searchParams.set('mode', mode);
       if (skipPreflight) {
         url.searchParams.set('skipPreflight', 'true');
@@ -274,7 +274,7 @@ export const ModelDetailPage: React.FC = () => {
     if (!decodedModelId) return;
 
     try {
-      await fetch(`/api/tooly/models/${encodeURIComponent(decodedModelId)}/test`, {
+      await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(decodedModelId)}/test`, {
         method: 'DELETE'
       });
       setTestProgress({ isRunning: false });
@@ -290,7 +290,7 @@ export const ModelDetailPage: React.FC = () => {
       setTestProgress({ isRunning: true, status: 'Running smoke test...' });
       setActiveTab('testing');
 
-      const response = await fetch(`/api/tooly/smoke-test/${encodeURIComponent(decodedModelId)}`, {
+      const response = await fetch(`http://localhost:3001/api/tooly/smoke-test/${encodeURIComponent(decodedModelId)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ testTrainability: true })
@@ -322,7 +322,7 @@ export const ModelDetailPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `/api/tooly/models/${encodeURIComponent(decodedModelId)}/results`,
+        `http://localhost:3001/api/tooly/models/${encodeURIComponent(decodedModelId)}/results`,
         { method: 'DELETE' }
       );
 
@@ -339,7 +339,7 @@ export const ModelDetailPage: React.FC = () => {
     if (!decodedModelId || testProgress.isRunning) return;
 
     try {
-      await fetch('/api/tooly/active-model', {
+      await fetch('http://localhost:3001/api/tooly/active-model', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ modelId: decodedModelId, role: 'main' })
@@ -354,7 +354,7 @@ export const ModelDetailPage: React.FC = () => {
     if (!decodedModelId || testProgress.isRunning) return;
 
     try {
-      await fetch('/api/tooly/active-model', {
+      await fetch('http://localhost:3001/api/tooly/active-model', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ modelId: decodedModelId, role: 'executor' })

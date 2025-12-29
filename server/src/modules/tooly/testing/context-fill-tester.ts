@@ -7,7 +7,7 @@
 
 import { intentRouter } from '../intent-router.js';
 import { getToolSchemas } from '../tool-prompts.js';
-import { SANDBOX_CONTEXT } from './readiness-runner.js';
+import { SANDBOX_CONTEXT } from './readiness-runner';
 
 // ============================================================
 // TYPES
@@ -329,5 +329,6 @@ export function createContextFillTester(settings: { lmstudioUrl: string; [key: s
 export function getContextFillTester(): ContextFillTester | null {
   return testerInstance;
 }
+
 
 

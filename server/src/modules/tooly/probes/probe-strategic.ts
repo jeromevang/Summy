@@ -29,8 +29,12 @@ export class ProbeStrategic extends ProbeBase {
         }
     }
 
-    public async runContextLatencyProfile(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ContextLatencyResult> {
-        const baseContextSizes = [2048, 4096, 8192, 16384, 32768, 65536];
+    public async runContextLatencyProfile(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ContextLatencyResult> {
+        // Use smaller context sizes for OpenRouter to avoid rate limits and API restrictions
+        const baseContextSizes = provider === 'openrouter'
+            ? [2048, 4096, 8192]  // Conservative for OpenRouter free models
+            : [2048, 4096, 8192, 16384, 32768, 65536];  // Full range for others
+
         const latencies: Record<number, number> = {};
         const testedContextSizes: number[] = [];
         let maxUsableContext = 2048;
@@ -42,12 +46,14 @@ export class ProbeStrategic extends ProbeBase {
             if (provider === 'lmstudio') await modelManager.ensureLoaded(modelId, contextSize);
             const startTime = Date.now();
             try {
-                await this.callLLM(modelId, provider, [{ role: 'user', content: 'Call ping.' }], [PING_TOOL], settings, timeout);
+                // Use shorter timeout for OpenRouter to avoid hanging
+                const callTimeout = provider === 'openrouter' ? Math.min(timeout, 10000) : timeout;
+                await this.callLLM(modelId, provider, [{ role: 'user', content: 'Call ping.' }], [PING_TOOL], settings, callTimeout);
                 const latency = Date.now() - startTime;
                 latencies[contextSize] = latency;
                 testedContextSizes.push(contextSize);
-                if (latency < 30000) maxUsableContext = contextSize;
-                if (latency >= 8000) break;
+                if (latency < (provider === 'openrouter' ? 15000 : 30000)) maxUsableContext = contextSize;
+                if (latency >= (provider === 'openrouter' ? 5000 : 8000)) break;
             } catch { break; }
         }
 

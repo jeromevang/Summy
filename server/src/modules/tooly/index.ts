@@ -129,19 +129,13 @@ export {
 // AGENTIC READINESS (Phase 11)
 // ============================================================
 
-export {
-  AGENTIC_READINESS_SUITE,
-  getReadinessConfig,
-  calculateCategoryScore,
-  calculateOverallScore,
-  isPassing
-} from './testing/agentic-readiness-suite.js';
+// Temporarily removed these exports to avoid circular dependency issues
 
 export {
   ReadinessRunner,
   createReadinessRunner,
   getReadinessRunner
-} from './testing/readiness-runner.js';
+} from './testing/readiness-runner';
 
 export {
   prostheticStore,

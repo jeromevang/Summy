@@ -31,14 +31,13 @@ export const loadServerSettings = async (): Promise<ServerSettings> => {
     try {
         if (await fs.pathExists(SETTINGS_FILE)) {
             const settings = await fs.readJson(SETTINGS_FILE);
-            console.log('[Settings] Loaded from JSON, openrouterApiKey exists:', !!settings.openrouterApiKey);
-            console.log('[Settings] OPENROUTER_API_KEY env var exists:', !!process.env.OPENROUTER_API_KEY);
+            console.log('[Settings] Loaded from JSON file');
             // Override with environment variables if they exist
             const finalSettings = {
                 ...settings,
                 openrouterApiKey: process.env.OPENROUTER_API_KEY || settings.openrouterApiKey || '',
             };
-            console.log('[Settings] Final openrouterApiKey exists:', !!finalSettings.openrouterApiKey);
+            console.log('[Settings] Settings loaded successfully');
             return finalSettings;
         }
     } catch (error) {

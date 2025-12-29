@@ -219,8 +219,11 @@ const RAG: React.FC = () => {
     loadData();
     
     // Connect to RAG server WebSocket
-    const ws = new ReconnectingWebSocket('ws://localhost:3003');
-    wsRef.current = ws;
+    const ws = new ReconnectingWebSocket('ws://localhost:3003', [], {
+      maxRetries: 10,
+      connectionTimeout: 5000,
+      maxReconnectionDelay: 10000
+    });
     
     ws.onopen = () => {
       console.log('[RAG] WebSocket connected');

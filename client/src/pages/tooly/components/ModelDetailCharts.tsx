@@ -425,3 +425,4 @@ export const ModelDetailChartsPanel: React.FC<{
 export default ModelDetailChartsPanel;
 
 
+

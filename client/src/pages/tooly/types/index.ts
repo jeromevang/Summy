@@ -94,7 +94,7 @@ export interface Recommendation {
 export interface ModelProfile {
     modelId: string;
     displayName: string;
-    provider: 'lmstudio' | 'openai' | 'azure';
+    provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
     testedAt: string;
     score: number;
     enabledTools: string[];
@@ -126,7 +126,7 @@ export interface ModelProfile {
 export interface DiscoveredModel {
     id: string;
     displayName: string;
-    provider: 'lmstudio' | 'openai' | 'azure';
+    provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
     status: 'tested' | 'untested' | 'failed' | 'known_good';
     score?: number;
     toolScore?: number;

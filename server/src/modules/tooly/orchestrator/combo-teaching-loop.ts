@@ -282,6 +282,8 @@ export class ComboTeachingLoop {
       executorModelId,
       totalTests,
       passedTests,
+      passedCount: passedTests,
+      failedCount: totalTests - passedTests,
       categoryScores: testResults.map(r => ({
         category: r.category,
         difficulty: r.difficulty,

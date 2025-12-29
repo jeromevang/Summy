@@ -24,7 +24,7 @@ export class TestRunner {
     public async runSingleTest(
         test: TestDefinition,
         modelId: string,
-        provider: 'lmstudio' | 'openai' | 'azure',
+        provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter',
         settings: any
     ): Promise<TestResult> {
         const startTime = Date.now();
@@ -59,7 +59,7 @@ export class TestRunner {
     public async runSingleProbe(
         probe: any, // ProbeDefinition
         modelId: string,
-        provider: 'lmstudio' | 'openai' | 'azure',
+        provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter',
         settings: any
     ): Promise<TestResult> {
         const startTime = Date.now();
@@ -72,16 +72,32 @@ export class TestRunner {
             const response = await this.callLLM(modelId, provider, messages, tools, settings);
             const latency = Date.now() - startTime;
 
-            const evalRes = probe.evaluate(response, {});
+            // Extract tool calls from response
+            const toolCalls = response.choices?.[0]?.message?.tool_calls || [];
+
+            const evalRes = probe.evaluate(response, toolCalls);
+
+            // Check for tool hallucination and add to details
+            const validToolNames = tools.map(t => t.function.name);
+            const hallucinatedTools = toolCalls
+                .map((tc: any) => tc.function?.name)
+                .filter((name: any) => name && !validToolNames.includes(name));
+
+            let details = evalRes.details;
+            if (hallucinatedTools.length > 0) {
+                details += ` | Hallucinated tools: ${hallucinatedTools.join(', ')}`;
+            }
 
             return {
                 testId: probe.id,
                 tool: 'probe',
+                category: 'tool', // Categorize as tool-related test
                 passed: evalRes.passed,
                 score: evalRes.score,
                 latency,
                 checks: evalRes.checks || [],
-                response
+                response,
+                details
             };
         } catch (error: any) {
             return {
@@ -113,10 +129,37 @@ export class TestRunner {
             const { azureResourceName, azureDeploymentName, azureApiKey, azureApiVersion } = settings;
             url = `https://${azureResourceName}.openai.azure.com/openai/deployments/${azureDeploymentName}/chat/completions?api-version=${azureApiVersion || '2024-02-01'}`;
             headers['api-key'] = azureApiKey;
+        } else if (provider === 'openrouter') {
+            url = 'https://openrouter.ai/api/v1/chat/completions';
+            headers['Authorization'] = `Bearer ${settings.openrouterApiKey}`;
+            headers['HTTP-Referer'] = 'https://summy.ai';
+            headers['X-Title'] = 'Summy AI';
+            body.model = modelId;
+
+            // LOG EXACT OPENROUTER REQUEST FOR 401 DEBUGGING
+            console.log('🔍 OPENROUTER REQUEST DETAILS (401 DEBUG):');
+            console.log('URL:', url);
+            console.log('Method: POST');
+            console.log('Headers:', JSON.stringify(headers, null, 2));
+            console.log('Body:', JSON.stringify(body, null, 2));
+            console.log('Model ID:', modelId);
+            console.log('API Key (masked):', settings.openrouterApiKey ? `${settings.openrouterApiKey.substring(0, 10)}...` : 'MISSING');
         }
 
-        const response = await axios.post(url, body, { headers, timeout: 60000 });
-        return response.data;
+        console.log(`📤 Making ${provider.toUpperCase()} request to: ${url}`);
+        try {
+            const response = await axios.post(url, body, { headers, timeout: 60000 });
+            console.log(`✅ ${provider.toUpperCase()} request successful:`, response.status);
+            return response.data;
+        } catch (error: any) {
+            console.log(`❌ ${provider.toUpperCase()} request failed:`, {
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                data: error.response?.data,
+                message: error.message
+            });
+            throw error;
+        }
     }
 
     private evaluateResponse(response: any, expected: any) {

@@ -1,5 +1,5 @@
 {
-  "port": 3002,
+  "port": 3005,
   "wsPort": 3003,
   "lmstudio": {
     "model": "nomic-ai/nomic-embed-text-v1.5-GGUF/nomic-embed-text-v1.5.Q8_0.gguf",

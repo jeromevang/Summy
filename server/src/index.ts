@@ -28,9 +28,14 @@ import { mcpClient } from './modules/tooly/mcp-client.js';
 import { testSandbox } from './modules/tooly/test-sandbox.js';
 import { prostheticPromptBuilder } from './modules/tooly/orchestrator/prosthetic-prompt-builder.js';
 import { probeEngine } from './modules/tooly/probe-engine.js';
+import { cacheService } from './services/cache/cache-service.js';
+import { modelManager as enhancedModelManager } from './services/model-manager.js';
+import { traceManager, tracingMiddleware, TraceStorage } from './services/tracing.js';
+import { HealthCheckScheduler } from './services/health-checks.js';
+import { logger, loggingMiddleware } from './services/enhanced-logger.js';
 import { wsBroadcast } from './services/ws-broadcast.js';
 import { systemMetrics } from './services/system-metrics.js';
-import { modelManager } from './services/lmstudio-model-manager.js';
+import { modelManager as lmStudioModelManager } from './services/lmstudio-model-manager.js';
 import { ideMapping, type IDEMapping } from './services/ide-mapping.js';
 import { TOOL_SCHEMAS } from './modules/tooly/tool-prompts.js';
 import { ALL_TOOLS, capabilities } from './modules/tooly/capabilities.js';
@@ -65,6 +70,8 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(tracingMiddleware); // Add tracing middleware
+app.use(loggingMiddleware); // Add enhanced logging middleware
 
 // General request logging middleware - captures EVERYTHING from ngrok
 app.use((req, res, next) => {
@@ -175,8 +182,67 @@ notifications.initialize(wss);
 // Schedule backup cleanup (every hour)
 scheduleBackupCleanup(60 * 60 * 1000);
 
-// Health check and status (now in systemRoutes, but keeping basic health here for load balancers)
+// Debug routes
+app.get('/debug', (req, res) => {
+    try {
+        // Get server uptime
+        const uptime = process.uptime();
+
+        // Get session count
+        const sessionsDir = path.join(__dirname, '../../sessions');
+        let sessionCount = 0;
+        try {
+            if (fs.existsSync(sessionsDir)) {
+                sessionCount = fs.readdirSync(sessionsDir).filter(f => f.endsWith('.json')).length;
+            }
+        } catch (e) { }
+
+        // Get last activity
+        let lastActivity = null;
+        if (debugLog.length > 0) {
+            lastActivity = debugLog[0].timestamp;
+        }
+
+        res.json({
+            entries: debugLog,
+            sessionCount,
+            uptime,
+            lastActivity
+        });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/debug/clear', (req, res) => {
+    try {
+        debugLog.length = 0;
+        res.json({ success: true });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Health check endpoints
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/health/detailed', async (req, res) => {
+  try {
+    const { HealthCheckOrchestrator } = await import('./services/health-checks.js');
+    const summary = await HealthCheckOrchestrator.runAllChecks();
+    res.json(summary);
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+app.get('/health/components', async (req, res) => {
+  try {
+    const { HealthCheckOrchestrator } = await import('./services/health-checks.js');
+    const components = await HealthCheckOrchestrator.getComponentHealth();
+    res.json(components);
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
 
 // Start server
 server.listen(PORT, async () => {
@@ -191,11 +257,52 @@ server.listen(PORT, async () => {
   console.log('  🔔 Notifications: /api/notifications/*');
   console.log('  📈 Analytics: /api/analytics/*');
 
+  // Initialize cache service
+  try {
+    await cacheService.initialize();
+    console.log('  🚀 Cache service initialized');
+  } catch (error) {
+    console.error('❌ Cache service initialization failed:', error);
+  }
+
+  // Initialize model manager
+  try {
+    await enhancedModelManager.initialize();
+    console.log('  🤖 Model manager initialized');
+  } catch (error) {
+    console.error('❌ Model manager initialization failed:', error);
+  }
+
+  // Initialize tracing system
+  try {
+    await TraceStorage.initialize();
+    console.log('  📍 Distributed tracing initialized');
+  } catch (error) {
+    console.error('❌ Tracing initialization failed:', error);
+  }
+
+  // Start health check scheduler
+  try {
+    HealthCheckScheduler.start(5); // Check every 5 minutes
+    console.log('  🩺 Health check scheduler started');
+  } catch (error) {
+    console.error('❌ Health check scheduler failed:', error);
+  }
+
+  // Initialize enhanced logging
+  try {
+    const { LogFileManager } = await import('./services/enhanced-logger.js');
+    await LogFileManager.getInstance();
+    console.log('  📝 Enhanced logging system initialized');
+  } catch (error) {
+    console.error('❌ Enhanced logging initialization failed:', error);
+  }
+
   // Startup cleanup: Unload any stale LLM models from LM Studio
   // (Embedding models are NOT touched - they use a separate API)
   try {
-    const { modelManager } = await import('./services/lmstudio-model-manager.js');
-    await modelManager.cleanupOnStartup();
+const { lmStudioModelManager } = await import('./services/lmstudio-model-manager.js');
+await lmStudioModelManager.cleanupOnStartup();
 
     // Trigger automated ground truth sweep for all tests
     const { baselineEngine } = await import('./modules/tooly/baseline-engine.js');

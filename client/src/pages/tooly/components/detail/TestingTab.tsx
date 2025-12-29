@@ -301,7 +301,7 @@ export const TestingTab: React.FC<TestingTabProps> = ({
       </div>
 
       {/* Baseline Comparison Card */}
-      {baselineComparison && (
+      {baselineComparison && baselineComparison.baselineModelId && baselineComparison.deltas && (
         <div className="bg-[#1a1a1a] border border-purple-500/30 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-purple-300 font-semibold flex items-center gap-2">

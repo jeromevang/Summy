@@ -75,7 +75,7 @@ export const ConfigurationTab: React.FC<ConfigurationTabProps> = ({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await fetch(`/api/tooly/models/${encodeURIComponent(profile.modelId)}/config`, {
+      await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(profile.modelId)}/config`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -96,7 +96,7 @@ export const ConfigurationTab: React.FC<ConfigurationTabProps> = ({
   const handleGenerateOptimal = async () => {
     setIsSaving(true);
     try {
-      await fetch(`/api/tooly/models/${encodeURIComponent(profile.modelId)}/config/generate`, {
+      await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(profile.modelId)}/config/generate`, {
         method: 'POST'
       });
       onUpdate();

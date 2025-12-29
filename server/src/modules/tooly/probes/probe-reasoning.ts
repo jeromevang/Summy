@@ -3,7 +3,7 @@ import { ProbeResult } from './probe-types.js';
 import { detectBadOutput } from './probe-utils.js';
 
 export class ProbeReasoning extends ProbeBase {
-    public async runIntentExtractionTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runIntentExtractionTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'system', content: 'Output your intent as JSON only.' },
@@ -25,7 +25,7 @@ export class ProbeReasoning extends ProbeBase {
         }
     }
 
-    public async runMultiStepPlanningTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runMultiStepPlanningTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'system', content: 'Break tasks into numbered steps. Output as JSON array.' },
@@ -43,7 +43,7 @@ export class ProbeReasoning extends ProbeBase {
         } catch (error: any) { return { testName: 'multi_step_planning', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed' }; }
     }
 
-    public async runConditionalReasoningTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runConditionalReasoningTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'If package.json exists, read it. Otherwise, create it. The file EXISTS.' }
@@ -57,7 +57,7 @@ export class ProbeReasoning extends ProbeBase {
         } catch (error: any) { return { testName: 'conditional_reasoning', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed' }; }
     }
 
-    public async runContextContinuityTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runContextContinuityTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'The API endpoint is /users/profile' },
@@ -73,7 +73,7 @@ export class ProbeReasoning extends ProbeBase {
         } catch (error: any) { return { testName: 'context_continuity', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed' }; }
     }
 
-    public async runLogicalConsistencyTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runLogicalConsistencyTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'Delete the file log.txt, then append new data to log.txt.' }
@@ -87,7 +87,7 @@ export class ProbeReasoning extends ProbeBase {
         } catch (error: any) { return { testName: 'logical_consistency', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed' }; }
     }
 
-    public async runExplanationTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runExplanationTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'system', content: 'Explain reasoning then output JSON action.' },
@@ -102,7 +102,7 @@ export class ProbeReasoning extends ProbeBase {
         } catch (error: any) { return { testName: 'explanation', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed' }; }
     }
 
-    public async runEdgeCaseHandlingTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runEdgeCaseHandlingTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'Append to notes.txt, but it may not exist.' }

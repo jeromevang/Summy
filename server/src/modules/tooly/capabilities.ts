@@ -547,7 +547,22 @@ class CapabilitiesService {
   /**
    * Create a new empty profile for a model
    */
-  createEmptyProfile(modelId: string, displayName: string, provider: 'lmstudio' | 'openai' | 'azure'): ModelProfile {
+  private detectProviderFromModelId(modelId: string): 'lmstudio' | 'openai' | 'azure' | 'openrouter' {
+    // Check for OpenRouter format (contains slash and is in known OpenRouter models)
+    if (modelId.includes('/') && (modelId.startsWith('openai/') || modelId.startsWith('anthropic/') || modelId.startsWith('nvidia/') || modelId.startsWith('mistralai/'))) {
+      return 'openrouter';
+    }
+
+    // Check for Azure format (contains deployment info)
+    if (modelId.includes('-') && !modelId.includes('/')) {
+      return 'azure';
+    }
+
+    // Default to LM Studio for local models
+    return 'lmstudio';
+  }
+
+  createEmptyProfile(modelId: string, displayName: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter'): ModelProfile {
     const capabilities: Record<string, ToolCapability> = {};
 
     for (const tool of ALL_TOOLS) {
@@ -728,9 +743,11 @@ class CapabilitiesService {
    * Update agentic readiness status
    */
   async updateAgenticReadiness(modelId: string, readiness: AgenticReadinessStatus, trainabilityScores?: { systemPromptCompliance: number; instructionPersistence: number; correctionAcceptance: number; overallTrainability: number }): Promise<void> {
-    const profile = await this.getProfile(modelId);
+    let profile = await this.getProfile(modelId);
     if (!profile) {
-      throw new Error(`Profile not found for model: ${modelId}`);
+      // Create a basic profile if it doesn't exist
+      const provider = this.detectProviderFromModelId(modelId);
+      profile = this.createEmptyProfile(modelId, modelId, provider);
     }
 
     profile.agenticReadiness = readiness;

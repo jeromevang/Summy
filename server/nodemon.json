@@ -1,12 +1,13 @@
 {
-  "watch": ["src"],
-  "ext": "ts,json",
+  "watch": ["src", "../*.md", "../README.md"],
+  "ext": "ts,json,md",
   "ignore": [
     "data/**",
     "*.json",
     "settings.json",
     "node_modules/**"
   ],
-  "exec": "tsx src/index.ts"
+  "cwd": "..",
+  "exec": "cd .. && tsx server/src/index.ts"
 }
 

@@ -25,6 +25,7 @@ export interface TestDefinition {
 export interface TestResult {
     testId: string;
     tool: string;
+    category?: string; // Added for test categorization
     passed: boolean;
     score: number;
     latency: number;
@@ -33,6 +34,7 @@ export interface TestResult {
     error?: string;
     calledTool?: string;
     calledArgs?: Record<string, any>;
+    details?: string; // Added for additional test details
 }
 
 export interface CheckResult {

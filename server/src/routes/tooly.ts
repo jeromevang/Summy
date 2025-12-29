@@ -24,6 +24,20 @@ import { calculateRecommendations } from '../modules/tooly/recommendations.js';
 import { lookupModelInfo } from '../services/model-info-lookup.js';
 import { calculateBaselineComparison } from '../modules/tooly/scoring/agentic-scorer.js';
 import { broadcastToClients } from '../services/broadcast-util.js';
+import { 
+  validateModelId, 
+  validateTestExecution, 
+  validateProbeExecution, 
+  validateComboTest, 
+  validateProsthetic, 
+  validateSystemPrompt, 
+  validateFailureLog,
+  apiRateLimit,
+  expensiveOperationRateLimit,
+  addSecurityHeaders,
+  auditLog,
+  sanitizeInput
+} from '../middleware/validation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,9 +47,23 @@ const SETTINGS_FILE = path.join(__dirname, '../../settings.json');
 
 const router = Router();
 
-// ============================================================
-// MODEL DISCOVERY
-// ============================================================
+// Apply security and audit middleware to all routes
+router.use(addSecurityHeaders());
+router.use(auditLog());
+router.use(apiRateLimit);
+
+// Apply input sanitization to all routes
+router.use((req, res, next) => {
+  // Sanitize query parameters
+  if (req.query) {
+    for (const [key, value] of Object.entries(req.query)) {
+      if (typeof value === 'string') {
+        req.query[key] = sanitizeInput(value);
+      }
+    }
+  }
+  next();
+});
 
 /**
  * GET /api/tooly/models
@@ -45,7 +73,18 @@ const router = Router();
  */
 router.get('/models', async (req, res) => {
   try {
-    const providerFilter = (req.query.provider as string) || 'all';
+    // Validate provider parameter
+    const providerFilter = req.query.provider as string || 'all';
+    const validProviders = ['all', 'lmstudio', 'openai', 'azure', 'openrouter'];
+    
+    if (!validProviders.includes(providerFilter)) {
+      return res.status(400).json({
+        error: 'Invalid provider',
+        message: `Provider must be one of: ${validProviders.join(', ')}`
+      });
+    }
+    
+    console.log('[Tooly] Models endpoint called with provider:', providerFilter);
     let settings: any = {};
 
     settings = await loadServerSettings();
@@ -125,12 +164,49 @@ router.get('/models', async (req, res) => {
  */
 router.get('/models/:modelId', async (req, res) => {
   try {
-    const { modelId } = req.params;
-    const profile = await capabilities.getProfile(modelId);
+    const modelId = req.params.modelId;
+    
+    // Validate model ID
+    if (!modelId || modelId.trim() === '') {
+      return res.status(400).json({
+        error: 'Invalid model ID',
+        message: 'Model ID cannot be empty'
+      });
+    }
+    
+    // Sanitize model ID
+    const sanitizedModelId = sanitizeInput(modelId);
+    
+    let profile = await capabilities.getProfile(sanitizedModelId);
 
     if (!profile) {
-      res.status(404).json({ error: 'Model profile not found' });
-      return;
+      // For untested models (like OpenRouter models), create a default profile
+      profile = {
+        modelId,
+        displayName: modelId.split('/').pop() || modelId,
+        provider: modelId.includes('/') ? 'openrouter' : 'lmstudio', // Simple heuristic
+        testedAt: '',
+        score: 0,
+        enabledTools: [],
+        capabilities: {},
+        maxContextLength: 4096, // Default
+        role: 'none' as const, // Untested models have no role
+        probeResults: null,
+        systemPrompt: '',
+        badges: [],
+        recommendations: [],
+        scoreBreakdown: {
+          ragScore: 0,
+          bugDetectionScore: 0,
+          architecturalScore: 0,
+          navigationScore: 0,
+          proactiveScore: 0,
+          toolScore: 0,
+          reasoningScore: 0,
+          intentScore: 0,
+          overallScore: 0
+        }
+      };
     }
 
     // Get model info from LM Studio SDK if available
@@ -265,7 +341,7 @@ router.get('/baseline/compare/:modelId', async (req, res) => {
  */
 router.get('/models/:modelId/info', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
     const skipCache = req.query.refresh === 'true';
 
     const info = await lookupModelInfo(modelId, skipCache);
@@ -280,37 +356,36 @@ router.get('/models/:modelId/info', async (req, res) => {
  * POST /api/tooly/models/:modelId/test
  * Run capability tests for a model
  */
-router.post('/models/:modelId/test', async (req, res) => {
+router.post('/models/:modelId/test', expensiveOperationRateLimit, validateTestExecution, async (req, res) => {
   try {
-    const { modelId } = req.params;
-    const body = req.body || {};
-    const provider = body.provider || 'lmstudio';
+    const modelId = sanitizeInput(decodeURIComponent(req.params.modelId));
+    const body = sanitizeInput(req.body || {});
+
+    // Determine provider from model profile or request body
+    let provider = body.provider;
+    if (!provider) {
+      const profile = await capabilities.getProfile(modelId);
+      provider = profile?.provider || 'lmstudio';
+    }
     const tools = body.tools;
     // Check both query param and body for mode (client sends via query string)
     const testMode = (req.query.mode as string) || body.testMode || 'manual';  // 'quick' | 'standard' | 'deep' | 'manual'
     const isBaseline = body.isBaseline === true || req.query.isBaseline === 'true';
 
     // Load settings
-    let settings: any = {};
-
-    try {
-      if (await fs.pathExists(SETTINGS_FILE)) {
-        settings = await fs.readJson(SETTINGS_FILE);
-      }
-    } catch {
-      // Use defaults
-    }
+    const settings = await loadServerSettings();
 
     // Note: Model loading/unloading is now handled by the centralized modelManager
     // in test-engine.ts via modelManager.ensureLoaded()
 
     const testSettings = {
       lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
-      openaiApiKey: process.env.OPENAI_API_KEY,
+      openaiApiKey: settings.openaiApiKey,
       azureResourceName: settings.azureResourceName,
       azureApiKey: settings.azureApiKey,
       azureDeploymentName: settings.azureDeploymentName,
-      azureApiVersion: settings.azureApiVersion
+      azureApiVersion: settings.azureApiVersion,
+      openrouterApiKey: settings.openrouterApiKey
     };
 
     // Check for force/skip preflight option (allows running tests even if model is slow)
@@ -327,16 +402,51 @@ router.post('/models/:modelId/test', async (req, res) => {
       isBaseline
     };
 
-    console.log(`[Tooly] Running tests for ${modelId} with mode: ${testMode}`);
+    console.log(`[Tooly] Running tests for ${modelId} (provider: ${provider}) with mode: ${testMode}`);
 
-    let result;
-    if (tools && Array.isArray(tools)) {
-      result = await testEngine.runTestsForTools(modelId, provider, tools, testSettings, testOptions);
-    } else {
-      result = await testEngine.runAllTests(modelId, provider, testSettings, testOptions);
+    try {
+      let result;
+      if (tools && Array.isArray(tools)) {
+        result = await testEngine.runTestsForTools(modelId, provider, tools, testSettings, testOptions);
+      } else {
+        result = await testEngine.runAllTests(modelId, provider, testSettings, testOptions);
+      }
+
+      console.log(`[Tooly] Test completed for ${modelId}: ${result.results?.length || 0} tests, ${result.overallScore || 0} score`);
+      res.json(result);
+    } catch (testError: any) {
+      console.error(`[Tooly] Test failed for ${modelId}:`, testError);
+
+      // For OpenRouter models, provide more specific error messages
+      if (provider === 'openrouter') {
+        if (testError.message?.includes('rate limit') || testError.message?.includes('429')) {
+          return res.status(429).json({
+            error: 'OpenRouter rate limit exceeded. Try again later or use a different model.',
+            details: testError.message
+          });
+        }
+        if (testError.message?.includes('401') || testError.message?.includes('unauthorized')) {
+          return res.status(401).json({
+            error: 'OpenRouter API key invalid or expired.',
+            details: testError.message
+          });
+        }
+        if (testError.message?.includes('timeout')) {
+          return res.status(408).json({
+            error: 'OpenRouter request timed out. The model may be slow or unavailable.',
+            details: testError.message
+          });
+        }
+      }
+
+      // Generic error for other cases
+      res.status(500).json({
+        error: `Test failed: ${testError.message}`,
+        provider,
+        modelId,
+        mode: testMode
+      });
     }
-
-    res.json(result);
   } catch (error: any) {
     console.error('[Tooly] Failed to run tests:', error);
     res.status(500).json({ error: error.message });
@@ -412,10 +522,10 @@ router.delete('/models/:modelId/results', async (req, res) => {
  * Run probe tests (emit, schema, selection, suppression) for a model
  * This determines the model's role (main, executor, both, none)
  */
-router.post('/models/:modelId/probe', async (req, res) => {
+router.post('/models/:modelId/probe', expensiveOperationRateLimit, validateProbeExecution, async (req, res) => {
   try {
-    const { modelId } = req.params;
-    const body = req.body || {};
+    const modelId = sanitizeInput(decodeURIComponent(req.params.modelId));
+    const body = sanitizeInput(req.body || {});
     const provider = body.provider || 'lmstudio';
     const runLatencyProfile = body.runLatencyProfile || false;
     const isBaseline = body.isBaseline === true || req.query.isBaseline === 'true';
@@ -543,7 +653,7 @@ router.post('/models/:modelId/probe', async (req, res) => {
  */
 router.post('/models/:modelId/quick-latency', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
     const body = req.body || {};
     const provider = body.provider || 'lmstudio';
 
@@ -636,7 +746,8 @@ router.post('/models/:modelId/latency-profile', async (req, res) => {
  */
 router.put('/models/:modelId/tools/:tool', async (req, res) => {
   try {
-    const { modelId, tool } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
+    const { tool } = req.params;
     const { enabled } = req.body;
 
     await capabilities.toggleTool(modelId, tool, enabled);
@@ -653,7 +764,7 @@ router.put('/models/:modelId/tools/:tool', async (req, res) => {
  */
 router.put('/models/:modelId/prompt', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
     const { systemPrompt } = req.body;
 
     await capabilities.updateSystemPrompt(modelId, systemPrompt);
@@ -670,7 +781,7 @@ router.put('/models/:modelId/prompt', async (req, res) => {
  */
 router.put('/models/:modelId/context-length', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
     const { contextLength } = req.body;
 
     if (!contextLength || typeof contextLength !== 'number') {
@@ -692,7 +803,7 @@ router.put('/models/:modelId/context-length', async (req, res) => {
  */
 router.delete('/models/:modelId/context-length', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
 
     await capabilities.removeContextLength(modelId);
     res.json({ success: true });
@@ -731,7 +842,7 @@ router.delete('/models/:modelId/profile', async (req, res) => {
  */
 router.put('/models/:modelId/alias', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
     const { nativeToolName, mcpTool } = req.body;
 
     if (!nativeToolName || typeof nativeToolName !== 'string') {
@@ -1541,7 +1652,7 @@ router.get('/leaderboards', async (req, res) => {
  */
 router.get('/models/:modelId/detail', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
     const profile = await capabilities.getProfile(modelId);
 
     if (!profile) {
@@ -2278,18 +2389,17 @@ router.post('/readiness/assess', async (req, res) => {
       settings = await fs.readJson(SETTINGS_FILE);
     }
 
-    // Import and create runner
-    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner.js');
-    const { wsBroadcast } = await import('../index.js');
-    const { capabilities } = await import('../modules/tooly/capabilities.js');
+    // Detect provider from model ID
+    const provider = capabilities.detectProviderFromModelId(modelId);
+    console.log(`[Tooly] Detected provider: ${provider} for model: ${modelId}`);
 
-    const runner = createReadinessRunner({
-      lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
-    }, wsBroadcast as any);
+    // Import and create readiness runner
+    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner.js');
+    const runner = createReadinessRunner(settings);
 
     // Run assessment with new options
     const result = await runner.assessModel(modelId, {
-      provider: 'lmstudio',
+      provider: provider,
       executorModelId: isDualMode ? executorModelId : undefined,
       runCount: Math.min(Math.max(1, runCount), 3) // Clamp to 1-3
     });
@@ -2319,6 +2429,7 @@ router.post('/readiness/assess', async (req, res) => {
     if (autoTeach && !result.passed) {
       try {
         const { createProstheticLoop } = await import('../modules/tooly/orchestrator/prosthetic-loop.js');
+        const { wsBroadcast } = await import('../index.js');
         const loop = createProstheticLoop(runner, wsBroadcast as any);
         const teachingResult = await loop.runTeachingCycle(modelId, 'lmstudio');
 
@@ -2364,7 +2475,7 @@ router.post('/readiness/assess-all', async (req, res) => {
     }
 
     // Import and create runner
-    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner.js');
+    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner');
     const { wsBroadcast } = await import('../index.js');
 
     const runner = createReadinessRunner({
@@ -2387,8 +2498,8 @@ router.post('/readiness/assess-all', async (req, res) => {
  */
 router.get('/readiness/:modelId', async (req, res) => {
   try {
-    const { modelId } = req.params;
-    
+    const modelId = decodeURIComponent(req.params.modelId);
+
     const profile = await capabilities.getProfile(modelId);
     if (!profile) {
       return res.status(404).json({ error: 'Model profile not found' });
@@ -2419,7 +2530,7 @@ router.get('/readiness/:modelId', async (req, res) => {
  */
 router.post('/readiness/:modelId/teach', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
     const { maxAttempts = 3, startLevel = 1 } = req.body;
 
     console.log(`[Tooly] Teaching endpoint called for ${modelId}, maxAttempts: ${maxAttempts}, startLevel: ${startLevel}`);
@@ -2434,7 +2545,7 @@ router.post('/readiness/:modelId/teach', async (req, res) => {
 
     // Import and create runner/loop
     console.log('[Tooly] Importing modules...');
-    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner.js');
+    const { createReadinessRunner } = await import('../modules/tooly/testing/readiness-runner');
     const { createProstheticLoop } = await import('../modules/tooly/orchestrator/prosthetic-loop.js');
     const { wsBroadcast } = await import('../index.js');
 
@@ -2554,7 +2665,7 @@ router.post('/readiness/:modelId/certify', async (req, res) => {
  */
 router.put('/readiness/:modelId/prosthetic', async (req, res) => {
   try {
-    const { modelId } = req.params;
+    const modelId = decodeURIComponent(req.params.modelId);
     const { prompt, level = 1 } = req.body;
 
     if (!prompt) {
@@ -2627,9 +2738,9 @@ router.get('/combo-test/cases', (req, res) => {
  * Run combo tests on selected model pairs
  * Body: { mainModels: string[], executorModels: string[] }
  */
-router.post('/combo-test/run', async (req, res) => {
+router.post('/combo-test/run', expensiveOperationRateLimit, validateComboTest, async (req, res) => {
   try {
-    const { mainModels, executorModels } = req.body;
+    const { mainModels, executorModels } = sanitizeInput(req.body);
 
     if (!mainModels || !Array.isArray(mainModels) || mainModels.length === 0) {
       res.status(400).json({ error: 'mainModels array is required' });
@@ -2724,9 +2835,11 @@ router.get('/combo-test/:testId/status', (req, res) => {
  */
 router.post('/combo-test/quick', async (req, res) => {
   try {
+    console.log('[Tooly] Quick combo test called with:', req.body);
     const { mainModelId, executorModelId } = req.body;
 
     if (!mainModelId || !executorModelId) {
+      console.log('[Tooly] Missing required parameters');
       res.status(400).json({ error: 'mainModelId and executorModelId are required' });
       return;
     }
@@ -3163,9 +3276,9 @@ router.post('/failures/clear-old', (req, res) => {
  * POST /api/tooly/failures/resolve
  * Mark failures as resolved
  */
-router.post('/failures/resolve', (req, res) => {
+router.post('/failures/resolve', validateFailureLog, async (req, res) => {
   try {
-    const { failureIds, prostheticId } = req.body;
+    const { failureIds, prostheticId } = sanitizeInput(req.body);
     
     if (!failureIds || !Array.isArray(failureIds)) {
       return res.status(400).json({ error: 'failureIds array is required' });
@@ -3704,9 +3817,9 @@ router.post('/controller/run-combo-teaching', async (req, res) => {
  * POST /api/tooly/controller/apply-prosthetic
  * Apply a prosthetic prompt suggested by the controller
  */
-router.post('/controller/apply-prosthetic', async (req, res) => {
+router.post('/controller/apply-prosthetic', validateProsthetic, async (req, res) => {
   try {
-    const { modelId, comboId, prosthetic, testFirst = true } = req.body;
+    const { modelId, comboId, prosthetic, testFirst = true } = sanitizeInput(req.body);
 
     if ((!modelId && !comboId) || !prosthetic) {
       return res.status(400).json({ error: 'Either modelId or comboId and prosthetic are required' });
@@ -4038,9 +4151,16 @@ router.post('/distillation/run', async (req, res) => {
       lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
     };
     
+    // Get model profiles to determine providers
+    const teacherProfile = await capabilities.getProfile(teacherModelId);
+    const studentProfile = await capabilities.getProfile(studentModelId);
+
+    const teacherProvider = teacherProfile?.provider || 'lmstudio';
+    const studentProvider = studentProfile?.provider || 'lmstudio';
+
     const { createKnowledgeDistiller } = await import('../modules/tooly/learning/knowledge-distiller.js');
     const distiller = createKnowledgeDistiller(testSettings);
-    const result = await distiller.distillFromStrongModel(teacherModelId, studentModelId, capability);
+    const result = await distiller.distillFromStrongModel(teacherModelId, studentModelId, capability, teacherProvider as any, studentProvider as any);
     
     res.json(result);
   } catch (error: any) {

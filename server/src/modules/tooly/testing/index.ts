@@ -18,5 +18,5 @@ export * from './categories/calibration-tests.js';
 
 // Agentic Readiness (Phase 11)
 export * from './agentic-readiness-suite.js';
-export * from './readiness-runner.js';
+export * from './readiness-runner';
 

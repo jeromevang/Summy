@@ -13,7 +13,7 @@
  * if lower levels don't fix the failures.
  */
 
-import { ReadinessRunner } from '../testing/readiness-runner.js';
+import { ReadinessRunner } from '../testing/readiness-runner';
 import { getReadinessConfig, type ReadinessResult } from '../testing/agentic-readiness-suite.js';
 import { prostheticStore, buildProstheticPrompt } from '../learning/prosthetic-store.js';
 import { capabilities as modelCapabilities } from '../capabilities.js';
@@ -92,7 +92,7 @@ export class ProstheticLoop {
    */
   async runTeachingCycle(
     modelId: string,
-    provider: 'lmstudio' | 'openai' | 'azure' = 'lmstudio',
+    provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter' = 'lmstudio',
     options: TeachingOptions = {}
   ): Promise<TeachingResult> {
     if (!this.runner) {

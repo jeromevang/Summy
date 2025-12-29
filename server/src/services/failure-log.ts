@@ -163,6 +163,14 @@ class FailureLogService {
     if (errorLower.includes('format')) return 'format_error';
     if (errorLower.includes('intent')) return 'intent_misread';
     
+    // Combo-specific error classification
+    if (errorLower.includes('main') && errorLower.includes('timeout')) return 'main_timeout';
+    if (errorLower.includes('coordination') || errorLower.includes('communication')) return 'poor_coordination';
+    if (errorLower.includes('score') && errorLower.includes('low')) return 'score_too_low';
+    if (errorLower.includes('combo') && errorLower.includes('excluded')) return 'combo_excluded';
+    if (errorLower.includes('qualifying') || errorLower.includes('gate')) return 'qualifying_gate_failure';
+    if (errorLower.includes('format') && errorLower.includes('compatibility')) return 'format_compatibility';
+    
     return 'unknown';
   }
 
@@ -191,6 +199,28 @@ class FailureLogService {
     }
     if (category === 'reasoning') {
       return 'REASONING_FAILURE';
+    }
+    if (category === 'combo_pairing') {
+      // Combo-specific patterns
+      if (errorType === 'main_timeout') {
+        return 'COMBO_MAIN_TIMEOUT';
+      }
+      if (errorType === 'poor_coordination') {
+        return 'COMBO_COORDINATION_FAILURE';
+      }
+      if (errorType === 'score_too_low') {
+        return 'COMBO_PERFORMANCE_TOO_LOW';
+      }
+      if (errorType === 'combo_excluded') {
+        return 'COMBO_EXCLUDED';
+      }
+      if (errorType === 'qualifying_gate_failure') {
+        return 'COMBO_QUALIFYING_GATE_FAILURE';
+      }
+      if (errorType === 'format_compatibility') {
+        return 'COMBO_FORMAT_COMPATIBILITY';
+      }
+      return 'COMBO_PAIRING_FAILURE';
     }
     if (errorType === 'hallucination') {
       return 'TOOL_HALLUCINATION';

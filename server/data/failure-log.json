@@ -22338,26 +22338,387 @@
         "conversationLength": 1
       },
       "resolved": false
+    },
+    {
+      "id": "fail_1766846609549_90f7a528",
+      "timestamp": "2025-12-27T14:43:29.549Z",
+      "modelId": "allenai/olmo-3.1-32b-think:free",
+      "executorModelId": "allenai/olmo-3.1-32b-think:free",
+      "category": "combo_pairing",
+      "error": "Combo allenai/olmo-3.1-32b-think:free-allenai/olmo-3.1-32b-think:free scored only 36% (0/8 tests passed)",
+      "errorType": "unknown",
+      "context": {
+        "query": "Combo testing: allenai/olmo-3.1-32b-think:free-allenai/olmo-3.1-32b-think:free",
+        "queryHash": "36f394c7",
+        "expectedBehavior": "Better model pairing performance",
+        "actualBehavior": "Main: 0%, Executor: 100%, Overall: 36%",
+        "toolCallAttempted": "Single Tool: failed; Tool Selection: failed; Parameter Extraction: failed; Multi-Tool Sequence: failed; Reasoning Required: failed",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848173116_755e038c",
+      "timestamp": "2025-12-27T15:09:33.116Z",
+      "modelId": "allenai/olmo-3.1-32b-think:free",
+      "executorModelId": "xiaomi/mimo-v2-flash:free",
+      "category": "combo_pairing",
+      "error": "Combo allenai/olmo-3.1-32b-think:free-xiaomi/mimo-v2-flash:free scored only 36% (0/8 tests passed)",
+      "errorType": "unknown",
+      "context": {
+        "query": "Combo testing: allenai/olmo-3.1-32b-think:free-xiaomi/mimo-v2-flash:free",
+        "queryHash": "06a67421",
+        "expectedBehavior": "Better model pairing performance",
+        "actualBehavior": "Main: 0%, Executor: 100%, Overall: 36%",
+        "toolCallAttempted": "Single Tool: failed; Tool Selection: failed; Parameter Extraction: failed; Multi-Tool Sequence: failed; Reasoning Required: failed",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848562575_7615d744",
+      "timestamp": "2025-12-27T15:16:02.575Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "lmstudio/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-lmstudio/qwen2.5-coder-32b-instruct",
+        "queryHash": "444e9574",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848574471_134af4b5",
+      "timestamp": "2025-12-27T15:16:14.471Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848689293_d7f565b3",
+      "timestamp": "2025-12-27T15:18:09.293Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848703408_8e10a9c7",
+      "timestamp": "2025-12-27T15:18:23.408Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848772399_b2ce8461",
+      "timestamp": "2025-12-27T15:19:32.399Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848796972_0027a40a",
+      "timestamp": "2025-12-27T15:19:56.972Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848821467_eb4849c2",
+      "timestamp": "2025-12-27T15:20:21.467Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766848852978_4119b199",
+      "timestamp": "2025-12-27T15:20:52.978Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766849140885_74b181d2",
+      "timestamp": "2025-12-27T15:25:40.885Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766849156860_bffab4b3",
+      "timestamp": "2025-12-27T15:25:56.860Z",
+      "modelId": "qwen/qwen2.5-coder-32b-instruct",
+      "executorModelId": "allenai/olmo-3.1-32b-think",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: qwen/qwen2.5-coder-32b-instruct-allenai/olmo-3.1-32b-think",
+        "queryHash": "12d73838",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766849216370_5606c5ec",
+      "timestamp": "2025-12-27T15:26:56.371Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766849232497_4d70a28e",
+      "timestamp": "2025-12-27T15:27:12.498Z",
+      "modelId": "qwen/qwen2.5-coder-32b-instruct",
+      "executorModelId": "allenai/olmo-3.1-32b-think",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: qwen/qwen2.5-coder-32b-instruct-allenai/olmo-3.1-32b-think",
+        "queryHash": "12d73838",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766849274085_abe368e8",
+      "timestamp": "2025-12-27T15:27:54.085Z",
+      "modelId": "allenai/olmo-3.1-32b-think",
+      "executorModelId": "qwen/qwen2.5-coder-32b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: allenai/olmo-3.1-32b-think-qwen/qwen2.5-coder-32b-instruct",
+        "queryHash": "f3f8bcff",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766849290273_6d66c11e",
+      "timestamp": "2025-12-27T15:28:10.273Z",
+      "modelId": "qwen/qwen2.5-coder-32b-instruct",
+      "executorModelId": "allenai/olmo-3.1-32b-think",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: qwen/qwen2.5-coder-32b-instruct-allenai/olmo-3.1-32b-think",
+        "queryHash": "12d73838",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766849814766_b2ff02d2",
+      "timestamp": "2025-12-27T15:36:54.766Z",
+      "modelId": "qwen/qwen2.5-coder-14b-instruct",
+      "executorModelId": "qwen2.5-coder-1.5b-instruct",
+      "category": "combo_pairing",
+      "error": "Combo Qualifying Gate failed at CQG-1: Format Compatibility",
+      "errorType": "format_error",
+      "context": {
+        "query": "Combo qualifying gate: qwen/qwen2.5-coder-14b-instruct-qwen2.5-coder-1.5b-instruct",
+        "queryHash": "6608e294",
+        "expectedBehavior": "Call read_file",
+        "actualBehavior": "Request failed with status code 401",
+        "conversationLength": 1
+      },
+      "resolved": false
+    },
+    {
+      "id": "fail_1766885673664_c40ac079",
+      "timestamp": "2025-12-28T01:34:33.664Z",
+      "modelId": "nvidia/nemotron-3-nano-30b-a3b",
+      "category": "tool",
+      "tool": "list_allowed_directories",
+      "error": "Tool 'list_allowed_directories' not available. Tried agentic loop and continue-tools server. Error: Error",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{}",
+        "queryHash": "99914b93",
+        "expectedBehavior": "Tool should be available in agentic loop or MCP server",
+        "actualBehavior": "Tool list_allowed_directories not found anywhere",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766885785175_f5ce0f11",
+      "timestamp": "2025-12-28T01:36:25.175Z",
+      "modelId": "nvidia/nemotron-3-nano-30b-a3b",
+      "category": "tool",
+      "tool": "run_terminal_command",
+      "error": "Tool 'run_terminal_command' not available. Tried agentic loop and continue-tools server. Error: Request failed with status code 404",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{\"command\":\"cat package.json\",\"waitForCompletion\":true}",
+        "queryHash": "2680a1dd",
+        "expectedBehavior": "Tool should be available in agentic loop or MCP server",
+        "actualBehavior": "Tool run_terminal_command not found anywhere",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
+    },
+    {
+      "id": "fail_1766886411146_0b5421be",
+      "timestamp": "2025-12-28T01:46:51.146Z",
+      "modelId": "nvidia/nemotron-3-nano-30b-a3b",
+      "category": "tool",
+      "tool": "list_allowed_directories",
+      "error": "Tool 'list_allowed_directories' not available. Tried agentic loop and continue-tools server. Error: Request failed with status code 404",
+      "errorType": "tool_not_called",
+      "context": {
+        "query": "{}",
+        "queryHash": "99914b93",
+        "expectedBehavior": "Tool should be available in agentic loop or MCP server",
+        "actualBehavior": "Tool list_allowed_directories not found anywhere",
+        "conversationLength": 1
+      },
+      "resolved": false,
+      "pattern": "TOOL_SUPPRESSION"
     }
   ],
-  "patterns": {},
+  "patterns": {
+    "TOOL_SUPPRESSION": {
+      "id": "TOOL_SUPPRESSION",
+      "name": "Tool Not Called When Needed",
+      "description": "Model should call a tool but responds with text instead",
+      "category": "tool",
+      "count": 3,
+      "firstSeen": "2025-12-28T01:34:33.664Z",
+      "lastSeen": "2025-12-28T01:46:51.146Z",
+      "examples": [
+        "fail_1766885673664_c40ac079",
+        "fail_1766885785175_f5ce0f11",
+        "fail_1766886411146_0b5421be"
+      ],
+      "severity": "high"
+    }
+  },
   "stats": {
-    "totalFailures": 1241,
+    "totalFailures": 1261,
     "resolvedFailures": 0,
-    "lastUpdated": "2025-12-27T14:21:09.543Z",
+    "lastUpdated": "2025-12-28T01:46:51.147Z",
     "failuresByCategory": {
-      "tool": 0,
+      "tool": 3,
       "rag": 0,
       "reasoning": 0,
       "intent": 0,
       "browser": 0,
       "unknown": 0,
-      "combo_pairing": 1241
+      "combo_pairing": 1258
     },
     "failuresByModel": {
       "meta-llama/llama-3.3-70b-instruct:free": 36,
       "deepseek/deepseek-r1-0528:free": 36,
-      "allenai/olmo-3.1-32b-think:free": 42,
+      "allenai/olmo-3.1-32b-think:free": 44,
       "xiaomi/mimo-v2-flash:free": 35,
       "nvidia/nemotron-3-nano-30b-a3b:free": 42,
       "mistralai/devstral-2512:free": 41,
@@ -22389,7 +22750,11 @@
       "qwen/qwen-2.5-vl-7b-instruct:free": 35,
       "nousresearch/hermes-3-llama-3.1-405b:free": 35,
       "meta-llama/llama-3.1-405b-instruct:free": 35,
-      "mistralai/mistral-7b-instruct:free": 35
+      "mistralai/mistral-7b-instruct:free": 35,
+      "allenai/olmo-3.1-32b-think": 11,
+      "qwen/qwen2.5-coder-32b-instruct": 3,
+      "qwen/qwen2.5-coder-14b-instruct": 1,
+      "nvidia/nemotron-3-nano-30b-a3b": 3
     }
   }
 }

@@ -39,7 +39,7 @@ export class ProbeEngine {
 
   async runAllProbes(
     modelId: string,
-    provider: 'lmstudio' | 'openai' | 'azure',
+    provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter',
     settings: any,
     options: ProbeOptions = {}
   ): Promise<ProbeRunResult> {

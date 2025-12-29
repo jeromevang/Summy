@@ -1,4 +1,4 @@
-import { DBBase } from './db/db-base.js';
+import { dbManager, db } from './db/db-service.js';
 import { DBSessions, type Session } from './db/db-sessions.js';
 import { DBContext, type ContextSessionDB, type ContextMessage, type ContextTurn, type SystemPrompt, type ToolSet } from './db/db-context.js';
 import { DBAnalytics, type AnalyticsEntry, type AnalyticsSummary, type ExecutionLog, type FileBackup, type LogFilters } from './db/db-analytics.js';
@@ -10,13 +10,43 @@ import { DBComboTests, type ComboTestRecord } from './db/db-combo-tests.js';
  * Unified Database Service
  * Acts as a facade for modular database services to maintain backward compatibility.
  */
-class DatabaseService extends DBBase {
+class DatabaseService {
   private sessions = new DBSessions();
   private context = new DBContext();
   private analytics = new DBAnalytics();
   private notifications = new DBNotifications();
   private config = new DBConfig();
   private comboTests = new DBComboTests();
+
+  // Re-export database manager for direct access
+  public dbManager = dbManager;
+
+  // Lazy initialization of db operations to ensure database is ready
+  private get db() {
+    if (!dbManager.db) {
+      throw new Error('Database not initialized. Call dbManager.initialize() first.');
+    }
+    return dbManager.db;
+  }
+
+  // Re-export common operations for backward compatibility
+  public query = (...args: any[]) => this.db.query(...args);
+  public get = (...args: any[]) => this.db.get(...args);
+  public insert = (...args: any[]) => this.db.insert(...args);
+  public update = (...args: any[]) => this.db.update(...args);
+  public delete = (...args: any[]) => this.db.delete(...args);
+  public transaction = (...args: any[]) => this.db.transaction(...args);
+  public getTableStats = (...args: any[]) => this.db.getTableStats(...args);
+  public getHealthCheck = (...args: any[]) => this.db.getHealthCheck(...args);
+  public cleanupOldRecords = (...args: any[]) => this.db.cleanupOldRecords(...args);
+  public optimize = (...args: any[]) => this.db.optimize(...args);
+  public getRecentActivity = (...args: any[]) => this.db.getRecentActivity(...args);
+
+  // Re-export connection manager
+  public getConnection = () => dbManager.getConnection();
+  public isReady = () => dbManager.isReady();
+  public getStats = () => dbManager.getStats();
+  public close = () => dbManager.close();
 
   // Legacy Sessions
   getSessions = this.sessions.getSessions.bind(this.sessions);

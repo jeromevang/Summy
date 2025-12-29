@@ -41,7 +41,22 @@ export class OpenAIProxy {
 
         // Ensure there is at least a system message at the start
         if (result.length > 0 && result[0].role !== 'system') {
-            result.unshift({ role: 'system', content: 'You are a helpful AI assistant.' });
+            result.unshift({
+                role: 'system',
+                content: `You are a helpful AI assistant with access to various tools.
+
+🔍 For ANY questions about code, projects, functionality, or codebase exploration:
+   - ALWAYS use 'rag_query' FIRST - it's semantic search that finds relevant code by meaning
+   - Example: "what does this project do?" → use rag_query with query="project purpose"
+   - Example: "how does streaming work?" → use rag_query with query="streaming implementation"
+
+📁 For file operations after understanding the code:
+   - Use 'read_file' to read specific files
+   - Use 'list_directory' to explore directories
+   - Use 'search_files' for pattern matching (like "*.ts")
+
+⚡ rag_query is your PRIMARY tool for understanding codebases efficiently.`
+            });
         }
 
         return result;
@@ -71,14 +86,71 @@ export class OpenAIProxy {
             const parsedModel = ideMapping.parseModelIDE(requestedModel);
             const ideMappingConfig = await ideMapping.loadIDEMapping(parsedModel.ide);
 
-            const actualModelId = settings.provider === 'lmstudio'
-                ? settings.lmstudioModel
-                : settings.provider === 'azure'
-                    ? settings.azureDeploymentName
-                    : settings.openaiModel || parsedModel.baseModel;
+            let actualModelId: string;
+            if (settings.provider === 'lmstudio') {
+                actualModelId = settings.lmstudioModel;
+            } else if (settings.provider === 'azure') {
+                actualModelId = settings.azureDeploymentName;
+            } else if (settings.provider === 'openrouter') {
+                // For OpenRouter, use the mainModelId from dual-model settings
+                actualModelId = settings.mainModelId || parsedModel.baseModel;
+            } else {
+                // Default to OpenAI
+                actualModelId = settings.openaiModel || parsedModel.baseModel;
+            }
 
             const modelProfile = actualModelId ? await capabilities.getProfile(actualModelId) : null;
-            
+
+            // Apply model profile system prompt to ALL requests (not just tool calls)
+            if (modelProfile?.systemPrompt) {
+                // Check if there's already a system message
+                const hasSystemMessage = messagesToSend.length > 0 && messagesToSend[0].role === 'system';
+
+                if (hasSystemMessage) {
+                    // Prepend the profile system prompt to existing system message
+                    messagesToSend[0].content = modelProfile.systemPrompt + '\n\n' + messagesToSend[0].content;
+                } else {
+                    // Add new system message with profile prompt
+                    messagesToSend.unshift({
+                        role: 'system',
+                        content: modelProfile.systemPrompt
+                    });
+                }
+                addDebugEntry('request', `Applied model profile system prompt for ${actualModelId}`, {});
+            }
+
+            // Add tool usage guidance if tools are present
+            const hasTools = req.body?.tools && req.body.tools.length > 0;
+            if (hasTools) {
+                const toolGuidance = `\n\n🚨 CRITICAL: You may ONLY use the tools that are explicitly provided to you. Do NOT call tools that don't exist or hallucinate tool names.
+
+🔍 For ANY questions about code, projects, functionality, or codebase exploration:
+   - ALWAYS use 'rag_query' FIRST - it's semantic search that finds relevant code by meaning
+   - Example: "what does this project do?" → use rag_query with query="project purpose"
+   - Example: "how does streaming work?" → use rag_query with query="streaming implementation"
+
+📁 For file operations after understanding the code:
+   - Use 'read_file' to read specific files
+   - Use 'list_directory' to explore directories (try "." for current directory first)
+   - Use 'search_files' for pattern matching (like "*.ts")
+
+⚠️  NEVER call tools like: file_glob_search, ls, run_terminal_command, or any other tool that is not in your tool list. Only use the tools provided to you.
+
+⚡ rag_query is your PRIMARY tool for understanding codebases efficiently.
+
+💡 When exploring files: Start with the current directory "." or relative paths, not absolute paths like "/".`;
+
+                const hasSystemMessage = messagesToSend.length > 0 && messagesToSend[0].role === 'system';
+                if (hasSystemMessage) {
+                    messagesToSend[0].content += toolGuidance;
+                } else {
+                    messagesToSend.unshift({
+                        role: 'system',
+                        content: `You are a helpful AI assistant with access to various tools.${toolGuidance}`
+                    });
+                }
+            }
+
             // Estimate current token count (rough: chars / 4)
             const estimatedTokens = Math.round(JSON.stringify(messagesToSend).length / 4);
             const modelContextLength = modelProfile?.contextLength || 16000;
@@ -564,21 +636,85 @@ export class OpenAIProxy {
                 return;
             }
 
-            // OpenAI and Azure
-            if (settings.provider !== 'lmstudio' && (!apiKey || apiKey === 'your_openai_api_key_here')) {
-                return res.status(500).json({ error: 'Configuration Error', message: 'OpenAI API key not configured' });
-            }
-
-            let url = 'https://api.openai.com/v1/chat/completions';
+            // Provider-specific configuration
+            let url: string;
             const headers: any = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             };
 
-            if (effectiveProvider === 'azure') {
+            if (effectiveProvider === 'openrouter') {
+                if (!settings.openrouterApiKey) {
+                    return res.status(500).json({ error: 'Configuration Error', message: 'OpenRouter API key not configured' });
+                }
+
+                // Use WebSocket streaming for OpenRouter
+                if (req.isStreaming) {
+                    addDebugEntry('request', `Using WebSocket streaming for OpenRouter: ${actualModelId}`, {
+                        messageCount: messagesToSend.length,
+                        toolCount: toolsToSend.length
+                    });
+
+                    // Configure intent router for WebSocket streaming
+                    await intentRouter.configure({
+                        mainModelId: actualModelId,
+                        enableDualModel: false, // Single model mode
+                        timeout: 120000,
+                        provider: 'openrouter',
+                        settings: {
+                            openrouterApiKey: settings.openrouterApiKey
+                        }
+                    });
+
+                    try {
+                        // intentRouter.streamResponse handles its own headers
+                        await intentRouter.streamResponse(actualModelId, messagesToSend, toolsToSend, res, 120000);
+                        await SessionService.updateSessionWithResponse(req.sessionId, req.requestBody, {
+                            // Basic response structure for session logging
+                            id: `openrouter-${Date.now()}`,
+                            object: 'chat.completion',
+                            created: Math.floor(Date.now() / 1000),
+                            model: actualModelId,
+                            choices: [{
+                                index: 0,
+                                message: {
+                                    role: 'assistant',
+                                    content: '[STREAMED]'
+                                },
+                                finish_reason: 'stop'
+                            }],
+                            usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
+                        });
+                    } catch (error: any) {
+                        console.error('[WebSocket Streaming Error]', error.message);
+                        // Can't send HTTP response after headers are sent, so end the stream with error
+                        try {
+                            res.write(`data: ${JSON.stringify({ error: 'Streaming Error', message: error.message })}\n\n`);
+                            res.end();
+                        } catch (streamError) {
+                            console.error('[Stream Error]', streamError.message);
+                        }
+                    }
+                    return;
+                }
+
+                // Fallback for non-streaming requests
+                url = 'https://openrouter.ai/api/v1/chat/completions';
+                headers['Authorization'] = `Bearer ${settings.openrouterApiKey}`;
+                headers['HTTP-Referer'] = 'http://localhost:5173';
+                headers['X-Title'] = 'Summy AI Platform';
+            } else if (effectiveProvider === 'azure') {
+                if (!settings.azureApiKey) {
+                    return res.status(500).json({ error: 'Configuration Error', message: 'Azure API key not configured' });
+                }
                 url = `https://${settings.azureResourceName}.openai.azure.com/openai/deployments/${settings.azureDeploymentName}/chat/completions?api-version=${settings.azureApiVersion}`;
-                delete headers['Authorization'];
                 headers['api-key'] = settings.azureApiKey;
+            } else {
+                // OpenAI (default)
+                if (!apiKey || apiKey === 'your_openai_api_key_here') {
+                    return res.status(500).json({ error: 'Configuration Error', message: 'OpenAI API key not configured' });
+                }
+                url = 'https://api.openai.com/v1/chat/completions';
+                headers['Authorization'] = `Bearer ${apiKey}`;
             }
 
             const modifiedBody = {

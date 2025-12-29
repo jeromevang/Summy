@@ -249,7 +249,7 @@ async function executeToolCall(toolCall: any, modelId: string = 'unknown', trace
                 const dirPath = args.path || args.directory || args.dirPath || '.';
                 try {
                     const entries = await fs.readdir(dirPath, { withFileTypes: true });
-                    const formatted = entries.map(e => 
+                    const formatted = entries.map(e =>
                         `${e.isDirectory() ? '[DIR]' : '[FILE]'} ${e.name}`
                     ).join('\n');
                     return { toolCallId, name, result: formatted, success: true };
@@ -469,9 +469,10 @@ export const shouldExecuteAgentically = (response: any, ideConfig: any, mcpTools
     const toolCalls = response.choices?.[0]?.message?.tool_calls || response.tool_calls;
     if (!toolCalls || !Array.isArray(toolCalls) || toolCalls.length === 0) return false;
 
-    // Check if any of these tools are mapped to MCP (i.e., not handled by IDE)
-    const mcpToolNames = new Set(mcpToolsToAdd);
-    return toolCalls.some((tc: any) => mcpToolNames.has(tc.function?.name));
+    // Execute agentically for ANY tool call - we handle all tools in our agentic loop
+    // The MCP tools list is used for other purposes (like tool prompting), but execution
+    // should happen for any tool the model requests
+    return true;
 };
 
 export const parseStreamingResponse = (fullContent: string): any => {

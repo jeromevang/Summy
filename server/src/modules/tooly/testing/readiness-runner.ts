@@ -55,6 +55,7 @@ Use the tools available to complete tasks. Always use rag_query first when explo
 interface RunnerSettings {
   lmstudioUrl: string;
   openaiApiKey?: string;
+  openrouterApiKey?: string;
   azureResourceName?: string;
   azureDeploymentName?: string;
   azureApiKey?: string;
@@ -319,6 +320,7 @@ export class ReadinessRunner {
       settings: {
         lmstudioUrl: this.settings.lmstudioUrl,
         openaiApiKey: this.settings.openaiApiKey,
+        openrouterApiKey: this.settings.openrouterApiKey,
         azureResourceName: this.settings.azureResourceName,
         azureApiKey: this.settings.azureApiKey,
         azureDeploymentName: this.settings.azureDeploymentName,
@@ -326,7 +328,7 @@ export class ReadinessRunner {
       }
     });
 
-    console.log(`[ReadinessRunner] Configured router: ${isDualMode ? 'dual' : 'single'} mode`);
+    console.log(`[ReadinessRunner] Configured router: ${isDualMode ? 'dual' : 'single'} mode, openrouterApiKey: ${this.settings.openrouterApiKey ? 'SET' : 'NOT SET'}`);
   }
 
   /**

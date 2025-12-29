@@ -611,8 +611,8 @@ const ToolCapabilityGrid: React.FC<{
 }> = ({ results }) => {
   const toolStats = useMemo(() => {
     const stats: Record<string, { passes: number; fails: number; totalScore: number; totalLatency: number }> = {};
-    
-    results.forEach(r => {
+
+    (results || []).forEach(r => {
       const category = r.category;
       if (!stats[category]) {
         stats[category] = { passes: 0, fails: 0, totalScore: 0, totalLatency: 0 };
@@ -622,7 +622,7 @@ const ToolCapabilityGrid: React.FC<{
       stats[category].totalScore += r.score;
       stats[category].totalLatency += r.latency;
     });
-    
+
     return Object.entries(stats).map(([category, stat]) => ({
       category,
       total: stat.passes + stat.fails,
@@ -692,6 +692,7 @@ export const AgenticReadiness: React.FC = () => {
   
   // Models state
   const [models, setModels] = useState<Model[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<string>('lmstudio');
   const [selectedModelId, setSelectedModelId] = useState<string>('');
   const [executorModelId, setExecutorModelId] = useState<string>('');
   const [isLoadingModels, setIsLoadingModels] = useState(true);
@@ -741,10 +742,13 @@ export const AgenticReadiness: React.FC = () => {
     setIsLoadingModels(true);
     setError(null);
     try {
-      const response = await fetch('/api/tooly/models?provider=lmstudio');
+      const response = await fetch(`/api/tooly/models?provider=${selectedProvider}`);
       if (!response.ok) throw new Error('Failed to fetch models');
       const data = await response.json();
       setModels(data.models || []);
+      // Clear selected models when provider changes
+      setSelectedModelId('');
+      setExecutorModelId('');
       if (data.models?.length > 0 && !selectedModelId) {
         setSelectedModelId(data.models[0].id);
       }
@@ -795,6 +799,11 @@ export const AgenticReadiness: React.FC = () => {
     fetchModels();
   }, []);
 
+  // Refetch models when provider changes
+  useEffect(() => {
+    fetchModels();
+  }, [selectedProvider]);
+
   // Load assessment when model changes
   useEffect(() => {
     if (selectedModelId) {
@@ -840,10 +849,9 @@ export const AgenticReadiness: React.FC = () => {
   // ============================================================
 
   const runAssessment = async (mode: 'single' | 'dual', autoTeach = false) => {
-    if (!selectedModelId) {
-      setError('Please select a model first');
-      return;
-    }
+    // Use the selected model
+    const testModelId = selectedModelId;
+    console.log('Using selected model ID:', testModelId);
 
     if (mode === 'dual' && !executorModelId) {
       setError('Please select an executor model for dual mode');
@@ -860,7 +868,7 @@ export const AgenticReadiness: React.FC = () => {
 
     try {
       const body: any = {
-        modelId: selectedModelId,
+        modelId: testModelId,
         autoTeach,
         runCount
       };
@@ -869,16 +877,36 @@ export const AgenticReadiness: React.FC = () => {
         body.executorModelId = executorModelId;
       }
 
+      // LOG EXACT REQUEST DETAILS
+      console.log('🚀 ASSESSMENT REQUEST DETAILS:');
+      console.log('URL:', '/api/tooly/readiness/assess');
+      console.log('Method:', 'POST');
+      console.log('Headers:', { 'Content-Type': 'application/json' });
+      console.log('Body:', JSON.stringify(body, null, 2));
+      console.log('Full Request Payload:', body);
+
       const response = await fetch('/api/tooly/readiness/assess', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
 
+      // LOG RESPONSE DETAILS
+      console.log('📥 RESPONSE DETAILS:');
+      console.log('Status:', response.status);
+      console.log('Status Text:', response.statusText);
+      console.log('Headers:', Object.fromEntries(response.headers.entries()));
+      console.log('Response OK:', response.ok);
+
       if (!response.ok) throw new Error('Assessment failed');
       const data = await response.json();
 
-      setAssessmentResult(data.assessment);
+      // LOG RESPONSE BODY
+      console.log('📄 RESPONSE BODY:');
+      console.log('Full Response Data:', JSON.stringify(data, null, 2));
+      console.log('Assessment Result:', data);
+
+      setAssessmentResult(data);
       if (data.teaching) {
         setTeachingResult(data.teaching);
         setTeachingLog(data.teaching.log || []);
@@ -1055,7 +1083,13 @@ export const AgenticReadiness: React.FC = () => {
                 <div className="text-gray-400 text-center py-8">Loading models...</div>
               ) : models.length === 0 ? (
                 <div className="text-gray-400 text-center py-8">
-                  No models found. Make sure LM Studio is running.
+                  No models found for {selectedProvider === 'lmstudio' ? 'LM Studio' :
+                                      selectedProvider === 'openrouter' ? 'OpenRouter' :
+                                      selectedProvider === 'openai' ? 'OpenAI' : 'Azure'}.
+                  {selectedProvider === 'lmstudio' && ' Make sure LM Studio is running.'}
+                  {selectedProvider === 'openrouter' && ' Check OpenRouter API key configuration.'}
+                  {selectedProvider === 'openai' && ' Check OpenAI API key configuration.'}
+                  {selectedProvider === 'azure' && ' Check Azure configuration.'}
                 </div>
               ) : (
                 <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -1096,6 +1130,32 @@ export const AgenticReadiness: React.FC = () => {
         {/* Single Model Tab */}
         {tab === 'single' && (
           <div className="space-y-6">
+            {/* Provider Selection */}
+            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">🔧 Model Provider</h3>
+              <div className="flex items-center gap-4">
+                <select
+                  value={selectedProvider}
+                  onChange={(e) => {
+                    setSelectedProvider(e.target.value);
+                    // Models will be refetched automatically via useEffect
+                  }}
+                  className="bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-cyan-400 focus:outline-none"
+                >
+                  <option value="lmstudio">💻 LM Studio (Local)</option>
+                  <option value="openrouter">🚀 OpenRouter (Free)</option>
+                  <option value="openai">⚡ OpenAI</option>
+                  <option value="azure">☁️ Azure OpenAI</option>
+                </select>
+                <button
+                  onClick={fetchModels}
+                  className="text-gray-400 hover:text-white text-sm px-3 py-2 border border-gray-600 rounded-lg"
+                >
+                  🔄 Refresh Models
+                </button>
+              </div>
+            </div>
+
             {/* Model Selector */}
             <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
               <label className="block text-sm font-medium text-gray-400 mb-2">
@@ -1221,7 +1281,7 @@ export const AgenticReadiness: React.FC = () => {
                 </div>
 
                 {/* Capability Grid */}
-                <ToolCapabilityGrid results={assessmentResult.testResults} />
+                <ToolCapabilityGrid results={assessmentResult.testResults || []} />
               </>
             )}
 
@@ -1230,7 +1290,7 @@ export const AgenticReadiness: React.FC = () => {
               <Tooltip content="Run comprehensive agentic capability assessment on the selected model (28 tests, ~5-10 minutes)">
                 <button
                   onClick={() => runAssessment('single', false)}
-                  disabled={isLoading || !selectedModelId}
+                  disabled={isLoading}
                   className="px-6 py-3 bg-cyan-500 text-black font-bold rounded-lg hover:bg-cyan-400 transition-colors disabled:opacity-50"
                 >
                   {isLoading ? 'Running...' : 'Run Assessment'}
@@ -1489,7 +1549,7 @@ export const AgenticReadiness: React.FC = () => {
                   </div>
                 </div>
 
-                <ToolCapabilityGrid results={assessmentResult.testResults} />
+                <ToolCapabilityGrid results={assessmentResult.testResults || []} />
               </>
             )}
 

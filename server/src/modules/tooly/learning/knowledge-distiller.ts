@@ -10,7 +10,8 @@ import { intentRouter } from '../intent-router.js';
 import { getToolSchemas } from '../tool-prompts.js';
 import { prostheticStore, ProstheticEntry, buildProstheticPrompt } from './prosthetic-store.js';
 import { capabilities } from '../capabilities.js';
-import { SANDBOX_CONTEXT } from '../testing/readiness-runner.js';
+import { SANDBOX_CONTEXT } from '../testing/readiness-runner';
+import { Provider } from '../provider-types.js';
 
 // ============================================================
 // TYPES
@@ -133,7 +134,8 @@ export class KnowledgeDistiller {
    */
   private async runTestCase(
     modelId: string,
-    testCase: DistillationTestCase
+    testCase: DistillationTestCase,
+    provider: Provider
   ): Promise<{ score: number; details: string; response: string; toolCalls: any[] }> {
     try {
       // Configure router for this model
@@ -142,7 +144,7 @@ export class KnowledgeDistiller {
         executorModelId: modelId,
         enableDualModel: false,
         timeout: 60000,
-        provider: 'lmstudio',
+        provider: provider,
         settings: this.settings
       });
 
@@ -274,7 +276,9 @@ export class KnowledgeDistiller {
   async distillFromStrongModel(
     teacherModelId: string,
     studentModelId: string,
-    capability: string
+    capability: string,
+    teacherProvider: Provider,
+    studentProvider: Provider
   ): Promise<DistillationResult> {
     console.log(`[KnowledgeDistiller] Starting distillation: ${teacherModelId} → ${studentModelId} (${capability})`);
 
@@ -301,7 +305,7 @@ export class KnowledgeDistiller {
     let teacherToolCalls: any[] = [];
 
     for (const testCase of testCases) {
-      const teacherResult = await this.runTestCase(teacherModelId, testCase);
+      const teacherResult = await this.runTestCase(teacherModelId, testCase, teacherProvider);
       teacherTotalScore += teacherResult.score;
       teacherToolCalls.push(...teacherResult.toolCalls);
       
@@ -320,7 +324,7 @@ export class KnowledgeDistiller {
     let studentBeforeScore = 0;
 
     for (const testCase of testCases) {
-      const studentResult = await this.runTestCase(studentModelId, testCase);
+      const studentResult = await this.runTestCase(studentModelId, testCase, studentProvider);
       studentBeforeScore += studentResult.score;
     }
 
@@ -373,7 +377,7 @@ export class KnowledgeDistiller {
       const enhancedPrompt = testCase.prompt;
       // Note: In production, the prosthetic would be applied via the model profile
       // For now we just re-test (the prosthetic is stored for future use)
-      const studentResult = await this.runTestCase(studentModelId, testCase);
+      const studentResult = await this.runTestCase(studentModelId, testCase, studentProvider);
       studentAfterScore += studentResult.score;
     }
 
@@ -456,5 +460,6 @@ export function createKnowledgeDistiller(settings: { lmstudioUrl: string; [key: 
 export function getKnowledgeDistiller(): KnowledgeDistiller | null {
   return distillerInstance;
 }
+
 
 

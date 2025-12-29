@@ -73,7 +73,7 @@ export interface RAGConfig {
 }
 
 export const defaultConfig: RAGConfig = {
-  port: 3002,
+  port: 3005,
   wsPort: 3003,
   
   lmstudio: {

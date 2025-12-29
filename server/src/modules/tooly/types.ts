@@ -44,7 +44,7 @@ export interface TestResult {
 
 export interface TestRunResult {
   modelId: string;
-  provider: 'lmstudio' | 'openai' | 'azure';
+  provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
   startedAt: string;
   completedAt: string;
   totalTests: number;
@@ -365,7 +365,7 @@ export interface ScoreBreakdown {
 export interface ModelProfileV2 {
   modelId: string;
   displayName: string;
-  provider: 'lmstudio' | 'openai' | 'azure';
+  provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
   testedAt: string;
   testVersion: number;
 

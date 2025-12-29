@@ -120,7 +120,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
       // Quick latency check (skip for quick mode - it's fast enough)
       if (mode !== 'quick') {
         try {
-          const quickLatencyRes = await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/quick-latency`, {
+          const quickLatencyRes = await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(model.id)}/quick-latency`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ provider: model.provider })
@@ -159,7 +159,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
       // Run tests based on mode
       try {
         // For all modes: run probe first
-        await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/probe`, {
+        await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(model.id)}/probe`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ provider: model.provider, runLatencyProfile: false })
@@ -168,7 +168,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
         if (cancelTestAllRef.current) break;
         
         // Run the main test with the selected mode
-        await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/test`, {
+        await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(model.id)}/test`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -181,7 +181,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
         
         // For standard/deep/optimization: run latency profile
         if (mode !== 'quick') {
-          await fetch(`/api/tooly/models/${encodeURIComponent(model.id)}/latency-profile`, {
+          await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(model.id)}/latency-profile`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ provider: model.provider })
@@ -238,7 +238,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
       });
       
       try {
-        await fetch(`/api/tooly/probe/${encodeURIComponent(model.id)}`, {
+        await fetch(`http://localhost:3001/api/tooly/probe/${encodeURIComponent(model.id)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

@@ -1570,7 +1570,11 @@ Rules:
       loadCompressionVersions();
 
       // WebSocket for real-time updates
-      const ws = new ReconnectingWebSocket('ws://localhost:3001');
+      const ws = new ReconnectingWebSocket('ws://localhost:3001', [], {
+        maxRetries: 10,
+        connectionTimeout: 5000,
+        maxReconnectionDelay: 10000
+      });
 
       ws.onopen = () => {
         console.log('[WS] Connected to server');

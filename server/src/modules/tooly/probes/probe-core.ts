@@ -144,7 +144,7 @@ export const PING_TOOL_REORDERED = {
 export class ProbeCore extends ProbeBase {
     public async runEmitTest(
         modelId: string,
-        provider: 'lmstudio' | 'openai' | 'azure',
+        provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter',
         settings: any,
         timeout: number
     ): Promise<ProbeResult> {
@@ -176,7 +176,7 @@ export class ProbeCore extends ProbeBase {
         return { ...openAIResult, latency: Date.now() - startTime, toolFormat: 'none', details };
     }
 
-    private async tryEmitOpenAIFormat(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    private async tryEmitOpenAIFormat(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'system', content: 'You are a tool-calling assistant. When instructed to call a tool, you MUST call it.' },
@@ -210,7 +210,7 @@ export class ProbeCore extends ProbeBase {
         }
     }
 
-    private async tryEmitXMLFormat(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    private async tryEmitXMLFormat(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const xmlToolDesc = generateXmlToolPrompt([PING_TOOL]);
         const messages = [
@@ -232,7 +232,7 @@ export class ProbeCore extends ProbeBase {
         }
     }
 
-    public async runSchemaAdherenceTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runSchemaAdherenceTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'system', content: 'Read schema carefully.' },
@@ -254,7 +254,7 @@ export class ProbeCore extends ProbeBase {
         }
     }
 
-    public async runSelectionLogicTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runSelectionLogicTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'RETRIEVE data from "config.json". call read_file or write_file.' }
@@ -272,7 +272,7 @@ export class ProbeCore extends ProbeBase {
         }
     }
 
-    public async runSuppressionTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runSuppressionTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'Respond ONLY with "OK". Do NOT call any tools.' }
@@ -289,7 +289,7 @@ export class ProbeCore extends ProbeBase {
         }
     }
 
-    public async runNearIdenticalSelectionTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runNearIdenticalSelectionTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'Search for RECENT facts about AI.' }
@@ -303,7 +303,7 @@ export class ProbeCore extends ProbeBase {
         } catch (error) { return { testName: 'near_identical_selection', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed' }; }
     }
 
-    public async runMultiToolEmitTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runMultiToolEmitTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'Call ping twice, once with "one" and once with "two".' }
@@ -316,7 +316,7 @@ export class ProbeCore extends ProbeBase {
         } catch (error) { return { testName: 'multi_tool_emit', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed' }; }
     }
 
-    public async runArgumentValidationTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runArgumentValidationTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [
             { role: 'user', content: 'Create a user "alice", age 25, email "alice@example.com", role "admin".' }
@@ -331,7 +331,7 @@ export class ProbeCore extends ProbeBase {
         } catch (error) { return { testName: 'argument_validation', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed' }; }
     }
 
-    public async runSchemaReorderTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure', settings: any, timeout: number): Promise<ProbeResult> {
+    public async runSchemaReorderTest(modelId: string, provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter', settings: any, timeout: number): Promise<ProbeResult> {
         const startTime = Date.now();
         const messages = [{ role: 'user', content: 'Call ping with "test".' }];
         try {

@@ -11,6 +11,7 @@ import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { prostheticPromptBuilder } from '../modules/tooly/orchestrator/prosthetic-prompt-builder.js';
 import { testSandbox } from '../modules/tooly/test-sandbox.js';
+import { cacheService } from '../services/cache/cache-service.js';
 
 const router = express.Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -230,6 +231,30 @@ router.delete('/tooly/reset', async (req, res) => {
         res.json({ success: true, deleted: { sessions: sessionsDeleted, profiles: profiles.length } });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Cache stats endpoint
+router.get('/cache/stats', async (req, res) => {
+    try {
+        const stats = cacheService.getStats();
+        res.json({
+            success: true,
+            stats,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to get cache stats' });
+    }
+});
+
+// Cache clear endpoint
+router.delete('/cache/clear', async (req, res) => {
+    try {
+        cacheService.clearAll();
+        res.json({ success: true, message: 'All caches cleared' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to clear caches' });
     }
 });
 
