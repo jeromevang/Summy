@@ -35,7 +35,7 @@ export const loadServerSettings = async (): Promise<ServerSettings> => {
             // Override with environment variables if they exist
             const finalSettings = {
                 ...settings,
-                openrouterApiKey: process.env.OPENROUTER_API_KEY || settings.openrouterApiKey || '',
+                openrouterApiKey: process.env.OPENROUTER_API_KEY || '',
             };
             console.log('[Settings] Settings loaded successfully');
             return finalSettings;
