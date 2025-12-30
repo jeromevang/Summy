@@ -211,7 +211,7 @@ export function useToolyState(): ToolyState {
   });
 
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] } as ExpandedSections));
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section as keyof ExpandedSections] } as ExpandedSections));
   };
 
   // Detail pane version
@@ -316,7 +316,15 @@ export function useToolyState(): ToolyState {
   const cancelIntentTestRef = useRef(false);
 
   // New Cognitive Loop State (Phase 5)
-  const [legacyMode, setLegacyMode] = useState(false);
+  const [legacyMode, setLegacyMode] = useState(() => {
+    const saved = localStorage.getItem('tooly_legacyMode');
+    return saved === 'true';
+  });
+
+  // Persist legacy mode
+  useEffect(() => {
+    localStorage.setItem('tooly_legacyMode', legacyMode.toString());
+  }, [legacyMode]);
   const [cognitiveStep, setCognitiveStep] = useState<'idle' | 'search' | 'understand' | 'decide' | 'act' | 'verify' | 'persist'>('idle');
   const [intentCard, setIntentCard] = useState<{ strategy: 'refactor' | 'patch' | 'investigate'; risk: 'high' | 'medium' | 'low'; reasoning: string } | undefined>(undefined);
   const [cognitiveLogs, setCognitiveLogs] = useState<string[]>([]);

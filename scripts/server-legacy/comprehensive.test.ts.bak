@@ -1,0 +1,501 @@
+/**
+ * Comprehensive Testing Framework
+ * Unit tests, integration tests, and e2e tests for the entire application
+ */
+
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { Request, Response, NextFunction } from 'express';
+import axios from 'axios';
+import { ModelManager } from '../src/services/model-manager.js';
+import { cacheService } from '../src/services/cache/cache-service.js';
+import { errorMonitor } from '../src/services/error-handler.js';
+import { db } from '../src/services/database.js';
+
+// ============================================================
+// MOCKS AND TEST UTILITIES
+// ============================================================
+
+// Mock external dependencies
+vi.mock('axios');
+vi.mock('@lmstudio/sdk');
+vi.mock('better-sqlite3');
+
+// Test utilities
+export const createMockRequest = (overrides: any = {}) => ({
+  body: {},
+  params: {},
+  query: {},
+  headers: {},
+  ip: '127.0.0.1',
+  get: vi.fn(),
+  ...overrides
+});
+
+export const createMockResponse = () => {
+  const res = {
+    status: vi.fn().mockReturnThis(),
+    json: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    send: vi.fn().mockReturnThis()
+  };
+  return res;
+};
+
+export const createMockNext = () => vi.fn();
+
+// Test data generators
+export const generateTestModel = (overrides: any = {}) => ({
+  id: 'test-model-1',
+  displayName: 'Test Model',
+  provider: 'openai',
+  status: 'tested',
+  role: 'both',
+  category: 'general',
+  score: 85,
+  toolScore: 90,
+  reasoningScore: 80,
+  avgLatency: 1000,
+  testedAt: new Date().toISOString(),
+  ...overrides
+});
+
+// ============================================================
+// UNIT TESTS
+// ============================================================
+
+describe('Model Manager', () => {
+  let modelManager: ModelManager;
+  
+  beforeEach(() => {
+    modelManager = new ModelManager();
+  });
+
+  describe('Model Discovery', () => {
+    it('should discover models from all providers', async () => {
+      const result = await modelManager.discoverModels();
+      
+      expect(result.models).toBeDefined();
+      expect(Array.isArray(result.models)).toBe(true);
+      expect(result.totalModels).toBeGreaterThan(0);
+      expect(result.providers).toBeDefined();
+    });
+
+    it('should filter models by criteria', () => {
+      // Set up test models
+      const models = [
+        generateTestModel({ provider: 'openai', role: 'main' }),
+        generateTestModel({ provider: 'lmstudio', role: 'executor' }),
+        generateTestModel({ provider: 'openai', role: 'both' })
+      ];
+      
+      // Mock the internal models map
+      models.forEach(model => {
+        modelManager['models'].set(model.id, model);
+      });
+
+      const filtered = modelManager.getModels({ provider: 'openai' });
+      expect(filtered).toHaveLength(2);
+      expect(filtered.every(m => m.provider === 'openai')).toBe(true);
+    });
+  });
+
+  describe('Model Recommendations', () => {
+    it('should generate recommendations based on criteria', () => {
+      const models = [
+        generateTestModel({ score: 90, avgLatency: 500 }),
+        generateTestModel({ score: 70, avgLatency: 2000 }),
+        generateTestModel({ score: 85, avgLatency: 1000 })
+      ];
+
+      models.forEach(model => {
+        modelManager['models'].set(model.id, model);
+      });
+
+      const recommendations = modelManager.getRecommendations({
+        role: 'both',
+        minScore: 75,
+        maxLatency: 1500
+      });
+
+      expect(recommendations).toHaveLength(2);
+      expect(recommendations[0].score).toBeGreaterThan(recommendations[1].score);
+    });
+  });
+});
+
+describe('Cache Service', () => {
+  let testCache: any;
+
+  beforeEach(() => {
+    testCache = new (require('../services/cache/cache-manager.js').CacheManager)();
+  });
+
+  describe('Basic Operations', () => {
+    it('should set and get values', () => {
+      testCache.set('test-key', 'test-value');
+      expect(testCache.get('test-key')).toBe('test-value');
+    });
+
+    it('should handle TTL expiration', (done) => {
+      testCache.set('test-key', 'test-value', { ttl: 100 });
+      
+      setTimeout(() => {
+        expect(testCache.get('test-key')).toBe(null);
+        done();
+      }, 150);
+    });
+
+    it('should respect max items limit', () => {
+      const cache = new (require('../services/cache/cache-manager.js').CacheManager)({
+        maxItems: 2
+      });
+
+      cache.set('key1', 'value1');
+      cache.set('key2', 'value2');
+      cache.set('key3', 'value3'); // Should evict key1
+
+      expect(cache.get('key1')).toBe(null);
+      expect(cache.get('key2')).toBe('value2');
+      expect(cache.get('key3')).toBe('value3');
+    });
+  });
+});
+
+describe('Error Handler', () => {
+  describe('Error Classes', () => {
+    it('should create ValidationError with correct properties', () => {
+      const error = new (require('../services/error-handler.js').ValidationError)('Test message', { field: 'test' });
+      
+      expect(error.type).toBe('VALIDATION_ERROR');
+      expect(error.statusCode).toBe(400);
+      expect(error.details).toEqual({ field: 'test' });
+    });
+
+    it('should create AuthenticationError with default message', () => {
+      const error = new (require('../services/error-handler.js').AuthenticationError)();
+      
+      expect(error.type).toBe('AUTHENTICATION_ERROR');
+      expect(error.statusCode).toBe(401);
+      expect(error.message).toBe('Authentication required');
+    });
+  });
+
+  describe('Error Monitoring', () => {
+    it('should track error statistics', () => {
+      const { ErrorMonitor } = require('../services/error-handler.js');
+      
+      ErrorMonitor.report({
+        type: 'VALIDATION_ERROR',
+        message: 'Test error',
+        statusCode: 400,
+        timestamp: new Date().toISOString()
+      });
+
+      const stats = ErrorMonitor.getErrorStats();
+      expect(stats.total).toBe(1);
+      expect(stats.byType.VALIDATION_ERROR).toBe(1);
+    });
+  });
+});
+
+// ============================================================
+// INTEGRATION TESTS
+// ============================================================
+
+describe('API Integration Tests', () => {
+  let server: any;
+
+  beforeAll(async () => {
+    // Start test server
+    server = await import('../src/index.js');
+  });
+
+  afterAll(async () => {
+    // Cleanup
+    await server.close();
+  });
+
+  describe('Model Management API', () => {
+    it('should discover models via API', async () => {
+      const response = await axios.get('http://localhost:3001/api/models/discover');
+      
+      expect(response.status).toBe(200);
+      expect(response.data.success).toBe(true);
+      expect(response.data.data).toBeDefined();
+      expect(response.data.data.models).toBeDefined();
+    });
+
+    it('should list models with filtering', async () => {
+      const response = await axios.get('http://localhost:3001/api/models/list?provider=openai&role=main');
+      
+      expect(response.status).toBe(200);
+      expect(response.data.success).toBe(true);
+      expect(response.data.data.models).toBeDefined();
+    });
+
+    it('should get model recommendations', async () => {
+      const response = await axios.post('http://localhost:3001/api/models/recommendations', {
+        role: 'both',
+        minScore: 70
+      });
+      
+      expect(response.status).toBe(200);
+      expect(response.data.success).toBe(true);
+      expect(response.data.data.recommendations).toBeDefined();
+    });
+  });
+
+  describe('Validation Middleware', () => {
+    it('should reject requests with invalid provider', async () => {
+      const response = await axios.get('http://localhost:3001/api/tooly/models?provider=invalid');
+      
+      expect(response.status).toBe(400);
+      expect(response.data.success).toBe(false);
+      expect(response.data.error).toBeDefined();
+    });
+
+    it('should accept requests with valid provider', async () => {
+      const response = await axios.get('http://localhost:3001/api/tooly/models?provider=openai');
+      
+      expect(response.status).toBe(200);
+      expect(response.data.models).toBeDefined();
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle not found errors', async () => {
+      const response = await axios.get('http://localhost:3001/api/nonexistent');
+      
+      expect(response.status).toBe(404);
+      expect(response.data.success).toBe(false);
+      expect(response.data.error).toBeDefined();
+    });
+
+    it('should handle server errors gracefully', async () => {
+      // This would test actual server errors
+      const response = await axios.post('http://localhost:3001/api/models/invalid/test');
+      
+      expect(response.status).toBeGreaterThanOrEqual(400);
+      expect(response.data.success).toBe(false);
+      expect(response.data.error).toBeDefined();
+    });
+  });
+});
+
+// ============================================================
+// E2E TESTS
+// ============================================================
+
+describe('End-to-End Tests', () => {
+  describe('Model Testing Workflow', () => {
+    it('should complete full model testing workflow', async () => {
+      // 1. Discover models
+      const discoverResponse = await axios.get('http://localhost:3001/api/models/discover');
+      expect(discoverResponse.status).toBe(200);
+
+      // 2. List models
+      const listResponse = await axios.get('http://localhost:3001/api/models/list');
+      expect(listResponse.status).toBe(200);
+
+      // 3. Get recommendations
+      const recResponse = await axios.post('http://localhost:3001/api/models/recommendations', {
+        role: 'both',
+        minScore: 70
+      });
+      expect(recResponse.status).toBe(200);
+
+      // 4. Health check
+      const healthResponse = await axios.post('http://localhost:3001/api/models/health-check');
+      expect(healthResponse.status).toBe(200);
+
+      console.log('✅ Full workflow test passed');
+    });
+
+    it('should handle combo testing workflow', async () => {
+      // 1. Get available models
+      const modelsResponse = await axios.get('http://localhost:3001/api/tooly/models');
+      expect(modelsResponse.status).toBe(200);
+
+      const models = modelsResponse.data.models;
+      if (models.length >= 2) {
+        // 2. Run combo test
+        const comboResponse = await axios.post('http://localhost:3001/api/tooly/combo-test/run', {
+          mainModels: [models[0].id],
+          executorModels: [models[1].id]
+        });
+        expect(comboResponse.status).toBe(200);
+
+        console.log('✅ Combo testing workflow test passed');
+      }
+    });
+  });
+
+  describe('Caching System', () => {
+    it('should cache API responses', async () => {
+      // First request
+      const response1 = await axios.get('http://localhost:3001/api/models/list');
+      expect(response1.status).toBe(200);
+
+      // Second request should use cache
+      const response2 = await axios.get('http://localhost:3001/api/models/list');
+      expect(response2.status).toBe(200);
+
+      // Responses should be identical
+      expect(response1.data).toEqual(response2.data);
+      console.log('✅ Caching system test passed');
+    });
+
+    it('should handle cache invalidation', async () => {
+      // Clear cache
+      await axios.delete('http://localhost:3001/api/models/cache/clear');
+
+      // Get cache stats
+      const statsResponse = await axios.get('http://localhost:3001/api/models/cache/stats');
+      expect(statsResponse.status).toBe(200);
+
+      console.log('✅ Cache invalidation test passed');
+    });
+  });
+
+  describe('Error Recovery', () => {
+    it('should handle network errors gracefully', async () => {
+      // Test with invalid endpoint
+      try {
+        await axios.get('http://localhost:3001/api/invalid-endpoint');
+      } catch (error: any) {
+        expect(error.response.status).toBe(404);
+        expect(error.response.data.success).toBe(false);
+        console.log('✅ Network error handling test passed');
+      }
+    });
+  });
+});
+
+// ============================================================
+// PERFORMANCE TESTS
+// ============================================================
+
+describe('Performance Tests', () => {
+  describe('Database Performance', () => {
+    it('should handle concurrent database operations', async () => {
+      const operations = Array.from({ length: 10 }, (_, i) =>
+        axios.get(`http://localhost:3001/api/models/list?limit=10&offset=${i * 10}`)
+      );
+
+      const results = await Promise.all(operations);
+      results.forEach(result => {
+        expect(result.status).toBe(200);
+      });
+
+      console.log('✅ Concurrent database operations test passed');
+    });
+
+    it('should handle large result sets efficiently', async () => {
+      const start = Date.now();
+      const response = await axios.get('http://localhost:3001/api/models/list?limit=1000');
+      const duration = Date.now() - start;
+
+      expect(response.status).toBe(200);
+      expect(duration).toBeLessThan(5000); // Should complete in under 5 seconds
+
+      console.log(`✅ Large result set test passed (${duration}ms)`);
+    });
+  });
+
+  describe('Caching Performance', () => {
+    it('should serve cached responses faster than fresh queries', async () => {
+      // First request (cache miss)
+      const start1 = Date.now();
+      await axios.get('http://localhost:3001/api/models/list');
+      const duration1 = Date.now() - start1;
+
+      // Second request (cache hit)
+      const start2 = Date.now();
+      await axios.get('http://localhost:3001/api/models/list');
+      const duration2 = Date.now() - start2;
+
+      // Cache hit should be faster (allowing some variance)
+      expect(duration2).toBeLessThanOrEqual(duration1 * 1.5);
+
+      console.log(`✅ Caching performance test passed (${duration1}ms → ${duration2}ms)`);
+    });
+  });
+});
+
+// ============================================================
+// LOAD TESTS
+// ============================================================
+
+describe('Load Tests', () => {
+  it('should handle high concurrent load', async () => {
+    const concurrentUsers = 50;
+    const requestsPerUser = 10;
+
+    const startTime = Date.now();
+    
+    const loadTest = async () => {
+      const operations = Array.from({ length: requestsPerUser }, () =>
+        axios.get('http://localhost:3001/api/models/list')
+      );
+      return Promise.all(operations);
+    };
+
+    const userPromises = Array.from({ length: concurrentUsers }, () => loadTest());
+    await Promise.all(userPromises);
+
+    const totalTime = Date.now() - startTime;
+    const totalRequests = concurrentUsers * requestsPerUser;
+    const avgResponseTime = totalTime / totalRequests;
+
+    console.log(`✅ Load test passed: ${totalRequests} requests in ${totalTime}ms (avg: ${avgResponseTime}ms)`);
+
+    // Assertions for load test
+    expect(totalTime).toBeLessThan(30000); // Should complete in under 30 seconds
+    expect(avgResponseTime).toBeLessThan(1000); // Average response time under 1 second
+  }, 60000); // 60 second timeout for load test
+});
+
+// ============================================================
+// TEST CONFIGURATION AND SETUP
+// ============================================================
+
+export const testConfig = {
+  apiBaseUrl: 'http://localhost:3001',
+  timeout: 10000,
+  retryAttempts: 3,
+  retryDelay: 1000
+};
+
+export const setupTestEnvironment = async () => {
+  // Setup test database
+  await db.initialize();
+
+  // Clear any existing test data
+  await db.cleanupOldRecords(1); // Clean up 1 hour old records
+
+  // Setup test models if needed
+  // await setupTestModels();
+
+  console.log('🧪 Test environment setup complete');
+};
+
+export const teardownTestEnvironment = async () => {
+  // Cleanup test data
+  await db.cleanupOldRecords(0); // Clean up all records
+
+  // Close database connections
+  db.close();
+
+  console.log('🧪 Test environment teardown complete');
+};
+
+// Export test utilities
+export default {
+  createMockRequest,
+  createMockResponse,
+  createMockNext,
+  generateTestModel,
+  testConfig,
+  setupTestEnvironment,
+  teardownTestEnvironment
+};

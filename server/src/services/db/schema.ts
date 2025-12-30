@@ -304,6 +304,59 @@ CREATE INDEX IF NOT EXISTS idx_model_metadata_category ON model_metadata(categor
 CREATE INDEX IF NOT EXISTS idx_model_metadata_score ON model_metadata(score DESC);
 CREATE INDEX IF NOT EXISTS idx_model_metadata_health_status ON model_metadata(health_status);
 
+-- ============================================================
+-- CODE INDEX SYSTEM (Refactoring & AI Navigation)
+-- ============================================================
+
+-- File metadata
+CREATE TABLE IF NOT EXISTS code_index (
+    file_path TEXT PRIMARY KEY,
+    scope TEXT,
+    exports TEXT,
+    inputs TEXT,
+    outputs TEXT,
+    libraries TEXT,
+    category TEXT,
+    tags TEXT,
+    complexity TEXT,
+    lines_count INTEGER,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_code_index_category ON code_index(category);
+
+-- Function-level chunks (from AST parsing)
+CREATE TABLE IF NOT EXISTS code_chunks (
+    id TEXT PRIMARY KEY,
+    file_path TEXT NOT NULL,
+    symbol_name TEXT NOT NULL,
+    symbol_type TEXT NOT NULL,     -- 'function', 'class', 'component', 'hook'
+    content TEXT,
+    inputs TEXT,                   -- JSON array of parameters
+    outputs TEXT,                  -- Return type/description
+    start_line INTEGER,
+    end_line INTEGER,
+    dependencies TEXT,             -- JSON array of called functions
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (file_path) REFERENCES code_index(file_path)
+);
+CREATE INDEX IF NOT EXISTS idx_code_chunks_file ON code_chunks(file_path);
+CREATE INDEX IF NOT EXISTS idx_code_chunks_symbol ON code_chunks(symbol_name);
+CREATE INDEX IF NOT EXISTS idx_code_chunks_type ON code_chunks(symbol_type);
+
+-- Dependency relationships
+CREATE TABLE IF NOT EXISTS code_dependencies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_chunk_id TEXT,
+    target_chunk_id TEXT,
+    dependency_type TEXT NOT NULL, -- 'calls', 'imports', 'extends'
+    metadata TEXT,                 -- Additional context
+    FOREIGN KEY (source_chunk_id) REFERENCES code_chunks(id),
+    FOREIGN KEY (target_chunk_id) REFERENCES code_chunks(id)
+);
+CREATE INDEX IF NOT EXISTS idx_code_deps_source ON code_dependencies(source_chunk_id);
+CREATE INDEX IF NOT EXISTS idx_code_deps_target ON code_dependencies(target_chunk_id);
+
 -- MIGRATION: Add missing columns if they don't exist
 -- This ensures backward compatibility with existing databases
 CREATE TABLE IF NOT EXISTS migration_log (

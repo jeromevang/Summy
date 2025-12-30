@@ -10,14 +10,14 @@ import { useWebSocket } from './hooks/useWebSocket';
 import { extractCategoryFromTest, TOOL_CATEGORIES } from './constants';
 
 // Components
-import { ModelListPanel } from './components/ModelListPanel';
+import { ModelSelector } from './components/ModelSelector';
 import { ModelDetailV1 } from './components/ModelDetailV1';
 import { ActiveModelConfig } from './components/ActiveModelConfig';
 import { SystemMetricsCharts } from './components/SystemMetricsCharts';
 import { SlowModelModal } from './components/SlowModelModal';
 import { TestsTab } from './components/TestsTab';
 import { LogsTab } from './components/LogsTab';
-import { ModelDetailV2 } from '../../components/ModelDetailV2';
+import { ModelDetail } from '../../components/ModelDetail';
 
 import type { TabId } from './types';
 
@@ -226,7 +226,7 @@ export const LegacyTooly: React.FC<LegacyToolyProps> = ({ state, api }) => {
                 {state.activeTab === 'models' && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" style={{ height: 'calc(100vh - 440px)', minHeight: '450px' }}>
                         {/* Model List */}
-                        <ModelListPanel
+                        <ModelSelector
                             models={state.models}
                             selectedModelId={state.selectedModel?.modelId ?? null}
                             loading={state.loading}
@@ -254,7 +254,7 @@ export const LegacyTooly: React.FC<LegacyToolyProps> = ({ state, api }) => {
                         {/* Model Detail */}
                         <div className="flex-1 overflow-y-auto overflow-x-hidden">
                             {state.detailPaneVersion === 'v2' && state.selectedModel ? (
-                                <ModelDetailV2
+                                <ModelDetail
                                     profile={state.selectedModel}
                                     toolCategories={toolCategories}
                                     onRunProbes={(withLatency) => {

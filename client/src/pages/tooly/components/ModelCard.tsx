@@ -126,12 +126,14 @@ export const ModelCard: React.FC<ModelCardProps> = ({
         <div className="text-right">
           {model.score !== undefined ? (
             <div className="text-right">
-              <p className="text-white font-medium" title="🔧Tools / 🔬Probe / 🧠Reasoning">
-                🔧{model.score}/🔬{model.toolScore ?? '-'}/🧠{model.reasoningScore ?? '-'}
-              </p>
-              <p className="text-gray-500 text-xs">
-                {model.toolCount}/{model.totalTools} tools
-              </p>
+              <div className="flex flex-col items-end">
+                <div className="text-white font-mono text-lg leading-none mb-1">
+                  {model.score}%
+                </div>
+                <div className="text-[10px] text-gray-500 uppercase tracking-wider">
+                  Agentic Score
+                </div>
+              </div>
             </div>
           ) : (
             <span className="text-gray-500 text-xs">Not tested</span>

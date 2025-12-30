@@ -33,7 +33,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ modelId }) => {
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3001/api/tooly/models/${encodeURIComponent(modelId)}/test/history`);
+      const response = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/test/history`);
       if (response.ok) {
         const data = await response.json();
         setHistory(data.history || []);

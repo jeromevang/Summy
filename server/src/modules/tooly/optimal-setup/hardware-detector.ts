@@ -40,6 +40,7 @@ export interface HardwareProfile {
   system: SystemInfo;
   totalVramGB: number;
   availableVramGB: number;
+  vramPercent: number;
   canRunModel: (vramRequiredGB: number) => boolean;
 }
 
@@ -65,13 +66,13 @@ async function detectNvidiaGPUs(): Promise<GPUInfo[]> {
       const parts = line.split(',').map(p => p.trim());
       if (parts.length >= 5) {
         gpus.push({
-          name: parts[0],
-          vramMB: parseInt(parts[1]) || 0,
-          vramUsedMB: parseInt(parts[2]) || 0,
-          vramFreeMB: parseInt(parts[3]) || 0,
-          driver: parts[4],
-          temperature: parseInt(parts[5]) || undefined,
-          utilization: parseInt(parts[6]) || undefined
+          name: parts[0]!,
+          vramMB: parseInt(parts[1]!) || 0,
+          vramUsedMB: parseInt(parts[2]!) || 0,
+          vramFreeMB: parseInt(parts[3]!) || 0,
+          driver: parts[4]!,
+          temperature: parts[5] ? parseInt(parts[5]) : undefined,
+          utilization: parts[6] ? parseInt(parts[6]) : undefined
         });
       }
     }
@@ -111,8 +112,8 @@ async function detectAMDGPUs(): Promise<GPUInfo[]> {
     for (const line of lines) {
       const parts = line.split(',');
       if (parts.length >= 3) {
-        const total = parseInt(parts[1]) || 0;
-        const used = parseInt(parts[2]) || 0;
+        const total = parseInt(parts[1]!) || 0;
+        const used = parseInt(parts[2]!) || 0;
         gpus.push({
           name: `AMD GPU ${gpus.length}`,
           vramMB: Math.round(total / 1024 / 1024),
@@ -232,6 +233,7 @@ export class HardwareDetector {
       system,
       totalVramGB: Math.round(totalVramMB / 1024 * 10) / 10,
       availableVramGB: Math.round(availableVramMB / 1024 * 10) / 10,
+      vramPercent: totalVramMB > 0 ? Math.round(((totalVramMB - availableVramMB) / totalVramMB) * 100) : 0,
       canRunModel: (vramRequiredGB: number) => {
         // Add some buffer (1GB) for overhead
         return availableVramMB >= (vramRequiredGB + 1) * 1024;

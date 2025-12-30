@@ -451,5 +451,7 @@ router.get('/stats', async (req, res) => {
       error: 'Failed to get statistics',
       message: error.message
     });
+  }
+});
 
 export default router;

@@ -1,30 +1,14 @@
-/**
- * Controller Page
- * Meta-agent visibility UI for the self-improving system.
- * 
- * Features:
- * - Failure queue with pattern grouping
- * - Controller analysis trigger
- * - Prosthetic review and approval
- * - Real-time failure alerts
- */
-
-import React, { useState, useEffect } from 'react';
-import { FailurePatternCard, type FailurePattern } from './components/FailurePatternCard';
+import React, { useState } from 'react';
+import { FailurePatternCard } from './components/FailurePatternCard';
 import ProstheticReview from './components/ProstheticReview';
+import { SummaryPanel } from './Controller/components';
+import { useController } from './Controller/hooks/useController';
 
-// Tooltip component
 const Tooltip: React.FC<{ children: React.ReactNode; content: string }> = ({ children, content }) => {
   const [show, setShow] = useState(false);
-
   return (
     <div className="relative inline-block">
-      <div
-        onMouseEnter={() => setShow(true)}
-        onMouseLeave={() => setShow(false)}
-      >
-        {children}
-      </div>
+      <div onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>{children}</div>
       {show && (
         <div className="absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg bottom-full left-1/2 transform -translate-x-1/2 mb-1 whitespace-nowrap">
           {content}
@@ -35,286 +19,13 @@ const Tooltip: React.FC<{ children: React.ReactNode; content: string }> = ({ chi
   );
 };
 
-// Types
-interface FailureEntry {
-  id: string;
-  timestamp: string;
-  modelId: string;
-  category: string;
-  tool?: string;
-  error: string;
-  errorType: string;
-  context: {
-    query: string;
-    queryHash: string;
-  };
-  pattern?: string;
-  resolved: boolean;
-}
-
-interface FailureAlert {
-  id: string;
-  type: string;
-  severity: string;
-  patternName: string;
-  message: string;
-  timestamp: string;
-}
-
-interface ComboProsthetic {
-  comboId: string;
-  mainModelId: string;
-  executorModelId: string;
-  prompt: string;
-  level: number;
-  verified: boolean;
-  comboScoreBefore?: number;
-  comboScoreAfter?: number;
-  createdAt: string;
-  successfulRuns: number;
-}
-
-interface ComboResult {
-  id: string;
-  mainModelId: string;
-  executorModelId: string;
-  overallScore: number;
-  mainScore: number;
-  executorScore: number;
-  testedAt: string;
-}
-
-interface ComboTeachingResult {
-  success: boolean;
-  attempts: number;
-  finalScore: number;
-  comboId: string;
-  mainModelId: string;
-  executorModelId: string;
-  comboScoreBefore: number;
-  comboScoreAfter: number;
-  improvements: {
-    overall: number;
-  };
-  certified: boolean;
-  log: string[];
-}
-
-interface ControllerAnalysis {
-  diagnosis: string;
-  rootCause: string;
-  suggestedProsthetic: {
-    level: number;
-    prompt: string;
-    targetCategories: string[];
-  };
-  testCases: Array<{
-    id: string;
-    prompt: string;
-    expectedTool?: string;
-    expectedBehavior: string;
-  }>;
-  confidence: number;
-  priority: string;
-}
-
-interface ObserverStatus {
-  enabled: boolean;
-  running: boolean;
-  lastCheck: string;
-  alertCount: number;
-  patternsTracked: number;
-}
-
-interface DashboardSummary {
-  unresolvedFailures: number;
-  criticalPatterns: number;
-  modelsAffected: number;
-  recentAlerts: FailureAlert[];
-  needsAttention: boolean;
-}
-
-const API_BASE = 'http://localhost:3001/api/tooly';
-
 export default function Controller() {
-  // State
-  const [patterns, setPatterns] = useState<FailurePattern[]>([]);
-  const [failures, setFailures] = useState<FailureEntry[]>([]);
-  const [alerts, setAlerts] = useState<FailureAlert[]>([]);
-  const [observerStatus, setObserverStatus] = useState<ObserverStatus | null>(null);
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [analysis, setAnalysis] = useState<ControllerAnalysis | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedPattern, setSelectedPattern] = useState<string | null>(null);
-  const [showProstheticReview, setShowProstheticReview] = useState(false);
-  const [comboProsthetics, setComboProsthetics] = useState<ComboProsthetic[]>([]);
-  const [comboTeachingResults, setComboTeachingResults] = useState<ComboTeachingResult[]>([]);
-  const [comboResults, setComboResults] = useState<ComboResult[]>([]);
-  const [teachingCombos, setTeachingCombos] = useState(false);
-
-  // Load data
-  useEffect(() => {
-    loadData();
-    const interval = setInterval(loadData, 30000); // Refresh every 30s
-    return () => clearInterval(interval);
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      
-      // Load all data in parallel
-      const [statusRes, patternsRes, failuresRes, comboProstheticsRes, comboTeachingRes, comboResultsRes] = await Promise.all([
-        fetch(`${API_BASE}/controller/status`),
-        fetch(`${API_BASE}/failures/patterns`),
-        fetch(`${API_BASE}/failures?resolved=false&limit=50`),
-        fetch(`${API_BASE}/prosthetics?type=combo`),
-        fetch(`${API_BASE}/controller/combo-teaching-results`),
-        fetch(`${API_BASE}/combo-test/results?limit=20`)
-      ]);
-
-      if (statusRes.ok) {
-        const data = await statusRes.json();
-        setObserverStatus(data.observer);
-        setSummary(data.summary);
-        setAlerts(data.summary?.recentAlerts || []);
-      }
-
-      if (patternsRes.ok) {
-        const data = await patternsRes.json();
-        setPatterns(data.patterns || []);
-      }
-
-      if (failuresRes.ok) {
-        const data = await failuresRes.json();
-        setFailures(data.failures || []);
-      }
-
-      if (comboProstheticsRes.ok) {
-        const data = await comboProstheticsRes.json();
-        setComboProsthetics(data.prosthetics || []);
-      }
-
-      if (comboTeachingRes.ok) {
-        const data = await comboTeachingRes.json();
-        setComboTeachingResults(data.results || []);
-      }
-
-      if (comboResultsRes.ok) {
-        const data = await comboResultsRes.json();
-        console.log('[Controller] Loaded combo results:', data.results?.length || 0);
-        setComboResults(data.results || []);
-      } else {
-        console.log('[Controller] Failed to load combo results:', comboResultsRes.status);
-      }
-
-      setError(null);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleObserver = async () => {
-    try {
-      const endpoint = observerStatus?.running ? 'stop' : 'start';
-      const res = await fetch(`${API_BASE}/controller/${endpoint}`, { method: 'POST' });
-      if (res.ok) {
-        const data = await res.json();
-        setObserverStatus(data.status);
-      }
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const runAnalysis = async () => {
-    try {
-      setAnalyzing(true);
-      setAnalysis(null);
-      
-      const res = await fetch(`${API_BASE}/controller/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.analysis) {
-          setAnalysis(data.analysis);
-        } else if (data.rawResponse) {
-          // If we only got raw response, show it as an error
-          setError('Analysis returned unparsed response - controller model may need adjustment');
-        }
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Analysis failed');
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setAnalyzing(false);
-    }
-  };
-
-  const applyProsthetic = async (modelId: string) => {
-    if (!analysis?.suggestedProsthetic) return;
-
-    try {
-      const res = await fetch(`${API_BASE}/controller/apply-prosthetic`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          modelId,
-          prosthetic: analysis.suggestedProsthetic,
-          testFirst: true
-        })
-      });
-
-      if (res.ok) {
-        alert('Prosthetic applied successfully!');
-        loadData();
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to apply prosthetic');
-      }
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const runComboTeaching = async (mainModelId: string, executorModelId: string) => {
-    try {
-      setTeachingCombos(true);
-      const res = await fetch(`${API_BASE}/controller/run-combo-teaching`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mainModelId,
-          executorModelId,
-          maxAttempts: 4,
-          targetScore: 70
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        alert(`Combo teaching ${data.result.success ? 'successful' : 'failed'}! Final score: ${data.result.finalScore}%`);
-        loadData();
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Failed to run combo teaching');
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setTeachingCombos(false);
-    }
-  };
+  const {
+    patterns, failures, alerts, observerStatus, summary, analysis, analyzing, loading, error, setError,
+    selectedPattern, setSelectedPattern, showProstheticReview, setShowProstheticReview,
+    comboProsthetics, comboTeachingResults, comboResults, teachingCombos,
+    toggleObserver, runAnalysis, runComboTeaching, loadData
+  } = useController();
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -327,483 +38,100 @@ export default function Controller() {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'tool': return '🔧';
-      case 'rag': return '🔍';
-      case 'reasoning': return '🧠';
-      case 'intent': return '💭';
-      case 'browser': return '🌐';
-      case 'combo_pairing': return '🤝';
+      case 'tool': return '🔧'; case 'rag': return '🔍'; case 'reasoning': return '🧠';
+      case 'intent': return '💭'; case 'browser': return '🌐'; case 'combo_pairing': return '🤝';
       default: return '❓';
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 p-6">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            🎮 Controller
-            <span className="text-sm font-normal text-gray-400 ml-2">
-              Self-Improving System Monitor
-            </span>
-          </h1>
-        </div>
-        
+        <h1 className="text-2xl font-bold text-white">🎮 Controller <span className="text-sm font-normal text-gray-400 ml-2">Self-Improving Monitor</span></h1>
         <div className="flex items-center gap-4">
-          {/* Observer Status */}
           <div className="flex items-center gap-2 text-sm">
-            <span className={`w-2 h-2 rounded-full ${observerStatus?.running ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} />
+            <span className={`w-2 h-2 rounded-full \${observerStatus?.running ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} />
             <span className="text-gray-400">Observer</span>
-            <Tooltip content={observerStatus?.running ? "Stop monitoring for model failures and performance issues" : "Start monitoring for model failures and performance issues"}>
-              <button
-                onClick={toggleObserver}
-                className={`px-3 py-1 rounded text-xs font-medium ${
-                  observerStatus?.running
-                    ? 'bg-red-900/50 text-red-300 hover:bg-red-900/70'
-                    : 'bg-green-900/50 text-green-300 hover:bg-green-900/70'
-                }`}
-              >
-                {observerStatus?.running ? 'Stop' : 'Start'}
-              </button>
-            </Tooltip>
-          </div>
-
-          {/* Analyze Button */}
-          <Tooltip content="Run AI analysis on failure patterns to generate prosthetic prompts that can fix model weaknesses">
-            <button
-              onClick={runAnalysis}
-              disabled={analyzing}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium disabled:opacity-50 flex items-center gap-2"
-            >
-              {analyzing ? (
-                <>
-                  <span className="animate-spin">⏳</span>
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <span>🔬</span>
-                  Analyze Failures
-                </>
-              )}
+            <button onClick={toggleObserver} className={`px-3 py-1 rounded text-xs font-medium \${observerStatus?.running ? 'bg-red-900/50 text-red-300' : 'bg-green-900/50 text-green-300'}`}>
+              {observerStatus?.running ? 'Stop' : 'Start'}
             </button>
-          </Tooltip>
+          </div>
+          <button onClick={runAnalysis} disabled={analyzing} className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium disabled:opacity-50">
+            {analyzing ? 'Analyzing...' : 'Analyze Failures'}
+          </button>
         </div>
       </div>
 
-      {/* Error Banner */}
-      {error && (
-        <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg text-red-300">
-          ⚠️ {error}
-          <Tooltip content="Dismiss this error message">
-            <button onClick={() => setError(null)} className="ml-2 text-red-400 hover:text-red-300">×</button>
-          </Tooltip>
-        </div>
-      )}
+      {error && <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg text-red-300">⚠️ {error} <button onClick={() => setError(null)} className="ml-2">×</button></div>}
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <SummaryCard
-          title="Unresolved Failures"
-          value={summary?.unresolvedFailures || 0}
-          icon="🔴"
-          color={summary?.unresolvedFailures ? 'text-red-400' : 'text-gray-400'}
-        />
-        <SummaryCard
-          title="Critical Patterns"
-          value={summary?.criticalPatterns || 0}
-          icon="⚠️"
-          color={summary?.criticalPatterns ? 'text-orange-400' : 'text-gray-400'}
-        />
-        <SummaryCard
-          title="Models Affected"
-          value={summary?.modelsAffected || 0}
-          icon="🤖"
-          color="text-blue-400"
-        />
-        <SummaryCard
-          title="Patterns Tracked"
-          value={patterns.length}
-          icon="📊"
-          color="text-purple-400"
-        />
-      </div>
+      <SummaryPanel unresolvedFailures={summary?.unresolvedFailures || 0} criticalPatterns={summary?.criticalPatterns || 0} modelsAffected={summary?.modelsAffected || 0} patternsTracked={patterns.length} />
 
       <div className="grid grid-cols-3 gap-6">
-        {/* Left: Failure Patterns */}
-        <div className="col-span-1">
-          <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              📋 Failure Patterns
-              <span className="text-sm font-normal text-gray-500">({patterns.length})</span>
-            </h2>
-
-            {loading ? (
-              <div className="text-gray-500 text-center py-8">Loading...</div>
-            ) : patterns.length === 0 ? (
-              <div className="text-gray-500 text-center py-8">
-                ✨ No failure patterns detected
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {patterns.map(pattern => (
-                  <FailurePatternCard
-                    key={pattern.id}
-                    pattern={pattern}
-                    isSelected={selectedPattern === pattern.id}
-                    onSelect={(id) => setSelectedPattern(id)}
-                    onAnalyze={() => {
-                      setSelectedPattern(pattern.id);
-                      runAnalysis();
-                    }}
-                  />
-                ))}
-              </div>
-            )}
+        <div className="col-span-1 bg-gray-900 rounded-lg border border-gray-800 p-4">
+          <h2 className="text-lg font-semibold mb-4">📋 Failure Patterns</h2>
+          <div className="space-y-2">
+            {patterns.map(p => <FailurePatternCard key={p.id} pattern={p} isSelected={selectedPattern === p.id} onSelect={setSelectedPattern} onAnalyze={() => { setSelectedPattern(p.id); runAnalysis(); }} />)}
           </div>
         </div>
 
-        {/* Center: Recent Failures */}
-        <div className="col-span-1">
-          <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              🔥 Recent Failures
-              <span className="text-sm font-normal text-gray-500">({failures.length})</span>
-            </h2>
-
-            {failures.length === 0 ? (
-              <div className="text-gray-500 text-center py-8">
-                ✨ No unresolved failures
+        <div className="col-span-1 bg-gray-900 rounded-lg border border-gray-800 p-4">
+          <h2 className="text-lg font-semibold mb-4">🔥 Recent Failures</h2>
+          <div className="space-y-2 max-h-[500px] overflow-y-auto">
+            {failures.slice(0, 20).map(f => (
+              <div key={f.id} className="p-3 rounded-lg border border-gray-700 text-sm">
+                <div className="flex justify-between mb-1"><span>{getCategoryIcon(f.category)} {f.errorType}</span><span className="text-xs text-gray-500">{new Date(f.timestamp).toLocaleTimeString()}</span></div>
+                <div className="text-xs text-purple-400 mb-1">{f.modelId.split('/').pop()}</div>
+                <p className="text-gray-400 text-xs truncate">{f.error}</p>
               </div>
-            ) : (
-              <div className="space-y-2 max-h-[500px] overflow-y-auto">
-                {failures.slice(0, 20).map(failure => (
-                  <div
-                    key={failure.id}
-                    className="p-3 rounded-lg border border-gray-700 text-sm hover:border-gray-600 transition-colors"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span>{getCategoryIcon(failure.category)}</span>
-                      <span className="font-medium text-gray-300">{failure.errorType}</span>
-                      <span className="text-xs text-gray-500 ml-auto">
-                        {new Date(failure.timestamp).toLocaleTimeString()}
-                      </span>
-                    </div>
-                    {/* Model ID - linked to model page */}
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs text-purple-400">🤖</span>
-                      <a 
-                        href={`/tooly/model/${encodeURIComponent(failure.modelId)}`}
-                        className="text-xs text-purple-400 hover:text-purple-300 hover:underline truncate max-w-[200px]"
-                        title={failure.modelId}
-                      >
-                        {failure.modelId.split('/').pop() || failure.modelId}
-                      </a>
-                      {failure.executorModelId && failure.executorModelId !== failure.modelId && (
-                        <>
-                          <span className="text-xs text-gray-500">→</span>
-                          <a 
-                            href={`/tooly/model/${encodeURIComponent(failure.executorModelId)}`}
-                            className="text-xs text-blue-400 hover:text-blue-300 hover:underline truncate max-w-[150px]"
-                            title={failure.executorModelId}
-                          >
-                            {failure.executorModelId.split('/').pop()}
-                          </a>
-                        </>
-                      )}
-                    </div>
-                    <p className="text-gray-400 text-xs truncate">{failure.error}</p>
-                    <p className="text-gray-500 text-xs truncate mt-1">
-                      "{failure.context.query.substring(0, 60)}..."
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
+            ))}
           </div>
         </div>
 
-        {/* Right: Analysis & Alerts */}
         <div className="col-span-1 space-y-4">
-          {/* Combo Learning Section */}
           <div className="bg-gray-900 rounded-lg border border-blue-500/50 p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              🤝 Combo Learning
-              <span className="text-sm font-normal text-gray-500">({comboProsthetics.length} prosthetics, {comboTeachingResults.length} results)</span>
-            </h2>
-
-            {/* Combo Prosthetics */}
-            {comboProsthetics.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-300 mb-2">Active Combo Prosthetics</h3>
-                <div className="space-y-2">
-                  {comboProsthetics.slice(0, 3).map(prosthetic => (
-                    <div key={prosthetic.comboId} className="p-2 bg-gray-800 rounded border border-gray-700">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-blue-400">
-                          {prosthetic.mainModelId} → {prosthetic.executorModelId}
-                        </span>
-                        <span className={`text-xs px-2 py-0.5 rounded ${
-                          prosthetic.verified ? 'bg-green-900/50 text-green-300' : 'bg-yellow-900/50 text-yellow-300'
-                        }`}>
-                          Level {prosthetic.level} {prosthetic.verified ? '✓' : '?'}
-                        </span>
-                      </div>
-                      {prosthetic.comboScoreBefore !== undefined && prosthetic.comboScoreAfter !== undefined && (
-                        <div className="text-xs text-gray-400">
-                          Score: {prosthetic.comboScoreBefore}% → {prosthetic.comboScoreAfter}%
-                          <span className="text-green-400 ml-1">
-                            (+{prosthetic.comboScoreAfter - prosthetic.comboScoreBefore}%)
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+            <h2 className="text-lg font-semibold mb-4">🤝 Combo Learning</h2>
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {comboResults.slice(0, 5).map(c => (
+                <div key={c.id} className="flex justify-between items-center p-2 bg-gray-800 rounded">
+                  <div className="text-xs truncate flex-1"><span className="text-blue-400">{c.mainModelId.split('/').pop()}</span> ↔ {c.executorModelId.split('/').pop()}</div>
+                  <button onClick={() => runComboTeaching(c.mainModelId, c.executorModelId)} disabled={teachingCombos} className="ml-2 px-2 py-1 bg-purple-600 rounded text-xs">Teach</button>
                 </div>
-              </div>
-            )}
-
-            {/* Combo Teaching Results */}
-            {comboTeachingResults.length > 0 && (
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-300 mb-2">Recent Teaching Cycles</h3>
-                <div className="space-y-2">
-                  {comboTeachingResults.slice(0, 3).map(result => (
-                    <div key={result.comboId} className="p-2 bg-gray-800 rounded border border-gray-700">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-purple-400">
-                          {result.mainModelId} ↔ {result.executorModelId}
-                        </span>
-                        <span className={`text-xs px-2 py-0.5 rounded ${
-                          result.success ? 'bg-green-900/50 text-green-300' : 'bg-red-900/50 text-red-300'
-                        }`}>
-                          {result.success ? '✓' : '✗'} {result.finalScore}%
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {result.comboScoreBefore}% → {result.comboScoreAfter}%
-                        <span className={`ml-1 ${result.improvements.overall >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                          ({result.improvements.overall >= 0 ? '+' : ''}{result.improvements.overall}%)
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {result.attempts} attempts • {result.certified ? 'Certified' : 'Needs work'}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Combo Teaching Controls */}
-            <div>
-              <h3 className="text-sm font-medium text-gray-300 mb-2">Available Combos for Teaching ({comboResults.length})</h3>
-              {comboResults.length === 0 ? (
-                <div className="text-xs text-gray-500 text-center py-2">
-                  No combo test results available. Run combo tests first.
-                </div>
-              ) : (
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {comboResults.slice(0, 5).map(combo => (
-                    <div key={combo.id} className="flex items-center justify-between p-2 bg-gray-800 rounded border border-gray-700">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-medium text-blue-400 truncate">
-                          {combo.mainModelId.split('/').pop()} ↔ {combo.executorModelId.split('/').pop()}
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          Score: {combo.overallScore}% (🧠{combo.mainScore}% 🔧{combo.executorScore}%)
-                        </div>
-                      </div>
-                      <Tooltip content={`Run automated teaching cycle for this model pair. Tests performance, identifies issues, generates combo-specific prosthetic prompts, and verifies improvement.`}>
-                        <button
-                          onClick={() => runComboTeaching(combo.mainModelId, combo.executorModelId)}
-                          disabled={teachingCombos}
-                          className="ml-2 px-2 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs font-medium disabled:opacity-50 flex items-center gap-1"
-                        >
-                          {teachingCombos ? (
-                            <span className="animate-spin text-xs">⏳</span>
-                          ) : (
-                            <span>🎓</span>
-                          )}
-                          Teach
-                        </button>
-                      </Tooltip>
-                    </div>
-                  ))}
-                </div>
-              )}
+              ))}
             </div>
           </div>
-          {/* Analysis Results */}
+
           {analysis && (
             <div className="bg-gray-900 rounded-lg border border-purple-500/50 p-4">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                🔬 Analysis Results
-                <span className={`ml-auto text-xs px-2 py-1 rounded ${
-                  analysis.priority === 'critical' ? 'bg-red-900/50 text-red-300' :
-                  analysis.priority === 'high' ? 'bg-orange-900/50 text-orange-300' :
-                  'bg-blue-900/50 text-blue-300'
-                }`}>
-                  {analysis.priority} priority
-                </span>
-              </h2>
-
-              <div className="space-y-3 text-sm">
-                <div>
-                  <span className="text-gray-500">Diagnosis:</span>
-                  <p className="text-gray-300">{analysis.diagnosis}</p>
-                </div>
-
-                <div>
-                  <span className="text-gray-500">Root Cause:</span>
-                  <p className="text-gray-300">{analysis.rootCause}</p>
-                </div>
-
-                <div>
-                  <span className="text-gray-500">Confidence:</span>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex-1 h-2 bg-gray-700 rounded-full">
-                      <div 
-                        className="h-full bg-purple-500 rounded-full"
-                        style={{ width: `${analysis.confidence}%` }}
-                      />
-                    </div>
-                    <span className="text-purple-400">{analysis.confidence}%</span>
-                  </div>
-                </div>
-
-                {analysis.suggestedProsthetic && (
-                  <div className="mt-4 p-3 bg-gray-800 rounded-lg border border-gray-700">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium">Suggested Prosthetic (Level {analysis.suggestedProsthetic.level})</span>
-                    </div>
-                    <p className="text-xs text-gray-400 font-mono bg-gray-900 p-2 rounded max-h-32 overflow-y-auto">
-                      {analysis.suggestedProsthetic.prompt.substring(0, 300)}...
-                    </p>
-                    <div className="flex gap-2 mt-3">
-                      <Tooltip content="Review the suggested prosthetic prompt, make modifications if needed, then apply it to improve model performance">
-                        <button
-                          onClick={() => setShowProstheticReview(true)}
-                          className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-medium"
-                        >
-                          📝 Review & Apply
-                        </button>
-                      </Tooltip>
-                    </div>
-                  </div>
-                )}
-
-                {analysis.testCases && analysis.testCases.length > 0 && (
-                  <div className="mt-2">
-                    <span className="text-gray-500">Test Cases ({analysis.testCases.length}):</span>
-                    <div className="mt-1 space-y-1">
-                      {analysis.testCases.map(tc => (
-                        <div key={tc.id} className="text-xs p-2 bg-gray-800 rounded">
-                          <span className="text-gray-400">{tc.prompt.substring(0, 50)}...</span>
-                          {tc.expectedTool && (
-                            <span className="ml-2 text-blue-400">→ {tc.expectedTool}</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              <h2 className="text-lg font-semibold mb-2">🔬 Analysis</h2>
+              <p className="text-sm text-gray-300 mb-2"><strong>Diagnosis:</strong> {analysis.diagnosis}</p>
+              <div className="flex items-center gap-2 text-xs text-purple-400 mb-4">
+                <div className="flex-1 h-1.5 bg-gray-700 rounded-full"><div className="h-full bg-purple-500 rounded-full" style={{ width: `\${analysis.confidence}%` }} /></div>
+                {analysis.confidence}% confidence
               </div>
+              <button onClick={() => setShowProstheticReview(true)} className="w-full py-2 bg-purple-600 rounded text-sm font-medium">Review & Apply</button>
             </div>
           )}
 
-          {/* Recent Alerts */}
           <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              🔔 Recent Alerts
-              <span className="text-sm font-normal text-gray-500">({alerts.length})</span>
-            </h2>
-
-            {alerts.length === 0 ? (
-              <div className="text-gray-500 text-center py-4 text-sm">
-                No alerts yet
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {alerts.map(alert => (
-                  <div
-                    key={alert.id}
-                    className={`p-2 rounded-lg border text-sm ${getSeverityColor(alert.severity)}`}
-                  >
-                    <div className="font-medium">{alert.patternName}</div>
-                    <div className="text-xs opacity-75">{alert.message}</div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <h2 className="text-lg font-semibold mb-4">🔔 Recent Alerts</h2>
+            <div className="space-y-2">
+              {alerts.length ? alerts.map(a => <div key={a.id} className={`p-2 rounded border text-sm \${getSeverityColor(a.severity)}`}><strong>{a.patternName}</strong>: {a.message}</div>) : <div className="text-gray-500 text-center text-sm">No alerts yet</div>}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Prosthetic Review Modal */}
       {showProstheticReview && analysis && (
         <ProstheticReview
-          analysis={{
-            ...analysis,
-            affectedPatterns: patterns.map(p => p.name).slice(0, 5)
-          }}
+          analysis={{ ...analysis, affectedPatterns: patterns.map(p => p.name).slice(0, 5) }}
           onApprove={async (modelId, modifications) => {
-            try {
-              const res = await fetch(`${API_BASE}/controller/apply-prosthetic`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  modelId,
-                  prosthetic: {
-                    ...analysis.suggestedProsthetic,
-                    ...modifications
-                  },
-                  testFirst: true
-                })
-              });
-
-              if (res.ok) {
-                setShowProstheticReview(false);
-                setAnalysis(null);
-                loadData();
-                alert('Prosthetic applied successfully!');
-              } else {
-                const data = await res.json();
-                setError(data.error || 'Failed to apply prosthetic');
-              }
-            } catch (err: any) {
-              setError(err.message);
-            }
+            const res = await fetch('http://localhost:3001/api/tooly/controller/apply-prosthetic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ modelId, prosthetic: { ...analysis.suggestedProsthetic, ...modifications }, testFirst: true }) });
+            if (res.ok) { setShowProstheticReview(false); loadData(); alert('Applied!'); }
           }}
-          onReject={(reason) => {
-            console.log('Prosthetic rejected:', reason);
-            setShowProstheticReview(false);
-          }}
+          onReject={() => setShowProstheticReview(false)}
           onClose={() => setShowProstheticReview(false)}
         />
       )}
     </div>
   );
 }
-
-// Summary Card Component
-function SummaryCard({ title, value, icon, color }: { 
-  title: string; 
-  value: number; 
-  icon: string;
-  color: string;
-}) {
-  return (
-    <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
-      <div className="flex items-center gap-3">
-        <span className="text-2xl">{icon}</span>
-        <div>
-          <div className={`text-2xl font-bold ${color}`}>{value}</div>
-          <div className="text-sm text-gray-500">{title}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-

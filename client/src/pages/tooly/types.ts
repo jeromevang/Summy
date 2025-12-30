@@ -1,4 +1,9 @@
-import type { Recommendation } from '../../components/Recommendations';
+import type { Recommendation as BaseRecommendation } from '../../components/Recommendations';
+
+export interface Recommendation extends BaseRecommendation {
+  task: string;
+  suitability: 'excellent' | 'good' | 'fair' | 'poor';
+}
 
 // ============================================================
 // TYPES
@@ -60,7 +65,7 @@ export interface ContextLatencyData {
   modelMaxContext?: number;
   minLatency?: number;
   isInteractiveSpeed?: boolean;
-  speedRating?: 'excellent' | 'good' | 'acceptable' | 'slow' | 'very_slow';
+  speedRating?: 'excellent' | 'good' | 'acceptable' | 'slow';
 }
 
 export interface ModelInfo {
@@ -87,7 +92,7 @@ export interface ModelProfile {
   capabilities: Record<string, { supported: boolean; score: number; nativeAliases?: string[]; testsPassed?: number; testsFailed?: number }>;
   contextLength?: number;
   maxContextLength?: number;
-  role?: 'main' | 'executor' | 'both' | 'none';
+  role: 'main' | 'executor' | 'both' | 'none';
   probeResults?: ProbeResults;
   contextLatency?: ContextLatencyData;
   systemPrompt?: string;

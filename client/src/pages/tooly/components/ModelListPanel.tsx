@@ -111,7 +111,7 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
       if (cancelTestAllRef.current) break;
       
       const model = lmstudioModels[i];
-      setTestAllProgress(prev => prev ? {
+      setTestAllProgress((prev: any) => prev ? {
         ...prev,
         current: i + 1,
         currentModelName: model.displayName
@@ -132,21 +132,21 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
             // Skip if too slow (> 10 seconds for standard, > 15 seconds for deep/optimization)
             const threshold = mode === 'standard' ? 10000 : 15000;
             if (latency > threshold) {
-              setTestAllProgress(prev => prev ? {
+              setTestAllProgress((prev: any) => prev ? {
                 ...prev,
                 skipped: [...prev.skipped, model.displayName]
               } : null);
               continue;
             }
           } else {
-            setTestAllProgress(prev => prev ? {
+            setTestAllProgress((prev: any) => prev ? {
               ...prev,
               skipped: [...prev.skipped, model.displayName]
             } : null);
             continue;
           }
         } catch {
-          setTestAllProgress(prev => prev ? {
+          setTestAllProgress((prev: any) => prev ? {
             ...prev,
             skipped: [...prev.skipped, model.displayName]
           } : null);
@@ -188,13 +188,13 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
           });
         }
         
-        setTestAllProgress(prev => prev ? {
+        setTestAllProgress((prev: any) => prev ? {
           ...prev,
           completed: [...prev.completed, model.displayName]
         } : null);
       } catch (error) {
         console.error(`Failed to test ${model.id}:`, error);
-        setTestAllProgress(prev => prev ? {
+        setTestAllProgress((prev: any) => prev ? {
           ...prev,
           skipped: [...prev.skipped, model.displayName]
         } : null);
@@ -257,22 +257,31 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex flex-col gap-3 mb-4">
+    <div className="flex flex-col h-full overflow-hidden bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-6 shadow-xl">
+      <div className="flex flex-col gap-4 mb-6">
         {/* Header row */}
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Available Models</h3>
-          {/* Filters */}
           <div className="flex items-center gap-3">
+            <div className="bg-purple-500/20 p-2 rounded-lg">
+              <span className="text-xl text-purple-400">🤖</span>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">Model Hub</h3>
+              <p className="text-xs text-gray-500 font-mono uppercase tracking-widest">Available Intelligence</p>
+            </div>
+          </div>
+          
+          {/* Filters */}
+          <div className="flex items-center gap-4">
             {/* Provider Filter */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">Provider:</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold ml-1">Source</span>
               <select
                 value={providerFilter}
                 onChange={(e) => setProviderFilter(e.target.value as ProviderFilter)}
-                className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
+                className="bg-[#252525] border border-[#3d3d3d] rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none appearance-none cursor-pointer min-w-[140px]"
               >
-                <option value="all">All</option>
+                <option value="all">All Providers</option>
                 <option value="lmstudio" disabled={!availableProviders.lmstudio}>
                   LM Studio {availableProviders.lmstudio ? '' : '(offline)'}
                 </option>
@@ -283,69 +292,90 @@ export const ModelListPanel: React.FC<ModelListPanelProps> = ({
                   Azure {availableProviders.azure ? '' : '(not configured)'}
                 </option>
                 <option value="openrouter" disabled={!availableProviders.openrouter}>
-                  🚀 OpenRouter {availableProviders.openrouter ? '(Free)' : '(no key)'}
+                  🚀 OpenRouter
                 </option>
               </select>
             </div>
             
             {/* Test Mode */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">Mode:</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold ml-1">Strategy</span>
               <select
                 value={testMode}
                 onChange={(e) => setTestMode(e.target.value as TestMode)}
-                className="bg-[#2d2d2d] border border-[#3d3d3d] rounded px-2 py-1 text-xs text-gray-300 focus:border-purple-500 focus:outline-none"
+                className="bg-[#252525] border border-[#3d3d3d] rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none appearance-none cursor-pointer min-w-[120px]"
                 title="Controls model loading/unloading during tests"
               >
-                <option value="quick">Quick</option>
-                <option value="keep_on_success">Keep</option>
-                <option value="manual">Manual</option>
+                <option value="quick">⚡ Quick</option>
+                <option value="keep_on_success">🔄 Keep</option>
+                <option value="manual">🛠️ Manual</option>
               </select>
             </div>
           </div>
         </div>
+
         {/* Action buttons row */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 pt-2 border-t border-[#2d2d2d]">
           {/* Test All Models Button */}
           <button
             onClick={handleTestAllClick}
             disabled={lmstudioModels.length === 0}
-            className={`px-3 py-1 text-xs rounded transition-colors ${
-              testingAllModels 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
+              testingAllModels
+                ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20'
+                : 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/20'
+            } disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed`}
           >
-            {testingAllModels ? '⏹️ Stop' : '🧪 Test All'}
+            {testingAllModels ? (
+              <><span className="animate-spin text-sm">⚙️</span> Stop Testing</>
+            ) : (
+              <><span className="text-sm">🧪</span> Full Sweep</>
+            )}
           </button>
           
           {/* Test Intents Button */}
           <button
             onClick={handleTestIntents}
             disabled={lmstudioModels.length === 0 || testingAllModels}
-            className={`px-3 py-1 text-xs rounded transition-colors ${
-              testingIntents 
-                ? 'bg-red-600 hover:bg-red-700 text-white' 
-                : 'bg-orange-600 hover:bg-orange-700 text-white'
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 ${
+              testingIntents
+                ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20'
+                : 'bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-600/20'
+            } disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed`}
           >
-            {testingIntents ? '⏹️ Stop' : '🎯 Test Intents'}
+            {testingIntents ? (
+              <><span className="animate-spin text-sm">⚙️</span> Stop</>
+            ) : (
+              <><span className="text-sm">🎯</span> Intent Audit</>
+            )}
           </button>
           
+          <div className="h-6 w-px bg-[#3d3d3d] mx-1" />
+
           {/* Agentic Readiness Button */}
           <button
             onClick={() => navigate('/tooly/readiness')}
-            className="px-3 py-1 text-xs rounded transition-colors bg-cyan-600 hover:bg-cyan-700 text-white"
+            className="px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-600/20"
           >
-            🚀 Agentic Ready
+            <span className="text-sm">🚀</span> Readiness
           </button>
           
           {/* Combo Testing Button */}
           <button
             onClick={() => navigate('/tooly/combo-test')}
-            className="px-3 py-1 text-xs rounded transition-colors bg-amber-600 hover:bg-amber-700 text-white"
+            className="px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20"
           >
-            🧪 Combo Test
+            <span className="text-sm">⚖️</span> Pair Analysis
+          </button>
+
+          <div className="flex-1" />
+
+          <button
+            onClick={() => fetchModels()}
+            className="p-2 text-gray-400 hover:text-white hover:bg-[#2d2d2d] rounded-lg transition-colors"
+            title="Refresh Model List"
+          >
+            <span className="text-lg">🔄</span>
           </button>
         </div>
       </div>

@@ -1,0 +1,30 @@
+{
+  "name": "@summy/database",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "index:code": "tsx scripts/analyze-codebase.ts",
+    "split:file": "tsx scripts/split-files.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "chalk": "^5.6.2",
+    "drizzle-orm": "^0.45.1",
+    "fs-extra": "^11.3.2",
+    "glob": "^11.0.1",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.19.3",
+    "drizzle-kit": "^0.31.8",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

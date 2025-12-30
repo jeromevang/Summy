@@ -166,6 +166,16 @@ class MCPClient {
           console.log('[MCP] Launching via tsx src/server.ts');
         }
 
+        // Add model config path to args if it exists for the current model
+        const activeModelId = process.env.MAIN_MODEL_ID || process.env.LMSTUDIO_MODEL;
+        if (activeModelId) {
+          const configPath = path.resolve(this.mcpServerPath, 'configs', 'models', `${activeModelId.replace(/[^a-zA-Z0-9-_.]/g, '_')}.json`);
+          if (require('fs').existsSync(configPath)) {
+            console.log(`[MCP] Found model-specific config: ${configPath}`);
+            args.push('--config', configPath);
+          }
+        }
+
         console.log(`[MCP] Spawning: ${cmd} ${args.join(' ')}`);
 
         this.process = spawn(cmd, args, {

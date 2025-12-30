@@ -115,7 +115,22 @@ export class TestEngine {
   }
 
   private formatCategory(cat: string): string {
-    const map: Record<string, string> = { '1.x': 'Tool Behavior', '2.x': 'Reasoning', '3.x': 'RAG Usage', '8.x': 'Intent Recognition', '9.x': 'Failure Modes', '10.x': 'Stateful', '14.x': 'Compliance' };
+    const map: Record<string, string> = {
+      '1.x': 'Tool Behavior',
+      '2.x': 'Reasoning',
+      '3.x': 'RAG Usage',
+      '4.x': 'Bug Detection',
+      '5.x': 'Navigation',
+      '6.x': 'Helicopter View',
+      '7.x': 'Proactive',
+      '8.x': 'Intent Recognition',
+      '9.x': 'Failure Modes',
+      '10.x': 'Stateful',
+      '11.x': 'Precedence',
+      '12.x': 'Evolution',
+      '13.x': 'Calibration',
+      '14.x': 'Compliance'
+    };
     return map[cat] || cat;
   }
 

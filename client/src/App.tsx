@@ -14,15 +14,17 @@ import Debug from './pages/Debug';
 import RAG from './pages/RAG';
 import Layout from './components/Layout';
 import { ToastProvider, useToast } from './components/Toast';
+import { useWebSocketConnection } from './hooks/useWebSocketManager';
 
 // Component to handle WebSocket notifications
 const NotificationListener: React.FC = () => {
   const { addToast } = useToast();
+  const ws = useWebSocketConnection(`ws://${window.location.hostname}:3001/ws`);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://${window.location.hostname}:3001/ws`);
+    if (!ws) return;
 
-    ws.onmessage = (event) => {
+    const handleMessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === 'notification') {
@@ -34,14 +36,12 @@ const NotificationListener: React.FC = () => {
       }
     };
 
-    ws.onerror = () => {
-      // WebSocket error - silently ignore
-    };
-
+    ws.addEventListener('message', handleMessage);
+    
     return () => {
-      ws.close();
+      ws.removeEventListener('message', handleMessage);
     };
-  }, [addToast]);
+  }, [ws, addToast]);
 
   return null;
 };

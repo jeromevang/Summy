@@ -26,8 +26,15 @@ interface ModelProfile {
     suppressionTest?: ProbeResult;
     strategicRAGProbes?: Array<{ name: string; passed: boolean; score: number }>;
     architecturalProbes?: Array<{ name: string; passed: boolean; score: number }>;
+    navigationProbes?: Array<{ name: string; passed: boolean; score: number }>;
+    helicopterProbes?: Array<{ name: string; passed: boolean; score: number }>;
+    proactiveProbes?: Array<{ name: string; passed: boolean; score: number }>;
     intentProbes?: Array<{ name: string; passed: boolean; score: number }>;
     reasoningProbes?: Record<string, ProbeResult>;
+    failureModeProbes?: Array<{ name: string; passed: boolean; score: number }>;
+    statefulProbes?: Array<{ name: string; passed: boolean; score: number }>;
+    precedenceProbes?: Array<{ name: string; passed: boolean; score: number }>;
+    complianceProbes?: Array<{ name: string; passed: boolean; score: number }>;
   };
 }
 
@@ -66,6 +73,30 @@ const CAPABILITY_SECTIONS = [
     name: 'Intent Recognition (8.x)',
     icon: '🎯',
     arrayKey: 'intentProbes'
+  },
+  {
+    id: 'failure',
+    name: 'Failure Modes (9.x)',
+    icon: '⚠️',
+    arrayKey: 'failureModeProbes'
+  },
+  {
+    id: 'stateful',
+    name: 'Stateful (10.x)',
+    icon: '⏳',
+    arrayKey: 'statefulProbes'
+  },
+  {
+    id: 'precedence',
+    name: 'Precedence (11.x)',
+    icon: '⚖️',
+    arrayKey: 'precedenceProbes'
+  },
+  {
+    id: 'compliance',
+    name: 'Compliance (14.x)',
+    icon: '📜',
+    arrayKey: 'complianceProbes'
   }
 ];
 

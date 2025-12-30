@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import Sidebar from './Sidebar';
 import ServerStatus from './ServerStatus';
 import { NotificationBell, ToastContainer } from './notifications';
 
@@ -21,129 +22,60 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return <>{children}</>;
   }
 
-  return (
-    <div className="min-h-screen bg-[#0d0d0d]">
-      {/* Navigation */}
-      <nav className="bg-[#1a1a1a] border-b border-[#2d2d2d]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-14">
-            <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                ✨ Summy
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <ServerStatus />
-              <NotificationBell />
-              <div className="flex space-x-1">
-                <Link
-                  to="/"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/'
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/sessions"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/sessions'
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                >
-                  Sessions
-                </Link>
-                <Link
-                  to="/tooly"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/tooly' || location.pathname.startsWith('/tooly/')
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                >
-                  Tooly
-                </Link>
-                <Link
-                  to="/tooly/readiness"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/tooly/readiness'
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                  title="Agentic Readiness Assessment"
-                >
-                  🚀 Readiness
-                </Link>
-                <Link
-                  to="/tooly/combo-test"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/tooly/combo-test'
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                  title="Combo Testing - Find Best Model Pairs"
-                >
-                  🧪 Combo
-                </Link>
-                <Link
-                  to="/tooly/controller"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/tooly/controller'
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                  title="Self-Improving System Controller"
-                >
-                  🎮 Controller
-                </Link>
-                <Link
-                  to="/rag"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/rag'
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                >
-                  RAG
-                </Link>
-                <Link
-                  to="/debug"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/debug'
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                >
-                  Debug
-                </Link>
-                <Link
-                  to="/settings"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    location.pathname === '/settings'
-                      ? 'bg-[#2d2d2d] text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-[#2d2d2d]'
-                  }`}
-                >
-                  Settings
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+  // Generate breadcrumbs/page title
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path === '/') return 'Dashboard';
+    if (path === '/sessions') return 'Conversations';
+    if (path === '/rag') return 'Semantic Index';
+    if (path === '/settings') return 'Configuration';
+    if (path === '/debug') return 'System Diagnostics';
+    if (path.startsWith('/tooly')) {
+      if (path === '/tooly/readiness') return 'Agentic Readiness';
+      if (path === '/tooly/combo-test') return 'Combo Optimizer';
+      if (path === '/tooly/controller') return 'System Controller';
+      if (path === '/tooly/prosthetics') return 'Prosthetic Manager';
+      return 'Tooly Hub';
+    }
+    return '';
+  };
 
-      {/* Main content */}
-      <main className={`${isToolyPage ? 'w-full px-4' : 'max-w-7xl mx-auto'} py-6 sm:px-6 lg:px-8`}>
-        {children}
-      </main>
+  return (
+    <div className="min-h-screen bg-[#0d0d0d] text-gray-100 flex overflow-hidden">
+      {/* Sidebar Navigation */}
+      <Sidebar />
+
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Context Bar */}
+        <header className="h-16 flex items-center justify-between px-8 bg-[#0d0d0d]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-10">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-lg font-semibold text-white tracking-tight">
+              {getPageTitle()}
+            </h1>
+          </div>
+          
+          <div className="flex items-center space-x-6">
+            <ServerStatus />
+            <div className="h-4 w-[1px] bg-white/10" />
+            <NotificationBell />
+          </div>
+        </header>
+
+        {/* Main Content Scroll Area */}
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className={`${isToolyPage ? 'w-full px-8' : 'max-w-7xl mx-auto px-8'} py-8`}>
+            {children}
+          </div>
+        </main>
+      </div>
 
       {/* Toast notifications */}
       <ToastContainer />
     </div>
   );
 };
+
+export default Layout;
+
 
 export default Layout;

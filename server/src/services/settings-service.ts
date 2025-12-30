@@ -1,30 +1,9 @@
 import path from 'path';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
+import { ServerSettings } from '@summy/shared';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const SETTINGS_FILE = path.join(__dirname, '../settings.json');
-
-export interface ServerSettings {
-    provider: 'openai' | 'azure' | 'lmstudio' | 'openrouter';
-    openaiModel: string;
-    azureResourceName: string;
-    azureDeploymentName: string;
-    azureApiKey: string;
-    azureApiVersion: string;
-    lmstudioUrl: string;
-    lmstudioModel: string;
-    openrouterApiKey: string;
-    openrouterModel: string;
-    defaultCompressionMode: 0 | 1 | 2 | 3;
-    defaultKeepRecent: number;
-    defaultContextLength?: number;
-    proxyMode?: 'passthrough' | 'summy' | 'tooly' | 'both';
-    enableDualModel?: boolean;
-    mainModelId?: string;
-    executorModelId?: string;
-}
 
 export const loadServerSettings = async (): Promise<ServerSettings> => {
     console.log('[Settings] loadServerSettings called');

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test OpenRouter API</title>
+</head>
+<body>
+    <h1>Testing OpenRouter API</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            try {
+                const response = await fetch('http://localhost:3001/api/tooly/models');
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `
+                    <h2>API Response:</h2>
+                    <pre>${JSON.stringify(data.providers, null, 2)}</pre>
+                    <h3>Models Count: ${data.models.length}</h3>
+                    <h3>OpenRouter Models:</h3>
+                    <pre>${JSON.stringify(data.models.filter(m => m.provider === 'openrouter'), null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,2 +1,0 @@
-﻿--- TEST: Tool with additionalProperties: false and hyphenated name ---
-Result: SUCCESS

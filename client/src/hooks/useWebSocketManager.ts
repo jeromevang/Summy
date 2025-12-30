@@ -4,6 +4,7 @@
  */
 
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import React from 'react';
 
 interface ConnectionConfig {
   maxRetries?: number;

@@ -40,6 +40,7 @@ import { ideMapping, type IDEMapping } from './services/ide-mapping.js';
 import { TOOL_SCHEMAS } from './modules/tooly/tool-prompts.js';
 import { ALL_TOOLS, capabilities } from './modules/tooly/capabilities.js';
 import { db, type ContextMessage, type ContextTurn } from './services/database.js';
+import { dbManager } from './services/db/db-service.js';
 
 // Modularized Services
 import { addDebugEntry, debugLog } from './services/logger.js';

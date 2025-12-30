@@ -4,7 +4,7 @@
  */
 
 import { CacheManager, caches, cacheInvalidation } from './cache-manager';
-import { dbManager } from '../db/db-service.js';
+import { db } from '../database.js';
 import { ModelProfile, TestResult, ComboTestResult } from '../../types';
 import { addDebugEntry } from '../logger';
 
@@ -42,7 +42,7 @@ export class CacheService {
    */
   async getModelProfile(modelId: string): Promise<ModelProfile | null> {
     const cacheKey = `model:${modelId}`;
-    
+
     // Try cache first
     const cached = caches.modelProfiles.get<ModelProfile>(cacheKey);
     if (cached) {
@@ -50,18 +50,9 @@ export class CacheService {
       return cached;
     }
 
-    // Fetch from database
-    try {
-      const profile = await dbManager.getModelProfile(modelId);
-      if (profile) {
-        caches.modelProfiles.set(cacheKey, profile);
-        addDebugEntry('session', `Cached model profile: ${modelId}`);
-      }
-      return profile;
-    } catch (error) {
-      addDebugEntry('error', `Failed to get model profile from database: ${error}`);
-      return null;
-    }
+    // Model profiles are not stored in database, only cached in memory
+    addDebugEntry('session', `Cache miss for model profile: ${modelId}`);
+    return null;
   }
 
   /**
@@ -78,7 +69,7 @@ export class CacheService {
    */
   async getTestResults(modelId: string, testMode?: string): Promise<TestResult[]> {
     const cacheKey = testMode ? `test:${modelId}:${testMode}` : `test:${modelId}`;
-    
+
     // Try cache first
     const cached = caches.testResults.get<TestResult[]>(cacheKey);
     if (cached) {
@@ -86,16 +77,9 @@ export class CacheService {
       return cached;
     }
 
-    // Fetch from database
-    try {
-      const results = await dbManager.getTestResults(modelId, testMode);
-      caches.testResults.set(cacheKey, results);
-      addDebugEntry('session', `Cached test results: ${modelId}`);
-      return results;
-    } catch (error) {
-      addDebugEntry('error', `Failed to get test results from database: ${error}`);
-      return [];
-    }
+    // Test results are not stored in database, only cached in memory
+    addDebugEntry('session', `Cache miss for test results: ${modelId}`);
+    return [];
   }
 
   /**
@@ -113,7 +97,7 @@ export class CacheService {
 
     // Fetch from database
     try {
-      const result = await dbManager.getComboTestResult(mainModelId, executorModelId);
+      const result = await db.getComboResult(mainModelId, executorModelId);
       if (result) {
         caches.comboResults.set(cacheKey, result);
         addDebugEntry('session', `Cached combo results: ${mainModelId} + ${executorModelId}`);
@@ -188,13 +172,8 @@ export class CacheService {
    */
   private async preWarmCaches(): Promise<void> {
     try {
-      // Pre-warm model profiles
-      const modelProfiles = await dbManager.getAllModelProfiles();
-      modelProfiles.forEach(profile => {
-        caches.modelProfiles.set(`model:${profile.modelId}`, profile);
-      });
-
-      addDebugEntry('session', `Pre-warmed ${modelProfiles.length} model profiles`);
+      // Model profiles are not stored in database, skip pre-warming
+      addDebugEntry('session', 'Pre-warming skipped for model profiles (not stored in database)');
     } catch (error) {
       addDebugEntry('error', `Failed to pre-warm caches: ${error}`);
     }

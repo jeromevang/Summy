@@ -69,6 +69,87 @@ export const TOOL_SYNONYMS: Record<string, string[]> = {
     'base64_decode': ['decode', 'from_base64', 'b64_decode']
 };
 
+/**
+ * Identify the provider for a model ID
+ */
+export async function getModelProvider(modelId: string, capabilities: any): Promise<string> {
+  try {
+    const profile = await capabilities.getProfile(modelId);
+    if (profile?.provider && profile.provider !== 'unknown') {
+      return profile.provider;
+    }
+  } catch {}
+
+  const openRouterPrefixes = ['allenai/', 'mistral/', 'nvidia/', 'xiaomi/', 'meta/', 'google/', 'anthropic/', 'microsoft/', 'cohere/', 'together/', 'deepseek/', 'tng/', 'arcee/', 'nex/', 'zephyr/', 'moonshot/', 'venice/', 'nous/', 'phind/', 'perplexity/'];
+  
+  if (openRouterPrefixes.some(prefix => modelId.startsWith(prefix))) {
+    if (modelId.startsWith('qwen/') && modelId.includes('coder')) return 'lmstudio';
+    return 'openrouter';
+  }
+  return 'lmstudio';
+}
+
+/**
+ * Get basic tool schemas for testing
+ */
+export function getBasicTools(): any[] {
+  return [
+    {
+      type: 'function',
+      function: {
+        name: 'read_file',
+        description: 'Read the contents of a file',
+        parameters: {
+          type: 'object',
+          properties: {
+            filepath: { type: 'string', description: 'Path to the file' },
+          },
+          required: ['filepath'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'rag_query',
+        description: 'Search the codebase semantically',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Search query' },
+          },
+          required: ['query'],
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'git_status',
+        description: 'Get git status',
+        parameters: {
+          type: 'object',
+          properties: {},
+        },
+      },
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'shell_exec',
+        description: 'Execute a shell command',
+        parameters: {
+          type: 'object',
+          properties: {
+            command: { type: 'string', description: 'Command to run' },
+          },
+          required: ['command'],
+        },
+      },
+    },
+  ];
+}
+
 export function extractKeywords(toolName: string): string[] {
     return toolName
         .toLowerCase()

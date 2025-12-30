@@ -20,33 +20,38 @@ Based on industry standards (React, TypeScript, Node.js best practices):
 - **Separation of concerns**: Components, hooks, utils, types in separate folders
 - **Flat structure**: Avoid deep nesting (>3 levels)
 
-## Phase 1: Database Service Setup
+## Phase 1: Infrastructure & Shared Core
 
-### 1.1 Create Database Folder Structure
+### 1.1 Shared Types Workspace
+To prevent circular dependencies and ensure type safety across split files, we will establish a shared types package.
+- **Directory**: `packages/types/`
+- **Action**: Initialize as an npm workspace and migrate shared interfaces from `client/` and `server/`.
+
+### 1.2 Database Service Setup
+- **ORM Choice**: **Drizzle ORM** (Lightweight, TypeScript-first, perfect for small-file architectures).
+- **Structure**:
 ```
 database/
 ├── package.json
+├── drizzle.config.ts               # Drizzle migration config
 ├── src/
-│   ├── index.ts                    # Database service entry point
+│   ├── index.ts                    # Service entry point
+│   ├── db/
+│   │   ├── schema.ts               # Drizzle schema definitions
+│   │   └── client.ts               # DB client initialization
 │   ├── services/
-│   │   ├── database.ts            # Core database operations
+│   │   ├── database.ts            # Core operations
 │   │   └── code-index.ts          # Code indexing operations
 │   └── analysis/
-│       ├── ast-parser.ts          # AST analysis for dependencies
-│       ├── index-builder.ts       # Code index building logic
-│       └── file-splitter.ts       # Automated file splitting
-├── data/                         # Database files
-│   ├── summy.db
-│   ├── summy.db-shm
-│   ├── summy.db-wal
-│   └── model-profiles/
+│       ├── ast-parser.ts          # AST analysis
+│       └── file-splitter.ts       # Automated splitting
+├── data/                          # SQLite files
 └── scripts/
-    ├── analyze-codebase.ts       # Build initial index
-    ├── update-index.ts          # Incremental updates
-    └── split-files.ts           # File splitting utility
+    ├── analyze-codebase.ts
+    └── validate-exports.ts        # Script to verify barrel exports
 ```
 
-### 1.2 Database Schema
+### 1.3 Database Schema
 ```sql
 -- File metadata
 CREATE TABLE code_index (
@@ -310,14 +315,20 @@ const mcpRules = {
 
 ## Phase 5: Testing & Validation
 
-### 5.1 Testing Strategy
+### 5.1 Validation Scripts
+Implement a `validate-exports.ts` utility using `ts-morph` to ensure that:
+1. All required symbols are exported via barrel files (`index.ts`).
+2. No circular dependencies are introduced during splitting.
+3. Every new small file is covered by at least one export chain.
+
+### 5.2 Testing Strategy
 - [ ] Run full test suite after each file split
-- [ ] Import/export validation
+- [ ] Execute `npm run validate-exports`
 - [ ] Component integration testing
 - [ ] API endpoint testing
 - [ ] End-to-end workflow testing
 
-### 5.2 Performance Validation
+### 5.3 Performance Validation
 - [ ] LLM context size reduction measurement
 - [ ] File discovery speed testing
 - [ ] Function tracing accuracy validation
@@ -380,6 +391,21 @@ If issues arise:
 2. Rollback imports to point to original files
 3. Gradually migrate imports back to new structure
 4. Use git to revert changes if needed
+
+## System Architecture (Target State)
+
+```mermaid
+graph TD
+    IDE[IDE - Cursor/VSCode] --> Proxy[Proxy Server - server/]
+    Proxy --> DB_Service[Database Service - database/]
+    Proxy --> OpenAI[AI Providers]
+    DB_Service --> SQLite[SQLite DB - data/summy.db]
+    Client[Web Client - client/] --> Proxy
+    RAG[RAG Server - rag-server/] --> DB_Service
+    Types[Shared Types - packages/types/] -.-> Proxy
+    Types -.-> DB_Service
+    Types -.-> Client
+```
 
 ---
 

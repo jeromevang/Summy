@@ -5,40 +5,21 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
+import { 
+  ModelIdSchema, 
+  ProviderSchema, 
+  BooleanSchema, 
+  TestExecutionSchema, 
+  ProbeExecutionSchema, 
+  ComboTestSchema, 
+  FailureLogSchema 
+} from '@summy/shared';
 
-// Common validation schemas
-export const ModelIdSchema = z.string().min(1, 'Model ID is required').max(500, 'Model ID too long');
-export const ProviderSchema = z.enum(['all', 'lmstudio', 'openai', 'azure', 'openrouter']).default('all');
-export const BooleanSchema = z.preprocess((val) => {
-  if (typeof val === 'boolean') return val;
-  if (val === 'true' || val === '1') return true;
-  if (val === 'false' || val === '0') return false;
-  return undefined;
-}, z.boolean().default(false));
-
-// Test execution validation
-export const TestExecutionSchema = z.object({
+// System prompt validation
+export const SystemPromptSchema = z.object({
   modelId: ModelIdSchema,
-  provider: ProviderSchema,
-  runLatencyProfile: BooleanSchema,
-  isBaseline: BooleanSchema,
-  runCount: z.number().int().min(1).max(10).default(1)
-});
-
-// Probe execution validation
-export const ProbeExecutionSchema = z.object({
-  modelId: ModelIdSchema,
-  categories: z.array(z.string()).optional(),
-  mode: z.enum(['quick', 'full']).default('full'),
-  isBaseline: BooleanSchema
-});
-
-// Combo test validation
-export const ComboTestSchema = z.object({
-  mainModelId: ModelIdSchema,
-  executorModelId: ModelIdSchema,
-  runCount: z.number().int().min(1).max(10).default(1),
-  includeQualifyingGate: BooleanSchema
+  systemPrompt: z.string().min(10, 'System prompt must be at least 10 characters'),
+  append: BooleanSchema
 });
 
 // Prosthetic validation
@@ -52,24 +33,6 @@ export const ProstheticSchema = z.object({
   testFirst: BooleanSchema
 });
 
-// System prompt validation
-export const SystemPromptSchema = z.object({
-  modelId: ModelIdSchema,
-  systemPrompt: z.string().min(10, 'System prompt must be at least 10 characters'),
-  append: BooleanSchema
-});
-
-// Failure log validation
-export const FailureLogSchema = z.object({
-  modelId: ModelIdSchema,
-  executorModelId: ModelIdSchema.optional(),
-  category: z.enum(['tool', 'intent', 'rag', 'reasoning', 'architectural', 'navigation', 'proactive', 'helicopter']).optional(),
-  tool: z.string().optional(),
-  error: z.string().min(1, 'Error message is required'),
-  query: z.string().min(5, 'Query must be at least 5 characters'),
-  expectedBehavior: z.string().optional(),
-  actualBehavior: z.string().optional()
-});
 
 // Rate limiting validation
 export const RateLimitSchema = z.object({
@@ -127,9 +90,10 @@ export function validateSchema(schema: z.ZodSchema) {
       }
 
       next();
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errors = error.errors.map(err => ({
+    } catch (error: any) {
+      const issues = error?.issues || error?.errors;
+      if (issues && Array.isArray(issues)) {
+        const errors = issues.map((err: any) => ({
           field: err.path.join('.'),
           message: err.message,
           code: err.code
@@ -153,9 +117,10 @@ export function validateSchema(schema: z.ZodSchema) {
  */
 export function sanitizeInput(input: any): any {
   if (typeof input === 'string') {
-    // Remove potentially dangerous characters
+    // Remove potentially dangerous HTML tags and their content
     return input
-      .replace(/[<>]/g, '') // Remove HTML tags
+      .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, '') // Remove scripts
+      .replace(/<[^>]*>?/gm, '') // Remove any other HTML tags
       .replace(/javascript:/gi, '') // Remove JS protocols
       .replace(/on\w+=/gi, '') // Remove event handlers
       .trim();

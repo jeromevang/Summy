@@ -1,5 +1,0 @@
-﻿--- TEST: With Tools, NO parallel_tool_calls ---
-Result 1: SUCCESS
-
---- TEST: With Tools, parallel_tool_calls: false ---
-Result 2: SUCCESS

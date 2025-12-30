@@ -271,6 +271,31 @@ Combo Pairs → Testing → Results → Stored → END ❌ (NO LEARNING!)
 
 ---
 
+## ✅ COMPLETED (Current Session - Dec 30, 2025)
+
+### 🎯 **CRITICAL BUG FIX: TEMPLATE LITERAL INTERPOLATION**
+
+**Goal**: Fix widespread "escaped template literal" bug that caused 401 Unauthorized errors and broken logging/RAG services.
+
+#### **Backend Fixes**
+1. ✅ **Universal Template Literal Correction**
+   - Fixed 35+ files where variables were escaped in template literals (e.g., `` `\${var}` `` → `` `${var}` ``).
+   - Resolved **401 Unauthorized** with OpenRouter (API key was sent as literal string).
+   - Fixed RAG health checks and queries (URL variables were not interpolating).
+   - Fixed logging, tracing, and health check messages across all services.
+   - Fixed `capabilities-manager.ts` path resolution and save/load logic.
+
+2. ✅ **GPS Database Verification**
+   - Confirmed GPS (Surgical Precision) uses `rag-server/data/rag.db` and main `data/summy.db`.
+   - Verified file watcher triggers `database/scripts/analyze-codebase.ts` for sync.
+
+#### **Impact**
+- **OpenRouter Assessment**: 401 errors resolved; models should now pass Qualifying Gate.
+- **System-wide Stability**: Logging, tracing, and service communication restored.
+- **RAG & GPS**: Search and symbol navigation now correctly use interpolated paths and queries.
+
+---
+
 ## ✅ ADDITIONAL COMPLETED (Current Session - Dec 27, 2024)
 
 ### Backend - VRAM-Aware Combo Testing

@@ -191,6 +191,7 @@ export interface RAGResult {
 export interface CodeChunk {
   id: string;
   content: string;
+  contentHash: string;
   type: 'function' | 'class' | 'method' | 'module' | 'block';
   name: string;
   filePath: string;

@@ -1,4 +1,7 @@
 import React, { useEffect } from 'react';
+import { SlimHeader } from './components/SlimHeader';
+import { ModelListPanel } from './components/ModelListPanel';
+import { ModelInfoSidebar } from './components/ModelInfoSidebar';
 
 // Hooks
 import { useToolyState } from './hooks/useToolyState';
@@ -94,12 +97,45 @@ const Tooly: React.FC = () => {
   }, [state.models]);
 
   return (
-    <div className="h-full">
-      {state.legacyMode ? (
-        <LegacyTooly state={state} api={api} />
-      ) : (
-        <ToolyNext state={state} api={api} />
-      )}
+    <div className="h-full space-y-6">
+      <SlimHeader
+        activeModels={{
+          main: state.activeMainModel ? {
+            id: state.activeMainModel.id,
+            name: state.activeMainModel.displayName,
+            score: state.activeMainModel.score
+          } : undefined,
+          executor: state.activeExecutorModel ? {
+            id: state.activeExecutorModel.id,
+            name: state.activeExecutorModel.displayName,
+            score: state.activeExecutorModel.score
+          } : undefined
+        }}
+        systemMetrics={state.systemMetrics[state.systemMetrics.length - 1]}
+        metricsHistory={state.systemMetrics}
+        isTestRunning={!!state.testingModel || !!state.probingModel}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-180px)]">
+        {/* Model List - Takes 3 columns */}
+        <div className="lg:col-span-3 overflow-hidden">
+          <ModelListPanel
+            {...state}
+            {...api}
+            selectedModelId={state.selectedModel?.modelId ?? null}
+          />
+        </div>
+
+        {/* Sidebar - Takes 1 column */}
+        <div className="lg:col-span-1 bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4 overflow-hidden">
+          <ModelInfoSidebar
+            profile={state.selectedModel as any}
+            isTestRunning={!!state.testingModel || !!state.probingModel}
+            onSetAsMain={() => state.selectedModel && api.setAsMainModel(state.selectedModel.modelId)}
+            onSetAsExecutor={() => state.selectedModel && api.setAsExecutorModel(state.selectedModel.modelId)}
+          />
+        </div>
+      </div>
     </div>
   );
 };

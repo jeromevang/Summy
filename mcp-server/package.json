@@ -7,10 +7,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "tsx src/server.ts",
-    "dev:standalone": "tsx src/standalone.ts",
-    "dev:cursor-tools": "tsx src/cursor-extra-tools.ts",
-    "dev:continue-tools": "tsx src/continue-extra-tools.ts"
+    "dev": "tsx watch src/server.ts",
+    "dev:standalone": "tsx watch src/standalone.ts",
+    "dev:cursor-tools": "tsx watch src/cursor-extra-tools.ts",
+    "dev:continue-tools": "tsx watch src/continue-extra-tools.ts"
   },
   "keywords": [
     "mcp",

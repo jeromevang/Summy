@@ -51,12 +51,12 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </h3>
           <div className="space-y-3">
             {profile.scoreBreakdown && Object.entries(profile.scoreBreakdown)
-              .filter(([key]) => !['avgLatencyMs', 'latencyScore', 'complianceScore', 'failureModesScore'].includes(key))
+              .filter(([key]) => !['avgLatencyMs', 'latencyScore', 'complianceScore', 'failureModesScore', 'overallScore'].includes(key))
               .map(([key, value]) => (
-              <ScoreBar 
-                key={key} 
-                label={formatLabel(key)} 
-                value={value} 
+              <ScoreBar
+                key={key}
+                label={formatLabel(key)}
+                value={value}
                 color={getScoreColor(value)}
               />
             ))}
