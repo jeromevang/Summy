@@ -18,10 +18,11 @@ The project is structured as a **Monorepo** using npm workspaces.
 
 | Service | Directory | Tech Stack | Description |
 | :--- | :--- | :--- | :--- |
-| **Proxy Server** | `server/` | Node.js, Express, SQLite, Vectra | The core backend. Handles request proxying, data persistence, and websocket updates. |
-| **Web Client** | `client/` | React, Vite, TailwindCSS, Recharts | The frontend UI. Provides a dashboard for session management and analytics. |
-| **MCP Server** | `mcp-server/` | Node.js, TypeScript | Implements the Model Context Protocol. Exposes local tools (FS, Git, Browser) to AI agents. |
+| **Proxy Server** | `server/` | Node.js, Express, SQLite | The core backend. Handles request proxying, data persistence, and modular routes. |
+| **Web Client** | `client/` | React, Vite, TailwindCSS | The frontend UI. Dashboard for session management, testing, and model analytics. |
+| **MCP Server** | `mcp-server/` | Node.js, TypeScript | Implements MCP. Exposes FS, Git, Browser, and Tracing tools to AI agents. |
 | **RAG Server** | `rag-server/` | Node.js, Express, LanceDB | specialized vector search service for semantic code queries and embeddings. |
+| **Database** | `database/` | Node.js, Drizzle, SQLite | Code Index System. Uses `ts-morph` for AST parsing and dependency graph mapping. |
 
 ## Building and Running
 
@@ -98,7 +99,10 @@ npm run build
 ## Key Files & Paths
 
 - `server/src/index.ts`: Entry point for the Proxy Server.
+- `server/src/routes/tooly/`: Modular API routes for model testing and configuration.
 - `client/src/App.tsx`: Main React component structure.
 - `mcp-server/src/server.ts`: Main MCP server implementation.
 - `rag-server/src/index.ts`: RAG server entry point.
-- `data/summy.db`: Main SQLite database (created at runtime).
+- `database/src/analysis/ast-parser.ts`: Core AST parsing logic using `ts-morph`.
+- `database/scripts/analyze-codebase.ts`: Code indexing orchestrator script.
+- `data/summy.db`: Main SQLite database (contains sessions, profiles, and code index).

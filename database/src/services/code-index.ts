@@ -1,12 +1,14 @@
 import { db } from './database.js';
-import { SemanticUnit } from '../analysis/ast-parser.js';
 
 export class CodeIndexService {
+  private getConnection() {
+    return db.getConnection();
+  }
+
   /**
    * Search for symbols across the codebase
    */
   async searchSymbols(query: string, type?: string) {
-    const connection = db.getConnection();
     let sql = 'SELECT * FROM code_chunks WHERE symbol_name LIKE ?';
     const params: any[] = [`%${query}%`];
 
@@ -14,35 +16,42 @@ export class CodeIndexService {
       sql += ' AND symbol_type = ?';
       params.push(type);
     }
-
-    return connection.prepare(sql).all(...params);
+    
+    return this.getConnection().prepare(sql).all(...params);
   }
 
-  /**
-   * Get file metadata
-   */
-  async getFileInfo(filePath: string) {
-    const connection = db.getConnection();
-    return connection.prepare('SELECT * FROM code_index WHERE file_path = ?').get(filePath);
+  async getChunk(id: string) {
+    return this.getConnection().prepare('SELECT * FROM code_chunks WHERE id = ?').get(id);
   }
 
-  /**
-   * Get all chunks for a file
-   */
   async getFileChunks(filePath: string) {
-    const connection = db.getConnection();
-    return connection.prepare('SELECT * FROM code_chunks WHERE file_path = ? ORDER BY start_line').all(filePath);
+    return this.getConnection().prepare('SELECT * FROM code_chunks WHERE file_path = ? ORDER BY start_line').all(filePath);
   }
 
   /**
-   * Record a dependency
+   * Get upstream dependencies (who calls me?)
    */
-  async addDependency(sourceId: string, targetId: string, type: string) {
-    const connection = db.getConnection();
-    return connection.prepare(`
-      INSERT INTO code_dependencies (source_chunk_id, target_chunk_id, dependency_type)
-      VALUES (?, ?, ?)
-    `).run(sourceId, targetId, type);
+  async getCallers(chunkId: string) {
+    const sql = `
+      SELECT c.* 
+      FROM code_dependencies d
+      JOIN code_chunks c ON d.source_chunk_id = c.id
+      WHERE d.target_chunk_id = ?
+    `;
+    return this.getConnection().prepare(sql).all(chunkId);
+  }
+
+  /**
+   * Get downstream dependencies (who do I call?)
+   */
+  async getCallees(chunkId: string) {
+    const sql = `
+      SELECT c.* 
+      FROM code_dependencies d
+      JOIN code_chunks c ON d.target_chunk_id = c.id
+      WHERE d.source_chunk_id = ?
+    `;
+    return this.getConnection().prepare(sql).all(chunkId);
   }
 }
 

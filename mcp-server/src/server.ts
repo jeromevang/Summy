@@ -16,6 +16,7 @@ import { registerNpmTools } from "./tools/npmTools.js";
 import { registerHttpTools } from "./tools/httpTools.js";
 import { registerBrowserTools } from "./tools/browserTools.js";
 import { registerRagTools } from "./tools/ragTools.js";
+import { registerTracingTools } from "./tools/tracingTools.js";
 import { registerSystemTools } from "./tools/systemTools.js";
 
 // ============================================================
@@ -52,6 +53,7 @@ registerNpmTools(server);
 registerHttpTools(server);
 registerBrowserTools(server);
 registerRagTools(server);
+registerTracingTools(server);
 registerSystemTools(server);
 
 // ============================================================

@@ -69,5 +69,77 @@ export async function updateModelProfile(modelId: string, provider: string, runR
         if (!profile.contextLength && runResult.contextLatency.recommendedContext) profile.contextLength = runResult.contextLatency.recommendedContext;
     }
 
+    // Calculate and store Efficiency Metrics
+    profile.efficiencyMetrics = computeEfficiencyMetrics(runResult.results);
+
     await capabilities.saveProfile(profile);
 }
+
+// ============================================================
+// NEW: Efficiency Metrics Calculation
+// ============================================================
+
+export function computeEfficiencyMetrics(results: TestResult[]): EfficiencyMetrics {
+    let totalTokensForCorrectActions = 0;
+    let correctActionsCount = 0;
+    let totalRagTokens = 0;
+    let failedRagTokens = 0;
+    let totalPlanningTokens = 0;
+    let totalToolTokens = 0;
+    let redundantToolCalls = 0;
+
+    for (const result of results) {
+        if (result.totalTokens) {
+            // tokensPerCorrectAction
+            if (result.passed) {
+                totalTokensForCorrectActions += result.totalTokens;
+                correctActionsCount++;
+            }
+
+            // ragWasteRatio (simplified proxy)
+            if (result.category === 'rag' || result.tool === 'rag_query') {
+                totalRagTokens += result.totalTokens;
+                if (!result.passed) {
+                    failedRagTokens += result.totalTokens;
+                }
+            }
+
+            // planningVerbosity (simplified proxy based on categories)
+            if (result.category === 'reasoning') {
+                totalPlanningTokens += result.totalTokens;
+            } else if (result.category === 'tool') {
+                totalToolTokens += result.totalTokens;
+            }
+
+            // redundantToolCalls (simplified proxy)
+            if (result.calledTool && !result.passed && result.error && result.error.includes('tool failed')) {
+                redundantToolCalls++;
+            }
+        }
+    }
+
+    const tokensPerCorrectAction = correctActionsCount > 0 
+        ? Math.round(totalTokensForCorrectActions / correctActionsCount)
+        : 0;
+
+    const ragWasteRatio = totalRagTokens > 0 
+        ? parseFloat((failedRagTokens / totalRagTokens).toFixed(2))
+        : 0;
+
+    const planningVerbosity = totalToolTokens > 0 
+        ? parseFloat((totalPlanningTokens / totalToolTokens).toFixed(2))
+        : 0;
+
+    return {
+        tokensPerCorrectAction,
+        ragWasteRatio,
+        planningVerbosity,
+        redundantToolCalls,
+        estimatedCostPerTask: 0, 
+        speedEfficiencyScore: 0
+    };
+}
+
+
+
+

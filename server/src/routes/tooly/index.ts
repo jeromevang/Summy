@@ -1,33 +1,52 @@
 import { Router } from 'express';
-import modelRoutes from './model-routes.js';
-import testRoutes from './test-routes.js';
-import baselineRoutes from './baseline-routes.js';
-import mcpRoutes from './mcp-routes.js';
-import actionRoutes from './action-routes.js';
-import { addSecurityHeaders, auditLog, apiRateLimit, sanitizeInput } from '../../middleware/validation.js';
+import { modelsRouter } from './models.js';
+import { testingRouter } from './testing.js';
+import { probesRouter } from './probes.js';
+import { configRouter } from './config.js';
+import { logsRouter } from './logs.js';
+import { mcpRouter } from './mcp.js';
+import { ideRouter } from './ide.js';
+import { leaderboardRouter } from './leaderboard.js';
+import { baselineRouter } from './baseline.js';
+import { customTestsRouter } from './custom-tests.js';
+
+import { 
+  addSecurityHeaders,
+  auditLog,
+  apiRateLimit,
+  sanitizeInput
+} from '../../middleware/validation.js';
 
 const router = Router();
 
-// Apply security and audit middleware
+// Apply security and audit middleware to all routes
 router.use(addSecurityHeaders());
 router.use(auditLog());
 router.use(apiRateLimit);
 
-// Input sanitization
+// Apply input sanitization to all routes
 router.use((req, res, next) => {
   if (req.query) {
     for (const [key, value] of Object.entries(req.query)) {
-      if (typeof value === 'string') req.query[key] = sanitizeInput(value);
+      if (typeof value === 'string') {
+        req.query[key] = sanitizeInput(value);
+      }
     }
   }
   next();
 });
 
-// Combine sub-routes
-router.use('/', modelRoutes);
-router.use('/', testRoutes);
-router.use('/', baselineRoutes);
-router.use('/', mcpRoutes);
-router.use('/', actionRoutes);
+// Mount sub-routers
+router.use('/', modelsRouter);
+router.use('/', testingRouter);
+router.use('/', probesRouter);
+router.use('/', configRouter);
+router.use('/', logsRouter);
+router.use('/mcp', mcpRouter);
+router.use('/', ideRouter);
+router.use('/', leaderboardRouter);
+router.use('/', baselineRouter);
+router.use('/', customTestsRouter);
 
 export default router;
+export const toolyRouter = router;

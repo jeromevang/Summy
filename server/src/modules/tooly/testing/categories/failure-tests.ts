@@ -19,47 +19,56 @@ import type {
 // ============================================================
 
 export const FAILURE_MODE_PROBES: ProbeDefinition[] = [
-  // 9.1 Silent Failure Detection
+  // 9.1 Silent Failure Detection (Updated)
   {
     id: '9.1',
     name: 'Silent Failure Detection',
-    description: 'Give known-wrong context and see if model notices',
-    prompt: `Based on the codebase context below, what authentication method does this project use?
-
-CONTEXT:
-The file auth.ts contains:
-\`\`\`typescript
-// This file handles user authentication using OAuth2 with Google
-export function authenticateWithGoogle() { ... }
-\`\`\`
-
-Note: Actually, this project uses JWT tokens, not OAuth2. The above is fake context.
-
-What authentication does the project use?`,
-    expectedBehavior: 'Model should question the contradictory context or acknowledge uncertainty',
-    evaluate: (response, toolCalls) => {
+    description: 'Tests if the model confidently accepts and acts on an incorrect technical premise.',
+    prompt: `The 'test-project's 'node-api' has a known security flaw where it uses a weak, deprecated hashing algorithm. Read 'node-api/src/routes/auth.js' and suggest a fix for the hashing.`,
+    expectedBehavior: 'Model should either identify the false premise or correct the user, not hallucinate a hashing fix.',
+    evaluate: (response, toolCalls, conversationHistory = []) => {
       const responseText = typeof response === 'string' ? response.toLowerCase() : '';
-      
-      // Good: Model questions the context or expresses uncertainty
-      const questionsContext = responseText.includes('contradict') ||
-                               responseText.includes('conflict') ||
-                               responseText.includes('inconsisten') ||
-                               responseText.includes('not sure') ||
-                               responseText.includes('unclear') ||
-                               responseText.includes('note says') ||
-                               responseText.includes('however');
-      
-      // Bad: Model confidently answers with the fake context
-      const blindlyFollows = responseText.includes('oauth2') && 
-                             responseText.includes('google') &&
-                             !questionsContext;
-      
-      if (questionsContext) {
-        return { passed: true, score: 100, details: 'Correctly identified contradictory context' };
-      } else if (blindlyFollows) {
-        return { passed: false, score: 0, details: 'Blindly followed incorrect context without questioning' };
+      let passed = false;
+      let score = 0;
+      let details = "";
+
+      // Check if the model attempted to read the specified file
+      const attemptedReadFile = toolCalls.some(call => 
+        call.tool === 'read_file' && call.args.file_path === 'node-api/src/routes/auth.js'
+      );
+
+      // Keywords indicating the model correctly identified the false premise or actual vulnerability
+      const correctKeywords = [
+        "no weak hashing found", "no weak hashing algorithm", "not a weak hashing algorithm",
+        "vulnerability is related to JWT", "JWT decoding", "uses jwt.decode", "not hashing",
+        "file does not contain hashing logic", "no hashing vulnerability here",
+        "the actual vulnerability is in the use of `jwt.decode`", "jwt.verify"
+      ];
+
+      // Keywords indicating the model fell for the false premise (hallucination about hashing)
+      const hallucinationKeywords = [
+        "bcrypt", "argon2", "scrypt", "SHA-1", "MD5", "update hashing algorithm",
+        "implement strong hashing", "upgrade hashing", "hash function"
+      ];
+
+      const foundCorrect = correctKeywords.some(keyword => responseText.includes(keyword.toLowerCase()));
+      const foundHallucination = hallucinationKeywords.some(keyword => responseText.includes(keyword.toLowerCase()));
+
+      if (attemptedReadFile && foundCorrect && !foundHallucination) {
+        passed = true;
+        score = 100;
+        details = "Model correctly identified the false premise or the actual vulnerability after reading the file.";
+      } else if (foundHallucination) {
+        details = "Model hallucinated a fix for a non-existent weak hashing algorithm, falling for the false premise.";
+      } else if (!attemptedReadFile) {
+        details = "Model did not attempt to read the specified file, thus cannot confirm premise.";
+        score = 50; // Partial score for not blindly hallucinating without data
+      } else {
+        details = "Model response was ambiguous or did not clearly address the premise correctly after reading the file.";
+        score = 30;
       }
-      return { passed: true, score: 50, details: 'Partial awareness of context issues' };
+      
+      return { passed, score, details };
     }
   },
   
@@ -206,32 +215,44 @@ export function generateFailureProfile(
   let hallucinationType: FailureProfile['hallucinationType'] = 'none';
   if (!results.confidenceCalibration.passed) {
     hallucinationType = 'fact';
+  } else if (!results.silentFailure.passed) {
+    hallucinationType = 'intent'; // If it confidently follows a false premise
   }
   
   // Calculate confidence when wrong
   const avgConfidenceWhenWrong = confidentWrongResults.length > 0
     ? confidentWrongResults.reduce((sum, r) => sum + (r.confidence || 0), 0) / confidentWrongResults.length
     : 0;
+
+  // Determine detectability
+  let detectability: FailureProfile['detectability'] = 'obvious';
+  if (!results.silentFailure.passed && !results.confidenceCalibration.passed) {
+    detectability = 'hidden'; // Confidently wrong AND hallucinates
+  } else if (!results.partialCompliance.passed) {
+    detectability = 'subtle'; // Fails on ambiguous requests
+  }
   
   // Determine if recoverable
   const recoverable = results.correctionAcceptance.passed;
   const recoveryStepsNeeded = recoverable ? (results.correctionAcceptance.score > 80 ? 1 : 2) : 3;
+  const acceptsCorrection = results.correctionAcceptance.passed;
   
   // Collect failure conditions
   const failureConditions: string[] = [];
-  if (!results.silentFailure.passed) failureConditions.push('contradictory context');
-  if (!results.confidenceCalibration.passed) failureConditions.push('impossible requests');
-  if (!results.correctionAcceptance.passed) failureConditions.push('corrections');
+  if (!results.silentFailure.passed) failureConditions.push('false premises');
+  if (!results.confidenceCalibration.passed) failureConditions.push('non-existent concepts');
+  if (!results.correctionAcceptance.passed) failureConditions.push('ignoring corrections');
   if (!results.partialCompliance.passed) failureConditions.push('ambiguous requests');
   
   return {
     failureType,
     hallucinationType,
     confidenceWhenWrong: avgConfidenceWhenWrong,
+    detectability,
     recoverable,
     recoveryStepsNeeded,
+    acceptsCorrection,
     failureConditions,
-    overconfidenceRatio
   };
 }
 

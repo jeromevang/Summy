@@ -21,6 +21,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@summy/database": "*",
     "ignore": "^7.0.5",
     "playwright": "^1.57.0",
     "zod": "3.25"

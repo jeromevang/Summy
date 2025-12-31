@@ -1,4 +1,4 @@
-import path from 'path';
+import { Project, SyntaxKind, Node, FunctionDeclaration, ClassDeclaration, InterfaceDeclaration, TypeAliasDeclaration, VariableStatement } from 'ts-morph';
 
 export interface SemanticUnit {
   id: string;
@@ -15,102 +15,212 @@ export interface SemanticUnit {
 }
 
 export class ASTParser {
+  private project: Project;
+
+  constructor() {
+    this.project = new Project({
+      useInMemoryFileSystem: true,
+      skipLoadingLibFiles: true,
+      compilerOptions: {
+        allowJs: true,
+        jsx: 1 // preserve
+      }
+    });
+  }
+
   /**
-   * Heuristic-based parsing for JS/TS/React patterns
+   * AST-based parsing using ts-morph
    */
   parseFile(filePath: string, content: string): SemanticUnit[] {
-    const lines = content.split('\n');
-    const units: SemanticUnit[] = [];
+    // Create a source file in the virtual project
+    // We use a random suffix to avoid collisions if called in parallel on same path
+    const uniquePath = `${filePath}_${Date.now()}.ts${filePath.endsWith('x') ? 'x' : ''}`;
+    const sourceFile = this.project.createSourceFile(uniquePath, content);
     
-    let currentUnit: Partial<SemanticUnit> | null = null;
-    let braceDepth = 0;
-    let inComment = false;
+    const units: SemanticUnit[] = [];
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const trimmed = line.trim();
+    try {
+      // 1. Functions
+      sourceFile.getFunctions().forEach(func => {
+        units.push(this.processFunction(func));
+      });
 
-      // Skip comments
-      if (trimmed.startsWith('/*')) inComment = true;
-      if (inComment) {
-        if (trimmed.includes('*/')) inComment = false;
-        continue;
-      }
-      if (trimmed.startsWith('//')) continue;
+      // 2. Classes
+      sourceFile.getClasses().forEach(cls => {
+        units.push(this.processClass(cls));
+      });
 
-      // Detect start of a potential unit (Top-level)
-      if (braceDepth === 0) {
-        const unitMatch = this.detectUnitStart(line);
-        if (unitMatch) {
-          if (currentUnit) {
-            this.finalizeUnit(currentUnit as SemanticUnit, i, units);
-          }
-          currentUnit = {
-            name: unitMatch.name,
-            type: unitMatch.type,
-            startLine: i + 1,
-            isExported: unitMatch.isExported,
-            isAsync: unitMatch.isAsync,
-            signature: line.trim(),
-            content: line + '\n'
-          };
-        } else if (currentUnit) {
-          currentUnit.content += line + '\n';
-        }
-      } else if (currentUnit) {
-        currentUnit.content += line + '\n';
-      }
+      // 3. Interfaces
+      sourceFile.getInterfaces().forEach(intf => {
+        units.push(this.processInterface(intf));
+      });
 
-      // Track braces
-      const openBraces = (line.match(/{/g) || []).length;
-      const closeBraces = (line.match(/}/g) || []).length;
-      braceDepth += openBraces - closeBraces;
+      // 4. Type Aliases
+      sourceFile.getTypeAliases().forEach(typeAlias => {
+        units.push(this.processTypeAlias(typeAlias));
+      });
 
-      // If we just closed the unit
-      if (braceDepth === 0 && currentUnit && !this.detectUnitStart(line)) {
-        this.finalizeUnit(currentUnit as SemanticUnit, i + 1, units);
-        currentUnit = null;
+      // 5. Variables (const/let/var) - handling arrow functions (Components/Hooks)
+      sourceFile.getVariableStatements().forEach(stmt => {
+        stmt.getDeclarations().forEach(decl => {
+          units.push(this.processVariable(decl, stmt));
+        });
+      });
+
+    } finally {
+      // Clean up to save memory
+      this.project.removeSourceFile(sourceFile);
+    }
+
+    // Sort by line number
+    return units.sort((a, b) => a.startLine - b.startLine);
+  }
+
+  private processFunction(func: FunctionDeclaration): SemanticUnit {
+    const name = func.getName() || 'anonymous';
+    const isAsync = func.isAsync();
+    const isExported = func.isExported();
+    const startLine = func.getStartLineNumber();
+    const endLine = func.getEndLineNumber();
+    const content = func.getText();
+    
+    // Get doc comments
+    const docComment = func.getJsDocs().map(doc => doc.getInnerText()).join('\n');
+    
+    // Get signature (heuristic: just the first line or up to the body)
+    const signature = content.split('{')[0].trim();
+
+    return {
+      id: `${name}_${startLine}`,
+      name,
+      type: 'function',
+      content,
+      startLine,
+      endLine,
+      dependencies: [], // Analyzing body for calls would go here
+      isExported,
+      isAsync,
+      signature,
+      docComment: docComment || undefined
+    };
+  }
+
+  private processClass(cls: ClassDeclaration): SemanticUnit {
+    const name = cls.getName() || 'anonymous';
+    const isExported = cls.isExported();
+    const startLine = cls.getStartLineNumber();
+    const endLine = cls.getEndLineNumber();
+    const content = cls.getText();
+    const docComment = cls.getJsDocs().map(doc => doc.getInnerText()).join('\n');
+    const signature = `class ${name}`;
+
+    return {
+      id: `${name}_${startLine}`,
+      name,
+      type: 'class',
+      content,
+      startLine,
+      endLine,
+      dependencies: [],
+      isExported,
+      isAsync: false,
+      signature,
+      docComment: docComment || undefined
+    };
+  }
+
+  private processInterface(intf: InterfaceDeclaration): SemanticUnit {
+    const name = intf.getName();
+    const isExported = intf.isExported();
+    const startLine = intf.getStartLineNumber();
+    const endLine = intf.getEndLineNumber();
+    const content = intf.getText();
+    const docComment = intf.getJsDocs().map(doc => doc.getInnerText()).join('\n');
+    const signature = `interface ${name}`;
+
+    return {
+      id: `${name}_${startLine}`,
+      name,
+      type: 'interface',
+      content,
+      startLine,
+      endLine,
+      dependencies: [],
+      isExported,
+      isAsync: false,
+      signature,
+      docComment: docComment || undefined
+    };
+  }
+
+  private processTypeAlias(typeAlias: TypeAliasDeclaration): SemanticUnit {
+    const name = typeAlias.getName();
+    const isExported = typeAlias.isExported();
+    const startLine = typeAlias.getStartLineNumber();
+    const endLine = typeAlias.getEndLineNumber();
+    const content = typeAlias.getText();
+    const docComment = typeAlias.getJsDocs().map(doc => doc.getInnerText()).join('\n');
+    const signature = `type ${name}`;
+
+    return {
+      id: `${name}_${startLine}`,
+      name,
+      type: 'interface', // Treat type aliases as interfaces for broad categorization
+      content,
+      startLine,
+      endLine,
+      dependencies: [],
+      isExported,
+      isAsync: false,
+      signature,
+      docComment: docComment || undefined
+    };
+  }
+
+  private processVariable(decl: any, stmt: VariableStatement): SemanticUnit {
+    const name = decl.getName();
+    const isExported = stmt.isExported();
+    const startLine = stmt.getStartLineNumber(); // Use statement for line numbers
+    const endLine = stmt.getEndLineNumber();
+    const content = stmt.getText(); // Capture full statement
+    const docComment = stmt.getJsDocs().map(doc => doc.getInnerText()).join('\n');
+
+    let type: SemanticUnit['type'] = 'variable';
+    let isAsync = false;
+
+    // Detect if it's an arrow function or component
+    const initializer = decl.getInitializer();
+    if (initializer && Node.isArrowFunction(initializer)) {
+      isAsync = initializer.isAsync();
+      
+      // Heuristic for React Components: PascalCase name + arrow function
+      if (/^[A-Z]/.test(name)) {
+        type = 'component';
+      } else if (name.startsWith('use')) {
+        type = 'hook';
+      } else {
+        type = 'function';
       }
     }
 
-    return units;
-  }
+    // Heuristic for simple constants that look like components (e.g. React.memo(...))
+    if (type === 'variable' && /^[A-Z]/.test(name)) {
+        // Could be a HOC or component
+        type = 'component'; 
+    }
 
-  private detectUnitStart(line: string): { name: string; type: SemanticUnit['type']; isExported: boolean; isAsync: boolean } | null {
-    const trimmed = line.trim();
-    
-    // 1. React Components (const Name = () => ...)
-    const componentMatch = trimmed.match(/^(export\s+)?const\s+([A-Z]\w+)\s*[:=]\s*(React\.FC|(\([^)]*\)\s*=>))/);
-    if (componentMatch) return { name: componentMatch[2], type: 'component', isExported: !!componentMatch[1], isAsync: false };
-
-    // 2. Classes
-    const classMatch = trimmed.match(/^(export\s+)?class\s+([A-Z]\w+)/);
-    if (classMatch) return { name: classMatch[2], type: 'class', isExported: !!classMatch[1], isAsync: false };
-
-    // 3. Functions
-    const funcMatch = trimmed.match(/^(export\s+)?(async\s+)?function\s+(\w+)/);
-    if (funcMatch) return { name: funcMatch[3], type: 'function', isExported: !!funcMatch[1], isAsync: !!funcMatch[2] };
-
-    // 4. Interfaces/Types
-    const typeMatch = trimmed.match(/^(export\s+)?(interface|type)\s+([A-Z]\w+)/);
-    if (typeMatch) return { name: typeMatch[3], type: 'interface', isExported: !!typeMatch[1], isAsync: false };
-
-    // 5. Hooks
-    const hookMatch = trimmed.match(/^(export\s+)?const\s+(use\w+)/);
-    if (hookMatch) return { name: hookMatch[2], type: 'hook', isExported: !!hookMatch[1], isAsync: false };
-
-    // 6. Generic Variables/Constants
-    const varMatch = trimmed.match(/^(export\s+)?(const|let|var)\s+(\w+)/);
-    if (varMatch) return { name: varMatch[3], type: 'variable', isExported: !!varMatch[1], isAsync: false };
-
-    return null;
-  }
-
-  private finalizeUnit(unit: SemanticUnit, endLine: number, units: SemanticUnit[]): void {
-    unit.endLine = endLine;
-    unit.id = `${unit.name}_${unit.startLine}`;
-    unit.dependencies = []; // Heuristic dependency extraction could be added here
-    units.push(unit);
+    return {
+      id: `${name}_${startLine}`,
+      name,
+      type,
+      content,
+      startLine,
+      endLine,
+      dependencies: [],
+      isExported,
+      isAsync,
+      signature: `const ${name}`,
+      docComment: docComment || undefined
+    };
   }
 }
-

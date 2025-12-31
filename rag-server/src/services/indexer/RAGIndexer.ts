@@ -8,15 +8,15 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 
 import { IndexProgress, CodeChunk, EnrichedChunk, FileSummary, defaultConfig, RAGConfig } from '../../config.js';
-import { Chunker, getChunker, detectLanguage } from '../chunker.js';
+import { Chunker, detectLanguage } from '../chunker.js';
 import { getLMStudioEmbedder, LMStudioEmbedder } from '../../embeddings/lmstudio.js';
 import { getLanceDBStore, LanceDBStore } from '../../storage/lancedb-store.js';
-import { 
-  initializeSummarizer, 
-  isSummarizerReady, 
-  summarizeChunk, 
+import {
+  initializeSummarizer,
+  isSummarizerReady,
+  summarizeChunk,
   summarizeFile,
-  buildContextualContent 
+  buildContextualContent
 } from '../summarizer.js';
 import { analyzeFile as analyzeFileDeps, serializeGraph, loadGraph } from '../graph-builder.js';
 import { getRAGDatabase, RAGDatabase, StoredChunk as DBStoredChunk, FileSummary as DBFileSummary, SymbolType } from '../database.js';
@@ -37,10 +37,10 @@ export class Indexer {
   private pendingChanges: Set<string> = new Set();
   private ragDb: RAGDatabase;
   private pendingSummaries: Set<string> = new Set();
-  
+
   constructor(config: Partial<RAGConfig> = {}) {
     this.config = { ...defaultConfig, ...config };
-    this.chunker = getChunker({ maxChunkTokens: this.config.indexing.chunkSize, minChunkTokens: 50 });
+    this.chunker = new Chunker({ maxChunkTokens: this.config.indexing.chunkSize, minChunkTokens: 50 });
     this.embedder = getLMStudioEmbedder();
     this.vectorStore = getLanceDBStore(path.join(this.config.storage.dataPath, 'lance'));
     this.ragDb = getRAGDatabase(this.config.storage.dataPath);
@@ -62,7 +62,7 @@ export class Indexer {
     if (!this.config.watcher.enabled) return;
     this.stopWatcher();
     this.fileWatcher = watch(projectPath, { ignored: this.config.indexing.excludePatterns, persistent: true, ignoreInitial: true });
-    
+
     this.fileWatcher.on('all', (event, filePath) => {
       if (['add', 'change', 'unlink'].includes(event)) {
         this.pendingChanges.add(filePath);
@@ -71,7 +71,6 @@ export class Indexer {
           const changes = [...this.pendingChanges];
           this.pendingChanges.clear();
           for (const file of changes) await this.indexFile(file, projectPath);
-          await this.vectorStore.save();
           // Trigger Code Index sync
           await this.triggerCodeIndexSync();
         }, this.config.watcher.debounceMs);

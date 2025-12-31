@@ -138,4 +138,61 @@ export interface ModelProfile {
     trainableCapabilities: string[];
     blockedCapabilities: string[];
   };
+
+  // --- NEW: Project Opus Behavioral Profiles ---
+  failureProfile?: FailureProfile;
+  statefulProfile?: StatefulProfile;
+  precedenceMatrix?: PrecedenceMatrix;
+  efficiencyMetrics?: EfficiencyMetrics;
+  calibration?: ConfidenceCalibration;
+  // -----------------------------------------
+}
+
+// ============================================================
+// NEW: From Project Opus - Advanced Behavioral Profiling
+// ============================================================
+
+export interface FailureProfile {
+  // Classification
+  failureType: 'silent' | 'partial' | 'protocol_drift' | 'recovery_failure' | 'none';
+  hallucinationType: 'tool' | 'code' | 'intent' | 'fact' | 'none';
+  
+  // Severity
+  confidenceWhenWrong: number; // 0-1, High = dangerous (overconfident)
+  detectability: 'obvious' | 'subtle' | 'hidden';
+  
+  // Recovery
+  recoverable: boolean;
+  recoveryStepsNeeded: number; // 0 = self-corrects, 3+ = needs human
+  acceptsCorrection: boolean;
+  
+  // Common failure conditions for this model
+  failureConditions: string[]; // e.g., "long_context", "ambiguous_request", "complex_tool_chain"
+}
+
+export interface StatefulProfile {
+  instructionDecayTurn: number; // At what turn instructions start failing (0 = no decay)
+  maxReliableContext: number; // Tokens before significant quality degradation
+  recoversWithReminder: boolean;
+}
+
+export interface PrecedenceMatrix {
+  // Records which source wins in a conflict
+  systemVsDeveloper: 'system' | 'developer' | 'unpredictable';
+  developerVsUser: 'developer' | 'user' | 'unpredictable';
+  ragVsToolSchema: 'rag' | 'tool_schema' | 'unpredictable';
+  safetyVsExecution: 'safety' | 'execution' | 'unpredictable';
+}
+
+export interface EfficiencyMetrics {
+  tokensPerCorrectAction: number;
+  ragWasteRatio: number; // Unused retrieved context / total retrieved
+  planningVerbosity: number; // Planning tokens / execution tokens
+  redundantToolCalls: number;
+}
+
+export interface ConfidenceCalibration {
+  score: number; // 0-1, how well confidence matches accuracy
+  overconfidenceRatio: number; // % of time model was wrong but confident
+  saysIDontKnow: boolean; // Does the model admit when it doesn't know?
 }

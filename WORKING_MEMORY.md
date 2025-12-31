@@ -14,10 +14,14 @@ Build a COMPLETE Self-Improving Agentic Testing Platform with comprehensive capa
 - Professional UX with tooltips and documentation
 - Cross-provider model support (OpenRouter free models)
 - VRAM-aware combo testing and optimization
+- **Codebase Refactoring (Phase 1-5)**: Modularized architecture, split large files (Dec 2025)
+- **Code Index System**: AST-based indexing with `ts-morph` and dependency graph (Dec 2025)
+- **Advanced Tracing Tools**: `trace_function`, `find_components`, `read_component` MCP tools
 
 **🔄 PENDING SYSTEMS:**
 - Advanced model rankings integration
 - Credits/billing tracking for OpenRouter usage
+- **Combo Learning Integration**: Connecting combo failures to self-improvement loop (NEXT)
 
 **🎯 MISSION ACCOMPLISHED:** The core self-improving AI platform is complete and functional. Users can now test, optimize, and improve both individual models and model combinations across multiple providers, with the system learning and adapting automatically.
 

@@ -35,6 +35,9 @@ export interface TestResult {
     calledTool?: string;
     calledArgs?: Record<string, any>;
     details?: string; // Added for additional test details
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
 }
 
 export interface CheckResult {

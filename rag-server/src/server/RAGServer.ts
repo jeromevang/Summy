@@ -37,11 +37,62 @@ export class RAGServer {
   private async initializeServices() {
     this.indexer = getIndexer(this.config);
     this.indexer.onProgress((p) => this.broadcast('indexProgress', p));
+
+    // Start file watcher if enabled
+    if (this.config.watcher.enabled && this.config.project.path) {
+      console.log(`[RAG Server] Starting file watcher for: ${this.config.project.path}`);
+      this.indexer.startWatcher(this.config.project.path);
+    } else {
+      console.log(`[RAG Server] File watcher disabled or no project path set`);
+    }
   }
 
   private setupRoutes() {
     this.app.get('/api/rag/health', (req, res) => res.json({ status: 'ok', indexStatus: this.indexer.getProgress().status }));
-    // Other routes would be added here
+    this.app.get('/api/rag/stats', async (req, res) => {
+      try {
+        const progress = this.indexer.getProgress();
+        res.json({
+          projectPath: this.config.project?.path || null,
+          status: progress.status,
+          totalFiles: progress.totalFiles,
+          processedFiles: progress.processedFiles,
+          chunksCreated: progress.chunksCreated,
+          embeddingsGenerated: progress.embeddingsGenerated,
+          fileWatcherActive: this.indexer ? (this.indexer as any).fileWatcher !== null : false,
+          embeddingModel: 'LMStudio',
+          embeddingModelLoaded: false
+        });
+      } catch (error: any) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.post('/api/rag/query', async (req, res) => {
+      try {
+        const { query, limit = 5 } = req.body;
+        if (!query) return res.status(400).json({ error: 'query is required' });
+
+        // For now, return empty results since indexing might not be complete
+        const results = [];
+        res.json({ results, query });
+      } catch (error: any) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.post('/api/rag/index', async (req, res) => {
+      try {
+        const { projectPath } = req.body;
+        if (!projectPath) return res.status(400).json({ error: 'projectPath is required' });
+
+        // Start indexing in background
+        this.indexer.indexProject(projectPath);
+        res.json({ success: true, message: 'Indexing started' });
+      } catch (error: any) {
+        res.status(500).json({ error: error.message });
+      }
+    });
   }
 
   private setupWebSocket(server: any) {

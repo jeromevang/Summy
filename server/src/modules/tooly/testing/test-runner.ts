@@ -36,9 +36,9 @@ export class TestRunner {
                 { role: 'user', content: test.prompt }
             ];
             const tools = getToolSchemas([test.tool]);
-            const response = await this.callLLM(modelId, provider, messages, tools, settings);
+            const { responseData, tokens } = await this.callLLM(modelId, provider, messages, tools, settings);
             const latency = Date.now() - startTime;
-            const evalRes = this.evaluateResponse(response, test.expected);
+            const evalRes = this.evaluateResponse(responseData, test.expected);
 
             return {
                 testId: test.id,
@@ -47,9 +47,12 @@ export class TestRunner {
                 score: evalRes.score,
                 latency,
                 checks: evalRes.checks,
-                response,
+                response: responseData,
                 calledTool: evalRes.calledTool,
-                calledArgs: evalRes.calledArgs
+                calledArgs: evalRes.calledArgs,
+                promptTokens: tokens?.prompt,
+                completionTokens: tokens?.completion,
+                totalTokens: tokens?.total,
             };
         } finally {
             await this.cleanupSandbox();
@@ -69,13 +72,13 @@ export class TestRunner {
                 { role: 'user', content: probe.prompt }
             ];
             const tools = getToolSchemas(probe.tools || []);
-            const response = await this.callLLM(modelId, provider, messages, tools, settings);
+            const { responseData, tokens } = await this.callLLM(modelId, provider, messages, tools, settings);
             const latency = Date.now() - startTime;
 
             // Extract tool calls from response
-            const toolCalls = response.choices?.[0]?.message?.tool_calls || [];
+            const toolCalls = responseData.choices?.[0]?.message?.tool_calls || [];
 
-            const evalRes = probe.evaluate(response, toolCalls);
+            const evalRes = probe.evaluate(responseData, toolCalls);
 
             // Check for tool hallucination and add to details
             const validToolNames = tools.map(t => t.function.name);
@@ -96,8 +99,11 @@ export class TestRunner {
                 score: evalRes.score,
                 latency,
                 checks: evalRes.checks || [],
-                response,
-                details
+                response: responseData,
+                details,
+                promptTokens: tokens?.prompt,
+                completionTokens: tokens?.completion,
+                totalTokens: tokens?.total,
             };
         } catch (error: any) {
             return {
@@ -112,7 +118,7 @@ export class TestRunner {
         }
     }
 
-    private async callLLM(modelId: string, provider: string, messages: any[], tools: any[], settings: any): Promise<any> {
+    private async callLLM(modelId: string, provider: string, messages: any[], tools: any[], settings: any): Promise<{ responseData: any; tokens: { prompt: number; completion: number; total: number; } | null; }> {
         let url = '';
         const headers: any = { 'Content-Type': 'application/json' };
         const body: any = { messages, tools, tool_choice: 'auto', temperature: 0, max_tokens: 500 };
@@ -150,7 +156,15 @@ export class TestRunner {
         try {
             const response = await axios.post(url, body, { headers, timeout: 60000 });
             console.log(`✅ ${provider.toUpperCase()} request successful:`, response.status);
-            return response.data;
+            
+            const usage = response.data?.usage;
+            const tokens = usage ? {
+                prompt: usage.prompt_tokens || 0,
+                completion: usage.completion_tokens || 0,
+                total: usage.total_tokens || 0,
+            } : null;
+
+            return { responseData: response.data, tokens };
         } catch (error: any) {
             console.log(`❌ ${provider.toUpperCase()} request failed:`, {
                 status: error.response?.status,
