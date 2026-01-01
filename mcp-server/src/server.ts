@@ -18,24 +18,13 @@ import { registerBrowserTools } from "./tools/browserTools.js";
 import { registerRagTools } from "./tools/ragTools.js";
 import { registerTracingTools } from "./tools/tracingTools.js";
 import { registerSystemTools } from "./tools/systemTools.js";
+import { registerRefactorTools } from "./tools/refactorTools.js";
 
 // ============================================================
 // MCP SERVER SETUP
 // ============================================================
 
-// Parse configuration from command line
-const configPathIndex = process.argv.indexOf("--config");
-let modelConfig: any = null;
-
-if (configPathIndex !== -1 && process.argv[configPathIndex + 1]) {
-  const configPath = process.argv[configPathIndex + 1];
-  try {
-    modelConfig = fs.readJsonSync(configPath);
-    console.error(`[MCP] Loaded model-specific configuration from ${configPath}`);
-  } catch (error: any) {
-    console.error(`[MCP] Failed to load config from ${configPath}: ${error.message}`);
-  }
-}
+// ... (config parsing code) ...
 
 export const server = new McpServer({
   name: "summy-mcp-server",
@@ -55,6 +44,7 @@ registerBrowserTools(server);
 registerRagTools(server);
 registerTracingTools(server);
 registerSystemTools(server);
+registerRefactorTools(server);
 
 // ============================================================
 // SERVER START

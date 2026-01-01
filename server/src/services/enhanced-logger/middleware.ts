@@ -1,6 +1,7 @@
 import { logger } from './EnhancedLogger.js';
 
 export const loggingMiddleware = (req: any, res: any, next: any): void => {
+  req.logger = logger;
   const startTime = Date.now();
   const originalEnd = res.end;
 

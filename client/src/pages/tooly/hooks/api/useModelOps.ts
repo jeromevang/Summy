@@ -10,7 +10,7 @@ export const useModelOps = (setters: any, values: any) => {
   const fetchModels = async () => {
     setters.setLoading(true);
     try {
-      const res = await fetch(`/api/tooly/models?provider=\${values.providerFilter}`);
+      const res = await fetch(`/api/tooly/models?provider=${values.providerFilter}`);
       if (res.ok) {
         const data = await res.json();
         setters.setModels((data.models || []).sort((a: any, b: any) => a.displayName.localeCompare(b.displayName)));
@@ -22,7 +22,7 @@ export const useModelOps = (setters: any, values: any) => {
   const saveSystemPrompt = async (modelId: string, prompt: string) => {
     setters.setSavingSystemPrompt(true);
     try {
-      await fetch(`/api/tooly/models/\${encodeURIComponent(modelId)}/prompt`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ systemPrompt: prompt }) });
+      await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/prompt`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ systemPrompt: prompt }) });
     } catch (error) { console.error('Failed to save system prompt:', error); } finally { setters.setSavingSystemPrompt(false); }
   };
 

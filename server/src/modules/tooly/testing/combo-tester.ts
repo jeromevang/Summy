@@ -193,6 +193,19 @@ export class ComboTester {
       }
 
       const passed = this.evaluateTestResult(test, cached.intent.action, cached.intent.tool, execTools);
+
+      if (!passed) {
+        failureLog.logFailure({
+          modelId: mainId,
+          executorModelId: execId,
+          category: 'combo_pairing',
+          tool: test.expectedTool || 'unknown',
+          error: `Combo test ${test.id} failed. Main: ${cached.intent.action}, Exec: ${execTools.join(', ') || 'none'}`,
+          query: test.prompt,
+          conversationLength: 2
+        });
+      }
+
       testResults.push({
         testId: test.id, testName: test.name, category: test.category, difficulty: test.difficulty,
         passed, mainOutputValid: !!cached.intent.action, mainAction: cached.intent.action, mainTool: cached.intent.tool,
@@ -262,9 +275,23 @@ export class ComboTester {
         const mainAction = res.intent?.action || null;
         const mainTool = res.intent?.tool || null;
         const execTools = res.toolCalls?.map(tc => tc.function?.name).filter(Boolean) || [];
+        const passed = this.evaluateTestResult(test, mainAction, mainTool, execTools);
+
+        if (!passed) {
+          failureLog.logFailure({
+            modelId: mainId,
+            executorModelId: execId,
+            category: 'combo_pairing',
+            tool: test.expectedTool || 'unknown',
+            error: `Combo test ${test.id} failed. Main: ${mainAction}, Exec: ${execTools.join(', ') || 'none'}`,
+            query: test.prompt,
+            conversationLength: 2
+          });
+        }
+
         results.push({
           testId: test.id, testName: test.name, category: test.category, difficulty: test.difficulty,
-          passed: this.evaluateTestResult(test, mainAction, mainTool, execTools),
+          passed,
           mainOutputValid: !!mainAction, mainAction, mainTool, executorCalled: !!execTools.length, executorToolCalls: execTools,
           latencyMs: Date.now() - start, mainLatencyMs: res.latency?.main || 0, executorLatencyMs: res.latency?.executor || 0,
           mainTimedOut: (res.latency?.main || 0) > 10000, executorTimedOut: (res.latency?.executor || 0) > 10000,

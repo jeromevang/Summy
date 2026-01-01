@@ -2,16 +2,18 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
+import Sources from './pages/Sources';
+import TeamBuilder from './pages/TeamBuilder';
 import Sessions from './pages/Sessions';
 import ContextEditor from './pages/ContextEditor';
 import Tooly from './pages/tooly';
-import { ModelDetailPage } from './pages/tooly/ModelDetailPage';
-import { AgenticReadiness } from './pages/tooly/AgenticReadiness';
-import { ComboTest } from './pages/tooly/ComboTest';
+import ModelDetailsPage from './pages/tooly/ModelDetailPage/ModelDetailsPage'; // Corrected import
+import AgenticReadiness from './pages/tooly/AgenticReadiness';
+import ComboTest from './pages/tooly/ComboTest';
 import { ProstheticManager } from './pages/tooly/ProstheticManager';
-import Controller from './pages/tooly/Controller';
+import Controller from './pages/tooly/Controller/SystemControllerPage';
 import Debug from './pages/Debug';
-import RAG from './pages/RAG';
+import RAG from './pages/RAG/RAGNavigatorPage';
 import Layout from './components/Layout';
 import { ToastProvider, useToast } from './components/Toast';
 import { useWebSocketConnection } from './hooks/useWebSocketManager';
@@ -56,7 +58,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/tooly" element={<Tooly />} />
-            <Route path="/tooly/model/:modelId" element={<ModelDetailPage />} />
+            <Route path="/tooly/model/:modelId" element={<ModelDetailsPage />} />
             {/* OptimalSetup deprecated - redirect to readiness */}
             <Route path="/tooly/optimal-setup" element={<Navigate to="/tooly/readiness" replace />} />
             <Route path="/tooly/readiness" element={<AgenticReadiness />} />
@@ -64,6 +66,8 @@ function App() {
             <Route path="/tooly/prosthetics" element={<ProstheticManager />} />
             <Route path="/tooly/controller" element={<Controller />} />
             <Route path="/rag" element={<RAG />} />
+            <Route path="/sources" element={<Sources />} />
+            <Route path="/team-builder" element={<TeamBuilder />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/debug" element={<Debug />} />
             <Route path="/session/:sessionId" element={<ContextEditor />} />

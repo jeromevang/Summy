@@ -29,6 +29,14 @@ export class ModelDiscoveryService {
       return res.data.data.map((m: any) => ({ id: m.id, displayName: m.id, provider: 'openai', status: 'untested' }));
     } catch { return []; }
   }
+
+  async discoverAzure(config: any): Promise<DiscoveredModel[]> {
+    return []; // Placeholder
+  }
+
+  async discoverOpenRouter(key?: string): Promise<DiscoveredModel[]> {
+    return []; // Placeholder
+  }
 }
 
 export const modelDiscovery = new ModelDiscoveryService();

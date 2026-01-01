@@ -4,19 +4,21 @@
  * Persists prosthetic prompts that compensate for model weaknesses.
  * These prompts are auto-applied when the model is loaded for use.
  * 
- * Storage: server/data/prosthetic-prompts.json
+ * Storage: server/data/projects/<project-hash>/prosthetic-prompts.json
  */
 
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
+import { workspaceService } from '../../../services/workspace-service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ============================================================
+// ============================================================ 
 // TYPES
-// ============================================================
+// ============================================================ 
 
 export interface ProstheticVersion {
   version: number;
@@ -65,17 +67,34 @@ interface ProstheticStoreData {
   lastUpdated: string;
 }
 
-// ============================================================
+// ============================================================ 
 // PROSTHETIC STORE CLASS
-// ============================================================
+// ============================================================ 
 
 class ProstheticStore {
-  private storagePath: string;
   private data: ProstheticStoreData;
+  private currentWorkspaceHash: string = '';
 
   constructor() {
-    this.storagePath = path.join(__dirname, '../../../../../data/prosthetic-prompts.json');
-    this.data = this.load();
+    this.data = { version: 1, entries: {}, lastUpdated: new Date().toISOString() };
+  }
+
+  private getStoragePath(): string {
+    const workspace = workspaceService.getCurrentWorkspace();
+    const hash = crypto.createHash('md5').update(workspace).digest('hex');
+    this.currentWorkspaceHash = hash;
+    // Store in server/data/projects/<hash>/prosthetic-prompts.json
+    return path.join(__dirname, '../../../../../data/projects', hash, 'prosthetic-prompts.json');
+  }
+
+  private ensureDataLoaded() {
+    const workspace = workspaceService.getCurrentWorkspace();
+    const hash = crypto.createHash('md5').update(workspace).digest('hex');
+    
+    // If workspace changed, reload
+    if (hash !== this.currentWorkspaceHash) {
+      this.data = this.load();
+    }
   }
 
   /**
@@ -83,14 +102,14 @@ class ProstheticStore {
    */
   private load(): ProstheticStoreData {
     try {
-      if (fs.existsSync(this.storagePath)) {
-        return fs.readJsonSync(this.storagePath);
+      const storagePath = this.getStoragePath();
+      if (fs.existsSync(storagePath)) {
+        return fs.readJsonSync(storagePath);
       }
     } catch (error) {
       console.error('[ProstheticStore] Error loading store:', error);
     }
     
-    // Return default empty store
     return {
       version: 1,
       entries: {},
@@ -99,9 +118,24 @@ class ProstheticStore {
   }
 
   /**
+   * Save store to disk
+   */
+  private save(): void {
+    try {
+      const storagePath = this.getStoragePath();
+      fs.ensureDirSync(path.dirname(storagePath));
+      this.data.lastUpdated = new Date().toISOString();
+      fs.writeJsonSync(storagePath, this.data, { spaces: 2 });
+    } catch (error) {
+      console.error('[ProstheticStore] Error saving store:', error);
+    }
+  }
+
+  /**
    * Get prosthetic for a specific model (individual or combo)
    */
   getPrompt(key: string): ProstheticEntry | null {
+    this.ensureDataLoaded();
     return this.data.entries[key] || null;
   }
 
@@ -109,6 +143,7 @@ class ProstheticStore {
    * Get prosthetic for an individual model
    */
   getForModel(modelId: string): ProstheticEntry | null {
+    this.ensureDataLoaded();
     return this.getPrompt(modelId);
   }
 
@@ -116,6 +151,7 @@ class ProstheticStore {
    * Get prosthetic for a model combination
    */
   getForCombo(mainModelId: string, executorModelId: string): ProstheticEntry | null {
+    this.ensureDataLoaded();
     const comboId = `${mainModelId}-${executorModelId}`;
     return this.getPrompt(comboId);
   }
@@ -127,6 +163,7 @@ class ProstheticStore {
     mainModelId: string;
     executorModelId: string;
   }): void {
+    this.ensureDataLoaded();
     const comboId = `${entry.mainModelId}-${entry.executorModelId}`;
     this.savePrompt({
       ...entry,
@@ -136,23 +173,10 @@ class ProstheticStore {
   }
 
   /**
-   * Save store to disk
-   */
-  private save(): void {
-    try {
-      fs.ensureDirSync(path.dirname(this.storagePath));
-      this.data.lastUpdated = new Date().toISOString();
-      fs.writeJsonSync(this.storagePath, this.data, { spaces: 2 });
-    } catch (error) {
-      console.error('[ProstheticStore] Error saving store:', error);
-    }
-  }
-
-
-  /**
    * Save prosthetic prompt for a model
    */
   savePrompt(entry: Omit<ProstheticEntry, 'createdAt' | 'updatedAt' | 'successfulRuns' | 'verified' | 'currentVersion' | 'versions'>): void {
+    this.ensureDataLoaded();
     // Use comboId as key if provided, otherwise use modelId
     const key = entry.comboId || entry.modelId;
     if (!key) {
@@ -196,6 +220,7 @@ class ProstheticStore {
    * Update existing prosthetic prompt
    */
   updatePrompt(modelId: string, updates: Partial<ProstheticEntry>): void {
+    this.ensureDataLoaded();
     const existing = this.data.entries[modelId];
     if (!existing) {
       console.warn(`[ProstheticStore] No existing entry for ${modelId}`);
@@ -215,6 +240,7 @@ class ProstheticStore {
    * Increment successful runs count
    */
   incrementSuccess(modelId: string): void {
+    this.ensureDataLoaded();
     const entry = this.data.entries[modelId];
     if (entry) {
       entry.successfulRuns += 1;
@@ -227,6 +253,7 @@ class ProstheticStore {
    * Mark prosthetic as verified (passed re-test)
    */
   markVerified(modelId: string): void {
+    this.ensureDataLoaded();
     const entry = this.data.entries[modelId];
     if (entry) {
       entry.verified = true;
@@ -239,6 +266,7 @@ class ProstheticStore {
    * Delete prosthetic for a model
    */
   deletePrompt(modelId: string): boolean {
+    this.ensureDataLoaded();
     if (this.data.entries[modelId]) {
       delete this.data.entries[modelId];
       this.save();
@@ -252,6 +280,7 @@ class ProstheticStore {
    * List all prosthetic entries
    */
   listPrompts(): ProstheticEntry[] {
+    this.ensureDataLoaded();
     return Object.values(this.data.entries);
   }
 
@@ -259,6 +288,7 @@ class ProstheticStore {
    * Get all model IDs with prosthetics
    */
   getModelIds(): string[] {
+    this.ensureDataLoaded();
     return Object.keys(this.data.entries);
   }
 
@@ -266,6 +296,7 @@ class ProstheticStore {
    * Check if a model has a prosthetic
    */
   hasProsthetic(modelId: string): boolean {
+    this.ensureDataLoaded();
     return modelId in this.data.entries;
   }
 
@@ -278,6 +309,7 @@ class ProstheticStore {
     levelDistribution: Record<number, number>;
     avgSuccessfulRuns: number;
   } {
+    this.ensureDataLoaded();
     const entries = Object.values(this.data.entries);
     const levelDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
     
@@ -299,6 +331,7 @@ class ProstheticStore {
    * Export all data (for backup)
    */
   export(): ProstheticStoreData {
+    this.ensureDataLoaded();
     return { ...this.data };
   }
 
@@ -311,15 +344,15 @@ class ProstheticStore {
   }
 }
 
-// ============================================================
+// ============================================================ 
 // SINGLETON INSTANCE
-// ============================================================
+// ============================================================ 
 
 export const prostheticStore = new ProstheticStore();
 
-// ============================================================
+// ============================================================ 
 // HELPER FUNCTIONS
-// ============================================================
+// ============================================================ 
 
 /**
  * Build the prosthetic prompt text for a model based on its failures
@@ -408,6 +441,15 @@ export function buildProstheticPrompt(
     lines.push('');
   }
 
+  // Combo failures
+  if (byCategory['combo_pairing']?.length) {
+    lines.push('### Model Coordination');
+    lines.push('- Ensure clear handoff between main and executor models');
+    lines.push('- Main model must provide explicit, complete instructions to executor');
+    lines.push('- Executor model must follow instructions precisely without hallucinating params');
+    lines.push('');
+  }
+
   // Level escalation
   if (level >= 3) {
     lines.push('### MANDATORY CONSTRAINTS');
@@ -419,8 +461,3 @@ export function buildProstheticPrompt(
 
   return lines.join('\n');
 }
-
-
-
-
-

@@ -29,7 +29,7 @@ export const useProsthetics = () => {
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       setProsthetics(data.prosthetics || []);
-      setStats(data.stats);
+      if (data.stats) setStats(data.stats);
     } catch (err: any) { setError(err.message); }
   }, []);
 
@@ -56,7 +56,7 @@ export const useProsthetics = () => {
 
   const handleSaveProsthetic = async (modelId: string, prompt: string, level: number) => {
     try {
-      const res = await fetch(`/api/tooly/prosthetics/\${encodeURIComponent(modelId)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, level }) });
+      const res = await fetch(`/api/tooly/prosthetics/${encodeURIComponent(modelId)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, level }) });
       if (!res.ok) throw new Error('Failed to save');
       await fetchProsthetics();
       const updated = prosthetics.find(p => p.modelId === modelId);

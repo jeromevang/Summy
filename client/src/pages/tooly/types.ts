@@ -114,7 +114,7 @@ export interface ModelProfile {
   recommendations?: Recommendation[];
 }
 
-export interface DiscoveredModel {
+export interface Model {
   id: string;
   displayName: string;
   provider: 'lmstudio' | 'openai' | 'azure' | 'openrouter';
@@ -128,6 +128,11 @@ export interface DiscoveredModel {
   maxContextLength?: number;
   sizeBytes?: number;
   quantization?: string;
+  // Additional fields for detail page
+  modelFamily?: string;
+  contextWindow?: number;
+  supportsTools?: boolean;
+  freeTier?: boolean;
 }
 
 export interface TestDefinition {

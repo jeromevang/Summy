@@ -1,0 +1,29 @@
+{
+  "lmstudioUrl": "http://localhost:1234",
+  "lmstudioModel": "qwen/qwen3-coder-30b",
+  "defaultCompressionMode": 0,
+  "defaultKeepRecent": 5,
+  "openaiModel": "gpt-4o",
+  "provider": "openrouter",
+  "modules": {
+    "summy": {
+      "enabled": false
+    },
+    "tooly": {
+      "enabled": true
+    }
+  },
+  "proxyMode": "tooly",
+  "enableDualModel": true,
+  "mainModelId": "qwen/qwen3-4b:free",
+  "executorModelId": "",
+  "smallModel": {
+    "enabled": true,
+    "modelId": "qwen2.5-coder-0.5b-instruct",
+    "maxTokens": 150,
+    "temperature": 0,
+    "timeout": 5000,
+    "cacheEnabled": true,
+    "cacheTTL": 300000
+  }
+}

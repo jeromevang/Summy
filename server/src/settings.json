@@ -1,0 +1,26 @@
+{
+  "provider": "openrouter",
+  "openaiModel": "gpt-4o-mini",
+  "azureResourceName": "",
+  "azureDeploymentName": "",
+  "azureApiKey": "",
+  "azureApiVersion": "2024-02-01",
+  "lmstudioUrl": "http://localhost:1234",
+  "lmstudioModel": "deepseek/deepseek-v3.2",
+  "defaultCompressionMode": 0,
+  "defaultKeepRecent": 5,
+  "defaultContextLength": 8192,
+  "proxyMode": "both",
+  "enableDualModel": false,
+  "mainModelId": "deepseek/deepseek-v3.2",
+  "executorModelId": "mistralai/ministral-3-3b",
+  "modules": {
+    "summy": {
+      "enabled": false
+    },
+    "tooly": {
+      "enabled": true
+    }
+  },
+  "openrouterApiKey": ""
+}

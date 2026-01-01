@@ -58,6 +58,7 @@ class MCPClient {
   private mcpServerPath: string;
   private mcpHttpUrl: string;
   private requestTimeout: number;
+  private currentCwd: string | null = null;
 
   constructor(
     mcpServerPath: string = DEFAULT_MCP_SERVER_PATH,
@@ -68,6 +69,23 @@ class MCPClient {
     this.mcpHttpUrl = mcpHttpUrl;
     this.requestTimeout = requestTimeout;
     console.log(`[MCP Client] MCP server path: ${this.mcpServerPath}`);
+  }
+
+  /**
+   * Restart the MCP client with a new working directory
+   */
+  async restart(newCwd?: string): Promise<void> {
+    console.log(`[MCP] Restarting... (New CWD: ${newCwd || 'unchanged'})`);
+    if (newCwd) {
+      this.currentCwd = newCwd;
+    }
+    
+    this.disconnect();
+    
+    // Small delay to ensure process cleanup
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    await this.connect();
   }
 
   /**
@@ -177,9 +195,10 @@ class MCPClient {
         }
 
         console.log(`[MCP] Spawning: ${cmd} ${args.join(' ')}`);
+        console.log(`[MCP] CWD: ${this.currentCwd || this.mcpServerPath}`);
 
         this.process = spawn(cmd, args, {
-          cwd: this.mcpServerPath,
+          cwd: this.currentCwd || this.mcpServerPath,
           stdio: ['pipe', 'pipe', 'pipe'],
           shell: false, // Important: Don't use shell on Windows to avoid quoting issues with paths
           env: { ...process.env, FORCE_COLOR: '1' }
@@ -395,6 +414,20 @@ class MCPClient {
   async executeTool(name: string, args: Record<string, any> = {}): Promise<MCPToolResult> {
     if (!this.isConnected()) {
       await this.connect();
+    }
+
+    // --- SAFE MODE CHECK ---
+    const modifyingTools = ['write_file', 'edit_file', 'delete_file', 'move_file', 'copy_file', 'refactor_split_file', 'shell_exec'];
+    if (modifyingTools.includes(name)) {
+      const { workspaceService } = await import('../../services/workspace-service.js');
+      const { gitService } = await import('../../services/git-service.js');
+      
+      if (workspaceService.isSafeMode()) {
+        const gitStatus = await gitService.getStatus();
+        if (gitStatus.isRepo && !gitStatus.isClean) {
+          throw new Error(`SAFE MODE: Operation "${name}" blocked because Git working tree is not clean. Please commit or stash your changes first.`);
+        }
+      }
     }
 
     const startTime = Date.now();

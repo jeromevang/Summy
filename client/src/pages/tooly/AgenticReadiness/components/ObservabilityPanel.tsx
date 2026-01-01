@@ -20,7 +20,7 @@ export const ObservabilityPanel: React.FC<ObservabilityPanelProps> = ({ isOpen, 
   const [activeTrace, setActiveTrace] = useState<string | null>(null);
   
   useEffect(() => {
-    const ws = new ReconnectingWebSocket(`ws://\${window.location.hostname}:3001`);
+    const ws = new ReconnectingWebSocket(`ws://${window.location.hostname}:3001`);
     
     ws.onmessage = (event) => {
       try {

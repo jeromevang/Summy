@@ -16,7 +16,7 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon, label, isActive, isSubItem 
       isSubItem ? 'ml-9 py-2' : ''
     } ${
       isActive
-        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-lg shadow-purple-500/5'
+        ? 'bg-cyber-purple/10 text-cyber-purple border border-cyber-purple/20 shadow-lg shadow-cyber-purple/5'
         : 'text-gray-400 hover:text-white hover:bg-white/5'
     }`}
   >
@@ -35,11 +35,11 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-[#141414] border-r border-white/5 flex flex-col h-screen sticky top-0 overflow-y-auto custom-scrollbar">
+    <aside className="w-64 flex-shrink-0 bg-obsidian border-r border-white/5 flex flex-col h-screen sticky top-0 overflow-y-auto custom-scrollbar">
       {/* Brand */}
       <div className="p-6">
         <Link to="/" className="flex items-center space-x-3">
-          <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold bg-gradient-to-r from-cyber-purple to-pink-400 bg-clip-text text-transparent">
             ✨ Summy
           </span>
         </Link>
@@ -59,6 +59,21 @@ const Sidebar: React.FC = () => {
           label="Sessions"
           isActive={isNavItemActive('/sessions')}
         />
+
+        <div className="my-2 border-t border-white/5 mx-4" />
+
+        <NavItem
+          to="/sources"
+          icon="🔑"
+          label="Sources"
+          isActive={isNavItemActive('/sources')}
+        />
+        <NavItem
+          to="/team-builder"
+          icon="👥"
+          label="Team Builder"
+          isActive={isNavItemActive('/team-builder')}
+        />
         
         {/* Tooly Group */}
         <div className="pt-2">
@@ -66,7 +81,7 @@ const Sidebar: React.FC = () => {
             onClick={() => setIsToolyOpen(!isToolyOpen)}
             className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               location.pathname.startsWith('/tooly')
-                ? 'text-purple-400'
+                ? 'text-cyber-purple'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -120,6 +135,7 @@ const Sidebar: React.FC = () => {
           isActive={isNavItemActive('/rag')}
         />
       </nav>
+
 
       {/* Footer Navigation */}
       <div className="p-4 border-t border-white/5 space-y-1">

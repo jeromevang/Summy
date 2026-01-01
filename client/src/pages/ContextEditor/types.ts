@@ -94,15 +94,3 @@ export interface ToolResultInfo {
   name?: string;
   isError?: boolean;
 }
-
-export interface CompressionVersion {
-  messages: any[];
-  stats: { originalTokens: number; compressedTokens: number; ratio: number };
-}
-
-export interface CompressionVersions {
-  none: CompressionVersion;
-  light: CompressionVersion;
-  medium: CompressionVersion;
-  aggressive: CompressionVersion;
-}

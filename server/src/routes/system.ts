@@ -206,12 +206,35 @@ router.get('/health', (req, res) => {
 router.get('/status', async (req, res) => {
     try {
         const settings = await loadServerSettings();
+        
+        let mainModel = null;
+        let executorModel = null;
+
+        if (settings.enableDualModel) {
+            if (settings.mainModelId) {
+                const profile = await capabilities.getProfile(settings.mainModelId);
+                mainModel = { id: settings.mainModelId, name: profile?.displayName || settings.mainModelId };
+            }
+            if (settings.executorModelId) {
+                const profile = await capabilities.getProfile(settings.executorModelId);
+                executorModel = { id: settings.executorModelId, name: profile?.displayName || settings.executorModelId };
+            }
+        } else if (settings.lmstudioModel) {
+             // In single model mode, treat it as Main
+             const profile = await capabilities.getProfile(settings.lmstudioModel);
+             mainModel = { id: settings.lmstudioModel, name: profile?.displayName || settings.lmstudioModel };
+        }
+
         res.json({
             online: true,
             port: process.env.PORT || 3001,
             ngrokUrl: process.env.NGROK_URL || null,
             provider: settings.provider || 'lmstudio',
-            model: settings.provider === 'lmstudio' ? settings.lmstudioModel : settings.openaiModel
+            model: settings.provider === 'lmstudio' ? settings.lmstudioModel : settings.openaiModel,
+            swarm: {
+                main: mainModel,
+                executor: executorModel
+            }
         });
     } catch (error) {
         res.json({ online: true, port: 3001 });

@@ -9,8 +9,8 @@ import { useToolyApi } from './hooks/useToolyApi';
 import { useWebSocket } from './hooks/useWebSocket';
 
 // Components
-import { LegacyTooly } from './LegacyTooly';
-import { ToolyNext } from './ToolyNext';
+// import { LegacyTooly } from './LegacyTooly';
+// import { ToolyNext } from './ToolyNext';
 
 const Tooly: React.FC = () => {
   // Initialize state
@@ -116,25 +116,13 @@ const Tooly: React.FC = () => {
         isTestRunning={!!state.testingModel || !!state.probingModel}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-180px)]">
-        {/* Model List - Takes 3 columns */}
-        <div className="lg:col-span-3 overflow-hidden">
-          <ModelListPanel
-            {...state}
-            {...api}
-            selectedModelId={state.selectedModel?.modelId ?? null}
-          />
-        </div>
-
-        {/* Sidebar - Takes 1 column */}
-        <div className="lg:col-span-1 bg-[#1a1a1a] rounded-xl border border-[#2d2d2d] p-4 overflow-hidden">
-          <ModelInfoSidebar
-            profile={state.selectedModel as any}
-            isTestRunning={!!state.testingModel || !!state.probingModel}
-            onSetAsMain={() => state.selectedModel && api.setAsMainModel(state.selectedModel.modelId)}
-            onSetAsExecutor={() => state.selectedModel && api.setAsExecutorModel(state.selectedModel.modelId)}
-          />
-        </div>
+      <div className="flex flex-col gap-6 h-[calc(100vh-180px)]">
+        {/* Model Hub - Full Width */}
+        <ModelListPanel
+          {...state}
+          {...api}
+          selectedModelId={state.selectedModel?.modelId ?? null}
+        />
       </div>
     </div>
   );

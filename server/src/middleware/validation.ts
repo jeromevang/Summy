@@ -56,36 +56,58 @@ export const SecurityHeadersSchema = z.object({
 export function validateSchema(schema: z.ZodSchema) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
+      // Create a stripped version of the schema to ignore unknown keys
+      const strippedSchema = schema instanceof z.ZodObject ? schema.strip() : schema;
+
+      // Helper to pick keys that exist in the schema
+      const pickValidKeys = (data: any) => {
+        if (!(schema instanceof z.ZodObject)) return data;
+        const validKeys = Object.keys(schema.shape);
+        const filteredData: any = {};
+        for (const key of Object.keys(data)) {
+          if (validKeys.includes(key)) {
+            filteredData[key] = data[key];
+          }
+        }
+        return filteredData;
+      };
+
       // Validate query parameters
       if (Object.keys(req.query).length > 0) {
-        const querySchema = schema.pick(Object.keys(req.query).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {} as any));
-        if (querySchema) {
-          querySchema.parse(req.query);
+        const queryData = pickValidKeys(req.query);
+        if (Object.keys(queryData).length > 0) {
+          try {
+            strippedSchema.parse(queryData);
+          } catch (e: any) {
+            console.error(`[Validation Error] Query params failed for ${req.path}:`, e.errors || e);
+            throw e;
+          }
         }
       }
 
       // Validate body parameters
       if (Object.keys(req.body).length > 0) {
-        const bodySchema = schema.pick(Object.keys(req.body).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {} as any));
-        if (bodySchema) {
-          bodySchema.parse(req.body);
+        const bodyData = pickValidKeys(req.body);
+        if (Object.keys(bodyData).length > 0) {
+          try {
+            strippedSchema.parse(bodyData);
+          } catch (e: any) {
+            console.error(`[Validation Error] Body failed for ${req.path}:`, e.errors || e);
+            throw e;
+          }
         }
       }
 
       // Validate path parameters
       if (Object.keys(req.params).length > 0) {
-        const paramSchema = schema.pick(Object.keys(req.params).reduce((acc, key) => {
-          acc[key] = true;
-          return acc;
-        }, {} as any));
-        if (paramSchema) {
-          paramSchema.parse(req.params);
+        const paramData = pickValidKeys(req.params);
+        if (Object.keys(paramData).length > 0) {
+          try {
+            strippedSchema.parse(paramData);
+          } catch (e: any) {
+            console.error(`[Validation Error] Path params failed for ${req.path}:`, e.errors || e);
+            throw e;
+          }
         }
       }
 
@@ -189,9 +211,14 @@ export function addSecurityHeaders() {
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     
     // Add CORS headers for API
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
     
     next();
   };
@@ -267,7 +294,7 @@ export const validateFailureLog = validateSchema(FailureLogSchema);
 // Export rate limiting instances
 export const apiRateLimit = createRateLimit({
   windowMs: 60000, // 1 minute
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // Increased from 100 to 1000 to prevent blocking during health checks
   message: 'Too many API requests from this IP, please try again later.'
 });
 

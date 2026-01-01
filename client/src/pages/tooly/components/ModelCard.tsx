@@ -1,61 +1,46 @@
 import React from 'react';
-import type { DiscoveredModel, TestProgress } from '../types';
+import type { Model, TestProgress } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 interface ModelCardProps {
-  model: DiscoveredModel;
+  model: Model;
   isSelected: boolean;
   testProgress: TestProgress;
   calculateETA: () => string | null;
-  onClick: () => void;
 }
 
 export const getStatusIcon = (status: DiscoveredModel['status']) => {
   switch (status) {
-    case 'tested': return '✅';
-    case 'known_good': return '✅';
-    case 'untested': return '⚠️';
-    case 'failed': return '❌';
-    default: return '❓';
-  }
-};
-
-export const getStatusColor = (status: DiscoveredModel['status']) => {
-  switch (status) {
-    case 'tested': return 'text-green-400';
-    case 'known_good': return 'text-green-400';
-    case 'untested': return 'text-yellow-400';
-    case 'failed': return 'text-red-400';
-    default: return 'text-gray-400';
+    case 'tested': return <div className="w-2 h-2 rounded-full bg-cyber-emerald shadow-[0_0_8px_rgba(16,185,129,0.5)]" />;
+    case 'known_good': return <div className="w-2 h-2 rounded-full bg-cyber-emerald shadow-[0_0_8px_rgba(16,185,129,0.5)]" />;
+    case 'untested': return <div className="w-2 h-2 rounded-full bg-cyber-amber shadow-[0_0_8px_rgba(245,158,11,0.5)]" />;
+    case 'failed': return <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />;
+    default: return <div className="w-2 h-2 rounded-full bg-gray-500" />;
   }
 };
 
 export const getRoleBadge = (role?: string) => {
   switch (role) {
     case 'main':
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400">🧠 Main</span>;
+      return <span className="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider bg-cyber-purple/10 text-cyber-purple border border-cyber-purple/20">Planning</span>;
     case 'executor':
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">⚡ Executor</span>;
+      return <span className="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/20">Action</span>;
     case 'both':
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-purple-500/20 text-purple-400">✨ Both</span>;
+      return <span className="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider bg-cyber-emerald/10 text-cyber-emerald border border-cyber-emerald/20">Hybrid</span>;
     case 'none':
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-red-500/20 text-red-400">⚠️ Limited</span>;
+      return <span className="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20">Limited</span>;
     default:
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-500/20 text-gray-400">? Unprobed</span>;
+      return <span className="px-1.5 py-0.5 text-[9px] font-bold rounded uppercase tracking-wider bg-white/5 text-white/30 border border-white/5">Unknown</span>;
   }
 };
 
-export const getProviderBadge = (provider: string) => {
+export const getProviderIcon = (provider: string) => {
   switch (provider) {
-    case 'openrouter':
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-orange-500/20 text-orange-400">🚀 OpenRouter</span>;
-    case 'lmstudio':
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400">💻 LM Studio</span>;
-    case 'openai':
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400">🌐 OpenAI</span>;
-    case 'azure':
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-sky-500/20 text-sky-400">☁️ Azure</span>;
-    default:
-      return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-500/20 text-gray-400">{provider}</span>;
+    case 'openrouter': return '🚀';
+    case 'lmstudio': return '💻';
+    case 'openai': return '🌐';
+    case 'azure': return '☁️';
+    default: return '🤖';
   }
 };
 
@@ -64,8 +49,13 @@ export const ModelCard: React.FC<ModelCardProps> = ({
   isSelected,
   testProgress,
   calculateETA,
-  onClick,
 }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/tooly/model/${model.id}`);
+  };
+
   const isTestRunning = testProgress.modelId === model.id && 
     (testProgress.probeProgress?.status === 'running' || 
      testProgress.toolsProgress?.status === 'running' || 
@@ -83,93 +73,94 @@ export const ModelCard: React.FC<ModelCardProps> = ({
 
   return (
     <div
-      onClick={onClick}
-      className={`p-4 rounded-lg border cursor-pointer transition-all ${
+      onClick={handleCardClick}
+      className={`group relative p-4 rounded-xl border transition-all duration-300 flex flex-col justify-between h-40 overflow-hidden cursor-pointer ${
         isSelected
-          ? 'border-purple-500 bg-purple-500/10'
-          : 'border-[#2d2d2d] hover:border-[#3d3d3d]'
+          ? 'bg-white/[0.03] border-cyber-purple/50 shadow-[0_0_20px_rgba(139,92,246,0.1)]'
+          : 'bg-white/[0.01] border-white/5 hover:border-white/20 hover:bg-white/[0.02]'
       }`}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className={getStatusColor(model.status)}>
+      {/* Background Glow for Selected */}
+      {isSelected && (
+        <div className="absolute -right-8 -top-8 w-24 h-24 bg-cyber-purple/10 blur-3xl rounded-full" />
+      )}
+
+      {/* Top Section */}
+      <div className="relative z-10 space-y-3">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
             {getStatusIcon(model.status)}
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="text-white font-medium">{model.displayName}</p>
-              {getRoleBadge(model.role)}
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              {getProviderBadge(model.provider)}
-              {model.quantization && (
-                <>
-                  <span>•</span>
-                  <span className="text-purple-400">{model.quantization}</span>
-                </>
-              )}
-              {model.sizeBytes && (
-                <>
-                  <span>•</span>
-                  <span>{(model.sizeBytes / (1024 * 1024 * 1024)).toFixed(1)}GB</span>
-                </>
-              )}
-              {model.maxContextLength && (
-                <>
-                  <span>•</span>
-                  <span>{(model.maxContextLength / 1024).toFixed(0)}K ctx</span>
-                </>
-              )}
-            </div>
+            <span className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">
+              {model.provider}
+            </span>
+          </div>
+          <div className="flex gap-1">
+            {getRoleBadge(model.role)}
           </div>
         </div>
-        <div className="text-right">
-          {model.score !== undefined ? (
-            <div className="text-right">
-              <div className="flex flex-col items-end">
-                <div className="text-white font-mono text-lg leading-none mb-1">
-                  {model.score}%
-                </div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider">
-                  Agentic Score
-                </div>
-              </div>
-            </div>
-          ) : (
-            <span className="text-gray-500 text-xs">Not tested</span>
-          )}
+
+        <div>
+          <h3 className="text-white font-semibold text-sm line-clamp-2 leading-tight group-hover:text-cyber-purple transition-colors">
+            {model.displayName}
+          </h3>
+          <div className="flex items-center gap-2 mt-2">
+             <span className="text-[10px] text-white/40 font-mono">
+               {model.maxContextLength ? `${(model.maxContextLength / 1024).toFixed(0)}K CTX` : '8K CTX'}
+             </span>
+             <span className="text-white/10 text-[10px]">•</span>
+             <span className="text-[10px] text-white/40 font-mono">
+               {model.quantization || 'FP16'}
+             </span>
+          </div>
         </div>
       </div>
       
-      {/* Mini Progress Bar on Model Card */}
-      {isTestRunning && (
-        <div className="mt-3 pt-3 border-t border-[#2d2d2d]">
-          <div className="flex items-center justify-between mb-1">
-            <div className="flex items-center gap-2">
-              <span className="animate-pulse text-purple-400 text-xs">●</span>
-              <span className="text-xs text-gray-400 truncate max-w-[180px]">
-                {testProgress.probeProgress?.currentTest || 
-                 testProgress.toolsProgress?.currentTest || 
-                 testProgress.latencyProgress?.currentTest || 
-                 'Testing...'}
-              </span>
+      {/* Bottom Section */}
+      <div className="relative z-10">
+        {isTestRunning ? (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[9px] uppercase tracking-widest font-bold">
+              <span className="text-cyber-purple animate-pulse">Processing</span>
+              <span className="text-white/30">{Math.round(progressPercent)}%</span>
             </div>
-            <div className="flex items-center gap-2">
-              {calculateETA() && (
-                <span className="text-xs text-gray-500">{calculateETA()}</span>
-              )}
-              <span className="text-xs text-gray-500">
-                {currentProgress}/{totalProgress}
-              </span>
+            <div className="w-full bg-white/5 rounded-full h-1 overflow-hidden">
+              <div 
+                className="bg-cyber-purple h-full rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
           </div>
-          <div className="w-full bg-[#1a1a1a] rounded-full h-1.5">
-            <div 
-              className="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
+        ) : (
+          <div className="flex items-end justify-between">
+            <div className="text-[24px] opacity-20 filter grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300">
+              {getProviderIcon(model.provider)}
+            </div>
+            {model.score !== undefined ? (
+              <div className="text-right">
+                <div className="text-white font-mono text-xl font-bold leading-none tracking-tight">
+                  {model.score}<span className="text-xs text-white/40 ml-0.5">%</span>
+                </div>
+                <div className="text-[9px] text-cyber-emerald font-bold uppercase tracking-widest mt-1">
+                  Readiness
+                </div>
+              </div>
+            ) : (
+              <div className="text-right">
+                <div className="text-white/20 font-mono text-xl font-bold leading-none tracking-tight">
+                  --
+                </div>
+                <div className="text-[9px] text-white/20 font-bold uppercase tracking-widest mt-1">
+                  No Data
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
+      </div>
+
+      {/* Selected Indicator Bar */}
+      {isSelected && (
+        <div className="absolute left-0 bottom-0 top-0 w-1 bg-cyber-purple shadow-[0_0_10px_rgba(139,92,246,0.5)]" />
       )}
     </div>
   );

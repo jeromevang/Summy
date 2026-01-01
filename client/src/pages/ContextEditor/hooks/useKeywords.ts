@@ -17,7 +17,7 @@ export const extractKeywords = (text: string): string[] => {
   const keywords: Set<string> = new Set();
   
   // Extract file paths
-  const pathMatches = text.match(/[w/\]+\.(ts|tsx|js|jsx|json|md|css|py|go|rs|java|c|cpp|h)/gi);
+  const pathMatches = text.match(/[\w/\\.-]+\.(ts|tsx|js|jsx|json|md|css|py|go|rs|java|c|cpp|h)\b/gi);
   if (pathMatches) pathMatches.forEach(k => keywords.add(k));
   
   // Extract technical terms

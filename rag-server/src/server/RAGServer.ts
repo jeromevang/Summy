@@ -7,11 +7,13 @@ import { RAGConfig, defaultConfig } from '../config.js';
 import { getIndexer, Indexer } from '../services/indexer.js';
 import { getLMStudioEmbedder } from '../embeddings/lmstudio.js';
 import { getLanceDBStore } from '../storage/lancedb-store.js';
+import { getRAGDatabase, RAGDatabase } from '../services/database.js';
 
 export class RAGServer {
   private app = express();
   private config: RAGConfig = { ...defaultConfig };
   private indexer!: Indexer;
+  private ragDb!: RAGDatabase;
   private wsClients: Set<WebSocket> = new Set();
 
   constructor() {
@@ -37,6 +39,7 @@ export class RAGServer {
   private async initializeServices() {
     this.indexer = getIndexer(this.config);
     this.indexer.onProgress((p) => this.broadcast('indexProgress', p));
+    this.ragDb = getRAGDatabase(this.config.storage.dataPath);
 
     // Start file watcher if enabled
     if (this.config.watcher.enabled && this.config.project.path) {
@@ -73,9 +76,21 @@ export class RAGServer {
         const { query, limit = 5 } = req.body;
         if (!query) return res.status(400).json({ error: 'query is required' });
 
-        // For now, return empty results since indexing might not be complete
-        const results = [];
+        const results = await this.indexer.query(query, limit);
         res.json({ results, query });
+      } catch (error: any) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.get('/api/nav/symbols', async (req, res) => {
+      try {
+        const query = req.query.query as string;
+        const limit = parseInt(req.query.limit as string || '10');
+        if (!query) return res.status(400).json({ error: 'query is required' });
+
+        const symbols = this.ragDb.symbols.searchSymbols(query, { limit });
+        res.json({ symbols });
       } catch (error: any) {
         res.status(500).json({ error: error.message });
       }

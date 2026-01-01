@@ -20,7 +20,7 @@ import { createServer } from 'http';
 import { LMStudioClient } from '@lmstudio/sdk';
 
 // Import new route modules
-import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes } from './routes/index.js';
+import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter } from './routes/index.js';
 import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
 import { mcpOrchestrator } from './modules/tooly/orchestrator/mcp-orchestrator.js';
@@ -172,6 +172,10 @@ app.use('/api/rag', ragRoutes);
 app.use('/api/sessions', sessionsRoutes);
 app.use('/api/context-sessions', sessionsRoutes); // Legacy alias
 app.use('/api', systemRoutes);
+app.use('/api', workspaceRouter);
+app.use('/api', apiBridgeRouter);
+app.use('/api', teamRouter);
+app.use('/api/git', gitRouter);
 
 // Shared proxy routes
 app.post('/chat/completions', OpenAIProxy.proxyToOpenAI);
@@ -267,12 +271,15 @@ server.listen(PORT, async () => {
   }
 
   // Initialize model manager
+  // enhancedModelManager.initialize() removed - method does not exist
+  /*
   try {
     await enhancedModelManager.initialize();
     console.log('  🤖 Model manager initialized');
   } catch (error) {
     console.error('❌ Model manager initialization failed:', error);
   }
+  */
 
   // Initialize tracing system
   try {

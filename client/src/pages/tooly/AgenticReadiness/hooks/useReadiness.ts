@@ -32,7 +32,7 @@ export const useReadiness = (selectedProvider: string) => {
 
   // WebSocket for real-time updates
   useEffect(() => {
-    const ws = new ReconnectingWebSocket(`ws://\${window.location.hostname}:3001`);
+    const ws = new ReconnectingWebSocket(`ws://${window.location.hostname}:3001`);
 
     ws.onmessage = (event) => {
       try {
@@ -174,29 +174,23 @@ export const useReadiness = (selectedProvider: string) => {
 
   const loadModelAssessmentData = async (modelId: string) => {
     try {
-      const response = await fetch(`/api/tooly/models/\${encodeURIComponent(modelId)}`);
+      const response = await fetch(`/api/tooly/models/${encodeURIComponent(modelId)}/detail`);
       if (response.ok) {
-        const profile = await response.json();
-        if (profile.agenticReadiness) {
-          setAssessmentResult({
-            modelId,
-            assessedAt: profile.agenticReadiness.assessedAt || new Date().toISOString(),
-            overallScore: profile.agenticReadiness.score,
-            passed: profile.agenticReadiness.certified,
-            qualifyingGatePassed: profile.agenticReadiness.qualifyingGatePassed ?? true,
-            categoryScores: profile.agenticReadiness.categoryScores,
-            testResults: profile.agenticReadiness.testResults || [],
-            failedTests: [],
-            duration: 0,
-            mode: profile.agenticReadiness.mode || 'single',
-            trainabilityScores: profile.trainabilityScores
-          });
-        } else {
-          setAssessmentResult(null);
-        }
+        const data = await response.json();
+        setAssessmentResult({
+          modelId: data.modelId,
+          displayName: data.displayName,
+          provider: data.provider,
+          testedAt: data.testedAt,
+          overallScore: data.score,
+          categoryScores: data.scoreBreakdown,
+          testResults: data.testResults || [],
+          duration: 0,
+          passed: data.score >= THRESHOLD
+        });
       }
     } catch (err) {
-      console.warn('Failed to load model assessment data:', err);
+      console.error('Failed to load assessment data:', err);
     }
   };
 

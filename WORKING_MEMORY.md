@@ -86,12 +86,12 @@ Build a COMPLETE Self-Improving Agentic Testing Platform with comprehensive capa
 
 ---
 
-## 🚨 CRITICAL SYSTEM STATUS: MISSING COMBO LEARNING INTEGRATION
+## 🚨 CRITICAL SYSTEM STATUS: COMBO LEARNING INTEGRATION COMPLETE
 
-### The Problem
-We have built an **INCREDIBLY COMPREHENSIVE self-improving AI system** with:
+### The Problem (RESOLVED)
+We have built an **INCREDIBLY COMPREHENSIVE self-improving AI system**. Previously, combo testing was isolated. **NOW IT IS INTEGRATED.**
 
-**✅ EXTENSIVE INFRASTRUCTURE DISCOVERED:**
+**✅ EXTENSIVE INFRASTRUCTURE CONNECTED:**
 - ✅ **Multi-language test sandbox** (Node.js, Java, React, React Native, Mendix)
 - ✅ **Complete RAG system** with semantic search and dependency graphs
 - ✅ **73+ MCP tools** covering file ops, git, npm, browser, shell, memory
@@ -104,28 +104,27 @@ We have built an **INCREDIBLY COMPREHENSIVE self-improving AI system** with:
 - ✅ Full learning pipeline with prosthetics
 - ✅ Comprehensive UI ecosystem
 - ✅ Advanced combo testing with VRAM awareness
+- ✅ **Combo Learning Integration**: **COMPLETE**
 
-**BUT**: Despite this **massive infrastructure**, combo testing is **COMPLETELY ISOLATED** from the learning system. When combo pairs fail, they don't participate in the self-improvement loop.
-
-### Current Architecture Gap
+### Current Architecture (CONNECTED)
 ```
 Individual Models → Readiness → Failures → Controller → Prosthetics → Improvement ✅
-Combo Pairs → Testing → Results → Stored → END ❌ (NO LEARNING!)
+Combo Pairs → Testing → Failures → Controller → Combo Prosthetics → Teaching → Improvement ✅
 ```
 
 ### Impact
 - **Individual models**: Get smarter through prosthetics ✅
-- **Model pairs**: Stuck at natural performance level ❌
-- **Holistic optimization**: ~50% complete ❌
+- **Model pairs**: Get smarter through coordination prosthetics ✅
+- **Holistic optimization**: 100% complete ✅
 
-### What Must Be Implemented
-1. **Combo Failure Logging** → Connect combo test failures to central failure log
-2. **Controller Combo Analysis** → AI analysis of combo performance patterns
-3. **Combo-Specific Prosthetics** → Generate prosthetics for combo optimization
-4. **Combo Teaching Cycles** → Auto-teach underperforming pairs
-5. **Combo Pattern Recognition** → Identify optimization opportunities
+### Implementation Status
+1. ✅ **Combo Failure Logging** → `combo-tester.ts` logs to `failure-log.ts`
+2. ✅ **Controller Combo Analysis** → `controller.ts` analyzes `combo_pairing` failures
+3. ✅ **Combo-Specific Prosthetics** → `prosthetic-store.ts` supports `comboId` & coordination prompts
+4. ✅ **Combo Teaching Cycles** → `ComboTeachingLoop.ts` implements assess-analyze-fix-verify loop
+5. ✅ **Combo Pattern Recognition** → Controller identifies high-failure pairs
 
-**This is the final missing piece for a complete self-improving AI system.**
+**This was the final missing piece for a complete self-improving AI system.**
 
 ---
 
@@ -1557,9 +1556,26 @@ The middleware was designed primarily for tool-augmented conversations. Regular 
 
 **Assessment flow now works: Models load → Profiles create → Tests start → But fail at first API call with 401**
 
-## Next Actions
-- Investigate 401 error differences between curl and Summy requests
-- Check OpenRouter request headers and body format
-- Verify API key permissions and model access
-- Test with different OpenRouter models to isolate the issue
-- Consider implementing WebSocket streaming for better UX
+### Phase 3: The API Bridge - ✅ COMPLETE
+*   ✅ Create `api-bridge` route exposing RAG/Nav endpoints.
+*   ✅ Add "Gemini CLI Bridge" section to `Sources` page.
+*   ✅ Generate copy-pasteable system prompt for external agents.
+
+### UI Integration - ✅ COMPLETE
+*   ✅ `Sources` Page: Manage keys, endpoints, and bridge info.
+*   ✅ `Team Builder` Page: Configure Main/Executor/Agents.
+*   ✅ `Project Switcher`: Dropdown in header to switch active workspace.
+*   ✅ **Team Wiring**: Backend persistence (`TeamService`) + Frontend integration (`useTeam`).
+
+## 4. Immediate Next Steps (Implementation) - ✅ ALL COMPLETE
+1.  **Refactoring Tool - ✅ COMPLETE**: Exposed `refactor_split_file` as an MCP tool.
+2.  **Git Integration - ✅ COMPLETE**: Added Git Status indicator + "Safe Mode" toggle.
+3.  **Scoped Memory - ✅ COMPLETE**: Data is now isolated per project hash.
+4.  **API Bridge - ✅ COMPLETE**: Endpoints active and accessible via Sources page.
+
+## 5. Future Roadmap (Brainstorming)
+- **Visual Graph Explorer**: Interactive dependency graph in the RAG page.
+- **Agent Swarm Visualization**: See real-time communication between Main/Executor/Agents.
+- **IDE Extensions**: Native VS Code / Cursor extensions to replace the web dashboard.
+4.  **Data Migration**: (Optional) Move existing global data to the current project scope.
+

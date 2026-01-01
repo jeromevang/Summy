@@ -10,7 +10,7 @@ export const useModels = (selectedProvider: string) => {
   const fetchModels = async () => {
     setIsLoadingModels(true);
     try {
-      const response = await fetch(`/api/tooly/models?provider=\${selectedProvider}`);
+      const response = await fetch(`/api/tooly/models?provider=${selectedProvider}`);
       if (!response.ok) throw new Error('Failed to fetch models');
       const data = await response.json();
       setModels(data.models || []);

@@ -21,7 +21,7 @@ export const useComboTest = () => {
   const [excludedMainModels, setExcludedMainModels] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const ws = new ReconnectingWebSocket(`ws://\${window.location.hostname}:3001`);
+    const ws = new ReconnectingWebSocket(`ws://${window.location.hostname}:3001`);
 
     ws.onmessage = (event) => {
       try {

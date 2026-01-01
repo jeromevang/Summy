@@ -198,6 +198,18 @@ class WSBroadcastService {
     console.log(`[WSBroadcast] Teaching complete: ${data.modelId} - Success: ${data.success}, Score: ${data.finalScore} (clients: ${this.clients.size})`);
     this.broadcast('teaching_complete', data);
   }
+
+  /**
+   * Broadcast combo teaching progress
+   */
+  broadcastComboTeachingProgress(data: {
+    comboId: string;
+    message: string;
+    step: 'teaching' | 'verifying' | 'complete';
+  }) {
+    console.log(`[WSBroadcast] Combo Teaching: ${data.comboId} - ${data.message} (clients: ${this.clients.size})`);
+    this.broadcast('combo_teaching_progress', data);
+  }
 }
 
 export const wsBroadcast = new WSBroadcastService();

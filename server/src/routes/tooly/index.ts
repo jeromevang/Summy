@@ -9,6 +9,10 @@ import { ideRouter } from './ide.js';
 import { leaderboardRouter } from './leaderboard.js';
 import { baselineRouter } from './baseline.js';
 import { customTestsRouter } from './custom-tests.js';
+import { hardwareRouter } from './hardware.js';
+import { controllerRouter } from './controller.js';
+import { comboTestRouter } from './combo-test.js';
+import { failuresRouter } from './failures.js';
 
 import { 
   addSecurityHeaders,
@@ -47,6 +51,10 @@ router.use('/', ideRouter);
 router.use('/', leaderboardRouter);
 router.use('/', baselineRouter);
 router.use('/', customTestsRouter);
+router.use('/', hardwareRouter);
+router.use('/', controllerRouter);
+router.use('/', comboTestRouter);
+router.use('/', failuresRouter);
 
 export default router;
 export const toolyRouter = router;

@@ -1,108 +1,80 @@
-# Summy
+# Summy: Local AI Platform
 
 ## Project Overview
 
-**Summy** is a comprehensive context management middleware designed to optimize Large Language Model (LLM) interactions. It acts as a smart proxy between Integrated Development Environments (IDEs) like Cursor or VS Code and AI providers (OpenAI, OpenRouter, etc.).
+**Summy** is a local "Sidecar Platform" designed to manage AI teams, context, and secrets for software projects. It has evolved from a simple proxy middleware into a comprehensive workspace manager that enables "Self-Improving Agentic Workflows".
 
-**Core Mission:** To capture, analyze, and refine the context sent to LLMs, enabling features like session replay, token optimization, and semantic search integration.
+**Core Mission:** To allow developers to assemble "Squads" of AI models (Main Architect + Executors + Specialists) that work together on any local codebase, supported by a shared memory and semantic intelligence layer.
 
 ### Key Capabilities
-- **Traffic Interception:** Proxies requests to capture full conversation history.
-- **Context Management:** A "Time Machine" for your coding sessions, allowing you to save, edit, and fork conversation contexts.
-- **Visual Interface:** A React-based dashboard for monitoring latency, costs, and model performance.
-- **Local Intelligence:** Includes a RAG server and MCP (Model Context Protocol) server for deep integration with local files and tools.
+
+1.  **Dynamic Workspace Management (Sidecar Mode):**
+    *   Summy can switch between different projects on the fly using the **Project Switcher**.
+    *   It dynamically re-indexes the codebase (RAG) and restarts tools (MCP) to match the active folder.
+    *   **Git Integration:** "Safe Mode" prevents agents from modifying files if the git repo is dirty.
+
+2.  **Team Builder & Coordination:**
+    *   **Squad Assembly:** Define a **Main Architect** (e.g., GPT-4o for planning) and an **Executor** (e.g., DeepSeek-Coder for file ops).
+    *   **Specialists:** Add custom agents for QA or security auditing.
+    *   **Combo Learning:** The system automatically tests model pairs and generates "Coordination Prosthetics" to fix handoff failures.
+
+3.  **Local Intelligence (The API Bridge):**
+    *   **RAG Server:** A semantic search engine that indexes the active project.
+    *   **API Bridge:** Exposes endpoints (`/api/rag/query`, `/api/nav/symbols`) so *external* agents (like Gemini CLI) can tap into Summy's index.
+    *   **Sources Page:** Centralized management for API Keys (OpenAI, Anthropic) and Local Endpoints (LM Studio).
+
+4.  **Refactoring & Tooling:**
+    *   **Auto File Splitter:** An explicit tool (`refactor_split_file`) for breaking large files into modules.
+    *   **Project-Scoped Memory:** "Prosthetic Prompts" (fixes for model bugs) and "Failure Logs" are saved specifically for each project hash, preventing context pollution.
 
 ## Architecture
 
 The project is structured as a **Monorepo** using npm workspaces.
 
-| Service | Directory | Tech Stack | Description |
-| :--- | :--- | :--- | :--- |
-| **Proxy Server** | `server/` | Node.js, Express, SQLite | The core backend. Handles request proxying, data persistence, and modular routes. |
-| **Web Client** | `client/` | React, Vite, TailwindCSS | The frontend UI. Dashboard for session management, testing, and model analytics. |
-| **MCP Server** | `mcp-server/` | Node.js, TypeScript | Implements MCP. Exposes FS, Git, Browser, and Tracing tools to AI agents. |
-| **RAG Server** | `rag-server/` | Node.js, Express, LanceDB | specialized vector search service for semantic code queries and embeddings. |
-| **Database** | `database/` | Node.js, Drizzle, SQLite | Code Index System. Uses `ts-morph` for AST parsing and dependency graph mapping. |
+| Service | Directory | Description |
+| :--- | :--- | :--- |
+| **Proxy Server** | `server/` | The core platform logic. Handles Workspace switching, Team persistence, and API bridging. |
+| **Web Client** | `client/` | React/Vite dashboard. Now includes "Sources", "Team Builder", and "Project Switcher". |
+| **MCP Server** | `mcp-server/` | Provides filesystem/git tools. Spawns as a child process with dynamic `cwd` based on the active project. |
+| **RAG Server** | `rag-server/` | Vector search engine (LanceDB). Watches the active project folder for changes. |
+| **Database** | `database/` | Shared logic for AST parsing and code analysis. |
+
+## Key Concepts & Workflows
+
+### 1. The "Sidecar" Workflow
+1.  User launches Summy (`npm run dev`).
+2.  User navigates to `localhost:5173`.
+3.  **Project Switcher:** User selects a target folder (e.g., `C:/Projects/MyApp`).
+4.  **Backend:**
+    *   `WorkspaceService` updates the path.
+    *   `MCPClient` restarts the tool server in that folder.
+    *   `RAGServer` starts indexing that folder.
+5.  **Team Builder:** User selects "GPT-4o" as Architect and "Local Model" as Executor.
+6.  **Action:** User (or Agent) interacts with the system; models use tools on the target repo safely.
+
+### 2. The API Bridge (External Integration)
+*   **Goal:** Allow a CLI agent (like Gemini) to "see" the project Summy is managing.
+*   **Mechanism:**
+    *   Summy exposes `GET /api/bridge/info`.
+    *   User copies the "System Prompt Snippet" from the **Sources Page**.
+    *   External Agent uses this prompt to know how to call `POST /api/rag/query` to find code in the user's project.
 
 ## Building and Running
 
-### Prerequisites
-- **Node.js**: v18+
-- **npm**: (Handles workspace management)
-- **External Tools**: `ngrok` (for exposing the local proxy to cloud IDEs), `LMStudio` (optional, for local inference/summarization).
-
-### Quick Start (Dev Mode)
-
-To start the entire suite (Server, Client, RAG, and MCP tools) concurrently:
-
+### Quick Start
 ```bash
 npm install
 npm run dev
+# Starts Server (3001), Client (5173), RAG (3002), and prepares MCP.
 ```
 
-### Individual Services
+### Configuration
+*   **API Keys:** Manage them in the UI (**Sources** page). They are persisted to `settings.json`.
+*   **Team Configs:** Saved per-project in `server/data/teams.json`.
+*   **Memories:** Saved per-project in `server/data/projects/<hash>/`.
 
-If you prefer running services in separate terminals:
-
-**1. Proxy Server (Backend)**
-```bash
-npm run dev:server
-# Runs on http://localhost:3001
-```
-
-**2. Web Client (Frontend)**
-```bash
-npm run dev:client
-# Runs on http://localhost:5173
-```
-
-**3. RAG Server**
-```bash
-npm run dev:rag
-# Runs on internal port (default 3002)
-```
-
-**4. MCP Server**
-```bash
-npm run dev:mcp
-# or
-npm run dev:cursor-tools  # Specific for Cursor integration
-npm run dev:continue-tools # Specific for Continue integration
-```
-
-### Building for Production
-
-```bash
-npm run build
-# Builds all workspaces
-```
-
-## Configuration
-
-- **Environment Variables:** Each service typically uses `.env` files (though `settings.json` is also used in `server/`).
-- **Dashboard Settings:** Configure API keys (OpenAI, etc.) and URLs (ngrok, LMStudio) directly in the Client UI (`http://localhost:5173/settings`).
-- **MCP Configuration:**
-    - Cursor: Update `.cursor/mcp.json` to point to the `mcp-server` script.
-    - Continue: Update `~/.continue/config.json` to use the SSE endpoint.
-
-## Development Conventions
-
-- **Language:** **TypeScript** is strictly used across all workspaces (`type: "module"`).
-- **Styling:** **TailwindCSS** for the frontend.
-- **State Management:** Local state + React Hooks for frontend; SQLite + In-memory objects for backend.
-- **Communication:**
-    - **HTTP/REST:** Between Client and Server.
-    - **WebSockets:** For real-time updates (logs, status).
-    - **MCP (Stdio/SSE):** For AI tool communication.
-- **Database:** Local-first approach using `better-sqlite3` and `vectra`/`lancedb` for vector storage. No external DB server required.
-
-## Key Files & Paths
-
-- `server/src/index.ts`: Entry point for the Proxy Server.
-- `server/src/routes/tooly/`: Modular API routes for model testing and configuration.
-- `client/src/App.tsx`: Main React component structure.
-- `mcp-server/src/server.ts`: Main MCP server implementation.
-- `rag-server/src/index.ts`: RAG server entry point.
-- `database/src/analysis/ast-parser.ts`: Core AST parsing logic using `ts-morph`.
-- `database/scripts/analyze-codebase.ts`: Code indexing orchestrator script.
-- `data/summy.db`: Main SQLite database (contains sessions, profiles, and code index).
+## Key Files
+*   `server/src/services/workspace-service.ts`: Manages active project state.
+*   `server/src/modules/tooly/mcp-client.ts`: Handles spawning/restarting the MCP tool server.
+*   `client/src/pages/TeamBuilder.tsx`: UI for defining model squads.
+*   `rag-server/src/server/RAGServer.ts`: The semantic search API backend.

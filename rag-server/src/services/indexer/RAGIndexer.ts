@@ -6,6 +6,7 @@ import { watch, FSWatcher } from 'chokidar';
 import { v4 as uuidv4 } from 'uuid';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { RAGResult } from '../../config.js';
 
 import { IndexProgress, CodeChunk, EnrichedChunk, FileSummary, defaultConfig, RAGConfig } from '../../config.js';
 import { Chunker, detectLanguage } from '../chunker.js';
@@ -90,5 +91,57 @@ export class Indexer {
   }
 
   private async indexFile(file: string, projectPath: string) { /* ... */ }
-  stopWatcher(): void { if (this.fileWatcher) { this.fileWatcher.close(); this.fileWatcher = null; } }
-}
+import { RAGResult } from '../../config.js';
+
+// ... existing imports ...
+
+export class Indexer {
+  // ... existing properties ...
+
+  // ... existing constructor ...
+
+  async query(text: string, limit: number = 5): Promise<RAGResult[]> {
+    try {
+      if (!text) return [];
+      
+      console.log(`[Indexer] Querying: "${text}"`);
+      
+      // 1. Embed query
+      // The embedder might not be loaded, this should handle lazy loading
+      const embedding = await this.embedder.embed(text);
+      if (!embedding || embedding.length === 0) {
+        console.warn('[Indexer] Failed to generate embedding for query');
+        return [];
+      }
+
+      // 2. Search vector store
+      const vectorResults = await this.vectorStore.search(embedding, limit);
+      console.log(`[Indexer] Vector search returned ${vectorResults.length} matches`);
+
+      // 3. Enrich with metadata
+      const results: RAGResult[] = [];
+      for (const res of vectorResults) {
+        // res.id corresponds to chunk.id
+        const chunk = this.ragDb.chunks.getChunk(res.id);
+        if (chunk) {
+          results.push({
+            filePath: chunk.filePath,
+            startLine: chunk.startLine,
+            endLine: chunk.endLine,
+            snippet: chunk.content,
+            symbolName: chunk.symbolName,
+            symbolType: chunk.symbolType,
+            language: chunk.language,
+            score: res.score
+          });
+        }
+      }
+
+      return results;
+    } catch (error: any) {
+      console.error(`[Indexer] Query failed: ${error.message}`);
+      return [];
+    }
+  }
+
+  // ... existing methods ...

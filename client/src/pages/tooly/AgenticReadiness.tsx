@@ -13,6 +13,7 @@ import {
   useHardware,
   useModels
 } from './AgenticReadiness/hooks';
+import { useTeam } from '../../hooks/useTeam';
 import { renderProgressBar } from './AgenticReadiness/utils/renderUtils';
 import { CATEGORIES, THRESHOLD } from './AgenticReadiness/constants';
 import { Tab, CategoryScore } from './AgenticReadiness/types';
@@ -44,10 +45,22 @@ const AgenticReadiness: React.FC = () => {
 
   const { hardware, isLoadingHardware, detectHardware } = useHardware();
   const { models, isLoadingModels, selectedModelId, setSelectedModelId, executorModelId, setExecutorModelId, fetchModels } = useModels(selectedProvider);
+  const { team, loading: teamLoading } = useTeam();
   const {
     isLoading, error, assessmentResult, progress, batchResult, batchProgress,
     combinationCheck, runAssessment, checkCombination, runBatchAssessment, loadModelAssessmentData
   } = useReadiness(selectedProvider);
+
+  // Sync team config to local state if available
+  useEffect(() => {
+    if (team) {
+      if (team.mainModelId) setSelectedModelId(team.mainModelId);
+      if (team.executorEnabled && team.executorModelId) {
+        setExecutorModelId(team.executorModelId);
+        setTab('dual'); // Auto-switch to dual mode if team has executor
+      }
+    }
+  }, [team, setSelectedModelId, setExecutorModelId]);
 
   useEffect(() => {
     if (selectedModelId) loadModelAssessmentData(selectedModelId);
@@ -57,9 +70,16 @@ const AgenticReadiness: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-6">
       <div className="max-w-7xl mx-auto">
         <button onClick={() => navigate('/tooly')} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors">← Back</button>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Agentic Readiness</h1>
-          <p className="text-gray-400 mt-2">Test and certify local models for agentic coding tasks</p>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Agentic Readiness</h1>
+            <p className="text-gray-400 mt-2">Test and certify local models for agentic coding tasks</p>
+          </div>
+          {team && (
+            <div className="bg-purple-500/10 border border-purple-500/30 px-4 py-2 rounded-lg text-sm text-purple-300">
+              👥 Using Team: <strong>{team.mainModelId}</strong> {team.executorEnabled ? `+ ${team.executorModelId}` : ''}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2 mb-6">

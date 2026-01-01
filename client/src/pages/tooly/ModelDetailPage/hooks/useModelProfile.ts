@@ -47,7 +47,7 @@ export const useModelProfile = (decodedModelId: string) => {
   }, [fetchProfile, fetchBaselineComparison, decodedModelId]);
 
   useEffect(() => {
-    const ws = new ReconnectingWebSocket(`ws://\${window.location.hostname}:3001/ws`);
+    const ws = new ReconnectingWebSocket(`ws://${window.location.hostname}:3001/ws`);
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
