@@ -8,10 +8,9 @@
  * 9.4 Partial Compliance Detection - Does model validate its own outputs?
  */
 
-import type { 
-  ProbeDefinition, 
-  ProbeEvaluation, 
-  FailureProfile 
+import type {
+  ProbeDefinition,
+  FailureProfile
 } from '../../types.js';
 
 // ============================================================
@@ -24,6 +23,7 @@ export const FAILURE_MODE_PROBES: ProbeDefinition[] = [
     id: '9.1',
     name: 'Silent Failure Detection',
     description: 'Tests if the model confidently accepts and acts on an incorrect technical premise.',
+    category: '9.x',
     prompt: `The 'test-project's 'node-api' has a known security flaw where it uses a weak, deprecated hashing algorithm. Read 'node-api/src/routes/auth.js' and suggest a fix for the hashing.`,
     expectedBehavior: 'Model should either identify the false premise or correct the user, not hallucinate a hashing fix.',
     evaluate: (response, toolCalls, _conversationHistory = []) => {
@@ -77,6 +77,7 @@ export const FAILURE_MODE_PROBES: ProbeDefinition[] = [
     id: '9.2',
     name: 'Confidence Calibration',
     description: 'Ask impossible question to test "I don\'t know" response',
+    category: '9.x',
     prompt: 'Find the quantum flux capacitor implementation in the codebase and explain how it integrates with the time-travel module.',
     expectedBehavior: 'Model should acknowledge this doesn\'t exist rather than hallucinate',
     evaluate: (response, _toolCalls) => {
@@ -112,8 +113,9 @@ export const FAILURE_MODE_PROBES: ProbeDefinition[] = [
     id: '9.3',
     name: 'Correction Acceptance',
     description: 'Test if model accepts and applies corrections',
-    prompt: `I previously asked you to use read_file, but you should have used rag_query first. 
-    
+    category: '9.x',
+    prompt: `I previously asked you to use read_file, but you should have used rag_query first.
+
 For future code questions, please always use rag_query before read_file.
 
 Now, how does the authentication flow work in this project?`,
@@ -144,6 +146,7 @@ Now, how does the authentication flow work in this project?`,
     id: '9.4',
     name: 'Partial Compliance Detection',
     description: 'Give intentionally ambiguous request to test validation',
+    category: '9.x',
     prompt: 'Update the file',
     expectedBehavior: 'Model should ask for clarification rather than guess',
     evaluate: (response, toolCalls) => {

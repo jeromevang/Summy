@@ -13,7 +13,7 @@ export class FailureLogService {
   private currentWorkspaceHash: string = '';
 
   constructor() {
-    this.data = { version: 1, entries: [], patterns: {}, stats: { totalFailures: 0, resolvedFailures: 0, lastUpdated: new Date().toISOString(), failuresByCategory: { tool: 0, rag: 0, reasoning: 0, intent: 0, browser: 0, unknown: 0, combo_pairing: 0 }, failuresByModel: {} } };
+    this.data = { version: 1, entries: [], patterns: {}, stats: { totalFailures: 0, resolvedFailures: 0, unresolvedCount: 0, lastUpdated: new Date().toISOString(), failuresByCategory: { tool: 0, rag: 0, reasoning: 0, intent: 0, browser: 0, unknown: 0, combo_pairing: 0 }, failuresByModel: {} } };
   }
 
   private getStoragePath(): string {
@@ -41,7 +41,7 @@ export class FailureLogService {
         return fs.readJsonSync(storagePath);
       }
     } catch (e) { console.error('[FailureLog] Load error:', e); }
-    return { version: 1, entries: [], patterns: {}, stats: { totalFailures: 0, resolvedFailures: 0, lastUpdated: new Date().toISOString(), failuresByCategory: { tool: 0, rag: 0, reasoning: 0, intent: 0, browser: 0, unknown: 0, combo_pairing: 0 }, failuresByModel: {} } };
+    return { version: 1, entries: [], patterns: {}, stats: { totalFailures: 0, resolvedFailures: 0, unresolvedCount: 0, lastUpdated: new Date().toISOString(), failuresByCategory: { tool: 0, rag: 0, reasoning: 0, intent: 0, browser: 0, unknown: 0, combo_pairing: 0 }, failuresByModel: {} } };
   }
 
   private save(): void {
@@ -100,16 +100,32 @@ export class FailureLogService {
     return this.data.entries; 
   }
   
-  getStats() { 
+  getStats() {
     this.ensureDataLoaded();
-    return this.data.stats; 
+    this.data.stats.unresolvedCount = this.data.entries.filter(e => !e.resolved).length;
+    return this.data.stats;
   }
   
-  getAnalysisSummary() { 
+  getAnalysisSummary() {
     this.ensureDataLoaded();
-    return { unresolvedPatterns: Object.values(this.data.patterns), recentFailures: this.data.entries.slice(-20), modelSummary: [] }; 
+    return { unresolvedPatterns: Object.values(this.data.patterns), recentFailures: this.data.entries.slice(-20), modelSummary: [] };
   }
-  
+
+  getPattern(patternId: string): FailurePattern | null {
+    this.ensureDataLoaded();
+    return this.data.patterns[patternId] || null;
+  }
+
+  getPatterns(): FailurePattern[] {
+    this.ensureDataLoaded();
+    return Object.values(this.data.patterns);
+  }
+
+  getPatternsAboveThreshold(threshold: number = 3): FailurePattern[] {
+    this.ensureDataLoaded();
+    return Object.values(this.data.patterns).filter(p => p.count >= threshold);
+  }
+
   markResolved(_ids: string[], _pid: string) { return 0; }
   clearForModel(_mid: string) { return 0; }
   clearOld(_days: number) { return 0; }

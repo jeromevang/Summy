@@ -3,10 +3,9 @@
  * Finds optimal model combinations for dual-model routing
  */
 
-import type { 
+import type {
   AgenticScores,
-  TrainabilityScores,
-  ModelProfileV2
+  TrainabilityScores
 } from '../types.js';
 
 // ============================================================

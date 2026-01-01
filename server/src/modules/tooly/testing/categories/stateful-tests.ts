@@ -21,28 +21,36 @@ import type {
 
 export const STATEFUL_TEST_CONFIGS: Record<string, StatefulTestConfig> = {
   instructionDecay: {
+    turns: 50,
     totalTurns: 50,
     instructionTurn: 1,
     testTurns: [5, 10, 25, 50],
-    testType: 'instruction_decay'
+    testType: 'instruction_decay',
+    complexity: 'medium'
   },
   schemaErosion: {
+    turns: 30,
     totalTurns: 30,
     instructionTurn: 1,
     testTurns: [10, 20, 30],
-    testType: 'schema_erosion'
+    testType: 'schema_erosion',
+    complexity: 'medium'
   },
   contextDrift: {
+    turns: 25,
     totalTurns: 25,
     instructionTurn: 1,
     testTurns: [10, 15, 25],
-    testType: 'context_drift'
+    testType: 'context_drift',
+    complexity: 'medium'
   },
   roleStability: {
+    turns: 20,
     totalTurns: 20,
     instructionTurn: 1,
     testTurns: [5, 10, 20],
-    testType: 'role_stability'
+    testType: 'role_stability',
+    complexity: 'medium'
   }
 };
 
@@ -83,6 +91,7 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     id: '10.1',
     name: 'Instruction Decay',
     description: 'Rule given at turn 1, tested at turn 10/25/50',
+    category: '10.x',
     prompt: 'INSTRUCTION AT TURN 1: From now on, always end your responses with "---END---".\n\nNow, what is a function in programming?',
     expectedBehavior: 'Response should end with "---END---" even after many intervening turns',
     evaluate: (response, _toolCalls) => {
@@ -102,6 +111,7 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     id: '10.2',
     name: 'Schema Erosion',
     description: 'Tool schema shown early, used correctly late',
+    category: '10.x',
     prompt: 'Use the custom_analyze tool with parameters: { "target": "main.ts", "depth": 3 }',
     expectedBehavior: 'Model should remember and correctly use custom tool schema from earlier in conversation',
     evaluate: (response, _toolCalls) => {
@@ -131,6 +141,7 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     id: '10.3',
     name: 'RAG Rule Persistence',
     description: '"Use rag_query first" still followed after 20 turns',
+    category: '10.x',
     prompt: 'How does authentication work in this project?',
     expectedBehavior: 'Should still use rag_query first even after many turns',
     evaluate: (_response, toolCalls) => {
@@ -155,7 +166,9 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     id: '10.4',
     name: 'Role Stability',
     description: 'Does model maintain its assigned role over time',
+    category: '10.x',
     prompt: 'What should I do with this error: "TypeError: undefined is not a function"?',
+    expectedBehavior: 'Model should respond as a coding assistant, not break character',
     evaluate: (response, _toolCalls) => {
       const responseText = typeof response === 'string' ? response.toLowerCase() : '';
       
@@ -192,6 +205,7 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
   {
     id: '10.5',
     name: 'Context Drift',
+    category: '10.x',
     description: 'Is task context maintained across long sessions',
     prompt: 'Based on what we discussed earlier about the authentication bug, what file should we fix first?',
     expectedBehavior: 'Should reference earlier context about authentication bug',
@@ -246,10 +260,12 @@ export function generateStatefulConversation(
   }
   
   // Add filler messages
-  for (let turn = 2; turn < config.totalTurns; turn++) {
+  const totalTurns = config.totalTurns || 10;
+  for (let turn = 2; turn < totalTurns; turn++) {
     const fillerIndex = (turn - 2) % FILLER_MESSAGES.length;
-    conversation.push({ role: 'user', content: FILLER_MESSAGES[fillerIndex] });
-    conversation.push({ role: 'assistant', content: `Response to: ${FILLER_MESSAGES[fillerIndex]}` });
+    const fillerMessage = FILLER_MESSAGES[fillerIndex] || 'Default filler message';
+    conversation.push({ role: 'user', content: fillerMessage });
+    conversation.push({ role: 'assistant', content: `Response to: ${fillerMessage}` });
   }
   
   // Add test prompt
@@ -266,7 +282,7 @@ export function analyzeStatefulResults(
 ): StatefulTestResult {
   const complianceAtTurn: Record<number, number> = {};
   const degradationCurve: number[] = [];
-  
+
   let breakpointTurn: number | null = null;
   
   for (const result of results) {
@@ -276,11 +292,12 @@ export function analyzeStatefulResults(
     if (!result.passed && breakpointTurn === null) {
       breakpointTurn = result.turn;
     }
-    
-    lastPassingScore = result.score;
   }
   
+  const passed = breakpointTurn === null; // Passed if no breakpoint (no failure turn)
+
   return {
+    passed,
     testType: 'instruction_decay',
     complianceAtTurn,
     degradationCurve,

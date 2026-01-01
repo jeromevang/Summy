@@ -306,6 +306,8 @@ export function calculateBaselineComparison(
   return {
     modelId,
     baselineModelId,
+    similarity: 0, // TODO: Calculate actual similarity
+    improvement: modelScores.overallScore - baselineScores.overallScore,
     timestamp: new Date().toISOString(),
     deltas,
     relativePerformance: Math.round(relativePerformance),

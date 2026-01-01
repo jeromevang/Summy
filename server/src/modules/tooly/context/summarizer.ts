@@ -214,7 +214,7 @@ export class Summarizer {
           { timeout: this.config.timeout }
         );
 
-        if (!response.data) return null;
+        if (!response.data) return combinedContent.substring(0, 2000) + '...'; // Fallback to truncated content
       const summary = (response.data as any).choices?.[0]?.message?.content;
         if (summary) return summary;
       } catch (error) {
@@ -292,25 +292,30 @@ export class Summarizer {
         { timeout: this.config.timeout }
       );
 
-      if (!response.data) return undefined;
-      if (!response.data) return undefined;
-      if (!response.data) return undefined;
-      if (response.data.choices && response.data.choices.length > 0) {
-      if (!response.data) return null;
-      const content = (response.data as any).choices?.[0]?.message?.content || '';
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!response.data) {
+        return {
+          turns: turns.length,
+          summary: 'Failed to generate summary',
+          keyTopics: [],
+          pendingItems: [],
+          importantFacts: [],
+          aiGenerated: false
+        };
+      }
 
-        if (jsonMatch && jsonMatch[0]) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          return {
-            turns: turns.length,
-            summary: parsed.summary || '',
-            keyTopics: parsed.keyTopics || [],
-            pendingItems: parsed.pendingItems || [],
-            importantFacts: parsed.importantFacts || [],
-            aiGenerated: true
-          };
-        }
+      const content = (response.data as any).choices?.[0]?.message?.content || '';
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+
+      if (jsonMatch && jsonMatch[0]) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          turns: turns.length,
+          summary: parsed.summary || '',
+          keyTopics: parsed.keyTopics || [],
+          pendingItems: parsed.pendingItems || [],
+          importantFacts: parsed.importantFacts || [],
+          aiGenerated: true
+        };
       }
     } catch (error) {
       // Fall through to fallback
@@ -350,15 +355,17 @@ export class Summarizer {
     let charCount = 0;
 
     // First sentence
-    result.push(sentences[0]?.trim());
-    charCount += sentences[0]?.length || 0;
+    if (sentences[0]) {
+      result.push(sentences[0].trim());
+      charCount += sentences[0].length;
+    }
 
     // Key sentences from middle (those with important keywords)
     const keywords = ['function', 'class', 'return', 'import', 'export', 'const', 'let', 'def', 'if', 'for'];
     const middleSentences = sentences.slice(1, -1);
 
     for (const sentence of middleSentences) {
-      if (charCount >= targetChars * 0.7) break;
+      if (!sentence || charCount >= targetChars * 0.7) break;
 
       const hasKeyword = keywords.some(kw => sentence.toLowerCase().includes(kw));
       if (hasKeyword) {
@@ -369,7 +376,10 @@ export class Summarizer {
 
     // Last sentence
     if (charCount < targetChars) {
-      result.push(sentences[sentences.length - 1]?.trim());
+      const lastSentence = sentences[sentences.length - 1];
+      if (lastSentence) {
+        result.push(lastSentence.trim());
+      }
     }
 
     return result.join('. ') + '.';

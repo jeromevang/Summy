@@ -10,7 +10,8 @@
  */
 
 import { wsBroadcast } from './ws-broadcast.js';
-import { failureLog, type FailureCategory, type FailureEntry, type FailurePattern } from './failure-log.js';
+import { failureLog } from './failure-log/FailureLogService.js';
+import type { FailureEntry } from './failure-log/types.js';
 
 // ============================================================
 // TYPES
@@ -308,7 +309,7 @@ class FailureObserver {
   } {
     const stats = failureLog.getStats();
     const patterns = failureLog.getPatterns();
-    const criticalPatterns = patterns.filter(p => 
+    const criticalPatterns = patterns.filter((p: any) =>
       p.severity === 'critical' && p.count >= this.config.criticalThreshold
     ).length;
 

@@ -26,12 +26,12 @@ router.get('/discover', async (_req, res) => {
       data: result,
       message: `Discovered ${result.totalModels} models`
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Model discovery failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Model discovery failed',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -74,12 +74,12 @@ router.get('/list', async (req, res) => {
         offset: parseInt(offset as string)
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Get models failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get models',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -104,12 +104,12 @@ router.get('/:modelId', async (req, res) => {
       success: true,
       data: model
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Get model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get model',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -138,12 +138,12 @@ router.patch('/:modelId', async (req, res) => {
       data: modelManager.getModel(modelId),
       message: `Updated model ${modelId}`
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Update model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to update model',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -171,12 +171,12 @@ router.post('/:modelId/disable', async (req, res) => {
       success: true,
       message: `Disabled model ${modelId}: ${reason || 'Manual disable'}`
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Disable model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to disable model',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -203,12 +203,12 @@ router.post('/:modelId/enable', async (req, res) => {
       success: true,
       message: `Enabled model ${modelId}`
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Enable model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to enable model',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -239,12 +239,12 @@ router.post('/recommendations', async (req, res) => {
       },
       message: `Found ${recommendations.length} recommendations`
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Get recommendations failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get recommendations',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -278,12 +278,12 @@ router.get('/best/:role', async (req, res) => {
       data: best,
       message: `Best ${role} model: ${best.model.displayName}`
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Get best model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get best model',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -316,12 +316,12 @@ router.post('/health-check', async (_req, res) => {
       },
       message: `Health check completed: ${healthyCount} healthy, ${unhealthyCount} unhealthy`
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Health check failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Health check failed',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -339,12 +339,12 @@ router.post('/:modelId/health-check', async (req, res) => {
       data: result,
       message: `Health check for ${modelId}: ${result.status}`
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Health check model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Health check failed',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -363,12 +363,12 @@ router.delete('/cache/clear', async (_req, res) => {
       success: true,
       message: 'Model cache cleared'
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Clear cache failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to clear cache',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -383,12 +383,12 @@ router.get('/cache/stats', async (_req, res) => {
       success: true,
       data: stats
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Get cache stats failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get cache stats',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });
@@ -444,12 +444,12 @@ router.get('/stats', async (_req, res) => {
       success: true,
       data: stats
     });
-  } catch (error) {
+  } catch (error: any) {
     addDebugEntry('error', `Get stats failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get statistics',
-      message: error.message
+      message: error?.message || 'Unknown error'
     });
   }
 });

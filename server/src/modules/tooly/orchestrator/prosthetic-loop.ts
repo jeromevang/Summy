@@ -16,7 +16,7 @@
 import { ReadinessRunner } from '../testing/readiness-runner';
 import { loadTestSuite, type ReadinessResult } from '../testing/agentic-readiness-suite.js';
 import { prostheticStore, buildProstheticPrompt } from '../learning/prosthetic-store.js';
-import { capabilities, ALL_TOOLS } from '../capabilities.js';
+import { capabilities } from '../capabilities.js';
 
 // ============================================================ 
 // TYPES
@@ -259,12 +259,12 @@ export class ProstheticLoop {
    */
   private async applyProstheticToProfile(modelId: string, prostheticPrompt: string): Promise<void> {
     try {
-      let profile = await modelCapabilities.getProfile(modelId);
+      let profile = await capabilities.getProfile(modelId);
 
       if (!profile || !profile.modelId) {
         if (profile && !profile.modelId) {
           // Clear the cache to remove corrupted entries
-          (modelCapabilities as any).clearCache();
+          (capabilities as any).clearCache();
         }
         // Create a basic profile for the model
         profile = {
@@ -287,7 +287,7 @@ export class ProstheticLoop {
       profile!.systemPrompt = newPrompt;
       profile!.prostheticApplied = true;
 
-      await modelCapabilities.saveProfile(profile!);
+      await capabilities.saveProfile(profile!);
     } catch (error) {
       console.error(`[ProstheticLoop] Error applying prosthetic:`, error);
       throw error;
@@ -299,7 +299,7 @@ export class ProstheticLoop {
    */
   private async certifyModel(modelId: string, result: ReadinessResult): Promise<void> {
     try {
-      let profile = await modelCapabilities.getProfile(modelId);
+      let profile = await capabilities.getProfile(modelId);
       if (!profile) {
         console.log(`[ProstheticLoop] Creating profile for certification of ${modelId}`);
         profile = {
@@ -319,12 +319,19 @@ export class ProstheticLoop {
         certified: true,
         score: result.overallScore,
         certifiedAt: new Date().toISOString(),
-        categoryScores: result.categoryScores,
+        categoryScores: {
+          tool: result.categoryScores.tool || 0,
+          rag: result.categoryScores.rag || 0,
+          reasoning: result.categoryScores.reasoning || 0,
+          intent: result.categoryScores.intent || 0,
+          browser: result.categoryScores.browser || 0,
+          ...result.categoryScores
+        },
         failedTests: result.failedTests,
         prostheticApplied: prostheticStore.hasProsthetic(modelId)
       };
 
-      await modelCapabilities.saveProfile(profile!);
+      await capabilities.saveProfile(profile!);
       console.log(`[ProstheticLoop] Certified model ${modelId} with score ${result.overallScore}`);
     } catch (error) {
       console.error(`[ProstheticLoop] Error certifying model:`, error);

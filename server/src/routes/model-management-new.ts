@@ -27,11 +27,11 @@ router.get('/discover', async (_req, res) => {
       message: `Discovered ${result.totalModels} models`
     });
   } catch (err: any) {
-    addDebugEntry('error', `Model discovery failed: ${error}`);
+    addDebugEntry('error', `Model discovery failed: ${err}`);
     res.status(500).json({
       success: false,
       error: 'Model discovery failed',
-      message: err.message
+      message: err?.message || 'Unknown error'
     });
   }
 });

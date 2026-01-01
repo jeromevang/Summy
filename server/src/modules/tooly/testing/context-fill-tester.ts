@@ -148,13 +148,13 @@ const TIMEOUT_MS = 42000;`,
 // ============================================================
 
 export class ContextFillTester {
-  private settings: {
+  private _settings: {
     lmstudioUrl: string;
     [key: string]: any;
   };
 
   constructor(settings: { lmstudioUrl: string; [key: string]: any }) {
-    this.settings = settings;
+    this._settings = settings;
   }
 
   /**

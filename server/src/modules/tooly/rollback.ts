@@ -57,7 +57,7 @@ class RollbackService {
    */
   async createBackup(
     filePath: string,
-    executionLogId: string // Kept for context, though not directly used in file naming/mapping here
+    _executionLogId: string // Kept for context, though not directly used in file naming/mapping here
   ): Promise<string | null> {
     try {
       const absolutePath = path.resolve(filePath);
@@ -73,7 +73,7 @@ class RollbackService {
 
       const backupId = uuidv4();
       const backupFileName = `${backupId}-${path.basename(filePath)}`;
-      const backupFilePath = path.join(thisD.BACKUP_DIR, backupFileName);
+      const backupFilePath = path.join(this.BACKUP_DIR, backupFileName);
 
       // Ensure backup directory exists
       await fs.ensureDir(this.BACKUP_DIR);
@@ -116,8 +116,8 @@ class RollbackService {
         return { success: false, filePath: '', message: 'Backup map file not found.' };
       }
       try {
-        const mapData = await fs.readFile(this.BACKUP_MAP_FILE, 'utf-utf-8');
-        backupMap = JSON.parse(mapData);
+        const mapData = await fs.readFile(this.BACKUP_MAP_FILE, 'utf-8');
+        backupMap = JSON.parse(mapData as string);
       } catch (e) {
         console.error(`[Rollback] Error reading backup map ${this.BACKUP_MAP_FILE}:`, e);
         return { success: false, filePath: '', message: 'Failed to read backup map.' };
@@ -177,6 +177,85 @@ class RollbackService {
    */
   toolSupportsRollback(toolName: string): boolean {
     return ROLLBACK_SUPPORTED_TOOLS.includes(toolName);
+  }
+}
+
+/**
+ * Schedules periodic cleanup of old backup files
+ */
+export function scheduleBackupCleanup(intervalMs: number): void {
+  setInterval(async () => {
+    try {
+      await cleanupOldBackups();
+    } catch (error) {
+      console.error('[Rollback] Error during backup cleanup:', error);
+    }
+  }, intervalMs);
+}
+
+/**
+ * Cleans up old backup files (files older than 24 hours)
+ */
+async function cleanupOldBackups(): Promise<void> {
+  try {
+    const backupDir = rollback['BACKUP_DIR']; // Access private property
+    const backupMapFile = rollback['BACKUP_MAP_FILE']; // Access private property
+
+    if (!await fs.pathExists(backupDir)) {
+      return;
+    }
+
+    // Read backup map
+    let backupMap: Record<string, BackupInfo> = {};
+    if (await fs.pathExists(backupMapFile)) {
+      try {
+        const mapData = await fs.readFile(backupMapFile, 'utf-8');
+        backupMap = JSON.parse(mapData);
+      } catch (e) {
+        console.error('[Rollback] Error reading backup map during cleanup:', e);
+        return;
+      }
+    }
+
+    const now = Date.now();
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const toDelete: string[] = [];
+
+    // Find old backup files
+    for (const [backupId, backupInfo] of Object.entries(backupMap)) {
+      try {
+        const stats = await fs.stat(backupInfo.backupFilePath);
+        if (now - stats.mtime.getTime() > maxAge) {
+          toDelete.push(backupId);
+        }
+      } catch (e) {
+        // File might not exist, add to deletion list
+        toDelete.push(backupId);
+      }
+    }
+
+    // Delete old backups and update map
+    for (const backupId of toDelete) {
+      const backupInfo = backupMap[backupId];
+      if (!backupInfo) continue;
+      try {
+        if (await fs.pathExists(backupInfo.backupFilePath)) {
+          await fs.unlink(backupInfo.backupFilePath);
+        }
+        delete backupMap[backupId];
+      } catch (e) {
+        console.error(`[Rollback] Error deleting backup ${backupId}:`, e);
+      }
+    }
+
+    // Save updated map
+    if (toDelete.length > 0) {
+      await fs.writeFile(backupMapFile, JSON.stringify(backupMap, null, 2), 'utf-8');
+      console.log(`[Rollback] Cleaned up ${toDelete.length} old backup files`);
+    }
+
+  } catch (error) {
+    console.error('[Rollback] Error during cleanup:', error);
   }
 }
 

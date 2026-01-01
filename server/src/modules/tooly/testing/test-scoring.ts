@@ -42,7 +42,7 @@ export function calculateTrainabilityScores(results: TestResult[]) {
 
 export async function updateModelProfile(modelId: string, provider: string, runResult: TestRunResult, discoveryResult?: any, aliasRefinements?: AliasRefinement[], trainabilityScores?: any) {
     let profile = await capabilities.getProfile(modelId) || capabilities.createEmptyProfile(modelId, modelId, provider as any);
-    profile = capabilities.updateProfileWithResults(profile, runResult.results.map(r => ({ testId: r.testId, tool: r.tool, passed: r.passed, score: r.score, latency: r.latency, response: r.response ? JSON.stringify(r.response).slice(0, 500) : undefined, error: r.error })));
+    await capabilities.updateProbeResults(modelId, runResult as any, 'both');
 
     if (discoveryResult) {
         if (discoveryResult.discoveredTools?.length) profile.discoveredNativeTools = discoveryResult.discoveredTools;
@@ -54,10 +54,10 @@ export async function updateModelProfile(modelId: string, provider: string, runR
 
     if (aliasRefinements?.length) {
         for (const ref of aliasRefinements) {
-            if (profile.capabilities[ref.originalMapping]?.nativeAliases) profile.capabilities[ref.originalMapping].nativeAliases = profile.capabilities[ref.originalMapping].nativeAliases!.filter(a => a !== ref.nativeToolName);
+            if (profile.capabilities[ref.originalMapping]?.nativeAliases) profile.capabilities[ref.originalMapping].nativeAliases = profile.capabilities[ref.originalMapping].nativeAliases.filter(a => a !== ref.nativeToolName);
             if (profile.capabilities[ref.refinedMapping]) {
                 if (!profile.capabilities[ref.refinedMapping].nativeAliases) profile.capabilities[ref.refinedMapping].nativeAliases = [];
-                if (!profile.capabilities[ref.refinedMapping].nativeAliases!.includes(ref.nativeToolName)) profile.capabilities[ref.refinedMapping].nativeAliases!.push(ref.nativeToolName);
+                if (profile.capabilities[ref.refinedMapping].nativeAliases && !profile.capabilities[ref.refinedMapping].nativeAliases.includes(ref.nativeToolName)) profile.capabilities[ref.refinedMapping].nativeAliases.push(ref.nativeToolName);
             }
         }
         wsBroadcast.broadcast('alias_refinements', { modelId, refinements: aliasRefinements });

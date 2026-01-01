@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { db } from '../database.js';
-import { TraceSpan, TraceContext } from './types.js';
+import { TraceSpan } from './types.js';
 
 export class TraceManager {
   private static instance: TraceManager;

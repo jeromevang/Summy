@@ -130,8 +130,7 @@ function createDisplayName(modelId: string): string {
 export class ModelScanner {
   private lmstudioUrl: string;
     private cachedModels: Map<string, ScannedModel> = new Map();
-    private _lastScanTime: number = 0;
-  
+
     constructor(lmstudioUrl: string = 'http://localhost:1234') {    this.lmstudioUrl = lmstudioUrl;
   }
   
@@ -201,9 +200,7 @@ export class ModelScanner {
     } catch (error: any) {
       console.error('[ModelScanner] Failed to scan models:', error.message);
     }
-    
-    this._lastScanTime = Date.now();
-    
+
     return {
       models,
       totalCount: models.length,

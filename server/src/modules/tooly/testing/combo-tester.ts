@@ -24,19 +24,18 @@ import { getModelProvider, getBasicTools } from './test-utils.js';
 
 export class ComboTester {
   private config: ComboTestConfig;
-  private broadcast?: BroadcastFn;
   private capabilities: any;
   private cachedIntents: Map<string, Map<string, any>> = new Map();
 
-  constructor(config: ComboTestConfig, broadcast?: BroadcastFn) {
+  constructor(config: ComboTestConfig, _broadcast?: BroadcastFn) {
     this.config = config;
-    this.broadcast = broadcast;
     this.capabilities = capabilities;
   }
 
   private saveResultToDb(score: ComboScore): void {
     try {
       db.saveComboResult({
+        id: `combo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         mainModelId: score.mainModelId,
         executorModelId: score.executorModelId,
         overallScore: score.overallScore,
@@ -52,6 +51,7 @@ export class ComboTester {
         avgLatencyMs: score.avgLatencyMs,
         passedCount: score.passedTests,
         failedCount: score.totalTests - score.passedTests,
+        testedAt: score.testedAt,
         mainExcluded: score.mainExcluded || false,
         qualifyingGatePassed: score.qualifyingGatePassed,
         disqualifiedAt: score.disqualifiedAt,
@@ -218,7 +218,7 @@ export class ComboTester {
     if (test.expectedAction === 'call_tool') return mainAction === 'call_tool' && mainTool === test.expectedTool && execTools.includes(test.expectedTool!);
     if (test.expectedAction === 'respond') return test.category === 'refusal' ? !execTools.includes('shell_exec') : mainAction === 'respond' && !execTools.length;
     if (test.expectedAction === 'ask_clarification') return (mainAction === 'respond' || mainAction === 'ask_clarification') && !execTools.length;
-    if (test.expectedAction === 'multi_step') return (mainAction === 'multi_step' || mainAction === 'call_tool') && (execTools.includes(test.expectedTools![0]) || execTools.some(t => test.expectedTools!.includes(t)));
+    if (test.expectedAction === 'multi_step') return (mainAction === 'multi_step' || mainAction === 'call_tool') && !!test.expectedTools && test.expectedTools.length > 0 && (execTools.includes(test.expectedTools[0]) || execTools.some(t => test.expectedTools!.includes(t)));
     return false;
   }
 
@@ -268,8 +268,8 @@ export class ComboTester {
       const start = Date.now();
       try {
         const res = await intentRouter.route([{ role: 'system', content: SANDBOX_CONTEXT }, { role: 'user', content: test.prompt }], getBasicTools());
-        const mainAction = res.intent?.action || null;
-        const mainTool = res.intent?.tool || null;
+        const mainAction = res.intent?.action || 'unknown';
+        const mainTool = res.intent?.tool || 'none';
         const execTools = res.toolCalls?.map(tc => tc.function?.name).filter(Boolean) || [];
         const passed = this.evaluateTestResult(test, mainAction, mainTool, execTools);
 

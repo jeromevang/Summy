@@ -26,7 +26,6 @@ import {
 } from './testing/test-scoring.js';
 import { TestRunner } from './testing/test-runner.js';
 import { ALL_TOOLS } from './capabilities.js';
-import { ESSENTIAL_TOOLS, STANDARD_TOOLS, FULL_TOOLS } from './orchestrator/mcp-orchestrator.js';
 
 export class TestEngine {
   private runner: TestRunner;

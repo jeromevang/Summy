@@ -19,11 +19,6 @@ import {
   ProbeTestResult as StrategicProbeResult,
 } from './strategic-probes.js';
 
-import {
-  runIntentProbes,
-  calculateIntentScores,
-  IntentProbeResult,
-} from './intent-probes.js';
 
 export class ProbeEngine {
   private core: ProbeCore;

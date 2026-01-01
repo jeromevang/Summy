@@ -163,8 +163,13 @@ export interface AgenticScores {
 
 export interface FailureProfile {
   failureType: 'none' | 'silent' | 'partial' | 'recovery_failure';
-  hallucinationType: 'none' | 'tool' | 'code' | 'fact';
+  hallucinationType: 'none' | 'tool' | 'code' | 'fact' | 'intent';
   detectability: 'obvious' | 'subtle' | 'hidden';
+  confidenceWhenWrong?: number;
+  recoverable?: boolean;
+  recoveryStepsNeeded?: number;
+  acceptsCorrection?: boolean;
+  failureConditions?: string[];
 }
 
 export interface StatefulProfile {
@@ -174,8 +179,10 @@ export interface StatefulProfile {
 }
 
 export interface PrecedenceMatrix {
-  systemVsDeveloper: 'system' | 'developer' | 'balanced';
-  safetyVsExecution: 'safety' | 'execution' | 'balanced';
+  systemVsDeveloper: 'system' | 'developer' | 'balanced' | 'unpredictable';
+  safetyVsExecution: 'safety' | 'execution' | 'balanced' | 'unpredictable';
+  developerVsUser?: 'developer' | 'user' | 'balanced' | 'unpredictable';
+  ragVsToolSchema?: 'rag' | 'tool_schema' | 'balanced' | 'unpredictable';
 }
 
 export interface EfficiencyMetrics {
@@ -255,9 +262,13 @@ export interface OptimalSetupResult {
 }
 
 export interface TrainabilityScores {
-  score: number;
-  learningRate: number;
-  adaptationSpeed: number;
+  score?: number;
+  learningRate?: number;
+  adaptationSpeed?: number;
+  overallTrainability: number;
+  systemPromptCompliance: number;
+  instructionPersistence: number;
+  correctionAcceptance: number;
 }
 
 export interface SystemPromptCompliance {
@@ -269,16 +280,43 @@ export interface SystemPromptCompliance {
 export interface AntiPatternDetection {
   detected: boolean;
   patterns: string[];
+  redFlagScore?: number;
+  overTooling?: boolean;
+  megaToolCall?: boolean;
+  fileReadWithoutSearch?: boolean;
+  repeatedFailedQuery?: boolean;
+  ignoresContext?: boolean;
+  verbosePlanning?: boolean;
+  toolHallucination?: boolean;
+  recommendations?: string[];
 }
 
 export interface BaselineComparison {
+  modelId: string;
+  baselineModelId?: string;
   similarity: number;
   improvement: number;
+  timestamp?: string;
+  deltas?: Record<string, number>;
+  relativePerformance?: number;
+  strengths?: string[];
+  weaknesses?: string[];
 }
 
 export interface ScoreBreakdown {
-  categories: Record<string, number>;
-  details: string[];
+  toolScore: number;
+  reasoningScore: number;
+  ragScore: number;
+  bugDetectionScore: number;
+  architecturalScore: number;
+  navigationScore: number;
+  helicopterScore: number;
+  proactiveScore: number;
+  intentScore: number;
+  complianceScore: number;
+  overallScore: number;
+  categories?: Record<string, number>;
+  details?: string[];
 }
 
 export interface LearnedPattern {
@@ -370,12 +408,21 @@ export interface PrecedenceTest extends ProbeDefinition {
 
 export interface StatefulTestConfig {
   turns: number;
+  totalTurns?: number;
+  instructionTurn?: number;
+  testTurns?: number[];
+  testType?: string;
   complexity: 'low' | 'medium' | 'high';
 }
 
 export interface StatefulTestResult {
   passed: boolean;
   decayTurn?: number;
+  testType?: string;
+  complianceAtTurn?: Record<number, number>;
+  degradationCurve?: number[];
+  breakpointTurn?: number | null;
+  recoveryAfterReminder?: boolean;
 }
 
 export interface SmokeTestSummary {

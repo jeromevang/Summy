@@ -156,8 +156,8 @@ export function detectIgnoresContext(
   
   for (const interaction of interactions) {
     if (interaction.ragResultsProvided && interaction.toolCalls.length > 0) {
-      const firstTool = interaction.toolCalls[0].name;
-      
+      const firstTool = interaction.toolCalls[0]?.name;
+
       // If RAG results were provided but model still calls rag_query first
       if (firstTool === 'rag_query') {
         instances.push('Called rag_query despite RAG results already provided');
@@ -297,7 +297,19 @@ export function detectAllAntiPatterns(
     recommendations.push('Model may need clearer tool schema or different format');
   }
   
+  const detectedPatterns = [
+    overTooling.detected && 'overTooling',
+    megaToolCall.detected && 'megaToolCall',
+    fileReadWithoutSearch.detected && 'fileReadWithoutSearch',
+    repeatedFailedQuery.detected && 'repeatedFailedQuery',
+    ignoresContext.detected && 'ignoresContext',
+    verbosePlanning.detected && 'verbosePlanning',
+    toolHallucination.detected && 'toolHallucination'
+  ].filter(Boolean) as string[];
+
   return {
+    detected: detectedPatterns.length > 0,
+    patterns: detectedPatterns,
     overTooling: overTooling.detected,
     megaToolCall: megaToolCall.detected,
     fileReadWithoutSearch: fileReadWithoutSearch.detected,

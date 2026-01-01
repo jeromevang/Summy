@@ -86,7 +86,7 @@ class SystemMetricsService {
             try {
                 const gpuData = await si.graphics();
                 if (gpuData.controllers.length > 0) {
-                    this.gpuName = gpuData.controllers[0].model || 'Unknown GPU';
+                    this.gpuName = gpuData.controllers[0]?.model || 'Unknown GPU';
                 }
             } catch {
                 // Ignore
@@ -132,16 +132,16 @@ class SystemMetricsService {
             );
             
             const lines = stdout.trim().split('\n');
-            if (lines.length === 0) return null;
-            
+            if (lines.length === 0 || !lines[0]) return null;
+
             const parts = lines[0].split(',').map(s => s.trim());
             if (parts.length < 5) return null;
             
-            const utilization = parseInt(parts[0]) || 0;
-            const memoryUsed = parseInt(parts[1]) || 0;
-            const memoryTotal = parseInt(parts[2]) || 1;
-            const temperature = parseInt(parts[3]) || 0;
-            const name = parts[4] || 'NVIDIA GPU';
+            const utilization = parseInt(parts[0] || '0') || 0;
+            const memoryUsed = parseInt(parts[1] || '0') || 0;
+            const memoryTotal = parseInt(parts[2] || '1') || 1;
+            const temperature = parseInt(parts[3] || '0') || 0;
+            const name = parts[4]?.trim() || 'NVIDIA GPU';
             
             return {
                 utilization,

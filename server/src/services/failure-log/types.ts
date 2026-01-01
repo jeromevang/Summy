@@ -43,6 +43,7 @@ export interface FailureLogData {
   stats: {
     totalFailures: number;
     resolvedFailures: number;
+    unresolvedCount: number;
     lastUpdated: string;
     failuresByCategory: Record<FailureCategory, number>;
     failuresByModel: Record<string, number>;

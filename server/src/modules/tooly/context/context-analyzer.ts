@@ -244,7 +244,7 @@ ${truncatedItems.map((item, i) => `${i}. ${item.substring(0, 200)}`).join('\n')}
         { timeout: this.config.timeout * 2 }
       );
 
-      if (!response.data) return null;
+      if (!response.data) return this.keywordBasedRanking(query, items, maxItems);
       const content = (response.data as any).choices?.[0]?.message?.content || '';
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       

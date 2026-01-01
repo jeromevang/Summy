@@ -1,10 +1,10 @@
 import { intentRouter } from '../../modules/tooly/intent-router.js';
 import { extractPatternFromCorrection, addPatternToMemory, initializeMemory } from '../../modules/tooly/learning/learning-system.js';
+import { ProxyHandlers } from './ProxyHandlers.js';
 
 export class OpenAIProxy {
   static async proxyToOpenAI(req: any, res: any) {
     const messages = ProxyHandlers.normalizeMessages(req.body?.messages);
-    const modelId = req.body?.model || process.env.LMSTUDIO_MODEL || 'unknown';
     
     // Check for user corrections in the last message
     const lastMessage = messages[messages.length - 1];
@@ -14,9 +14,8 @@ export class OpenAIProxy {
       
       if (prevAssistantMessage?.role === 'assistant' && prevUserMessage?.role === 'user') {
         const pattern = extractPatternFromCorrection(
-          prevAssistantMessage.content,
           lastMessage.content,
-          prevUserMessage.content
+          prevAssistantMessage.content
         );
         
         if (pattern) {

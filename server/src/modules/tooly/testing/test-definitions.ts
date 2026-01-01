@@ -16,8 +16,7 @@ import { CALIBRATION_TESTS } from './categories/calibration-tests.js';
 import { COMPLIANCE_PROBES } from './categories/compliance-tests.js';
 import {
   TestDefinition,
-  TestMode,
-  TestCategoryId
+  TestMode
 } from './test-types.js';
 import type { ProbeDefinition } from '../types.js';
 
@@ -326,7 +325,7 @@ export function getProbesForMode(mode: TestMode): ProbeDefinition[] {
   if (!config) return ALL_PROBE_DEFINITIONS;
 
   return ALL_PROBE_DEFINITIONS.filter(p => {
-    const categoryPrefix = p.id.split('.')[0];
+    const categoryPrefix = p.id.split('.')[0] || '';
     return config.categories.some(cat => cat.startsWith(categoryPrefix));
   });
 }

@@ -72,10 +72,16 @@ export class DBContext extends DBBase {
         return id;
     }
 
-    // Get system prompt by ID
-    public getSystemPrompt(id: string): string | null {
-        const row = this.get('SELECT content FROM system_prompts WHERE id = ?', [id]);
-        return row?.content || null;
+    // Get system prompt by hash
+    public getSystemPrompt(hash: string): SystemPrompt | null {
+        const row = this.get('SELECT * FROM system_prompts WHERE hash = ?', [hash]);
+        if (!row) return null;
+        return {
+            id: row.id,
+            content: row.content,
+            hash: row.hash,
+            createdAt: row.created_at
+        };
     }
 
     // Get or create tool set (deduplicated)
@@ -91,10 +97,17 @@ export class DBContext extends DBBase {
         return id;
     }
 
-    // Get tool set by ID
-    public getToolSet(id: string): any[] | null {
-        const row = this.get('SELECT tools FROM tool_sets WHERE id = ?', [id]);
-        return row ? JSON.parse(row.tools) : null;
+    // Get tool set by hash
+    public getToolSet(hash: string): ToolSet | null {
+        const row = this.get('SELECT * FROM tool_sets WHERE hash = ?', [hash]);
+        if (!row) return null;
+        return {
+            id: row.id,
+            tools: JSON.parse(row.tools),
+            toolCount: row.tool_count,
+            hash: row.hash,
+            createdAt: row.created_at
+        };
     }
 
     // Create new context session
@@ -104,7 +117,7 @@ export class DBContext extends DBBase {
         ide: string;
         ideMapping?: string;
         systemPrompt?: string;
-    }): void {
+    }): ContextSessionDB {
         let systemPromptId: string | null = null;
         if (session.systemPrompt) {
             systemPromptId = this.getOrCreateSystemPrompt(session.systemPrompt);
@@ -114,6 +127,9 @@ export class DBContext extends DBBase {
             'INSERT INTO context_sessions (id, name, ide, ide_mapping, system_prompt_id) VALUES (?, ?, ?, ?, ?)',
             [session.id, session.name, session.ide, session.ideMapping || null, systemPromptId]
         );
+
+        // Return the created session
+        return this.getContextSession(session.id)!;
     }
 
     // Get context session by ID (with turns and messages)

@@ -209,12 +209,19 @@ export function detectAntiPatterns(results: TestResult[]): AntiPattern[] {
     r.calledTool && !isKnownTool(r.calledTool)
   );
   if (hallucinatedTools.length > 0) {
-    detected.push({
-      ...ANTI_PATTERNS.tool_hallucination,
-      detected: true,
-      occurrences: hallucinatedTools.length,
-      examples: hallucinatedTools.map(r => r.calledTool || 'unknown')
-    });
+    const pattern = ANTI_PATTERNS.tool_hallucination;
+    if (pattern) {
+      detected.push({
+        ...pattern,
+        id: pattern.id,
+        name: pattern.name || 'Tool Hallucination',
+        description: pattern.description || 'Calling non-existent tools',
+        severity: pattern.severity || 'critical',
+        detected: true,
+        occurrences: hallucinatedTools.length,
+        examples: hallucinatedTools.map(r => r.calledTool || 'unknown')
+      } as AntiPattern);
+    }
   }
 
   // Repeated failure detection
@@ -228,12 +235,19 @@ export function detectAntiPatterns(results: TestResult[]): AntiPattern[] {
   const repeatedFailures = Array.from(toolFailures.entries())
     .filter(([_, count]) => count >= 3);
   if (repeatedFailures.length > 0) {
-    detected.push({
-      ...ANTI_PATTERNS.repeated_failure,
-      detected: true,
-      occurrences: repeatedFailures.length,
-      examples: repeatedFailures.map(([tool, count]) => `${tool}: ${count} failures`)
-    });
+    const pattern = ANTI_PATTERNS.repeated_failure;
+    if (pattern) {
+      detected.push({
+        ...pattern,
+        id: pattern.id,
+        name: pattern.name || 'Repeated Failure',
+        description: pattern.description || 'Repeating the same failed action',
+        severity: pattern.severity || 'high',
+        detected: true,
+        occurrences: repeatedFailures.length,
+        examples: repeatedFailures.map(([tool, count]) => `${tool}: ${count} failures`)
+      } as AntiPattern);
+    }
   }
 
   return detected;

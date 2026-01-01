@@ -253,8 +253,6 @@ class MCPClient {
 
   private retryCount = 0;
 
-  private _retryTimer: NodeJS.Timeout | null = null;
-
   private async attemptReconnectWithBackoff() {
     if (this.retryCount >= this.backoffConfig.maxRetries) {
       console.error('[MCP] Max retries reached. Giving up.');
@@ -269,7 +267,7 @@ class MCPClient {
 
     console.log(`[MCP] Reconnecting in ${delay}ms (Attempt ${this.retryCount + 1}/${this.backoffConfig.maxRetries})`);
 
-    this._retryTimer = setTimeout(async () => {
+    setTimeout(async () => {
       this.retryCount++;
       try {
         await this.reconnect();

@@ -279,7 +279,7 @@ export class ProgressTracker {
    * Complete current step
    */
   completeStep(message?: string): void {
-    const stepMsg = message || this.stepMessages[this.stepMessages.length - 1];
+    const stepMsg = message || this.stepMessages[this.stepMessages.length - 1] || 'Step completed';
     this.streamer.sendStatus({
       type: 'tool_complete',
       message: stepMsg,

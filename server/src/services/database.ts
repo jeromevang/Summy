@@ -74,9 +74,16 @@ export class DatabaseService {
   /** @see DBContext.getContextSession */
   getContextSession: (id: string) => ContextSessionDB | null;
   /** @see DBContext.listContextSessions */
-  listContextSessions: (limit?: number, offset?: number) => ContextSessionDB[];
+  listContextSessions: (limit?: number, offset?: number) => Array<{
+    id: string;
+    name: string;
+    ide: string;
+    turnCount: number;
+    createdAt: string;
+    updatedAt: string;
+  }>;
   /** @see DBContext.addContextTurn */
-  addContextTurn: (turn: Omit<ContextTurn, 'id' | 'createdAt'>) => ContextTurn;
+  addContextTurn: (turn: Omit<ContextTurn, 'id' | 'createdAt'>) => string;
   /** @see DBContext.getContextTurn */
   getContextTurn: (sessionId: string, turnNumber: number) => ContextTurn | null;
   /** @see DBContext.deleteContextSession */
