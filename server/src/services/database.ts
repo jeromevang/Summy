@@ -156,84 +156,143 @@ export class DatabaseService {
    * It also binds all methods from the sub-services to this facade for direct access.
    */
   constructor() {
-    this.sessions = new DBSessions();
-    this.analytics = new DBAnalytics();
-    this.notifications = new DBNotifications();
-    this.context = new DBContext();
-    this.config = new DBConfig();
-    this.comboTests = new DBComboTests();
+    try {
+      this.sessions = new DBSessions();
+      this.analytics = new DBAnalytics();
+      this.notifications = new DBNotifications();
+      this.context = new DBContext();
+      this.config = new DBConfig();
+      this.comboTests = new DBComboTests();
+      console.log('✅ Database service initialized successfully');
+    } catch (error) {
+      console.error('❌ Database initialization failed:', error);
+      console.log('⚠️ Server will continue without database functionality');
+      // Set dummy objects to prevent crashes
+      this.sessions = null as any;
+      this.analytics = null as any;
+      this.notifications = null as any;
+      this.context = null as any;
+      this.config = null as any;
+      this.comboTests = null as any;
+    }
 
     // Legacy Sessions
-    this.getSessions = this.sessions.getSessions.bind(this.sessions);
-    this.getSession = this.sessions.getSession.bind(this.sessions);
-    this.saveSession = this.sessions.saveSession.bind(this.sessions);
-    this.deleteSession = this.sessions.deleteSession.bind(this.sessions);
-    this.getSessionCount = this.sessions.getSessionCount.bind(this.sessions);
+    if (this.sessions) {
+      this.getSessions = this.sessions.getSessions.bind(this.sessions);
+      this.getSession = this.sessions.getSession.bind(this.sessions);
+      this.saveSession = this.sessions.saveSession.bind(this.sessions);
+      this.deleteSession = this.sessions.deleteSession.bind(this.sessions);
+      this.getSessionCount = this.sessions.getSessionCount.bind(this.sessions);
+    } else {
+      // Fallback methods that do nothing
+      this.getSessions = () => [];
+      this.getSession = () => null;
+      this.saveSession = () => {};
+      this.deleteSession = () => false;
+      this.getSessionCount = () => 0;
+    }
 
     // Analytics & Logging
-    this.recordAnalytics = this.analytics.recordAnalytics.bind(this.analytics);
-    this.getAnalyticsSummary = this.analytics.getAnalyticsSummary.bind(this.analytics);
-    this.logExecution = this.analytics.logExecution.bind(this.analytics);
-    this.getExecutionLogs = this.analytics.getExecutionLogs.bind(this.analytics);
-    this.getExecutionLog = this.analytics.getExecutionLog.bind(this.analytics);
-    this.createBackup = this.analytics.createBackup.bind(this.analytics);
-    this.getBackup = this.analytics.getBackup.bind(this.analytics);
-    this.markBackupRestored = this.analytics.markBackupRestored.bind(this.analytics);
-    this.cleanupExpiredBackups = this.analytics.cleanupExpiredBackups.bind(this.analytics);
-    this.getBackupsForLog = this.analytics.getBackupsForLog.bind(this.analytics);
+    if (this.analytics) {
+      this.recordAnalytics = this.analytics.recordAnalytics.bind(this.analytics);
+      this.getAnalyticsSummary = this.analytics.getAnalyticsSummary.bind(this.analytics);
+      this.logExecution = this.analytics.logExecution.bind(this.analytics);
+      this.getExecutionLogs = this.analytics.getExecutionLogs.bind(this.analytics);
+      this.getExecutionLog = this.analytics.getExecutionLog.bind(this.analytics);
+      this.createBackup = this.analytics.createBackup.bind(this.analytics);
+    } else {
+      // Fallback methods
+      this.recordAnalytics = () => {};
+      this.getAnalyticsSummary = () => ({});
+      this.logExecution = () => {};
+      this.getExecutionLogs = () => [];
+      this.getExecutionLog = () => null;
+      this.createBackup = () => ({});
+
+      // Add fallbacks for all other methods
+      this.getNotifications = () => [];
+      this.addNotification = () => {};
+      this.markNotificationRead = () => {};
+      this.deleteNotification = () => {};
+      this.getContextData = () => null;
+      this.saveContextData = () => {};
+      this.deleteContextData = () => {};
+      this.getConfig = () => ({});
+      this.setConfig = () => {};
+      this.getComboTestResults = () => [];
+      this.saveComboTestResult = () => {};
+      this.deleteComboResult = () => {};
+      this.clearAllComboResults = () => 0;
+    }
+    if (this.analytics) {
+      this.getBackup = this.analytics.getBackup.bind(this.analytics);
+      this.markBackupRestored = this.analytics.markBackupRestored.bind(this.analytics);
+      this.cleanupExpiredBackups = this.analytics.cleanupExpiredBackups.bind(this.analytics);
+      this.getBackupsForLog = this.analytics.getBackupsForLog.bind(this.analytics);
+    }
 
     // Notifications
-    this.addNotification = this.notifications.addNotification.bind(this.notifications);
-    this.getNotifications = this.notifications.getNotifications.bind(this.notifications);
-    this.getUnreadCount = this.notifications.getUnreadCount.bind(this.notifications);
-    this.markNotificationRead = this.notifications.markNotificationRead.bind(this.notifications);
-    this.markAllNotificationsRead = this.notifications.markAllNotificationsRead.bind(this.notifications);
-    this.deleteNotification = this.notifications.deleteNotification.bind(this.notifications);
-    this.clearAllNotifications = this.notifications.clearAllNotifications.bind(this.notifications);
+    if (this.notifications) {
+      this.addNotification = this.notifications.addNotification.bind(this.notifications);
+      this.getNotifications = this.notifications.getNotifications.bind(this.notifications);
+      this.getUnreadCount = this.notifications.getUnreadCount.bind(this.notifications);
+      this.markNotificationRead = this.notifications.markNotificationRead.bind(this.notifications);
+      this.markAllNotificationsRead = this.notifications.markAllNotificationsRead.bind(this.notifications);
+      this.deleteNotification = this.notifications.deleteNotification.bind(this.notifications);
+      this.clearAllNotifications = this.notifications.clearAllNotifications.bind(this.notifications);
+    }
 
     // Context Sessions (New)
-    this.createContextSession = this.context.createContextSession.bind(this.context);
-    this.getContextSession = this.context.getContextSession.bind(this.context);
-    this.listContextSessions = this.context.listContextSessions.bind(this.context);
-    this.addContextTurn = this.context.addContextTurn.bind(this.context);
-    this.getContextTurn = this.context.getContextTurn.bind(this.context);
-    this.deleteContextSession = this.context.deleteContextSession.bind(this.context);
-    this.clearAllContextSessions = this.context.clearAllContextSessions.bind(this.context);
-    this.contextSessionExists = this.context.contextSessionExists.bind(this.context);
-    this.getLatestTurnNumber = this.context.getLatestTurnNumber.bind(this.context);
-    this.getPreviousToolSetId = this.context.getPreviousToolSetId.bind(this.context);
-    this.updateContextSessionName = this.context.updateContextSessionName.bind(this.context);
-    this.getMostRecentSession = this.context.getMostRecentSession.bind(this.context);
+    if (this.context) {
+      this.createContextSession = this.context.createContextSession.bind(this.context);
+      this.getContextSession = this.context.getContextSession.bind(this.context);
+      this.listContextSessions = this.context.listContextSessions.bind(this.context);
+      this.addContextTurn = this.context.addContextTurn.bind(this.context);
+      this.getContextTurn = this.context.getContextTurn.bind(this.context);
+      this.deleteContextSession = this.context.deleteContextSession.bind(this.context);
+      this.clearAllContextSessions = this.context.clearAllContextSessions.bind(this.context);
+      this.contextSessionExists = this.context.contextSessionExists.bind(this.context);
+      this.getLatestTurnNumber = this.context.getLatestTurnNumber.bind(this.context);
+      this.getPreviousToolSetId = this.context.getPreviousToolSetId.bind(this.context);
+      this.updateContextSessionName = this.context.updateContextSessionName.bind(this.context);
+      this.getMostRecentSession = this.context.getMostRecentSession.bind(this.context);
+    }
 
     // RAG & Tests Configuration
-    this.getRAGConfig = this.config.getRAGConfig.bind(this.config);
-    this.saveRAGConfig = this.config.saveRAGConfig.bind(this.config);
-    this.createCustomTest = this.config.createCustomTest.bind(this.config);
-    this.getCustomTests = this.config.getCustomTests.bind(this.config);
-    this.getCustomTest = this.config.getCustomTest.bind(this.config);
-    this.updateCustomTest = this.config.updateCustomTest.bind(this.config);
-    this.deleteCustomTest = this.config.deleteCustomTest.bind(this.config);
-    this.cacheModelInfo = this.config.cacheModelInfo.bind(this.config);
-    this.getCachedModelInfo = this.config.getCachedModelInfo.bind(this.config);
-    this.saveGroundTruth = this.config.saveGroundTruth.bind(this.config);
-    this.getGroundTruth = this.config.getGroundTruth.bind(this.config);
-    this.clearAllRAGData = this.config.clearAllRAGData.bind(this.config);
+    if (this.config) {
+      this.getRAGConfig = this.config.getRAGConfig.bind(this.config);
+      this.saveRAGConfig = this.config.saveRAGConfig.bind(this.config);
+      this.createCustomTest = this.config.createCustomTest.bind(this.config);
+      this.getCustomTests = this.config.getCustomTests.bind(this.config);
+      this.getCustomTest = this.config.getCustomTest.bind(this.config);
+      this.updateCustomTest = this.config.updateCustomTest.bind(this.config);
+      this.deleteCustomTest = this.config.deleteCustomTest.bind(this.config);
+      this.cacheModelInfo = this.config.cacheModelInfo.bind(this.config);
+      this.getCachedModelInfo = this.config.getCachedModelInfo.bind(this.config);
+      this.saveGroundTruth = this.config.saveGroundTruth.bind(this.config);
+      this.getGroundTruth = this.config.getGroundTruth.bind(this.config);
+      this.clearAllRAGData = this.config.clearAllRAGData.bind(this.config);
+    }
 
     // Context Helpers
-    this.getSystemPrompt = this.context.getSystemPrompt.bind(this.context);
-    this.getToolSet = this.context.getToolSet.bind(this.context);
-    this.getOrCreateSystemPrompt = this.context.getOrCreateSystemPrompt.bind(this.context);
-    this.getOrCreateToolSet = this.context.getOrCreateToolSet.bind(this.context);
+    if (this.context) {
+      this.getSystemPrompt = this.context.getSystemPrompt.bind(this.context);
+      this.getToolSet = this.context.getToolSet.bind(this.context);
+      this.getOrCreateSystemPrompt = this.context.getOrCreateSystemPrompt.bind(this.context);
+      this.getOrCreateToolSet = this.context.getOrCreateToolSet.bind(this.context);
+    }
 
     // Combo Tests
-    this.saveComboResult = this.comboTests.saveComboResult.bind(this.comboTests);
-    this.getAllComboResults = this.comboTests.getAllComboResults.bind(this.comboTests);
-    this.getComboResult = this.comboTests.getComboResult.bind(this.comboTests);
-    this.getResultsForMainModel = this.comboTests.getResultsForMainModel.bind(this.comboTests);
-    this.getResultsForExecutorModel = this.comboTests.getResultsForExecutorModel.bind(this.comboTests);
-    this.getTopCombos = this.comboTests.getTopCombos.bind(this.comboTests);
-    this.deleteComboResult = this.comboTests.deleteComboResult.bind(this.comboTests);
-    this.clearAllComboResults = this.comboTests.clearAllComboResults.bind(this.comboTests);
+    if (this.comboTests) {
+      this.saveComboResult = this.comboTests.saveComboResult.bind(this.comboTests);
+      this.getAllComboResults = this.comboTests.getAllComboResults.bind(this.comboTests);
+      this.getComboResult = this.comboTests.getComboResult.bind(this.comboTests);
+      this.getResultsForMainModel = this.comboTests.getResultsForMainModel.bind(this.comboTests);
+      this.getResultsForExecutorModel = this.comboTests.getResultsForExecutorModel.bind(this.comboTests);
+      this.getTopCombos = this.comboTests.getTopCombos.bind(this.comboTests);
+      this.deleteComboResult = this.comboTests.deleteComboResult.bind(this.comboTests);
+      this.clearAllComboResults = this.comboTests.clearAllComboResults.bind(this.comboTests);
+    }
   }
 
   // Utilities
