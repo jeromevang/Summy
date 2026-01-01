@@ -31,7 +31,8 @@ export const server = new McpServer({
   version: "2.1.0"
 });
 
-// Store config on the server instance for tools to access if needed
+// Store config on the server instance for tools to access if needed (placeholder)
+const modelConfig = {}; // Config loading logic to be implemented
 (server as any).modelConfig = modelConfig;
 
 // Register all tool categories

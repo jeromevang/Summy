@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { failureLog } from '../../services/failure-log.js';
-import { prostheticStore, buildProstheticPrompt } from '../../modules/tooly/learning/prosthetic-store.js';
+import { prostheticStore } from '../../modules/tooly/learning/prosthetic-store.js';
 import { ComboTeachingLoop } from '../../modules/tooly/orchestrator/combo-teaching-loop.js';
 import { ComboTester } from '../../modules/tooly/testing/combo-tester.js';
 import { wsBroadcast } from '../../services/ws-broadcast.js';
@@ -129,7 +129,7 @@ router.get('/controller/combo-teaching-results', (_req, res) => {
  * POST /api/tooly/controller/run-combo-teaching
  * Run combo teaching session
  */
-router.post('/controller/run-combo-teaching', async (_req, res) => {
+router.post('/controller/run-combo-teaching', async (req, res) => {
   const { mainModelId, executorModelId, contextSize } = req.body;
 
   if (!mainModelId || !executorModelId) {

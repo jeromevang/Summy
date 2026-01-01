@@ -75,7 +75,7 @@ router.get('/list', async (req, res) => {
       }
     });
   } catch (err: any) {
-    addDebugEntry('error', `Get models failed: ${error}`);
+    addDebugEntry('error', `Get models failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get models',
@@ -105,7 +105,7 @@ router.get('/:modelId', async (req, res) => {
       data: model
     });
   } catch (err: any) {
-    addDebugEntry('error', `Get model failed: ${error}`);
+    addDebugEntry('error', `Get model failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get model',
@@ -139,7 +139,7 @@ router.patch('/:modelId', async (req, res) => {
       message: `Updated model ${modelId}`
     });
   } catch (err: any) {
-    addDebugEntry('error', `Update model failed: ${error}`);
+    addDebugEntry('error', `Update model failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to update model',
@@ -172,7 +172,7 @@ router.post('/:modelId/disable', async (req, res) => {
       message: `Disabled model ${modelId}: ${reason || 'Manual disable'}`
     });
   } catch (err: any) {
-    addDebugEntry('error', `Disable model failed: ${error}`);
+    addDebugEntry('error', `Disable model failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to disable model',
@@ -204,7 +204,7 @@ router.post('/:modelId/enable', async (req, res) => {
       message: `Enabled model ${modelId}`
     });
   } catch (err: any) {
-    addDebugEntry('error', `Enable model failed: ${error}`);
+    addDebugEntry('error', `Enable model failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to enable model',
@@ -240,7 +240,7 @@ router.post('/recommendations', async (req, res) => {
       message: `Found ${recommendations.length} recommendations`
     });
   } catch (err: any) {
-    addDebugEntry('error', `Get recommendations failed: ${error}`);
+    addDebugEntry('error', `Get recommendations failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get recommendations',
@@ -276,10 +276,10 @@ router.get('/best/:role', async (req, res) => {
     res.json({
       success: true,
       data: best,
-      message: `Best ${role} model: ${best.model.displayName}`
+      message: `Best ${role} model: ${best.displayName}`
     });
   } catch (err: any) {
-    addDebugEntry('error', `Get best model failed: ${error}`);
+    addDebugEntry('error', `Get best model failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get best model',
@@ -317,7 +317,7 @@ router.post('/health-check', async (_req, res) => {
       message: `Health check completed: ${healthyCount} healthy, ${unhealthyCount} unhealthy`
     });
   } catch (err: any) {
-    addDebugEntry('error', `Health check failed: ${error}`);
+    addDebugEntry('error', `Health check failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Health check failed',
@@ -340,7 +340,7 @@ router.post('/:modelId/health-check', async (req, res) => {
       message: `Health check for ${modelId}: ${result.status}`
     });
   } catch (err: any) {
-    addDebugEntry('error', `Health check model failed: ${error}`);
+    addDebugEntry('error', `Health check model failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Health check failed',
@@ -364,7 +364,7 @@ router.delete('/cache/clear', async (_req, res) => {
       message: 'Model cache cleared'
     });
   } catch (err: any) {
-    addDebugEntry('error', `Clear cache failed: ${error}`);
+    addDebugEntry('error', `Clear cache failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to clear cache',
@@ -384,7 +384,7 @@ router.get('/cache/stats', async (_req, res) => {
       data: stats
     });
   } catch (err: any) {
-    addDebugEntry('error', `Get cache stats failed: ${error}`);
+    addDebugEntry('error', `Get cache stats failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get cache stats',
@@ -445,7 +445,7 @@ router.get('/stats', async (req, res) => {
       data: stats
     });
   } catch (err: any) {
-    addDebugEntry('error', `Get stats failed: ${error}`);
+    addDebugEntry('error', `Get stats failed: ${err.message}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get statistics',

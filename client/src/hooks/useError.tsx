@@ -362,7 +362,7 @@ export const useErrorHandler = () => {
 export const useAsyncError = () => {
   const { handleApiError } = useErrorHandler();
 
-  const executeAsync = useCallback(async <T>(
+  const executeAsync = useCallback(async <T,>(
     asyncFn: () => Promise<T>,
     context?: { component?: string; action?: string }
   ): Promise<T | null> => {

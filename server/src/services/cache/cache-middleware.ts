@@ -66,8 +66,8 @@ export const cacheTestResults = async (req: Request, res: Response, next: NextFu
     res.json = function(body: any) {
       if (Array.isArray(body) && body.length > 0) {
         // Cache the results
-        const cacheKey = testMode ? `test:${modelId}:${testMode}` : `test:${modelId}`;
-        // Note: We'll need to modify the cache service to handle this properly
+        // Note: Caching logic to be implemented
+        // const cacheKey = testMode ? `test:${modelId}:${testMode}` : `test:${modelId}`;
       }
       res.set('X-Cache', 'MISS');
       return originalJson.call(this, body);
@@ -152,7 +152,7 @@ export const invalidateCache = (req: Request, res: Response, next: NextFunction)
 /**
  * Cache stats endpoint middleware
  */
-export const cacheStatsMiddleware = (_req: Request, res: Response, next: NextFunction): void => {
+export const cacheStatsMiddleware = (_req: Request, res: Response, _next: NextFunction): void => {
   try {
     const stats = cacheService.getStats();
     res.json({

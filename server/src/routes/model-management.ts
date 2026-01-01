@@ -276,7 +276,7 @@ router.get('/best/:role', async (req, res) => {
     res.json({
       success: true,
       data: best,
-      message: `Best ${role} model: ${best.model.displayName}`
+      message: `Best ${role} model: ${best.displayName}`
     });
   } catch (error: any) {
     addDebugEntry('error', `Get best model failed: ${error}`);

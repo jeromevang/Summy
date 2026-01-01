@@ -28,7 +28,7 @@ router.post('/baseline/generate', async (_req, res) => {
  * GET /api/tooly/baseline/compare/:modelId
  * Compare a model's performance against the ground truth baseline
  */
-router.get('/baseline/compare/:modelId', async (_req, res) => {
+router.get('/baseline/compare/:modelId', async (req, res) => {
   try {
     const { modelId } = req.params;
     const decodedModelId = decodeURIComponent(modelId);

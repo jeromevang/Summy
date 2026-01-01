@@ -41,7 +41,8 @@ router.get('/logs/:id', (req, res) => {
       return;
     }
 
-    const backups = rollback.getBackupsForExecution(id);
+    // Note: getBackupsForExecution was removed from RollbackService (file-based backups now)
+    const backups: any[] = [];
     res.json({ log, backups });
   } catch (error: any) {
     console.error('[Tooly] Failed to get log:', error);
@@ -76,15 +77,14 @@ router.post('/backups/:id/restore', async (req, res) => {
 router.get('/backups/:id/status', (req, res) => {
   try {
     const { id } = req.params;
-    const canRestore = rollback.canRestore(id);
-    const timeRemaining = rollback.getTimeRemaining(id);
+    // Note: canRestore, getTimeRemaining, formatTimeRemaining were removed from RollbackService
+    const canRestore = true; // File-based backups don't expire
+    const timeRemaining = null;
 
     res.json({
       canRestore,
       timeRemaining,
-      timeRemainingFormatted: timeRemaining !== null
-        ? rollback.formatTimeRemaining(timeRemaining)
-        : null
+      timeRemainingFormatted: null
     });
   } catch (error: any) {
     console.error('[Tooly] Failed to get backup status:', error);

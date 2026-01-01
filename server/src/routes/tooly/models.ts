@@ -1,7 +1,4 @@
 import { Router } from 'express';
-import path from 'path';
-import fs from 'fs-extra';
-import { fileURLToPath } from 'url';
 import { LMStudioClient } from '@lmstudio/sdk';
 import { loadServerSettings } from '../../services/settings-service.js';
 import { modelDiscovery } from '../../services/model-discovery.js';
@@ -12,10 +9,6 @@ import { calculateRecommendations } from '../../modules/tooly/recommendations.js
 import { sanitizeInput } from '../../middleware/validation.js';
 
 const router: Router = Router();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const SETTINGS_FILE = path.join(__dirname, '../../../settings.json');
 
 /**
  * GET /api/tooly/models
@@ -121,12 +114,10 @@ router.get('/models/:modelId', async (req, res) => {
         score: 0,
         enabledTools: [],
         capabilities: {},
-        maxContextLength: 4096,
+        contextLength: 4096,
         role: 'none' as const,
-        probeResults: null,
+        probeResults: undefined,
         systemPrompt: '',
-        badges: [],
-        recommendations: [],
         scoreBreakdown: {
           ragScore: 0,
           bugDetectionScore: 0,

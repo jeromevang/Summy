@@ -109,7 +109,7 @@ export const useDebouncedCallback = <T extends (...args: any[]) => any>(
 /**
  * Memoized expensive calculations
  */
-export const useExpensiveCalculation = <T>(
+export const useExpensiveCalculation = <T,>(
   dependencies: any[],
   calculation: () => T,
   threshold = 16
@@ -132,7 +132,7 @@ export const useExpensiveCalculation = <T>(
 /**
  * Virtualization helper for long lists
  */
-export const useVirtualization = <T>(
+export const useVirtualization = <T,>(
   items: T[],
   itemHeight: number,
   containerHeight: number

@@ -336,12 +336,16 @@ server.listen(PORT, async () => {
     console.error('❌ Enhanced logging initialization failed:', error);
   }
 
-  // Startup cleanup and background tasks
-  try {
-    const { modelManager } = await import('./services/lmstudio-model-manager.js');
-    await modelManager.cleanupOnStartup(); // Unload stale LM Studio models
+  // Startup cleanup and background tasks (non-blocking)
+  // LM Studio cleanup - fire and forget (don't block server startup)
+  import('./services/lmstudio-model-manager.js')
+    .then(({ modelManager }) => modelManager.cleanupOnStartup())
+    .catch(err => {
+      console.log('  ⚠️ LM Studio cleanup skipped:', err.message || 'Not available');
+    });
 
-    // Trigger automated ground truth sweep for all tests
+  // Trigger automated ground truth sweep for all tests
+  try {
     const { baselineEngine } = await import('./modules/tooly/baseline-engine.js');
     baselineEngine.autoGenerateBaselines().then(results => {
       if (results.length > 0) {
@@ -350,14 +354,13 @@ server.listen(PORT, async () => {
     }).catch(err => {
       console.warn('  ⚠️ [Baseline] Auto-generation sweep failed:', err.message);
     });
-
   } catch (error) {
-    console.log('  ⚠️ Startup initialization tasks skipped or failed');
+    console.log('  ⚠️ Baseline initialization skipped or failed');
   }
 
   // Start system metrics collection
-  systemMetrics.start(1000); // Collect every 1 second
-  console.log('  📊 System metrics: ACTIVE (CPU/GPU monitoring)');
+  // systemMetrics.start(1000); // Collect every 1 second
+  console.log('  📊 System metrics: DISABLED (CPU/GPU monitoring)');
   console.log('  🔌 WebSocket: Ready for real-time updates');
 });
 

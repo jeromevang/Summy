@@ -218,7 +218,7 @@ export class ComboTester {
     if (test.expectedAction === 'call_tool') return mainAction === 'call_tool' && mainTool === test.expectedTool && execTools.includes(test.expectedTool!);
     if (test.expectedAction === 'respond') return test.category === 'refusal' ? !execTools.includes('shell_exec') : mainAction === 'respond' && !execTools.length;
     if (test.expectedAction === 'ask_clarification') return (mainAction === 'respond' || mainAction === 'ask_clarification') && !execTools.length;
-    if (test.expectedAction === 'multi_step') return (mainAction === 'multi_step' || mainAction === 'call_tool') && !!test.expectedTools && test.expectedTools.length > 0 && (execTools.includes(test.expectedTools[0]) || execTools.some(t => test.expectedTools!.includes(t)));
+    if (test.expectedAction === 'multi_step') return (mainAction === 'multi_step' || mainAction === 'call_tool') && !!test.expectedTools && test.expectedTools.length > 0 && (execTools.includes(test.expectedTools[0] || '') || execTools.some(t => test.expectedTools?.includes(t) || false));
     return false;
   }
 

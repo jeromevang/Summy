@@ -46,35 +46,35 @@ export class DatabaseService {
   // Changed return type from void to string to satisfy rollback.ts
   createBackup: (logId: string, filePath: string, content: string) => string;
   /** @see DBAnalytics.getBackup */
-  getBackup: (backupId: string) => FileBackup | null;
+  getBackup!: (backupId: string) => FileBackup | null;
   /** @see DBAnalytics.markBackupRestored */
-  markBackupRestored: (backupId: string) => void;
+  markBackupRestored!: (backupId: string) => void;
   /** @see DBAnalytics.cleanupExpiredBackups */
-  cleanupExpiredBackups: () => number;
+  cleanupExpiredBackups!: () => number;
   /** @see DBAnalytics.getBackupsForLog */
-  getBackupsForLog: (logId: string) => FileBackup[];
+  getBackupsForLog!: (logId: string) => FileBackup[];
 
   /** @see DBNotifications.addNotification */
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => string;
+  addNotification!: (notification: Omit<Notification, 'id' | 'timestamp'>) => string;
   /** @see DBNotifications.getNotifications */
-  getNotifications: (unreadOnly?: boolean, limit?: number) => Notification[];
+  getNotifications!: (unreadOnly?: boolean, limit?: number) => Notification[];
   /** @see DBNotifications.getUnreadCount */
-  getUnreadCount: () => number;
+  getUnreadCount!: () => number;
   /** @see DBNotifications.markNotificationRead */
-  markNotificationRead: (id: string) => void;
+  markNotificationRead!: (id: string) => void;
   /** @see DBNotifications.markAllNotificationsRead */
-  markAllNotificationsRead: () => void;
+  markAllNotificationsRead!: () => void;
   /** @see DBNotifications.deleteNotification */
-  deleteNotification: (id: string) => void;
+  deleteNotification!: (id: string) => void;
   /** @see DBNotifications.clearAllNotifications */
-  clearAllNotifications: () => void;
+  clearAllNotificationsread!: () => void;
 
   /** @see DBContext.createContextSession */
-  createContextSession: (session: Omit<ContextSessionDB, "createdAt" | "updatedAt" | "turns" | "summary" | "compression">) => ContextSessionDB;
+  createContextSession!: (session: Omit<ContextSessionDB, "createdAt" | "updatedAt" | "turns" | "summary" | "compression">) => ContextSessionDB;
   /** @see DBContext.getContextSession */
-  getContextSession: (id: string) => ContextSessionDB | null;
+  getContextSession!: (id: string) => ContextSessionDB | null;
   /** @see DBContext.listContextSessions */
-  listContextSessions: (limit?: number, offset?: number) => Array<{
+  listContextSessions!: (limit?: number, offset?: number) => Array<{
     id: string;
     name: string;
     ide: string;
@@ -83,61 +83,61 @@ export class DatabaseService {
     updatedAt: string;
   }>;
   /** @see DBContext.addContextTurn */
-  addContextTurn: (turn: Omit<ContextTurn, 'id' | 'createdAt'>) => string;
+  addContextTurn!: (turn: Omit<ContextTurn, 'id' | 'createdAt'>) => string;
   /** @see DBContext.getContextTurn */
-  getContextTurn: (sessionId: string, turnNumber: number) => ContextTurn | null;
+  getContextTurn!: (sessionId: string, turnNumber: number) => ContextTurn | null;
   /** @see DBContext.deleteContextSession */
-  deleteContextSession: (id: string) => void;
+  deleteContextSession!: (id: string) => void;
   /** @see DBContext.clearAllContextSessions */
-  clearAllContextSessions: () => number;
+  clearAllContextSessions!: () => number;
   /** @see DBContext.contextSessionExists */
-  contextSessionExists: (id: string) => boolean;
+  contextSessionExists!: (id: string) => boolean;
   /** @see DBContext.getLatestTurnNumber */
-  getLatestTurnNumber: (sessionId: string) => number;
+  getLatestTurnNumber!: (sessionId: string) => number;
   /** @see DBContext.getPreviousToolSetId */
-  getPreviousToolSetId: (sessionId: string) => string | null;
+  getPreviousToolSetId!: (sessionId: string) => string | null;
   /** @see DBContext.updateContextSessionName */
-  updateContextSessionName: (sessionId: string, newName: string) => void;
+  updateContextSessionName!: (sessionId: string, newName: string) => void;
   /** @see DBContext.getMostRecentSession */
-  getMostRecentSession: () => ContextSessionDB | null;
+  getMostRecentSession!: () => ContextSessionDB | null;
 
   /** @see DBConfig.getRAGConfig */
-  getRAGConfig: () => any; // More specific type if available
+  getRAGConfig!: () => any; // More specific type if available
   /** @see DBConfig.saveRAGConfig */
-  saveRAGConfig: (config: any) => void; // More specific type if available
+  saveRAGConfig!: (config: any) => void; // More specific type if available
   /** @see DBConfig.createCustomTest */
-  createCustomTest: (test: any) => any; // More specific type if available
+  createCustomTest!: (test: any) => any; // More specific type if available
   /** @see DBConfig.getCustomTests */
-  getCustomTests: () => any[]; // More specific type if available
+  getCustomTests!: () => any[]; // More specific type if available
   /** @see DBConfig.getCustomTest */
-  getCustomTest: (id: string) => any | undefined; // More specific type if available
+  getCustomTest!: (id: string) => any | undefined; // More specific type if available
   /** @see DBConfig.updateCustomTest */
-  updateCustomTest: (id: string, updates: any) => boolean; // More specific type if available
+  updateCustomTest!: (id: string, updates: any) => boolean; // More specific type if available
   /** @see DBConfig.deleteCustomTest */
-  deleteCustomTest: (id: string) => boolean;
+  deleteCustomTest!: (id: string) => boolean;
   /** @see DBConfig.cacheModelInfo */
-  cacheModelInfo: (modelId: string, info: any, source: string) => void; // More specific type if available
+  cacheModelInfo!: (modelId: string, info: any, source: string) => void; // More specific type if available
   /** @see DBConfig.getCachedModelInfo */
-  getCachedModelInfo: (modelId: string) => any | undefined; // More specific type if available
+  getCachedModelInfo!: (modelId: string) => any | undefined; // More specific type if available
   /** @see DBConfig.saveGroundTruth */
-  saveGroundTruth: (testId: string, result: any) => void;
+  saveGroundTruth!: (testId: string, result: any) => void;
   /** @see DBConfig.getGroundTruth */
-  getGroundTruth: (testId: string) => any | null;
+  getGroundTruth!: (testId: string) => any | null;
   /** @see DBConfig.clearAllRAGData */
-  clearAllRAGData: () => void;
+  clearAllRAGData!: () => void;
 
   /** @see DBContext.getSystemPrompt */
-  getSystemPrompt: (hash: string) => SystemPrompt | null;
+  getSystemPrompt!: (hash: string) => SystemPrompt | null;
   /** @see DBContext.getToolSet */
-  getToolSet: (hash: string) => ToolSet | null;
-  getOrCreateSystemPrompt: (content: string) => SystemPrompt;
+  getToolSet!: (hash: string) => ToolSet | null;
+  getOrCreateSystemPrompt!: (content: string) => SystemPrompt;
   /** @see DBContext.getOrCreateToolSet */
-  getOrCreateToolSet: (tools: any[]) => ToolSet;
+  getOrCreateToolSet!: (tools: any[]) => ToolSet;
 
   /** @see DBComboTests.saveComboResult */
-  saveComboResult: (result: ComboTestRecord) => void;
+  saveComboResult!: (result: ComboTestRecord) => void;
   /** @see DBComboTests.getAllComboResults */
-  getAllComboResults: () => ComboTestRecord[];
+  getAllComboResults!: () => ComboTestRecord[];
   /** @see DBComboTests.getComboResult */
   getComboResult: (mainModelId: string, executorModelId: string) => ComboTestRecord | null;
   /** @see DBComboTests.getResultsForMainModel */

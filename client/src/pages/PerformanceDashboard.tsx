@@ -162,7 +162,7 @@ const PerformanceDashboard: React.FC = () => {
           <p className="text-2xl font-bold">{(stats.memoryUsage / (1024 * 1024)).toFixed(2)} MB</p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-medium text-gray-600">Slow Renders (>16ms)</h3>
+          <h3 className="text-sm font-medium text-gray-600">Slow Renders (&gt;16ms)</h3>
           <p className="text-2xl font-bold text-red-500">{stats.slowRenders}</p>
         </div>
       </div>

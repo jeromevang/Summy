@@ -1,4 +1,4 @@
-import { getFullStatus } from './lmstudio-status.js';
+// Removed unused import: getFullStatus
 
 /**
  * A set of active WebSocket clients currently connected to the server.

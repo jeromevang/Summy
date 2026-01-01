@@ -54,10 +54,16 @@ export async function updateModelProfile(modelId: string, provider: string, runR
 
     if (aliasRefinements?.length) {
         for (const ref of aliasRefinements) {
-            if (profile.capabilities[ref.originalMapping]?.nativeAliases) profile.capabilities[ref.originalMapping].nativeAliases = profile.capabilities[ref.originalMapping].nativeAliases.filter(a => a !== ref.nativeToolName);
-            if (profile.capabilities[ref.refinedMapping]) {
-                if (!profile.capabilities[ref.refinedMapping].nativeAliases) profile.capabilities[ref.refinedMapping].nativeAliases = [];
-                if (profile.capabilities[ref.refinedMapping].nativeAliases && !profile.capabilities[ref.refinedMapping].nativeAliases.includes(ref.nativeToolName)) profile.capabilities[ref.refinedMapping].nativeAliases.push(ref.nativeToolName);
+            const origCap = profile.capabilities[ref.originalMapping];
+            if (origCap?.nativeAliases) {
+                origCap.nativeAliases = origCap.nativeAliases.filter(a => a !== ref.nativeToolName);
+            }
+            const refinedCap = profile.capabilities[ref.refinedMapping];
+            if (refinedCap) {
+                if (!refinedCap.nativeAliases) refinedCap.nativeAliases = [];
+                if (refinedCap.nativeAliases && !refinedCap.nativeAliases.includes(ref.nativeToolName)) {
+                    refinedCap.nativeAliases.push(ref.nativeToolName);
+                }
             }
         }
         wsBroadcast.broadcast('alias_refinements', { modelId, refinements: aliasRefinements });

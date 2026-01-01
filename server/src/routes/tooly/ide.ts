@@ -32,7 +32,7 @@ router.get('/ide-mappings', async (_req, res) => {
  * GET /api/tooly/ide-mappings/:ide
  * Get specific IDE mapping details
  */
-router.get('/ide-mappings/:ide', async (_req, res) => {
+router.get('/ide-mappings/:ide', async (req, res) => {
   try {
     const { ide } = req.params;
     const mapping = await ideMapping.loadIDEMapping(ide);
@@ -50,7 +50,7 @@ router.get('/ide-mappings/:ide', async (_req, res) => {
  * POST /api/tooly/ide-mappings/:ide/reload
  * Reload an IDE mapping (for hot-reload after editing JSON)
  */
-router.post('/ide-mappings/:ide/reload', async (_req, res) => {
+router.post('/ide-mappings/:ide/reload', async (req, res) => {
   try {
     const { ide } = req.params;
     const mapping = await ideMapping.reloadIDEMapping(ide);
@@ -73,7 +73,7 @@ router.post('/ide-mappings/:ide/reload', async (_req, res) => {
  * POST /api/tooly/parse-model
  * Parse a model name to detect IDE suffix
  */
-router.post('/parse-model', (_req, res) => {
+router.post('/parse-model', (req, res) => {
   try {
     const { model } = req.body;
     if (!model) {

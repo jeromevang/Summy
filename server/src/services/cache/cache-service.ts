@@ -3,9 +3,11 @@
  * High-level service that provides caching for frequently accessed data
  */
 
-import { CacheManager, caches, cacheInvalidation } from './cache-manager';
+import { caches, cacheInvalidation } from './cache-manager';
 import { db } from '../database.js';
-import { ModelProfile, TestResult, ComboTestResult } from '@summy/shared';
+// Import types from tooly module
+import type { ModelProfile } from '../../modules/tooly/capabilities.js';
+import type { TestResult, ComboTestResult } from '../../modules/tooly/testing/test-types.js';
 import { addDebugEntry } from '../logger';
 
 export class CacheService {
@@ -85,7 +87,7 @@ export class CacheService {
   /**
    * Get combo test results with caching
    */
-  async getComboResults(mainModelId: string, executorModelId: string): Promise<ComboTestResult | null> {
+  async getComboResults(mainModelId: string, executorModelId: string): Promise<any | null> {
     const cacheKey = `combo:${mainModelId}:${executorModelId}`;
     
     // Try cache first

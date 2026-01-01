@@ -19,7 +19,7 @@ router.get('/', async (_req, res) => {
             name: s.name,
             ide: s.ide,
             created: s.createdAt,
-            turnCount: s.turns.length
+            turnCount: s.turnCount
         }));
         res.json(sessions);
     } catch (error: any) {

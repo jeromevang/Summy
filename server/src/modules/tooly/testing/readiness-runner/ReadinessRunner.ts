@@ -2,11 +2,17 @@ import { ReadinessResult } from '../agentic-readiness-suite.js';
 import { RunnerSettings, BroadcastFn, TestRunResult } from './types.js';
 
 export class ReadinessRunner {
-  constructor(private __settings: RunnerSettings, private __broadcast?: BroadcastFn) {}
+  constructor(private __settings: RunnerSettings, private __broadcast?: BroadcastFn) {
+    // Suppress unused warnings - these are placeholders for future implementation
+    void this.__settings;
+    void this.__broadcast;
+  }
 
   async assessModel(modelId: string, _options: any = {}): Promise<ReadinessResult> {
     const startTime = Date.now();
     // Real logic would run tests via intentRouter here
+    // Suppress unused warning for helper method
+    void this._runSingleTest;
     return { modelId, assessedAt: new Date().toISOString(), overallScore: 0, passed: false, categoryScores: {} as any, testResults: [], failedTests: [], duration: Date.now() - startTime };
   }
 

@@ -51,7 +51,7 @@ router.get('/custom-tests', (_req, res) => {
  * POST /api/tooly/custom-tests
  * Create a new custom test
  */
-router.post('/custom-tests', (_req, res) => {
+router.post('/custom-tests', (req, res) => {
   try {
     const { name, category, prompt, expectedTool, expectedBehavior, difficulty, variants } = req.body;
 
@@ -81,7 +81,7 @@ router.post('/custom-tests', (_req, res) => {
  * PUT /api/tooly/custom-tests/:id
  * Update a custom test
  */
-router.put('/custom-tests/:id', (_req, res) => {
+router.put('/custom-tests/:id', (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -104,7 +104,7 @@ router.put('/custom-tests/:id', (_req, res) => {
  * DELETE /api/tooly/custom-tests/:id
  * Delete a custom test
  */
-router.delete('/custom-tests/:id', (_req, res) => {
+router.delete('/custom-tests/:id', (req, res) => {
   try {
     const { id } = req.params;
 
@@ -126,7 +126,7 @@ router.delete('/custom-tests/:id', (_req, res) => {
  * POST /api/tooly/custom-tests/:id/try
  * Try a test on the currently selected model
  */
-router.post('/custom-tests/:id/try', async (_req, res) => {
+router.post('/custom-tests/:id/try', async (req, res) => {
   try {
     const { id } = req.params;
     const { modelId, prompt: overridePrompt } = req.body;

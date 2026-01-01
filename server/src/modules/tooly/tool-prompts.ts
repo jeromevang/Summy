@@ -15,7 +15,8 @@ export type { OpenAIToolSchema };
 export function getToolSchemas(enabledTools: string[]): OpenAIToolSchema[] {
   return enabledTools
     .filter(tool => TOOL_SCHEMAS[tool])
-    .map(tool => TOOL_SCHEMAS[tool]);
+    .map(tool => TOOL_SCHEMAS[tool])
+    .filter((schema): schema is OpenAIToolSchema => schema !== undefined);
 }
 
 /**

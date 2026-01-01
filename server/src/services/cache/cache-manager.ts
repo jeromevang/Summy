@@ -197,9 +197,11 @@ export class CacheManager extends EventEmitter {
 
     // Evict 10% of items
     const evictCount = Math.max(1, Math.floor(entries.length * 0.1));
-    
+
     for (let i = 0; i < evictCount; i++) {
-      const [key, entry] = entries[i];
+      const item = entries[i];
+      if (!item) continue;
+      const [key, entry] = item;
       this.cache.delete(key);
       this.options.onEvict(key, entry.value);
       this.emit('evict', { key, value: entry.value });
@@ -259,12 +261,12 @@ export const caches = {
 // Cache middleware for Express routes
 export function cacheMiddleware<T>(
   cache: CacheManager,
-  _keyGenerator: (req: any) => string,
-  _ttl?: number
+  keyGenerator: (req: any) => string,
+  ttl?: number
 ) {
   return (req: any, res: any, next: any) => {
     const cacheKey = keyGenerator(req);
-    
+
     // Try to get from cache
     const cached = cache.get<T>(cacheKey);
     if (cached !== null) {
@@ -274,7 +276,7 @@ export function cacheMiddleware<T>(
 
     // Store original json method
     const originalJson = res.json;
-    
+
     // Override json method to cache the response
     res.json = function(body: T) {
       // Cache the response
