@@ -5,7 +5,8 @@ import path from 'path';
 import fs from 'fs/promises';
 import { RAGConfig, defaultConfig } from '../config.js';
 import { getIndexer, Indexer } from '../services/indexer.js';
-import { getLMStudioEmbedder } from '../embeddings/lmstudio.js';
+import { getLMStudioEmbedder, LMStudioEmbedder } from '../embeddings/lmstudio.js';
+import { getGeminiEmbedder, GeminiEmbedder } from '../embeddings/gemini.js';
 import { getLanceDBStore } from '../storage/lancedb-store.js';
 import { getRAGDatabase, RAGDatabase } from '../services/database.js';
 
@@ -15,6 +16,7 @@ export class RAGServer {
   private indexer!: Indexer;
   private ragDb!: RAGDatabase;
   private wsClients: Set<WebSocket> = new Set();
+  private embedder!: any;
 
   constructor() {
     this.app.use(cors());
@@ -25,7 +27,7 @@ export class RAGServer {
     await this.loadConfig();
     await this.initializeServices();
     this.setupRoutes();
-    const server = this.app.listen(port, () => console.log(`[RAG Server] Running on port ${port}`));
+    const server = this.app.listen(port, () => console.log(`[RAG Server] Running on port \${port}`));
     this.setupWebSocket(server);
   }
 
@@ -37,13 +39,28 @@ export class RAGServer {
   }
 
   private async initializeServices() {
+    // Determine which embedder to use based on config
+    const embedderType = (this.config as any).embedder?.type || 'lmstudio';
+    
+    if (embedderType === 'gemini') {
+      const apiKey = (this.config as any).embedder?.apiKey || process.env.GEMINI_API_KEY;
+      this.embedder = getGeminiEmbedder(apiKey);
+      console.log('[RAG Server] Using Gemini Embedder');
+    } else {
+      this.embedder = getLMStudioEmbedder();
+      console.log('[RAG Server] Using LM Studio Embedder');
+    }
+
     this.indexer = getIndexer(this.config);
+    // Inject the selected embedder into the indexer
+    (this.indexer as any).embedder = this.embedder;
+    
     this.indexer.onProgress((p) => this.broadcast('indexProgress', p));
     this.ragDb = getRAGDatabase(this.config.storage.dataPath);
 
     // Start file watcher if enabled
     if (this.config.watcher.enabled && this.config.project.path) {
-      console.log(`[RAG Server] Starting file watcher for: ${this.config.project.path}`);
+      console.log(`[RAG Server] Starting file watcher for: \${this.config.project.path}`);
       this.indexer.startWatcher(this.config.project.path);
     } else {
       console.log(`[RAG Server] File watcher disabled or no project path set`);

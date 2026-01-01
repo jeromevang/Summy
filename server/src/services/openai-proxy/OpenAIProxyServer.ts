@@ -1,8 +1,5 @@
-import axios from 'axios';
-import { ProxyHandlers } from './ProxyHandlers.js';
 import { intentRouter } from '../../modules/tooly/intent-router.js';
 import { extractPatternFromCorrection, addPatternToMemory, initializeMemory } from '../../modules/tooly/learning/learning-system.js';
-import { db } from '../database.js';
 
 export class OpenAIProxy {
   static async proxyToOpenAI(req: any, res: any) {

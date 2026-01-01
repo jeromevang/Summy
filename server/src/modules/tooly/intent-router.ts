@@ -1,10 +1,8 @@
-import axios from 'axios';
 import { capabilities, ModelProfile } from './capabilities.js';
 import { getToolSchemas, buildSystemPrompt } from './tool-prompts.js';
-import { failureLog, type FailureCategory } from '../../services/failure-log.js';
+import { failureLog } from '../../services/failure-log.js';
 import { failureObserver } from '../../services/failure-observer.js';
 import { prostheticStore } from './learning/prosthetic-store.js';
-import { executeAgenticLoop } from './cognitive-engine.js';
 import { IntentSchema, RouterConfig, RoutingPhase, RoutingResult } from './types.js';
 import { IntentParser } from './utils/intent-parser.js';
 import { ModelProvider } from './providers/ModelProvider.js';

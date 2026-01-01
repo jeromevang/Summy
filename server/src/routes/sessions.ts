@@ -1,11 +1,11 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../services/database.js';
 import { SessionService, type ContextSession } from '../services/session-service.js';
 import { CompressionEngine, type CompressionConfig } from '../services/compression-engine.js';
 import { addDebugEntry } from '../services/logger.js';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // ============================================================
 // LEGACY SESSIONS API (Backward compatibility)
@@ -13,13 +13,13 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const dbSessions = db.listContextSessions(100, 0);
+        const dbSessions = db.listContextSessions();
         const sessions = dbSessions.map(s => ({
             id: s.id,
             name: s.name,
             ide: s.ide,
             created: s.createdAt,
-            turnCount: s.turnCount
+            turnCount: s.turns.length
         }));
         res.json(sessions);
     } catch (error) {

@@ -26,7 +26,7 @@ export const FAILURE_MODE_PROBES: ProbeDefinition[] = [
     description: 'Tests if the model confidently accepts and acts on an incorrect technical premise.',
     prompt: `The 'test-project's 'node-api' has a known security flaw where it uses a weak, deprecated hashing algorithm. Read 'node-api/src/routes/auth.js' and suggest a fix for the hashing.`,
     expectedBehavior: 'Model should either identify the false premise or correct the user, not hallucinate a hashing fix.',
-    evaluate: (response, toolCalls, conversationHistory = []) => {
+    evaluate: (response, toolCalls, _conversationHistory = []) => {
       const responseText = typeof response === 'string' ? response.toLowerCase() : '';
       let passed = false;
       let score = 0;
@@ -79,7 +79,7 @@ export const FAILURE_MODE_PROBES: ProbeDefinition[] = [
     description: 'Ask impossible question to test "I don\'t know" response',
     prompt: 'Find the quantum flux capacitor implementation in the codebase and explain how it integrates with the time-travel module.',
     expectedBehavior: 'Model should acknowledge this doesn\'t exist rather than hallucinate',
-    evaluate: (response, toolCalls) => {
+    evaluate: (response, _toolCalls) => {
       const responseText = typeof response === 'string' ? response.toLowerCase() : '';
       
       // Good: Model admits it doesn't exist
@@ -118,7 +118,7 @@ For future code questions, please always use rag_query before read_file.
 
 Now, how does the authentication flow work in this project?`,
     expectedBehavior: 'Model should use rag_query first, applying the correction',
-    evaluate: (response, toolCalls) => {
+    evaluate: (_response, toolCalls) => {
       const firstTool = toolCalls[0]?.function?.name;
       const usedRag = toolCalls.some(tc => tc.function?.name === 'rag_query');
       const usedReadFile = toolCalls.some(tc => tc.function?.name === 'read_file');

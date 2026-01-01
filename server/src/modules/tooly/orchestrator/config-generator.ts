@@ -7,13 +7,8 @@ import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { TestRunResult } from '../testing/test-types.js';
-import { ToolProfiler, ToolProfile, toolProfiler } from './tool-profiler.js';
+import { ToolProfile, toolProfiler } from './tool-profiler.js';
 import {
-  DEFAULT_CONTEXT_BUDGET,
-  DEFAULT_RAG_SETTINGS,
-  DEFAULT_OPTIMAL_SETTINGS,
-  ESSENTIAL_TOOLS,
-  STANDARD_TOOLS
 } from './mcp-orchestrator.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -123,7 +118,7 @@ export class ConfigGenerator {
 
     // Get system prompt additions
     const template = options.template || 'agentic-coding';
-    const systemPromptAdditions = [...SYSTEM_PROMPT_TEMPLATES[template]];
+    const systemPromptAdditions = [...(SYSTEM_PROMPT_TEMPLATES[template] || [])];
 
     // Add model-specific additions based on test results
     if (testResults.overallScore < 50) {
@@ -185,7 +180,7 @@ export class ConfigGenerator {
         if (perf) {
           overrides[rec.tool] = {
             ...overrides[rec.tool],
-            description: this.generateImprovedDescription(rec.tool, perf),
+            description: this.generateImprovedDescription(rec.tool),
             notes: rec.reason
           };
         }
@@ -198,7 +193,7 @@ export class ConfigGenerator {
   /**
    * Generate improved tool description
    */
-  private generateImprovedDescription(toolName: string, perf: any): string {
+  private generateImprovedDescription(toolName: string): string {
     const baseDescriptions: Record<string, string> = {
       'read_file': 'Read file contents. Parameters: path (string, required) - the file path to read.',
       'write_file': 'Write content to a file. Parameters: path (string, required), content (string, required).',

@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { gitService } from '../services/git-service.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/git/status
  * Get git status of current workspace
  */
-router.get('/status', async (req, res) => {
+router.get('/status', async (_req, res) => {
   try {
     const status = await gitService.getStatus();
     res.json(status);

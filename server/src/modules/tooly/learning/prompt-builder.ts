@@ -280,7 +280,7 @@ export class PromptBuilder {
   /**
    * Build a minimal prompt for quick operations
    */
-  buildMinimal(query: string, toolConfig?: ToolConfig): string {
+  buildMinimal(toolConfig?: ToolConfig): string {
     let prompt = BASE_SYSTEM_PROMPT;
     
     if (toolConfig?.disabledTools?.length) {

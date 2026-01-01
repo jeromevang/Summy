@@ -7,7 +7,9 @@ import { DBComboTests, type ComboTestRecord } from './db/db-combo-tests.js';
 
 /**
  * Main Database Service
- * Combines all database functionality into a single service
+ * This class acts as a facade, aggregating all database functionality from various
+ * sub-services (sessions, analytics, notifications, context, config, combo tests)
+ * into a single, convenient access point.
  */
 export class DatabaseService {
   private sessions: DBSessions;
@@ -17,66 +19,135 @@ export class DatabaseService {
   private config: DBConfig;
   private comboTests: DBComboTests;
 
-  // Method properties
-  getSessions: any;
-  getSession: any;
-  saveSession: any;
-  deleteSession: any;
-  getSessionCount: any;
-  recordAnalytics: any;
-  getAnalyticsSummary: any;
-  logExecution: any;
-  getExecutionLogs: any;
-  getExecutionLog: any;
-  createBackup: any;
-  getBackup: any;
-  markBackupRestored: any;
-  cleanupExpiredBackups: any;
-  getBackupsForLog: any;
-  addNotification: any;
-  getNotifications: any;
-  getUnreadCount: any;
-  markNotificationRead: any;
-  markAllNotificationsRead: any;
-  deleteNotification: any;
-  clearAllNotifications: any;
-  createContextSession: any;
-  getContextSession: any;
-  listContextSessions: any;
-  addContextTurn: any;
-  getContextTurn: any;
-  deleteContextSession: any;
-  clearAllContextSessions: any;
-  contextSessionExists: any;
-  getLatestTurnNumber: any;
-  getPreviousToolSetId: any;
-  updateContextSessionName: any;
-  getMostRecentSession: any;
-  getRAGConfig: any;
-  saveRAGConfig: any;
-  createCustomTest: any;
-  getCustomTests: any;
-  getCustomTest: any;
-  updateCustomTest: any;
-  deleteCustomTest: any;
-  cacheModelInfo: any;
-  getCachedModelInfo: any;
-  saveGroundTruth: any;
-  getGroundTruth: any;
-  clearAllRAGData: any;
-  getSystemPrompt: any;
-  getToolSet: any;
-  getOrCreateSystemPrompt: any;
-  getOrCreateToolSet: any;
-  saveComboResult: any;
-  getAllComboResults: any;
-  getComboResult: any;
-  getResultsForMainModel: any;
-  getResultsForExecutorModel: any;
-  getTopCombos: any;
-  deleteComboResult: any;
-  clearAllComboResults: any;
+  // Method properties (bound from sub-services)
 
+  /** @see DBSessions.getSessions */
+  getSessions: (query?: any) => Session[];
+  /** @see DBSessions.getSession */
+  getSession: (id: string) => Session | null;
+  /** @see DBSessions.saveSession */
+  saveSession: (session: Session) => void;
+  /** @see DBSessions.deleteSession */
+  deleteSession: (id: string) => void;
+  /** @see DBSessions.getSessionCount */
+  getSessionCount: () => number;
+
+  /** @see DBAnalytics.recordAnalytics */
+  recordAnalytics: (entry: AnalyticsEntry) => void;
+  /** @see DBAnalytics.getAnalyticsSummary */
+  getAnalyticsSummary: (period: 'day' | 'week' | 'month') => AnalyticsSummary;
+  /** @see DBAnalytics.logExecution */
+  logExecution: (log: ExecutionLog) => string;
+  /** @see DBAnalytics.getExecutionLogs */
+  getExecutionLogs: (filters?: LogFilters) => ExecutionLog[];
+  /** @see DBAnalytics.getExecutionLog */
+  getExecutionLog: (id: string) => ExecutionLog | null;
+  /** @see DBAnalytics.createBackup */
+  // Changed return type from void to string to satisfy rollback.ts
+  createBackup: (logId: string, filePath: string, content: string) => string;
+  /** @see DBAnalytics.getBackup */
+  getBackup: (backupId: string) => FileBackup | null;
+  /** @see DBAnalytics.markBackupRestored */
+  markBackupRestored: (backupId: string) => void;
+  /** @see DBAnalytics.cleanupExpiredBackups */
+  cleanupExpiredBackups: () => number;
+  /** @see DBAnalytics.getBackupsForLog */
+  getBackupsForLog: (logId: string) => FileBackup[];
+
+  /** @see DBNotifications.addNotification */
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => string;
+  /** @see DBNotifications.getNotifications */
+  getNotifications: (unreadOnly?: boolean, limit?: number) => Notification[];
+  /** @see DBNotifications.getUnreadCount */
+  getUnreadCount: () => number;
+  /** @see DBNotifications.markNotificationRead */
+  markNotificationRead: (id: string) => void;
+  /** @see DBNotifications.markAllNotificationsRead */
+  markAllNotificationsRead: () => void;
+  /** @see DBNotifications.deleteNotification */
+  deleteNotification: (id: string) => void;
+  /** @see DBNotifications.clearAllNotifications */
+  clearAllNotifications: () => void;
+
+  /** @see DBContext.createContextSession */
+  createContextSession: (session: Omit<ContextSessionDB, "createdAt" | "updatedAt" | "turns" | "summary" | "compression">) => ContextSessionDB;
+  /** @see DBContext.getContextSession */
+  getContextSession: (id: string) => ContextSessionDB | null;
+  /** @see DBContext.listContextSessions */
+  listContextSessions: (limit?: number, offset?: number) => ContextSessionDB[];
+  /** @see DBContext.addContextTurn */
+  addContextTurn: (turn: Omit<ContextTurn, 'id' | 'createdAt'>) => ContextTurn;
+  /** @see DBContext.getContextTurn */
+  getContextTurn: (sessionId: string, turnNumber: number) => ContextTurn | null;
+  /** @see DBContext.deleteContextSession */
+  deleteContextSession: (id: string) => void;
+  /** @see DBContext.clearAllContextSessions */
+  clearAllContextSessions: () => number;
+  /** @see DBContext.contextSessionExists */
+  contextSessionExists: (id: string) => boolean;
+  /** @see DBContext.getLatestTurnNumber */
+  getLatestTurnNumber: (sessionId: string) => number;
+  /** @see DBContext.getPreviousToolSetId */
+  getPreviousToolSetId: (sessionId: string) => string | null;
+  /** @see DBContext.updateContextSessionName */
+  updateContextSessionName: (sessionId: string, newName: string) => void;
+  /** @see DBContext.getMostRecentSession */
+  getMostRecentSession: () => ContextSessionDB | null;
+
+  /** @see DBConfig.getRAGConfig */
+  getRAGConfig: () => any; // More specific type if available
+  /** @see DBConfig.saveRAGConfig */
+  saveRAGConfig: (config: any) => void; // More specific type if available
+  /** @see DBConfig.createCustomTest */
+  createCustomTest: (test: any) => any; // More specific type if available
+  /** @see DBConfig.getCustomTests */
+  getCustomTests: () => any[]; // More specific type if available
+  /** @see DBConfig.getCustomTest */
+  getCustomTest: (id: string) => any | undefined; // More specific type if available
+  /** @see DBConfig.updateCustomTest */
+  updateCustomTest: (id: string, updates: any) => boolean; // More specific type if available
+  /** @see DBConfig.deleteCustomTest */
+  deleteCustomTest: (id: string) => boolean;
+  /** @see DBConfig.cacheModelInfo */
+  cacheModelInfo: (modelId: string, info: any, source: string) => void; // More specific type if available
+  /** @see DBConfig.getCachedModelInfo */
+  getCachedModelInfo: (modelId: string) => any | undefined; // More specific type if available
+  /** @see DBConfig.saveGroundTruth */
+  saveGroundTruth: (testId: string, result: any) => void;
+  /** @see DBConfig.getGroundTruth */
+  getGroundTruth: (testId: string) => any | null;
+  /** @see DBConfig.clearAllRAGData */
+  clearAllRAGData: () => void;
+
+  /** @see DBContext.getSystemPrompt */
+  getSystemPrompt: (hash: string) => SystemPrompt | null;
+  /** @see DBContext.getToolSet */
+  getToolSet: (hash: string) => ToolSet | null;
+  getOrCreateSystemPrompt: (content: string) => SystemPrompt;
+  /** @see DBContext.getOrCreateToolSet */
+  getOrCreateToolSet: (tools: any[]) => ToolSet;
+
+  /** @see DBComboTests.saveComboResult */
+  saveComboResult: (result: ComboTestRecord) => void;
+  /** @see DBComboTests.getAllComboResults */
+  getAllComboResults: () => ComboTestRecord[];
+  /** @see DBComboTests.getComboResult */
+  getComboResult: (mainModelId: string, executorModelId: string) => ComboTestRecord | null;
+  /** @see DBComboTests.getResultsForMainModel */
+  getResultsForMainModel: (mainModelId: string) => ComboTestRecord[];
+  /** @see DBComboTests.getResultsForExecutorModel */
+  getResultsForExecutorModel: (executorModelId: string) => ComboTestRecord[];
+  /** @see DBComboTests.getTopCombos */
+  getTopCombos: (limit?: number) => ComboTestRecord[];
+  /** @see DBComboTests.deleteComboResult */
+  deleteComboResult: (mainModelId: string, executorModelId: string) => void;
+  /** @see DBComboTests.clearAllComboResults */
+  clearAllComboResults: () => number;
+
+  /**
+   * Initializes the DatabaseService by creating instances of all sub-database services.
+   * It also binds all methods from the sub-services to this facade for direct access.
+   */
   constructor() {
     this.sessions = new DBSessions();
     this.analytics = new DBAnalytics();
@@ -159,18 +230,41 @@ export class DatabaseService {
   }
 
   // Utilities
+  /**
+   * Runs various database cleanup operations, such as removing expired backups.
+   * @returns An object detailing the results of the cleanup, e.g., number of backups deleted.
+   */
   runCleanup(): { backupsDeleted: number } {
     const backupsDeleted = this.analytics.cleanupExpiredBackups();
     return { backupsDeleted };
   }
+
+  // Direct Database Access (Facade for DBBase methods via sessions instance)
+  public query(sql: string, params: any[] = []): any[] {
+    return this.sessions.query(sql, params);
+  }
+
+  public run(sql: string, params: any[] = []): { changes: number; lastInsertRowid: number | bigint } {
+    return this.sessions.run(sql, params);
+  }
+
+  public get(sql: string, params: any[] = []): any {
+    return this.sessions.get(sql, params);
+  }
+
+  public exec(sql: string): void {
+    this.sessions.exec(sql);
+  }
 }
 
 // Export singleton instance
+/**
+ * The singleton instance of the DatabaseService, providing a unified interface to all database operations.
+ */
 export const db = new DatabaseService();
 
-// Export types
+// Export all relevant types for external consumption
 export type {
-  DatabaseService,
   Session,
   AnalyticsEntry,
   AnalyticsSummary,

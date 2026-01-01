@@ -8,9 +8,9 @@
 
 import { intentRouter } from '../intent-router.js';
 import { getToolSchemas } from '../tool-prompts.js';
-import { prostheticStore, ProstheticEntry, buildProstheticPrompt } from './prosthetic-store.js';
+import { prostheticStore } from './prosthetic-store.js';
 import { capabilities } from '../capabilities.js';
-import { SANDBOX_CONTEXT } from '../testing/readiness-runner';
+import { SANDBOX_CONTEXT } from '../testing/combo-test-definitions.js';
 import { Provider } from '../provider-types.js';
 
 // ============================================================
@@ -57,7 +57,7 @@ const DISTILLATION_TESTS: Record<string, DistillationTestCase[]> = {
       capability: 'rag_usage',
       prompt: 'How does the authentication flow work in this codebase?',
       expectedBehavior: 'Use rag_query first to explore, then read relevant files',
-      evaluator: (response, toolCalls) => {
+      evaluator: (_response, toolCalls) => {
         const ragFirst = toolCalls[0]?.function?.name === 'rag_query';
         const usedRag = toolCalls.some(tc => tc.function?.name === 'rag_query');
         const usedRead = toolCalls.some(tc => tc.function?.name === 'read_file');
@@ -79,7 +79,7 @@ const DISTILLATION_TESTS: Record<string, DistillationTestCase[]> = {
       capability: 'tool_selection',
       prompt: 'Find all files that contain error handling code.',
       expectedBehavior: 'Use search_files with appropriate query',
-      evaluator: (response, toolCalls) => {
+      evaluator: (_response, toolCalls) => {
         const usedSearch = toolCalls.some(tc => 
           ['search_files', 'grep', 'codebase_search'].includes(tc.function?.name)
         );
@@ -185,7 +185,6 @@ export class KnowledgeDistiller {
    */
   private extractPatterns(
     capability: string,
-    response: string,
     toolCalls: any[]
   ): ExtractedPattern[] {
     const patterns: ExtractedPattern[] = [];
@@ -311,7 +310,7 @@ export class KnowledgeDistiller {
       
       // Extract patterns from successful responses
       if (teacherResult.score >= 70) {
-        const patterns = this.extractPatterns(capability, teacherResult.response, teacherResult.toolCalls);
+        const patterns = this.extractPatterns(capability, teacherResult.toolCalls);
         allPatterns.push(...patterns);
       }
     }
@@ -373,8 +372,6 @@ export class KnowledgeDistiller {
     let studentAfterScore = 0;
 
     for (const testCase of testCases) {
-      // Enhance the test with prosthetic in system prompt
-      const enhancedPrompt = testCase.prompt;
       // Note: In production, the prosthetic would be applied via the model profile
       // For now we just re-test (the prosthetic is stored for future use)
       const studentResult = await this.runTestCase(studentModelId, testCase, studentProvider);
@@ -422,7 +419,7 @@ export class KnowledgeDistiller {
   /**
    * Automatically find the best teacher model for a capability
    */
-  async findBestTeacher(capability: string): Promise<string | null> {
+  async findBestTeacher(): Promise<string | null> {
     const profiles = await capabilities.getAllProfiles();
     
     // Find models with highest scores in this capability area

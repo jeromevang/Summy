@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/tooly/failures
  * Get recorded failures
  */
-router.get('/failures', (req, res) => {
+router.get('/failures', (_req, res) => {
   res.json({ failures: [] });
 });
 
@@ -14,7 +14,7 @@ router.get('/failures', (req, res) => {
  * GET /api/tooly/failures/patterns
  * Get failure patterns
  */
-router.get('/failures/patterns', (req, res) => {
+router.get('/failures/patterns', (_req, res) => {
   res.json({ patterns: [] });
 });
 

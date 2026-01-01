@@ -1,9 +1,7 @@
 import {
   TestCategory,
   DifficultyTier,
-  ComboTestCase,
-  CategoryScore,
-  TierScore
+  ComboTestCase
 } from './test-types.js';
 
 // Sandbox context for system prompt

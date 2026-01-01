@@ -3,12 +3,12 @@
  * API endpoints for advanced model management
  */
 
-import express from 'express';
+import express, { Router } from 'express';
 import { modelManager } from '../services/model-manager.js';
 import { cacheService } from '../services/cache/cache-service.js';
 import { addDebugEntry } from '../services/logger.js';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // ============================================================
 // MODEL DISCOVERY AND MANAGEMENT
@@ -17,7 +17,7 @@ const router = express.Router();
 /**
  * Discover all available models
  */
-router.get('/discover', async (req, res) => {
+router.get('/discover', async (_req, res) => {
   try {
     addDebugEntry('request', 'Model discovery request');
     const result = await modelManager.discoverModels();
@@ -26,12 +26,12 @@ router.get('/discover', async (req, res) => {
       data: result,
       message: `Discovered ${result.totalModels} models`
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Model discovery failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Model discovery failed',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -74,12 +74,12 @@ router.get('/list', async (req, res) => {
         offset: parseInt(offset as string)
       }
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Get models failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get models',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -104,12 +104,12 @@ router.get('/:modelId', async (req, res) => {
       success: true,
       data: model
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Get model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get model',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -138,12 +138,12 @@ router.patch('/:modelId', async (req, res) => {
       data: modelManager.getModel(modelId),
       message: `Updated model ${modelId}`
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Update model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to update model',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -171,12 +171,12 @@ router.post('/:modelId/disable', async (req, res) => {
       success: true,
       message: `Disabled model ${modelId}: ${reason || 'Manual disable'}`
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Disable model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to disable model',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -203,12 +203,12 @@ router.post('/:modelId/enable', async (req, res) => {
       success: true,
       message: `Enabled model ${modelId}`
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Enable model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to enable model',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -239,12 +239,12 @@ router.post('/recommendations', async (req, res) => {
       },
       message: `Found ${recommendations.length} recommendations`
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Get recommendations failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get recommendations',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -278,12 +278,12 @@ router.get('/best/:role', async (req, res) => {
       data: best,
       message: `Best ${role} model: ${best.model.displayName}`
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Get best model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get best model',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -295,7 +295,7 @@ router.get('/best/:role', async (req, res) => {
 /**
  * Health check all models
  */
-router.post('/health-check', async (req, res) => {
+router.post('/health-check', async (_req, res) => {
   try {
     addDebugEntry('request', 'Health check all models');
     const results = await modelManager.healthCheckAll();
@@ -316,12 +316,12 @@ router.post('/health-check', async (req, res) => {
       },
       message: `Health check completed: ${healthyCount} healthy, ${unhealthyCount} unhealthy`
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Health check failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Health check failed',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -339,12 +339,12 @@ router.post('/:modelId/health-check', async (req, res) => {
       data: result,
       message: `Health check for ${modelId}: ${result.status}`
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Health check model failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Health check failed',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -356,19 +356,19 @@ router.post('/:modelId/health-check', async (req, res) => {
 /**
  * Clear model cache
  */
-router.delete('/cache/clear', async (req, res) => {
+router.delete('/cache/clear', async (_req, res) => {
   try {
     cacheService.clearAll();
     res.json({
       success: true,
       message: 'Model cache cleared'
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Clear cache failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to clear cache',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -376,19 +376,19 @@ router.delete('/cache/clear', async (req, res) => {
 /**
  * Get cache statistics
  */
-router.get('/cache/stats', async (req, res) => {
+router.get('/cache/stats', async (_req, res) => {
   try {
     const stats = cacheService.getStats();
     res.json({
       success: true,
       data: stats
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Get cache stats failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get cache stats',
-      message: error.message
+      message: err.message
     });
   }
 });
@@ -402,41 +402,41 @@ router.get('/cache/stats', async (req, res) => {
  */
 router.get('/stats', async (req, res) => {
   try {
-    const models = Array.from(modelManager['models'].values());
+    const models = modelManager.getModels();
     
     const stats = {
       total: models.length,
       byProvider: {
-        lmstudio: models.filter(m => m.provider === 'lmstudio').length,
-        openai: models.filter(m => m.provider === 'openai').length,
-        azure: models.filter(m => m.provider === 'azure').length,
-        openrouter: models.filter(m => m.provider === 'openrouter').length
+        lmstudio: models.filter((m: any) => m.provider === 'lmstudio').length,
+        openai: models.filter((m: any) => m.provider === 'openai').length,
+        azure: models.filter((m: any) => m.provider === 'azure').length,
+        openrouter: models.filter((m: any) => m.provider === 'openrouter').length
       },
       byStatus: {
-        tested: models.filter(m => m.status === 'tested').length,
-        untested: models.filter(m => m.status === 'untested').length,
-        failed: models.filter(m => m.status === 'failed').length,
-        known_good: models.filter(m => m.status === 'known_good').length,
-        disabled: models.filter(m => m.status === 'disabled').length
+        tested: models.filter((m: any) => m.status === 'tested').length,
+        untested: models.filter((m: any) => m.status === 'untested').length,
+        failed: models.filter((m: any) => m.status === 'failed').length,
+        known_good: models.filter((m: any) => m.status === 'known_good').length,
+        disabled: models.filter((m: any) => m.status === 'disabled').length
       },
       byRole: {
-        main: models.filter(m => m.role === 'main').length,
-        executor: models.filter(m => m.role === 'executor').length,
-        both: models.filter(m => m.role === 'both').length,
-        none: models.filter(m => m.role === 'none').length
+        main: models.filter((m: any) => m.role === 'main').length,
+        executor: models.filter((m: any) => m.role === 'executor').length,
+        both: models.filter((m: any) => m.role === 'both').length,
+        none: models.filter((m: any) => m.role === 'none').length
       },
       byCategory: {
-        general: models.filter(m => m.category === 'general').length,
-        coding: models.filter(m => m.category === 'coding').length,
-        creative: models.filter(m => m.category === 'creative').length,
-        analysis: models.filter(m => m.category === 'analysis').length,
-        specialized: models.filter(m => m.category === 'specialized').length
+        general: models.filter((m: any) => m.category === 'general').length,
+        coding: models.filter((m: any) => m.category === 'coding').length,
+        creative: models.filter((m: any) => m.category === 'creative').length,
+        analysis: models.filter((m: any) => m.category === 'analysis').length,
+        specialized: models.filter((m: any) => m.category === 'specialized').length
       },
       performance: {
-        avgScore: models.reduce((sum, m) => sum + (m.score || 0), 0) / models.length || 0,
-        avgLatency: models.reduce((sum, m) => sum + (m.avgLatency || 0), 0) / models.length || 0,
-        healthyModels: models.filter(m => m.healthStatus === 'healthy').length,
-        unhealthyModels: models.filter(m => m.healthStatus === 'unhealthy').length
+        avgScore: models.reduce((sum, m: any) => sum + (m.score || 0), 0) / models.length || 0,
+        avgLatency: models.reduce((sum, m: any) => sum + (m.avgLatency || 0), 0) / models.length || 0,
+        healthyModels: models.filter((m: any) => m.healthStatus === 'healthy').length,
+        unhealthyModels: models.filter((m: any) => m.healthStatus === 'unhealthy').length
       }
     };
 
@@ -444,12 +444,12 @@ router.get('/stats', async (req, res) => {
       success: true,
       data: stats
     });
-  } catch (error) {
+  } catch (err: any) {
     addDebugEntry('error', `Get stats failed: ${error}`);
     res.status(500).json({
       success: false,
       error: 'Failed to get statistics',
-      message: error.message
+      message: err.message
     });
   }
 });

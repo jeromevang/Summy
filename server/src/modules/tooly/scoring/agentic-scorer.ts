@@ -247,7 +247,6 @@ export function recommendRole(
   // Thresholds
   const HIGH_THRESHOLD = 80;
   const MEDIUM_THRESHOLD = 60;
-  const LOW_THRESHOLD = 40;
 
   const goodForMain = reasoning >= HIGH_THRESHOLD &&
     intentRecognition >= MEDIUM_THRESHOLD &&

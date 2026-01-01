@@ -89,7 +89,7 @@ export class AgentVerify {
 
         // Verify tool results if present
         if (action.toolResults && decision.toolCalls) {
-            const toolVerification = this.verifyToolResults(action.toolResults, decision.toolCalls);
+            const toolVerification = this.verifyToolResults(action.toolResults);
 
             if (!toolVerification.allPassed) {
                 result.success = false;
@@ -129,8 +129,7 @@ export class AgentVerify {
     // ============================================================
 
     verifyToolResults(
-        results: ToolResult[],
-        intents: ToolIntent[]
+        results: ToolResult[]
     ): { allPassed: boolean; errors: string[]; summary: string } {
         const errors: string[] = [];
         let passed = 0;
@@ -169,7 +168,7 @@ export class AgentVerify {
             // Check for "NEVER" invariants
             if (invariant.toLowerCase().includes('never')) {
                 const neverMatch = invariant.match(/never\s+(.+)/i);
-                if (neverMatch) {
+                if (neverMatch && neverMatch[1]) {
                     const forbidden = neverMatch[1].toLowerCase();
                     if (outputStr.includes(forbidden)) {
                         check.valid = false;
@@ -181,7 +180,7 @@ export class AgentVerify {
             // Check for "MUST" invariants
             if (invariant.toLowerCase().includes('must')) {
                 const mustMatch = invariant.match(/must\s+(.+)/i);
-                if (mustMatch) {
+                if (mustMatch && mustMatch[1]) {
                     const required = mustMatch[1].toLowerCase();
                     // Simplified check - in reality would be more sophisticated
                     if (action.error && !outputStr.includes(required)) {
@@ -211,8 +210,6 @@ export class AgentVerify {
         const outputStr = JSON.stringify(action.output || {}).toLowerCase();
 
         for (const intent of intents) {
-            const expectedLower = intent.expectedOutcome.toLowerCase();
-
             // Check if output contains success indicators matching the intent
             const hasSuccess = SUCCESS_PATTERNS.some(p => p.test(outputStr));
             const hasFailure = FAILURE_PATTERNS.some(p => p.test(outputStr));
@@ -256,7 +253,7 @@ export class AgentVerify {
     // TEST VERIFICATION
     // ============================================================
 
-    async verifyTests(testCommand?: string): Promise<{ passed: boolean; output: string }> {
+    async verifyTests(): Promise<{ passed: boolean; output: string }> {
         // Placeholder - in real implementation would run tests
         return { passed: true, output: 'Tests not configured' };
     }

@@ -4,7 +4,8 @@
  * Search → Understand → Decide → Act → Verify → Persist
  */
 
-import type { OptimizedContext, Turn } from '../context/context-manager.js';
+// import type { AgentDecision, Strategy, ToolIntent } from './decision-engine.js';
+// import type { Turn } from '../context/index.js';
 import learningSystem from '../learning/learning-system.js';
 
 // ============================================================
@@ -132,7 +133,7 @@ export class DecisionEngine {
     // Build structured mental model
     // ============================================================
 
-    understand(searchContext: SearchContext, query: string): StructuredUnderstanding {
+    understand(searchContext: SearchContext): StructuredUnderstanding {
         const understanding: StructuredUnderstanding = {
             components: [],
             invariants: [],
@@ -320,7 +321,7 @@ export class DecisionEngine {
     // Check whether the action worked
     // ============================================================
 
-    verify(action: any, decision: AgentDecision): VerificationResult {
+    verify(action: any): VerificationResult {
         const result: VerificationResult = {
             success: true,
             invariantsValid: true,
@@ -366,7 +367,6 @@ export class DecisionEngine {
             // Extract positive pattern
             const pattern = learningSystem.extractPatternFromPositive(
                 outcome.decision.reasoning,
-                JSON.stringify(outcome.action),
                 outcome.decision.toolCalls?.map(t => ({ name: t.tool })) || []
             );
 
@@ -396,7 +396,7 @@ export class DecisionEngine {
         const searchContext = await this.search(query);
 
         // 2. Understand
-        const understanding = this.understand(searchContext, query);
+        const understanding = this.understand(searchContext);
 
         // 3. Decide
         const decision = this.decide(understanding, query);
@@ -405,7 +405,7 @@ export class DecisionEngine {
         const action = await this.act(decision);
 
         // 5. Verify
-        const verification = this.verify(action, decision);
+        const verification = this.verify(action);
 
         // 6. Persist
         const outcome: DecisionOutcome = {

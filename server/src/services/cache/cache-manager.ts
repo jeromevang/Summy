@@ -147,14 +147,14 @@ export class CacheManager extends EventEmitter {
   /**
    * Get all cache keys
    */
-  keys(): string[] {
+  _keys(): string[] {
     return Array.from(this.cache.keys());
   }
 
   /**
    * Get all cache values
    */
-  values(): any[] {
+  _values(): any[] {
     return Array.from(this.cache.values()).map(entry => entry.value);
   }
 
@@ -209,7 +209,7 @@ export class CacheManager extends EventEmitter {
   /**
    * Close the cache and cleanup resources
    */
-  close(): void {
+  _close(): void {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
     }
@@ -224,43 +224,43 @@ export const caches = {
   modelProfiles: new CacheManager({
     ttl: 10 * 60 * 1000,
     maxItems: 100,
-    onEvict: (key, value) => console.log(`Model profile evicted: ${key}`)
+    onEvict: (key, _value) => console.log(`Model profile evicted: ${key}`)
   }),
 
   // Test results cache - 5 minute TTL
   testResults: new CacheManager({
     ttl: 5 * 60 * 1000,
     maxItems: 500,
-    onEvict: (key, value) => console.log(`Test result evicted: ${key}`)
+    onEvict: (key, _value) => console.log(`Test result evicted: ${key}`)
   }),
 
   // Combo results cache - 15 minute TTL
   comboResults: new CacheManager({
     ttl: 15 * 60 * 1000,
     maxItems: 200,
-    onEvict: (key, value) => console.log(`Combo result evicted: ${key}`)
+    onEvict: (key, _value) => console.log(`Combo result evicted: ${key}`)
   }),
 
   // Analytics cache - 30 minute TTL
   analytics: new CacheManager({
     ttl: 30 * 60 * 1000,
     maxItems: 1000,
-    onEvict: (key, value) => console.log(`Analytics evicted: ${key}`)
+    onEvict: (key, _value) => console.log(`Analytics evicted: ${key}`)
   }),
 
   // File content cache - 2 minute TTL
   fileContent: new CacheManager({
     ttl: 2 * 60 * 1000,
     maxItems: 200,
-    onEvict: (key, value) => console.log(`File content evicted: ${key}`)
-  })
+    onEvict: (key, _value) => console.log(`File content evicted: ${key}`)
+  }) // Removed trailing comma here
 };
 
 // Cache middleware for Express routes
 export function cacheMiddleware<T>(
   cache: CacheManager,
-  keyGenerator: (req: any) => string,
-  ttl?: number
+  _keyGenerator: (req: any) => string,
+  _ttl?: number
 ) {
   return (req: any, res: any, next: any) => {
     const cacheKey = keyGenerator(req);

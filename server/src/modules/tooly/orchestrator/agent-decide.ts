@@ -154,7 +154,7 @@ export class AgentDecide {
     inferTools(query: string): ToolIntent[] {
         const intents: ToolIntent[] = [];
 
-        for (const { pattern, tool, confidence } of TOOL_PATTERNS) {
+        for (const { pattern, tool } of TOOL_PATTERNS) {
             if (pattern.test(query)) {
                 intents.push({
                     tool,
@@ -184,7 +184,7 @@ export class AgentDecide {
             };
         }
 
-        const topStrategy = strategyScores[0];
+        const topStrategy = strategyScores[0]!;
 
         // Check for dangerous operations
         if (this.isDangerous(context)) {
@@ -278,7 +278,6 @@ export class AgentDecide {
         if (success) {
             const pattern = learningSystem.extractPatternFromPositive(
                 context.query,
-                decision.reasoning,
                 decision.toolCalls?.map(t => ({ name: t.tool })) || []
             );
 

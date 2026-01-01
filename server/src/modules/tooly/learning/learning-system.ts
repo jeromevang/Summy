@@ -37,11 +37,9 @@ export interface ExtractedPattern {
  * Extract a learnable pattern from a correction
  */
 export function extractPatternFromCorrection(
-  original: string,
   correction: string,
   context: string
 ): ExtractedPattern | null {
-  const originalLower = original.toLowerCase();
   const correctionLower = correction.toLowerCase();
   
   // Look for explicit preference patterns
@@ -57,8 +55,8 @@ export function extractPatternFromCorrection(
     if (match) {
       return {
         patternType: pattern.type as LearnedPattern['patternType'],
-        trigger: match[1],
-        action: match[2] || match[1],
+        trigger: match[1]!,
+        action: match[2] || match[1]!,
         confidence: 80,
         source: 'user_correction'
       };
@@ -100,7 +98,6 @@ export function extractPatternFromCorrection(
  */
 export function extractPatternFromPositive(
   request: string,
-  response: string,
   toolCalls: any[]
 ): ExtractedPattern | null {
   // If user liked a response with specific tool usage, note it
@@ -175,6 +172,7 @@ export function addPatternToMemory(
     confidence: pattern.confidence,
     successRate: 1.0,
     occurrenceCount: 1,
+    uses: 1,
     lastUsed: new Date().toISOString(),
     source: pattern.source
   };
@@ -186,11 +184,11 @@ export function addPatternToMemory(
   
   if (existingIndex >= 0) {
     // Update existing pattern
-    memory.learned[existingIndex].occurrenceCount++;
-    memory.learned[existingIndex].confidence = Math.min(100, 
-      memory.learned[existingIndex].confidence + 5
+    memory.learned[existingIndex]!.occurrenceCount++;
+    memory.learned[existingIndex]!.confidence = Math.min(100, 
+      memory.learned[existingIndex]!.confidence + 5
     );
-    memory.learned[existingIndex].lastUsed = new Date().toISOString();
+    memory.learned[existingIndex]!.lastUsed = new Date().toISOString();
   } else {
     memory.learned.push(learnedPattern);
   }

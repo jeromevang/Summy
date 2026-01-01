@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { analytics } from '../services/analytics.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/analytics
@@ -13,7 +13,7 @@ const router = Router();
  */
 router.get('/', (req, res) => {
   try {
-    const period = (req.query.period as 'day' | 'week' | 'month') || 'week';
+    const period = (req.query['period'] as 'day' | 'week' | 'month') || 'week';
     const summary = analytics.getFormattedSummary(period);
     res.json(summary);
   } catch (error: any) {

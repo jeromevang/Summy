@@ -9,24 +9,25 @@ import { addDebugEntry } from '../logger.js';
 
 // Re-export common operations for convenience
 export const db = {
-  query: (...args: any[]) => DatabaseOperations.query(...args),
-  get: (...args: any[]) => DatabaseOperations.get(...args),
-  insert: (...args: any[]) => DatabaseOperations.insert(...args),
-  update: (...args: any[]) => DatabaseOperations.update(...args),
-  delete: (...args: any[]) => DatabaseOperations.delete(...args),
-  transaction: (...args: any[]) => DatabaseOperations.transaction(...args),
-  getTableStats: (...args: any[]) => DatabaseOperations.getTableStats(...args),
-  getHealthCheck: (...args: any[]) => DatabaseOperations.getHealthCheck(...args),
-  cleanupOldRecords: (...args: any[]) => DatabaseOperations.cleanupOldRecords(...args),
-  optimize: (...args: any[]) => DatabaseOperations.optimize(...args),
-  getRecentActivity: (...args: any[]) => DatabaseOperations.getRecentActivity(...args)
+  query: (..._args: any[]) => DatabaseOperations.query(..._args),
+  get: (..._args: any[]) => DatabaseOperations.get(..._args),
+  insert: (..._args: any[]) => DatabaseOperations.insert(..._args),
+  update: (..._args: any[]) => DatabaseOperations.update(..._args),
+  delete: (..._args: any[]) => DatabaseOperations.delete(..._args),
+  transaction: (..._args: any[]) => DatabaseOperations.transaction(..._args),
+  getTableStats: (..._args: any[]) => DatabaseOperations.getTableStats(..._args),
+  getHealthCheck: (..._args: any[]) => DatabaseOperations.getHealthCheck(..._args),
+  cleanupOldRecords: (..._args: any[]) => DatabaseOperations.cleanupOldRecords(..._args),
+  optimize: (..._args: any[]) => DatabaseOperations.optimize(..._args),
+  getRecentActivity: (..._args: any[]) => DatabaseOperations.getRecentActivity(..._args)
 };
 
 // Re-export connection manager
 export { dbManager };
 
 // Re-export schema utilities
-export { initializeDatabase, SCHEMA_SQL, DB_PATH } from './schema.js';
+export { initializeDatabase, SCHEMA_SQL } from './schema.js';
+export { DB_PATH } from './db-base';
 
 /**
  * Database service initialization

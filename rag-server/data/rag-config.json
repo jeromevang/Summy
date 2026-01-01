@@ -60,8 +60,12 @@
     ]
   },
   "project": {
-    "path": "C:\\Users\\Jerome\\Documents\\Projects\\Summy",
+    "path": "C:\\Users\\jvgeu\\Documents\\Projects\\Summy",
     "autoDetect": true
+  },
+  "embedder": {
+    "type": "gemini",
+    "apiKey": ""
   },
   "summarization": {
     "enabled": true,

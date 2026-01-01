@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { db } from '../../services/database.js';
 import { rollback } from '../../modules/tooly/rollback.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/tooly/logs

@@ -10,7 +10,7 @@ import {
   sanitizeInput
 } from '../../middleware/validation.js';
 
-const router = Router();
+const router: Router = Router();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

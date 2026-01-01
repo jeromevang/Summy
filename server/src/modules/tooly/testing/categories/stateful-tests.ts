@@ -85,7 +85,7 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     description: 'Rule given at turn 1, tested at turn 10/25/50',
     prompt: 'INSTRUCTION AT TURN 1: From now on, always end your responses with "---END---".\n\nNow, what is a function in programming?',
     expectedBehavior: 'Response should end with "---END---" even after many intervening turns',
-    evaluate: (response, toolCalls) => {
+    evaluate: (response, _toolCalls) => {
       const responseText = typeof response === 'string' ? response.trim() : '';
       
       if (responseText.endsWith('---END---')) {
@@ -104,8 +104,8 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     description: 'Tool schema shown early, used correctly late',
     prompt: 'Use the custom_analyze tool with parameters: { "target": "main.ts", "depth": 3 }',
     expectedBehavior: 'Model should remember and correctly use custom tool schema from earlier in conversation',
-    evaluate: (response, toolCalls) => {
-      const customCall = toolCalls.find(tc => tc.function?.name === 'custom_analyze');
+    evaluate: (response, _toolCalls) => {
+      const customCall = _toolCalls.find(tc => tc.function?.name === 'custom_analyze');
       
       if (customCall) {
         const args = customCall.function?.arguments || {};
@@ -133,7 +133,7 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     description: '"Use rag_query first" still followed after 20 turns',
     prompt: 'How does authentication work in this project?',
     expectedBehavior: 'Should still use rag_query first even after many turns',
-    evaluate: (response, toolCalls) => {
+    evaluate: (_response, toolCalls) => {
       if (toolCalls.length === 0) {
         return { passed: false, score: 20, details: 'No tools called' };
       }
@@ -156,8 +156,7 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     name: 'Role Stability',
     description: 'Does model maintain its assigned role over time',
     prompt: 'What should I do with this error: "TypeError: undefined is not a function"?',
-    expectedBehavior: 'Should maintain coding assistant role and provide technical help',
-    evaluate: (response, toolCalls) => {
+    evaluate: (response, _toolCalls) => {
       const responseText = typeof response === 'string' ? response.toLowerCase() : '';
       
       // Check for technical/coding assistant behavior
@@ -196,7 +195,7 @@ export const STATEFUL_PROBES: ProbeDefinition[] = [
     description: 'Is task context maintained across long sessions',
     prompt: 'Based on what we discussed earlier about the authentication bug, what file should we fix first?',
     expectedBehavior: 'Should reference earlier context about authentication bug',
-    evaluate: (response, toolCalls) => {
+    evaluate: (response, _toolCalls) => {
       const responseText = typeof response === 'string' ? response.toLowerCase() : '';
       
       // Check for context retention indicators
@@ -269,7 +268,6 @@ export function analyzeStatefulResults(
   const degradationCurve: number[] = [];
   
   let breakpointTurn: number | null = null;
-  let lastPassingScore = 100;
   
   for (const result of results) {
     complianceAtTurn[result.turn] = result.score;

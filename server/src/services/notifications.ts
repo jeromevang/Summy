@@ -1,6 +1,6 @@
 /**
  * Notification Service
- * Handles WebSocket broadcast of notifications to connected clients
+ * Handles WebSocket broadcast of notifications to connected clients.
  */
 
 import { WebSocket, WebSocketServer } from 'ws';
@@ -10,26 +10,63 @@ import { db, Notification } from './database.js';
 // TYPES
 // ============================================================
 
+/**
+ * Represents the payload structure for WebSocket notifications.
+ */
 export interface NotificationPayload {
+  /** The type of WebSocket message, always 'notification' for this service. */
   type: 'notification';
+  /** The action being performed on the notification (e.g., 'new', 'read', 'clear'). */
   action: 'new' | 'read' | 'clear';
+  /** The notification data, which can be a single notification, an array, or null/ID for actions. */
   data: Notification | Notification[] | { id: string } | null;
+  /** The current count of unread notifications. */
   unreadCount: number;
+  /** The ISO timestamp of when the payload was generated. */
   timestamp: string;
 }
 
+/**
+ * Defines the possible types for a notification, influencing its appearance and urgency.
+ */
 export type NotificationType = 'success' | 'warning' | 'error' | 'info';
 
 // ============================================================
 // NOTIFICATION SERVICE
 // ============================================================
 
+/**
+ * Manages the creation, storage, and broadcasting of notifications to connected WebSocket clients.
+ */
 class NotificationService {
-  private wss: WebSocketServer | null = null;
+  /** The WebSocket server instance. */
+  private _wss: WebSocketServer | null = null;
+  /** A set of currently connected WebSocket clients. */
   private clients: Set<WebSocket> = new Set();
 
   /**
-   * Initialize the notification service with a WebSocket server
+   * Sets the WebSocket server instance for the notification service.
+   * This method should be called once during server initialization.
+   * @param wss - The WebSocketServer instance to use for broadcasting.
+   */
+  public set wss(wss: WebSocketServer) {
+    this._wss = wss;
+  }
+
+  /**
+   * Retrieves the WebSocket server instance.
+   * @returns The WebSocketServer instance.
+   */
+  public get wss(): WebSocketServer {
+    if (!this._wss) {
+      throw new Error("NotificationService not initialized. Call initialize() first.");
+    }
+    return this._wss;
+  }
+
+  /**
+   * Initializes the notification service with a WebSocket server.
+   * @param wss - The WebSocketServer instance to associate with this service.
    */
   initialize(wss: WebSocketServer): void {
     this.wss = wss;
@@ -37,7 +74,9 @@ class NotificationService {
   }
 
   /**
-   * Register a WebSocket client for notifications
+   * Registers a new WebSocket client to receive notifications.
+   * Sends the initial unread count to the newly connected client.
+   * @param ws - The WebSocket instance representing the connected client.
    */
   registerClient(ws: WebSocket): void {
     this.clients.add(ws);
@@ -46,7 +85,7 @@ class NotificationService {
     this.sendToClient(ws, {
       type: 'notification',
       action: 'new',
-      data: null,
+      data: null, // No specific data for initial count
       unreadCount: db.getUnreadCount(),
       timestamp: new Date().toISOString()
     });
@@ -57,7 +96,13 @@ class NotificationService {
   }
 
   /**
-   * Create and broadcast a new notification
+   * Creates a new notification, saves it to the database, and broadcasts it to all clients.
+   * @param type - The type of the notification ('success', 'warning', 'error', 'info').
+   * @param title - The main title of the notification.
+   * @param message - An optional detailed message for the notification.
+   * @param actionLabel - An optional label for an action button within the notification.
+   * @param actionHref - An optional URL for the action button.
+   * @returns The ID of the newly created notification.
    */
   notify(
     type: NotificationType,
@@ -77,7 +122,7 @@ class NotificationService {
     };
 
     const id = db.addNotification(notification);
-    notification.id = id;
+    notification.id = id; // Assign the generated ID
 
     // Broadcast to all connected clients
     this.broadcast({
@@ -93,47 +138,89 @@ class NotificationService {
   }
 
   /**
-   * Shorthand methods for different notification types
+   * Sends a success notification.
+   * @param title - The title of the success notification.
+   * @param message - An optional detailed message.
+   * @returns The ID of the created notification.
    */
   success(title: string, message?: string): string {
     return this.notify('success', title, message);
   }
 
+  /**
+   * Sends a warning notification.
+   * @param title - The title of the warning notification.
+   * @param message - An optional detailed message.
+   * @returns The ID of the created notification.
+   */
   warning(title: string, message?: string): string {
     return this.notify('warning', title, message);
   }
 
+  /**
+   * Sends an error notification.
+   * @param title - The title of the error notification.
+   * @param message - An optional detailed message.
+   * @returns The ID of the created notification.
+   */
   error(title: string, message?: string): string {
     return this.notify('error', title, message);
   }
 
+  /**
+   * Sends an informational notification.
+   * @param title - The title of the info notification.
+   * @param message - An optional detailed message.
+   * @returns The ID of the created notification.
+   */
   info(title: string, message?: string): string {
     return this.notify('info', title, message);
   }
 
   /**
-   * Tool-related notifications
+   * Sends an informational notification indicating a tool has started execution.
+   * @param toolName - The name of the tool that started.
+   * @param args - Optional arguments passed to the tool, which will be stringified and truncated.
    */
   toolStarted(toolName: string, args?: any): void {
     this.info(`🔧 Executing: ${toolName}`, args ? JSON.stringify(args).slice(0, 100) : undefined);
   }
 
+  /**
+   * Sends a success notification indicating a tool has completed execution.
+   * @param toolName - The name of the tool that completed.
+   * @param durationMs - Optional duration in milliseconds the tool took to execute.
+   * @returns The ID of the created notification.
+   */
   toolCompleted(toolName: string, durationMs?: number): string {
     const duration = durationMs ? ` (${durationMs}ms)` : '';
     return this.success(`✅ ${toolName} completed${duration}`);
   }
 
+  /**
+   * Sends an error notification indicating a tool has failed.
+   * @param toolName - The name of the tool that failed.
+   * @param error - Optional error message or details about the failure.
+   * @returns The ID of the created notification.
+   */
   toolFailed(toolName: string, error?: string): string {
     return this.error(`❌ ${toolName} failed`, error);
   }
 
   /**
-   * Model-related notifications
+   * Sends an informational notification that a model test has started.
+   * @param modelId - The ID of the model being tested.
    */
   modelTestStarted(modelId: string): void {
     this.info(`🧪 Testing model: ${modelId}`);
   }
 
+  /**
+   * Sends a success notification that a model test has completed.
+   * @param modelId - The ID of the model that was tested.
+   * @param score - The score achieved by the model in the test.
+   * @returns The ID of the created notification.
+   */
   modelTestCompleted(modelId: string, score: number): string {
     return this.notify(
       'success',
@@ -144,27 +231,45 @@ class NotificationService {
     );
   }
 
+  /**
+   * Sends an error notification that a model test has failed.
+   * @param modelId - The ID of the model whose test failed.
+   * @param error - Optional error message or details about the failure.
+   * @returns The ID of the created notification.
+   */
   modelTestFailed(modelId: string, error?: string): string {
     return this.error(`❌ Model test failed: ${modelId}`, error);
   }
 
   /**
-   * Connection-related notifications
+   * Sends a success notification indicating the MCP server is connected.
+   * @returns The ID of the created notification.
    */
   mcpConnected(): string {
     return this.success('🔌 MCP server connected');
   }
 
+  /**
+   * Sends a warning notification indicating the MCP server is disconnected.
+   * @returns The ID of the created notification.
+   */
   mcpDisconnected(): string {
     return this.warning('⚠️ MCP server disconnected', 'Attempting to reconnect...');
   }
 
+  /**
+   * Sends a success notification indicating the MCP server has reconnected.
+   * @returns The ID of the created notification.
+   */
   mcpReconnected(): string {
     return this.success('🔌 MCP server reconnected');
   }
 
   /**
-   * Compression notifications
+   * Sends a success notification about context compression completion.
+   * @param tokensSaved - The number of tokens saved due to compression.
+   * @param percentage - The percentage of tokens saved.
+   * @returns The ID of the created notification.
    */
   compressionComplete(tokensSaved: number, percentage: number): string {
     return this.success(
@@ -174,9 +279,11 @@ class NotificationService {
   }
 
   /**
-   * Mark notification as read
+   * Marks a specific notification as read and broadcasts the update.
+   * @param id - The ID of the notification to mark as read.
    */
   markAsRead(id: string): void {
+    db.markNotificationRead(id); // Assuming this exists in database.js
     this.broadcast({
       type: 'notification',
       action: 'read',
@@ -187,7 +294,7 @@ class NotificationService {
   }
 
   /**
-   * Mark all notifications as read
+   * Marks all notifications as read and broadcasts the update.
    */
   markAllAsRead(): void {
     db.markAllNotificationsRead();
@@ -195,28 +302,32 @@ class NotificationService {
     this.broadcast({
       type: 'notification',
       action: 'read',
-      data: null,
+      data: null, // No specific notification data, action applies to all
       unreadCount: 0,
       timestamp: new Date().toISOString()
     });
   }
 
   /**
-   * Get all notifications
+   * Retrieves notifications from the database.
+   * @param unreadOnly - If true, only returns unread notifications.
+   * @param limit - The maximum number of notifications to return.
+   * @returns An array of Notification objects.
    */
   getAll(unreadOnly: boolean = false, limit: number = 20): Notification[] {
     return db.getNotifications(unreadOnly, limit);
   }
 
   /**
-   * Get unread count
+   * Retrieves the current count of unread notifications.
+   * @returns The number of unread notifications.
    */
   getUnreadCount(): number {
     return db.getUnreadCount();
   }
 
   /**
-   * Clear all notifications
+   * Clears all notifications from the database and broadcasts the update.
    */
   clearAll(): void {
     db.clearAllNotifications();
@@ -224,21 +335,22 @@ class NotificationService {
     this.broadcast({
       type: 'notification',
       action: 'clear',
-      data: null,
+      data: null, // No specific notification data, action applies to all
       unreadCount: 0,
       timestamp: new Date().toISOString()
     });
   }
 
   /**
-   * Delete a specific notification
+   * Deletes a specific notification from the database and broadcasts the update.
+   * @param id - The ID of the notification to delete.
    */
   delete(id: string): void {
     db.deleteNotification(id);
 
     this.broadcast({
       type: 'notification',
-      action: 'clear',
+      action: 'clear', // 'clear' action used for single deletion for now
       data: { id },
       unreadCount: db.getUnreadCount(),
       timestamp: new Date().toISOString()
@@ -246,7 +358,8 @@ class NotificationService {
   }
 
   /**
-   * Broadcast to all connected clients
+   * Broadcasts a payload to all connected WebSocket clients.
+   * @param payload - The `NotificationPayload` to send.
    */
   private broadcast(payload: NotificationPayload): void {
     const message = JSON.stringify(payload);
@@ -257,14 +370,16 @@ class NotificationService {
           client.send(message);
         } catch (e) {
           console.error('[Notifications] Failed to send to client:', e);
-          this.clients.delete(client);
+          this.clients.delete(client); // Remove client if sending fails
         }
       }
     });
   }
 
   /**
-   * Send to a specific client
+   * Sends a specific payload to a single WebSocket client.
+   * @param ws - The WebSocket client to send the payload to.
+   * @param payload - The `NotificationPayload` to send.
    */
   private sendToClient(ws: WebSocket, payload: NotificationPayload): void {
     if (ws.readyState === WebSocket.OPEN) {
@@ -277,7 +392,8 @@ class NotificationService {
   }
 
   /**
-   * Get connected client count
+   * Gets the number of currently connected WebSocket clients.
+   * @returns The count of connected clients.
    */
   getClientCount(): number {
     return this.clients.size;
@@ -285,5 +401,9 @@ class NotificationService {
 }
 
 // Export singleton instance
+/**
+ * The singleton instance of the NotificationService.
+ */
 export const notifications = new NotificationService();
+
 

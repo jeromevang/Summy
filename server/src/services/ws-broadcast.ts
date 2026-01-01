@@ -1,29 +1,56 @@
 /**
  * WebSocket Broadcast Service
- * Allows broadcasting messages to all connected WebSocket clients from anywhere
+ * Allows broadcasting messages to all connected WebSocket clients from anywhere.
  */
 
+/**
+ * Represents a generic WebSocket client with essential properties for broadcasting.
+ */
 type WebSocketClient = {
+  /** The current state of the WebSocket connection. */
   readyState: number;
+  /** Numeric constant indicating an open WebSocket connection. */
   OPEN: number;
+  /** Function to send data over the WebSocket connection. */
   send: (data: string) => void;
 };
 
+/**
+ * Manages broadcasting messages to all registered WebSocket clients.
+ */
 class WSBroadcastService {
   private clients: Set<WebSocketClient> = new Set();
 
+  /**
+   * Registers a new WebSocket client with the broadcasting service.
+   * @param client The WebSocket client to register.
+   */
   registerClient(client: WebSocketClient) {
     this.clients.add(client);
   }
 
+  /**
+   * Unregisters a WebSocket client from the broadcasting service.
+   * @param client The WebSocket client to unregister.
+   */
   unregisterClient(client: WebSocketClient) {
     this.clients.delete(client);
   }
 
+  /**
+   * Returns the number of currently connected WebSocket clients.
+   * @returns The number of connected clients.
+   */
   getClientCount(): number {
     return this.clients.size;
   }
 
+  /**
+   * Broadcasts a message to all registered WebSocket clients.
+   * The message includes a type, payload, and a timestamp.
+   * @param type The type of the message (e.g., 'test_progress', 'model_loading').
+   * @param payload The data payload of the message.
+   */
   broadcast(type: string, payload: any) {
     const message = JSON.stringify({ type, payload, timestamp: new Date().toISOString() });
     this.clients.forEach(client => {
@@ -34,7 +61,10 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast test progress updates
+   * Broadcasts test progress updates to all registered clients.
+   * @param testType The type of test ('probe', 'tools', 'latency').
+   * @param modelId The ID of the model being tested.
+   * @param progress The progress data, including current, total, test name, category, score, and status.
    */
   broadcastProgress(testType: 'probe' | 'tools' | 'latency', modelId: string, progress: {
     current: number;
@@ -45,7 +75,6 @@ class WSBroadcastService {
     status?: 'running' | 'completed' | 'cancelled' | 'failed';
   }) {
     console.log(`[WSBroadcast] Progress: ${testType} ${progress.current}/${progress.total} - ${progress.currentCategory || testType}: ${progress.currentTest} (clients: ${this.clients.size})`);
-    // Use 'payload' instead of spreading into root to match frontend expectations
     this.broadcast('test_progress', {
       testType,
       modelId,
@@ -58,7 +87,10 @@ class WSBroadcastService {
   }
 
   /**
-   * Infer category from test type or test name
+   * Infers the category of a test from its type or name.
+   * @param testType The general type of the test.
+   * @param testName The specific name of the test.
+   * @returns The inferred category of the test.
    */
   private inferCategory(testType: string, testName?: string): string {
     if (!testName) return testType;
@@ -83,7 +115,10 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast test completion
+   * Broadcasts test completion status to all registered clients.
+   * @param modelId The ID of the model for which the test completed.
+   * @param score The final score of the test.
+   * @param testType The type of test ('probe', 'tools', 'latency'). Defaults to 'tools'.
    */
   broadcastTestComplete(modelId: string, score: number, testType: 'probe' | 'tools' | 'latency' = 'tools') {
     console.log(`[WSBroadcast] Test complete: ${modelId} - Score: ${score} (clients: ${this.clients.size})`);
@@ -96,7 +131,10 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast model loading status
+   * Broadcasts model loading status updates to all registered clients.
+   * @param modelId The ID of the model whose status is being updated.
+   * @param status The loading status ('loading', 'unloading', 'loaded', 'unloaded', 'failed').
+   * @param message An optional descriptive message about the status.
    */
   broadcastModelLoading(modelId: string, status: 'loading' | 'unloading' | 'loaded' | 'unloaded' | 'failed', message?: string) {
     console.log(`[WSBroadcast] Model ${status}: ${modelId} - ${message || ''} (clients: ${this.clients.size})`);
@@ -106,8 +144,11 @@ class WSBroadcastService {
       message: message || `Model ${status}`
     });
   }
+  
   /**
-   * Broadcast cognitive loop trace events
+   * Broadcasts cognitive loop trace events.
+   * @param step The current step in the cognitive loop (e.g., 'search', 'understand', 'decide').
+   * @param data Optional supplementary data for the trace event.
    */
   broadcastCognitiveTrace(step: 'search' | 'understand' | 'decide' | 'act' | 'verify' | 'persist' | 'idle', data?: any) {
     this.broadcast('cognitive_trace', {
@@ -118,8 +159,8 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast agentic readiness progress
-   * Extended to support qualifying gate phase and dual-model mode
+   * Broadcasts agentic readiness progress, including qualifying gate phase and dual-model mode support.
+   * @param data The readiness progress data, including model ID, current/total progress, current test, status, score, phase, mode, and attribution.
    */
   broadcastReadinessProgress(data: {
     modelId: string;
@@ -141,7 +182,8 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast batch readiness progress
+   * Broadcasts batch readiness progress for multiple models.
+   * @param data The batch readiness progress data, including current model, total models, status, and results for each model.
    */
   broadcastBatchReadinessProgress(data: {
     currentModel: string | null;
@@ -160,7 +202,8 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast teaching progress
+   * Broadcasts teaching progress for a specific model.
+   * @param data The teaching progress data, including model ID, attempt, level, current score, phase, and failed tests by level.
    */
   broadcastTeachingProgress(data: {
     modelId: string;
@@ -175,7 +218,8 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast teaching verification progress
+   * Broadcasts teaching verification progress for a specific model.
+   * @param data The teaching verification progress data, including model ID, attempt, and phase.
    */
   broadcastTeachingVerify(data: {
     modelId: string;
@@ -187,7 +231,8 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast teaching completion
+   * Broadcasts teaching completion for a specific model.
+   * @param data The teaching completion data, including model ID, success status, final score, and number of attempts.
    */
   broadcastTeachingComplete(data: {
     modelId: string;
@@ -200,7 +245,8 @@ class WSBroadcastService {
   }
 
   /**
-   * Broadcast combo teaching progress
+   * Broadcasts combo teaching progress.
+   * @param data The combo teaching progress data, including combo ID, a descriptive message, and the current step.
    */
   broadcastComboTeachingProgress(data: {
     comboId: string;
@@ -212,5 +258,7 @@ class WSBroadcastService {
   }
 }
 
+/**
+ * The singleton instance of the WSBroadcastService.
+ */
 export const wsBroadcast = new WSBroadcastService();
-

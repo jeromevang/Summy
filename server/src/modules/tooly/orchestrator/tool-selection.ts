@@ -16,7 +16,6 @@ export function selectToolsForModel(profile: ModelProfile): { enabledTools: stri
       failureProfile,
       precedenceMatrix,
       calibration,
-      blockedCapabilities
     } = profile;
 
     let enabledTools: string[];

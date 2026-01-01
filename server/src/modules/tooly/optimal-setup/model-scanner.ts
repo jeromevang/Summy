@@ -61,7 +61,7 @@ function parseModelId(modelId: string): {
   // Common patterns: author/model-name-size-quant
   const parts = modelId.split('/');
   const author = parts.length > 1 ? parts[0] : undefined;
-  const fullName = parts[parts.length - 1];
+  const fullName = parts[parts.length - 1]!;
   
   // Extract size (7b, 13b, 32b, etc.)
   const sizeMatch = fullName.match(/(\d+\.?\d*)[bB]/);
@@ -129,11 +129,10 @@ function createDisplayName(modelId: string): string {
 
 export class ModelScanner {
   private lmstudioUrl: string;
-  private cachedModels: Map<string, ScannedModel> = new Map();
-  private lastScanTime: number = 0;
+    private cachedModels: Map<string, ScannedModel> = new Map();
+    private _lastScanTime: number = 0;
   
-  constructor(lmstudioUrl: string = 'http://localhost:1234') {
-    this.lmstudioUrl = lmstudioUrl;
+    constructor(lmstudioUrl: string = 'http://localhost:1234') {    this.lmstudioUrl = lmstudioUrl;
   }
   
   /**
@@ -203,7 +202,7 @@ export class ModelScanner {
       console.error('[ModelScanner] Failed to scan models:', error.message);
     }
     
-    this.lastScanTime = Date.now();
+    this._lastScanTime = Date.now();
     
     return {
       models,

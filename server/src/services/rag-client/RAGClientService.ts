@@ -1,10 +1,9 @@
-import { ChildProcess, spawn } from 'child_process';
-import { RAGConfig, RAGStats, RAGQueryResult } from './types.js';
+import { RAGQueryResult } from './types.js';
 
 export class RAGClient {
   private serverProcess: ChildProcess | null = null;
 
-  constructor(private serverPath: string, private httpUrl: string) {}
+  constructor(private _serverPath: string, private httpUrl: string) {}
 
   async healthCheck(): Promise<boolean> {
     try {

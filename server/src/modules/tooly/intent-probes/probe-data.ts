@@ -10,7 +10,7 @@ export const INTENT_PROBES: IntentProbeDefinition[] = [
     shouldInvoke: true,
     expectedTools: ['rag_query'],
     acceptableTools: ['read_file', 'search_files'],
-    evaluateIntent: (response, toolCalls) => {
+    evaluateIntent: (_response, toolCalls) => {
       const toolsInvoked = toolCalls.map(tc => tc.function?.name);
       const usedRag = toolsInvoked.includes('rag_query');
       const usedAnySearch = toolsInvoked.some(t => ['rag_query', 'search_files', 'read_file'].includes(t));
@@ -35,7 +35,7 @@ export const INTENT_PROBES: IntentProbeDefinition[] = [
     explicitness: 'neutral',
     shouldInvoke: false,
     expectedTools: [],
-    evaluateIntent: (response, toolCalls) => {
+    evaluateIntent: (_response, toolCalls) => {
       const noTools = toolCalls.length === 0;
       return {
         id: '8.3a',

@@ -21,10 +21,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@summy/database": "*",
+    "@summy/database": "workspace:*",
     "ignore": "^7.0.5",
     "playwright": "^1.57.0",
-    "zod": "3.25"
+    "zod": "3.25",
+    "fs-extra": "^11.3.3"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.25.1",
@@ -32,6 +33,7 @@
     "@types/node": "^20.19.27",
     "express": "^5.2.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@types/fs-extra": "^11.0.4"
   }
 }

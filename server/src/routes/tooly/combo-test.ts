@@ -1,12 +1,12 @@
 import { Router } from 'express';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/tooly/combo-test/results
  * Get combo test results
  */
-router.get('/combo-test/results', (req, res) => {
+router.get('/combo-test/results', (_req, res) => {
   try {
     res.json({ results: [] });
   } catch (error: any) {
@@ -18,7 +18,7 @@ router.get('/combo-test/results', (req, res) => {
  * GET /api/tooly/prosthetics
  * Get prosthetics (used by multiple pages)
  */
-router.get('/prosthetics', (req, res) => {
+router.get('/prosthetics', (_req, res) => {
   try {
     res.json({ 
       prosthetics: [],
@@ -38,7 +38,7 @@ router.get('/prosthetics', (req, res) => {
  * GET /api/tooly/distillation/capabilities
  * Get distillation capabilities
  */
-router.get('/distillation/capabilities', (req, res) => {
+router.get('/distillation/capabilities', (_req, res) => {
   try {
     res.json({ capabilities: [] });
   } catch (error: any) {

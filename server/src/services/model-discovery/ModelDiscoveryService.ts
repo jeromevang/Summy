@@ -1,7 +1,6 @@
 import axios from 'axios';
-import fs from 'fs-extra';
-import path from 'path';
 import { LMStudioClient } from '@lmstudio/sdk';
+
 import { ModelDiscoveryResult, DiscoveredModel } from './types.js';
 
 export class ModelDiscoveryService {

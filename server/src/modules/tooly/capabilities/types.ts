@@ -189,6 +189,8 @@ export interface EfficiencyMetrics {
   ragWasteRatio: number; // Unused retrieved context / total retrieved
   planningVerbosity: number; // Planning tokens / execution tokens
   redundantToolCalls: number;
+  estimatedCostPerTask?: number;
+  speedEfficiencyScore?: number;
 }
 
 export interface ConfidenceCalibration {

@@ -197,10 +197,12 @@ export function detectAntiPatterns(results: TestResult[]): AntiPattern[] {
   const detected: AntiPattern[] = [];
 
   // Over-tooling detection
-  const overToolingCount = results.filter(r => {
-    // This would need conversation history to detect properly
-    return false; // Placeholder
-  }).length;
+  // This would need conversation history to detect properly
+  // Currently, overToolingCount is not used and filter always returns false.
+  // This section is commented out for now as it's not fully implemented.
+  // const overToolingCount = results.filter(r => {
+  //   return false; // Placeholder
+  // }).length;
 
   // Tool hallucination detection
   const hallucinatedTools = results.filter(r =>

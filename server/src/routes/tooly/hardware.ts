@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { systemMetrics } from '../../services/system-metrics.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/tooly/optimal-setup/hardware
  * Get system hardware information for readiness assessment
  */
-router.get('/optimal-setup/hardware', async (req, res) => {
+router.get('/optimal-setup/hardware', async (_req, res) => {
   try {
     const metrics = await systemMetrics.collectMetrics();
     

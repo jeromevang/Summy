@@ -2,13 +2,13 @@ import { Router } from 'express';
 import { capabilities } from '../../modules/tooly/capabilities.js';
 import { calculateBaselineComparison } from '../../modules/tooly/scoring/agentic-scorer.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * POST /api/tooly/baseline/generate
  * Automatically generate ground truth baselines using Gemini
  */
-router.post('/baseline/generate', async (req, res) => {
+router.post('/baseline/generate', async (_req, res) => {
   try {
     // Dynamic import to avoid loading engine if not needed
     const { baselineEngine } = await import('../../modules/tooly/baseline-engine.js');
@@ -28,7 +28,7 @@ router.post('/baseline/generate', async (req, res) => {
  * GET /api/tooly/baseline/compare/:modelId
  * Compare a model's performance against the ground truth baseline
  */
-router.get('/baseline/compare/:modelId', async (req, res) => {
+router.get('/baseline/compare/:modelId', async (_req, res) => {
   try {
     const { modelId } = req.params;
     const decodedModelId = decodeURIComponent(modelId);

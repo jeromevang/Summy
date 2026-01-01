@@ -7,7 +7,7 @@
 
 import { intentRouter } from '../intent-router.js';
 import { getToolSchemas } from '../tool-prompts.js';
-import { SANDBOX_CONTEXT } from './readiness-runner';
+import { SANDBOX_CONTEXT } from './combo-test-definitions.js';
 
 // ============================================================
 // TYPES
@@ -160,7 +160,7 @@ export class ContextFillTester {
   /**
    * Run baseline test (0% fill) to establish quality baseline
    */
-  async runBaseline(modelId: string): Promise<{ qualityScore: number; latencyMs: number }> {
+  async runBaseline(_modelId: string): Promise<{ qualityScore: number; latencyMs: number }> {
     const testPrompt = "Read node-api/src/index.ts and tell me what express middleware is used.";
     
     const startTime = Date.now();
@@ -200,7 +200,7 @@ export class ContextFillTester {
    * Run context fill test at a specific level
    */
   async runContextFillTest(
-    modelId: string,
+    _modelId: string,
     fillLevel: number, // 25, 50, 75, 90
     contextLimit: number
   ): Promise<ContextFillResult> {

@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { format } from 'date-fns';
-import { LogEntry, LogStats, LogFilter, LogLevel, LogType } from './types.js';
+import { LogEntry, LogStats, LogLevel } from './types.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -10,7 +10,6 @@ const __dirname = path.dirname(__filename);
 export class LogRotationManager {
   private logDir: string = path.join(__dirname, '../../../../logs');
   private maxFileSize: number = 50 * 1024 * 1024;
-  private maxFiles: number = 10;
   private currentLogFile: string;
   private currentFileSize: number = 0;
 

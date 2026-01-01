@@ -1,8 +1,9 @@
-import { contextPrism } from './context/context-prism.js';
-import { decisionEngine } from './context/decision-engine.js';
-import { verificationLoop } from './context/verification.js';
-import { swarmRouter } from './orchestrator/swarm-router.js';
-import { wsBroadcast } from '../../services/ws-broadcast.js';
+import { contextPrism } from '../context/context-prism.ts';
+import { decisionEngine } from '../context/decision-engine.ts';
+import { verificationLoop } from '../context/verification.ts';
+import { swarmRouter } from '../orchestrator/swarm-router.ts';
+import { wsBroadcast } from '@services/ws-broadcast';
+import { IntentSchema } from '../types.ts';
 
 export class CognitiveEngine {
     async executeLoop(query: string, projectPath: string, openFiles: string[] = []) {
@@ -11,13 +12,13 @@ export class CognitiveEngine {
             const context = await contextPrism.scan(query, projectPath, openFiles);
             wsBroadcast.broadcastCognitiveTrace('understand', { log: 'Distilling context...' });
             const mentalModel = await contextPrism.distill(context, query);
-            const intent = decisionEngine.decide(mentalModel, query);
-            wsBroadcast.broadcastCognitiveTrace('decide', { log: `Decision: ${intent.strategy.toUpperCase()}`, intent });
+            const intent: IntentSchema = decisionEngine.decide(mentalModel, query);
+            wsBroadcast.broadcastCognitiveTrace('decide', { log: `Decision: ${intent.action.toUpperCase()}`, intent });
             const assignedModel = await swarmRouter.executeIntent(intent);
             if (assignedModel) {
                 await new Promise(r => setTimeout(r, 2000));
                 const verification = await verificationLoop.verify(intent, "Success", 0);
-                await verificationLoop.persist(intent, verification, query);
+                await verificationLoop.persist(verification);
             }
             wsBroadcast.broadcastCognitiveTrace('idle', { log: 'Complete.' });
         } catch (error: any) {

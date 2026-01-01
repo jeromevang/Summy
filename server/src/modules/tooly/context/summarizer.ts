@@ -214,7 +214,8 @@ export class Summarizer {
           { timeout: this.config.timeout }
         );
 
-        const summary = response.data.choices?.[0]?.message?.content;
+        if (!response.data) return null;
+      const summary = (response.data as any).choices?.[0]?.message?.content;
         if (summary) return summary;
       } catch (error) {
         console.log('[Summarizer] RAG summary fallback');
@@ -250,7 +251,7 @@ export class Summarizer {
         { timeout: this.config.timeout }
       );
 
-      return response.data.choices?.[0]?.message?.content || null;
+      return (response.data as any).choices?.[0]?.message?.content || null;
     } catch (error) {
       return null;
     }
@@ -291,19 +292,25 @@ export class Summarizer {
         { timeout: this.config.timeout }
       );
 
-      const content = response.data.choices?.[0]?.message?.content || '';
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!response.data) return undefined;
+      if (!response.data) return undefined;
+      if (!response.data) return undefined;
+      if (response.data.choices && response.data.choices.length > 0) {
+      if (!response.data) return null;
+      const content = (response.data as any).choices?.[0]?.message?.content || '';
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
 
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        return {
-          turns: turns.length,
-          summary: parsed.summary || '',
-          keyTopics: parsed.keyTopics || [],
-          pendingItems: parsed.pendingItems || [],
-          importantFacts: parsed.importantFacts || [],
-          aiGenerated: true
-        };
+        if (jsonMatch && jsonMatch[0]) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          return {
+            turns: turns.length,
+            summary: parsed.summary || '',
+            keyTopics: parsed.keyTopics || [],
+            pendingItems: parsed.pendingItems || [],
+            importantFacts: parsed.importantFacts || [],
+            aiGenerated: true
+          };
+        }
       }
     } catch (error) {
       // Fall through to fallback
@@ -343,8 +350,8 @@ export class Summarizer {
     let charCount = 0;
 
     // First sentence
-    result.push(sentences[0].trim());
-    charCount += sentences[0].length;
+    result.push(sentences[0]?.trim());
+    charCount += sentences[0]?.length || 0;
 
     // Key sentences from middle (those with important keywords)
     const keywords = ['function', 'class', 'return', 'import', 'export', 'const', 'let', 'def', 'if', 'for'];
@@ -362,7 +369,7 @@ export class Summarizer {
 
     // Last sentence
     if (charCount < targetChars) {
-      result.push(sentences[sentences.length - 1].trim());
+      result.push(sentences[sentences.length - 1]?.trim());
     }
 
     return result.join('. ') + '.';

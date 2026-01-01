@@ -11,7 +11,6 @@ export const executeAgenticLoop = async (
   initialResponse: any,
   initialMessages: any[],
   llmCallFn: (messages: any[]) => Promise<any>,
-  ideConfig: any,
   sessionId: string,
   maxIterations: number = 10,
   res?: any,

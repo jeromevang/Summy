@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./client" },
+    { "path": "./server" },
+    { "path": "./mcp-server" },
+    { "path": "./rag-server" },
+    { "path": "./database" },
+    { "path": "./packages/shared" },
+    { "path": "./packages/types" }
+  ]
+}

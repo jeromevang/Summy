@@ -156,7 +156,7 @@ export class PatternExtractor {
         const pattern: LearnedPattern = {
           id: `${rule.id}_${Date.now()}`,
           patternType: rule.type,
-          trigger: this.extractTrigger(original, context),
+trigger: this.extractTrigger(original),
           action: rule.extractAction(match, context),
           confidence: rule.baseConfidence,
           successRate: 1.0,
@@ -174,7 +174,7 @@ export class PatternExtractor {
     }
     
     // Try semantic extraction if no rule matched
-    return this.semanticExtraction(original, correction, context);
+    return this.semanticExtraction(original, correction);
   }
   
   /**
@@ -192,7 +192,7 @@ export class PatternExtractor {
       const pattern: LearnedPattern = {
         id: `workflow_${Date.now()}`,
         patternType: 'workflow',
-        trigger: this.extractTrigger(interaction.userRequest, ''),
+        trigger: this.extractTrigger(interaction.userRequest),
         action: `Tool sequence: ${workflow}`,
         confidence: 60,
         successRate: 1.0,
@@ -215,7 +215,7 @@ export class PatternExtractor {
   /**
    * Extract trigger keywords from the original request
    */
-  private extractTrigger(original: string, context: string): string {
+  private extractTrigger(original: string): string {
     // Extract key action words
     const actionWords = original.match(/\b(read|write|edit|create|delete|find|search|list|get|set|update)\b/gi);
     if (actionWords && actionWords.length > 0) {
@@ -231,8 +231,7 @@ export class PatternExtractor {
    */
   private semanticExtraction(
     original: string,
-    correction: string,
-    context: string
+    correction: string
   ): ExtractionResult {
     // Look for negation patterns
     if (correction.toLowerCase().includes("don't") || 
@@ -240,7 +239,7 @@ export class PatternExtractor {
       const pattern: LearnedPattern = {
         id: `anti_${Date.now()}`,
         patternType: 'anti-pattern',
-        trigger: this.extractTrigger(original, context),
+        trigger: this.extractTrigger(original),
         action: correction.slice(0, 100),
         confidence: 50,
         successRate: 1.0,

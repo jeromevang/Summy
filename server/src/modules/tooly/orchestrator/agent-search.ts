@@ -86,7 +86,7 @@ export class AgentSearch {
     // SYMBOL SEARCH
     // ============================================================
 
-    async searchSymbols(query: string, projectPath?: string): Promise<SymbolInfo[]> {
+    async searchSymbols(query: string): Promise<SymbolInfo[]> {
         const symbols: SymbolInfo[] = [];
 
         // Extract potential symbol names from query
@@ -104,7 +104,7 @@ export class AgentSearch {
             const classMatches = result.matchAll(/class\s+(\w+)(?:\s+extends\s+(\w+))?/g);
             for (const match of classMatches) {
                 symbols.push({
-                    name: match[1],
+                    name: match[1]!,
                     type: 'class',
                     file: 'unknown',
                     signature: match[0]
@@ -115,7 +115,7 @@ export class AgentSearch {
             const funcMatches = result.matchAll(/(?:async\s+)?function\s+(\w+)\s*\([^)]*\)/g);
             for (const match of funcMatches) {
                 symbols.push({
-                    name: match[1],
+                    name: match[1]!,
                     type: 'function',
                     file: 'unknown',
                     signature: match[0]
@@ -126,7 +126,7 @@ export class AgentSearch {
             const interfaceMatches = result.matchAll(/interface\s+(\w+)/g);
             for (const match of interfaceMatches) {
                 symbols.push({
-                    name: match[1],
+                    name: match[1]!,
                     type: 'interface',
                     file: 'unknown'
                 });
@@ -149,16 +149,16 @@ export class AgentSearch {
             // Extract interface with properties
             const interfaceMatch = result.match(/interface\s+(\w+)\s*\{([^}]+)\}/);
             if (interfaceMatch) {
-                const name = interfaceMatch[1];
-                const body = interfaceMatch[2];
+                const name = interfaceMatch[1]!;
+                const body = interfaceMatch[2]!;
 
                 const properties: SchemaInfo['properties'] = [];
                 const propMatches = body.matchAll(/(\w+)(\?)?:\s*([^;]+);?/g);
 
                 for (const prop of propMatches) {
                     properties.push({
-                        name: prop[1],
-                        type: prop[3].trim(),
+                        name: prop[1]!,
+                        type: prop[3]!.trim(),
                         required: !prop[2]
                     });
                 }
@@ -179,7 +179,7 @@ export class AgentSearch {
     // API SURFACE SCANNING
     // ============================================================
 
-    async scanApiSurface(projectPath?: string): Promise<ApiSurface[]> {
+    async scanApiSurface(): Promise<ApiSurface[]> {
         const apis: ApiSurface[] = [];
 
         // Search for route definitions
@@ -191,8 +191,8 @@ export class AgentSearch {
 
             for (const match of routeMatches) {
                 apis.push({
-                    endpoint: match[2],
-                    method: match[1].toUpperCase() as ApiSurface['method'],
+                    endpoint: match[2]!,
+                    method: match[1]!.toUpperCase() as ApiSurface['method'],
                     handler: 'inline',
                     file: 'unknown'
                 });
@@ -230,7 +230,7 @@ export class AgentSearch {
 
         if (options.includeSymbols) {
             promises.push(
-                this.searchSymbols(query, options.projectPath).then(symbols => {
+                this.searchSymbols(query).then(symbols => {
                     context.symbols = symbols.map(s => `${s.type}:${s.name}`);
                 })
             );
@@ -246,7 +246,7 @@ export class AgentSearch {
 
         if (options.includeApi) {
             promises.push(
-                this.scanApiSurface(options.projectPath).then(apis => {
+                this.scanApiSurface().then(apis => {
                     context.apiSurfaces = apis.map(a => `${a.method} ${a.endpoint}`);
                 })
             );

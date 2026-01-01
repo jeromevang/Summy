@@ -14,9 +14,9 @@
  */
 
 import { ReadinessRunner } from '../testing/readiness-runner';
-import { getReadinessConfig, type ReadinessResult } from '../testing/agentic-readiness-suite.js';
+import { loadTestSuite, type ReadinessResult } from '../testing/agentic-readiness-suite.js';
 import { prostheticStore, buildProstheticPrompt } from '../learning/prosthetic-store.js';
-import { capabilities as modelCapabilities } from '../capabilities.js';
+import { capabilities, ALL_TOOLS } from '../capabilities.js';
 
 // ============================================================
 // TYPES
@@ -32,13 +32,7 @@ export interface TeachingResult {
   probesFixed: string[];
   probesRemaining: string[];
   failedTestsByLevel: { level: number; count: number }[];
-  improvements: {
-    tool: number;
-    rag: number;
-    reasoning: number;
-    intent: number;
-    browser: number;
-  };
+  improvements: ScoreImprovements;
   certified: boolean;
   log: string[];
 }
@@ -47,6 +41,15 @@ interface TeachingOptions {
   maxAttempts?: number;
   startLevel?: 1 | 2 | 3 | 4;
   targetScore?: number;
+}
+
+// Define the specific structure for score improvements
+interface ScoreImprovements {
+  tool: number;
+  rag: number;
+  reasoning: number;
+  intent: number;
+  browser: number;
 }
 
 // Import WSBroadcastService type (or use inline interface)
@@ -102,7 +105,7 @@ export class ProstheticLoop {
     const {
       maxAttempts = 3,
       startLevel = 1,
-      targetScore = getReadinessConfig().threshold
+      targetScore = loadTestSuite().config.threshold
     } = options;
 
     const log: string[] = [];
@@ -134,9 +137,15 @@ export class ProstheticLoop {
     this.log(log, `Failed tests: ${initialResult.failedTests.length}`);
 
     // Track initial failed tests at level 0
-    failedTestsByLevel.push({
-      level: 0,
-      count: initialResult.failedTests.length
+    failedTestsByLevel.push({ level: 0, count: initialResult.failedTests.length } as { level: number; count: number });      this.log(log, `
+--- Attempt ${attempts} (Level ${currentLevel}) ---`);
+    this.broadcast?.broadcastTeachingProgress({
+      modelId,
+      attempt: attempts,
+      level: currentLevel,
+      currentScore: currentResult.overallScore,
+      phase: 'teaching_attempt',
+      failedTestsByLevel
     });
 
     // Check if already passing
@@ -150,11 +159,11 @@ export class ProstheticLoop {
       attempts++;
 
       // Track failed tests at current level (before applying prosthetic)
-      failedTestsByLevel.push({
-        level: currentLevel,
-        count: currentResult.failedTests.length
-      });
-      this.log(log, `\n--- Attempt ${attempts} (Level ${currentLevel}) ---`);
+          failedTestsByLevel.push({
+            level: currentLevel,
+            count: currentResult.failedTests.length
+          } as { level: number; count: number });      this.log(log, `
+--- Attempt ${attempts} (Level ${currentLevel}) ---`);
       this.broadcast?.broadcastTeachingProgress({
         modelId,
         attempt: attempts,
@@ -167,10 +176,10 @@ export class ProstheticLoop {
       // Step 2a: Generate prosthetic based on failures
       const failedTestDetails = currentResult.testResults
         .filter(t => !t.passed)
-        .map(t => ({ 
-          id: t.testId, 
-          category: t.category, 
-          details: t.details 
+        .map(t => ({
+          id: t.testId,
+          category: t.category,
+          details: t.details
         }));
 
       const prostheticPrompt = buildProstheticPrompt(failedTestDetails, currentLevel);
@@ -225,20 +234,14 @@ export class ProstheticLoop {
     const certified = currentResult.overallScore >= targetScore;
     
     if (certified) {
-      this.log(log, '\n=== TEACHING COMPLETE: Model Certified ===');
+      this.log(log, '
+=== TEACHING COMPLETE: Model Certified ===');
       // Update model profile with certification
       await this.certifyModel(modelId, currentResult);
     } else {
-      this.log(log, '\n=== TEACHING INCOMPLETE: Target not reached ===');
+      this.log(log, '=== TEACHING INCOMPLETE: Target not reached ===');
       this.log(log, `Final score: ${currentResult.overallScore}% (target: ${targetScore}%)`);
     }
-
-    this.broadcast?.broadcastTeachingComplete({
-      modelId,
-      success: certified,
-      finalScore: currentResult.overallScore,
-      attempts
-    });
 
     return this.buildResult(
       initialResult,
@@ -280,7 +283,9 @@ export class ProstheticLoop {
 
       // Add or update the prosthetic system prompt
       const existingPrompt = profile!.systemPrompt || '';
-      const newPrompt = prostheticPrompt + '\n\n' + existingPrompt;
+      const newPrompt = prostheticPrompt + '
+
+' + existingPrompt;
 
       profile!.systemPrompt = newPrompt;
       profile!.prostheticApplied = true;
@@ -336,13 +341,13 @@ export class ProstheticLoop {
   private calculateImprovements(
     initial: ReadinessResult,
     current: ReadinessResult
-  ): TeachingResult['improvements'] {
+  ): ScoreImprovements {
     return {
-      tool: current.categoryScores.tool - initial.categoryScores.tool,
-      rag: current.categoryScores.rag - initial.categoryScores.rag,
-      reasoning: current.categoryScores.reasoning - initial.categoryScores.reasoning,
-      intent: current.categoryScores.intent - initial.categoryScores.intent,
-      browser: current.categoryScores.browser - initial.categoryScores.browser,
+      tool: (current.categoryScores?.tool ?? 0) - (initial.categoryScores?.tool ?? 0),
+      rag: (current.categoryScores?.rag ?? 0) - (initial.categoryScores?.rag ?? 0),
+      reasoning: (current.categoryScores?.reasoning ?? 0) - (initial.categoryScores?.reasoning ?? 0),
+      intent: (current.categoryScores?.intent ?? 0) - (initial.categoryScores?.intent ?? 0),
+      browser: (current.categoryScores?.browser ?? 0) - (initial.categoryScores?.browser ?? 0),
     };
   }
 
@@ -396,4 +401,3 @@ export function createProstheticLoop(
 ): ProstheticLoop {
   return new ProstheticLoop(runner, broadcast);
 }
-

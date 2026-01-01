@@ -1,12 +1,12 @@
 import { ComboTester, ComboScore } from '../../testing/combo-tester.js';
-import { BroadcastService, ComboTeachingResult } from './types.js';
+import { ComboTeachingResult } from './types.js';
 import { prostheticStore, buildProstheticPrompt } from '../../learning/prosthetic-store.js';
-import { failureLog } from '../../../../services/failure-log.js';
+import type { ComboTestResult } from '../../testing/test-types.js';
 
 export class ComboTeachingLoop {
   constructor(private tester: ComboTester, private broadcast?: any) {}
 
-  async runTeachingCycle(mainModelId: string, executorModelId: string, options: any = {}): Promise<ComboTeachingResult> {
+  async runTeachingCycle(mainModelId: string, executorModelId: string): Promise<ComboTeachingResult> {
     const log: string[] = [];
     const logMsg = (msg: string) => {
       console.log(`[ComboTeaching] ${msg}`);
@@ -98,9 +98,9 @@ export class ComboTeachingLoop {
   }
 
   private buildResult(main: string, exec: string, initial: ComboScore, final: ComboScore, improved: boolean, log: string[], level: number = 1): ComboTeachingResult {
-      const initialFailed = initial.testResults.filter(r => !r.passed).map(r => r.testId);
-      const finalFailed = final.testResults.filter(r => !r.passed).map(r => r.testId);
-      const testsImproved = initialFailed.filter(id => !finalFailed.includes(id));
+      const initialFailed = initial.testResults.filter((r: ComboTestResult) => !r.passed).map((r: ComboTestResult) => r.testId);
+      const finalFailed = final.testResults.filter((r: ComboTestResult) => !r.passed).map((r: ComboTestResult) => r.testId);
+      const testsImproved = initialFailed.filter((id: string) => !finalFailed.includes(id));
       
       return {
           success: improved,

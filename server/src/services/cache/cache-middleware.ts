@@ -10,7 +10,7 @@ import { addDebugEntry } from '../logger';
 /**
  * Cache middleware for model profiles
  */
-export const cacheModelProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const cacheModelProfile = async (_req: Request, _res: Response, next: NextFunction): Promise<void> => {
   const modelId = req.params.modelId;
   
   if (!modelId) {
@@ -45,7 +45,7 @@ export const cacheModelProfile = async (req: Request, res: Response, next: NextF
 /**
  * Cache middleware for test results
  */
-export const cacheTestResults = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const cacheTestResults = async (_req: Request, _res: Response, next: NextFunction): Promise<void> => {
   const modelId = req.params.modelId;
   const testMode = req.query.testMode as string;
   
@@ -83,7 +83,7 @@ export const cacheTestResults = async (req: Request, res: Response, next: NextFu
 /**
  * Cache middleware for combo results
  */
-export const cacheComboResults = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const cacheComboResults = async (_req: Request, _res: Response, next: NextFunction): Promise<void> => {
   const { mainModelId, executorModelId } = req.body;
   
   if (!mainModelId || !executorModelId) {
@@ -119,7 +119,7 @@ export const cacheComboResults = async (req: Request, res: Response, next: NextF
 /**
  * Cache invalidation middleware
  */
-export const invalidateCache = (req: Request, res: Response, next: NextFunction): void => {
+export const invalidateCache = (_req: Request, _res: Response, next: NextFunction): void => {
   // Invalidate cache after successful operations
   const originalJson = res.json;
   
@@ -152,7 +152,7 @@ export const invalidateCache = (req: Request, res: Response, next: NextFunction)
 /**
  * Cache stats endpoint middleware
  */
-export const cacheStatsMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+export const cacheStatsMiddleware = (_req: Request, _res: Response, next: NextFunction): void => {
   try {
     const stats = cacheService.getStats();
     res.json({

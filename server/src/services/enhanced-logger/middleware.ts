@@ -2,10 +2,10 @@ import { logger } from './EnhancedLogger.js';
 
 export const loggingMiddleware = (req: any, res: any, next: any): void => {
   req.logger = logger;
-  const startTime = Date.now();
-  const originalEnd = res.end;
+  const _startTime = Date.now();
+  const _originalEnd = res.end;
 
-  const requestId = req.headers['x-request-id'] || `req_${Date.now()}`;
+  const _requestId = req.headers['x-request-id'] || `req_${Date.now()}`;
   const start = Date.now();
 
   res.on('finish', () => {

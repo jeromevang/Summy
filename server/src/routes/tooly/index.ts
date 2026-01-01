@@ -21,7 +21,7 @@ import {
   sanitizeInput
 } from '../../middleware/validation.js';
 
-const router = Router();
+const router: Router = Router();
 
 // Apply security and audit middleware to all routes
 router.use(addSecurityHeaders());
@@ -29,7 +29,7 @@ router.use(auditLog());
 router.use(apiRateLimit);
 
 // Apply input sanitization to all routes
-router.use((req, res, next) => {
+router.use((req, _res, next) => {
   if (req.query) {
     for (const [key, value] of Object.entries(req.query)) {
       if (typeof value === 'string') {

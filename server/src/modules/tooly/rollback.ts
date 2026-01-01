@@ -5,12 +5,15 @@
 
 import fs from 'fs-extra';
 import path from 'path';
-import { db, FileBackup } from '../../services/database.js';
-import { notifications } from '../../services/notifications.js';
+import { v4 as uuidv4 } from 'uuid';
+// Removed DB imports as we are moving to file-based backups
+// import { db, FileBackup } from '../../services/database.js';
+// Removed DB notifications import
+// import { notifications } from '../../services/notifications.js';
 
-// ============================================================
+// ============================================================ 
 // TYPES
-// ============================================================
+// ============================================================ 
 
 export interface RollbackResult {
   success: boolean;
@@ -18,9 +21,15 @@ export interface RollbackResult {
   message: string;
 }
 
-// ============================================================
+// Define a simple type for backup map entries
+interface BackupInfo {
+  originalFilePath: string;
+  backupFilePath: string;
+}
+
+// ============================================================ 
 // TOOLS THAT SUPPORT ROLLBACK
-// ============================================================
+// ============================================================ 
 
 export const ROLLBACK_SUPPORTED_TOOLS = [
   'file_write',
@@ -28,25 +37,32 @@ export const ROLLBACK_SUPPORTED_TOOLS = [
   'create_new_file'
 ];
 
-// ============================================================
+// ============================================================ 
 // ROLLBACK SERVICE
-// ============================================================
+// ============================================================ 
 
 class RollbackService {
-  private retentionHours: number = 24;
+  // retentionHours is no longer directly used for DB cleanup, but might be relevant for file cleanup logic later
+  // retentionHours: number = 24;
+
+  // Constants for file-based backup management
+  private readonly TEMP_BASE_DIR: string = 'C:/Users/jvgeu/.gemini/tmp/56da5016ba1b35bedd32c75a0ffca4b1925601bfe2a9beee7b5f170f1f2c6023';
+  private readonly BACKUP_SUBDIR: string = 'backups';
+  private readonly BACKUP_DIR: string = path.join(this.TEMP_BASE_DIR, this.BACKUP_SUBDIR);
+  private readonly BACKUP_MAP_FILE: string = path.join(this.TEMP_BASE_DIR, 'backup_map.json');
 
   /**
-   * Create a backup before a file operation
-   * Returns backup ID if successful, null if file doesn't exist
+   * Creates a backup of a file to the local file system.
+   * Returns the backup ID if successful, null if file doesn't exist or an error occurs.
    */
   async createBackup(
     filePath: string,
-    executionLogId: string
+    executionLogId: string // Kept for context, though not directly used in file naming/mapping here
   ): Promise<string | null> {
     try {
-      // Check if file exists
       const absolutePath = path.resolve(filePath);
       
+      // Check if file exists
       if (!await fs.pathExists(absolutePath)) {
         // File doesn't exist (new file), no backup needed
         return null;
@@ -55,58 +71,91 @@ class RollbackService {
       // Read original content
       const originalContent = await fs.readFile(absolutePath, 'utf-8');
 
-      // Calculate expiration
-      const expiresAt = new Date(Date.now() + this.retentionHours * 60 * 60 * 1000).toISOString();
+      const backupId = uuidv4();
+      const backupFileName = `${backupId}-${path.basename(filePath)}`;
+      const backupFilePath = path.join(thisD.BACKUP_DIR, backupFileName);
 
-      // Create backup in database
-      const backupId = db.createBackup({
-        executionLogId,
-        filePath: absolutePath,
-        originalContent,
-        expiresAt
-      });
+      // Ensure backup directory exists
+      await fs.ensureDir(this.BACKUP_DIR);
 
-      console.log(`[Rollback] Created backup ${backupId} for ${filePath}`);
+      // Write the backup file
+      await fs.writeFile(backupFilePath, originalContent, 'utf-8');
+
+      // Update the backup map file to store the mapping between backupId and file paths
+      let backupMap: Record<string, BackupInfo> = {};
+      try {
+        if (await fs.pathExists(this.BACKUP_MAP_FILE)) {
+          const mapData = await fs.readFile(this.BACKUP_MAP_FILE, 'utf-8');
+          backupMap = JSON.parse(mapData);
+        }
+      } catch (e) {
+        console.error(`[Rollback] Error reading backup map ${this.BACKUP_MAP_FILE}:`, e);
+        // Proceeding, will overwrite the map if read failed
+      }
+
+      backupMap[backupId] = { originalFilePath: absolutePath, backupFilePath: backupFilePath };
+      await fs.writeFile(this.BACKUP_MAP_FILE, JSON.stringify(backupMap, null, 2), 'utf-8');
+
+      console.log(`[Rollback] Created file backup ${backupId} for ${filePath} at ${backupFilePath}`);
       return backupId;
 
     } catch (error: any) {
-      console.error(`[Rollback] Failed to create backup for ${filePath}:`, error.message);
+      console.error(`[Rollback] Failed to create file backup for ${filePath}:`, error.message);
       return null;
     }
   }
 
   /**
-   * Restore a file from backup
+   * Restores a file from a previously created backup.
    */
   async restore(backupId: string): Promise<RollbackResult> {
     try {
-      // Get backup from database
-      const backup = db.getBackup(backupId);
-      
-      if (!backup) {
-        return {
-          success: false,
-          filePath: '',
-          message: 'Backup not found'
-        };
+      // Read backup map to find file paths
+      let backupMap: Record<string, BackupInfo> = {};
+      if (!await fs.pathExists(this.BACKUP_MAP_FILE)) {
+        return { success: false, filePath: '', message: 'Backup map file not found.' };
+      }
+      try {
+        const mapData = await fs.readFile(this.BACKUP_MAP_FILE, 'utf-utf-8');
+        backupMap = JSON.parse(mapData);
+      } catch (e) {
+        console.error(`[Rollback] Error reading backup map ${this.BACKUP_MAP_FILE}:`, e);
+        return { success: false, filePath: '', message: 'Failed to read backup map.' };
       }
 
-      // Restore file content
-      await fs.writeFile(backup.filePath, backup.originalContent, 'utf-8');
+      const backupInfo = backupMap[backupId];
+      if (!backupInfo) {
+        return { success: false, filePath: '', message: `Backup ID ${backupId} not found in map.` };
+      }
 
-      // Mark backup as restored
-      db.markBackupRestored(backupId);
+      const { originalFilePath, backupFilePath } = backupInfo;
 
-      console.log(`[Rollback] Restored ${backup.filePath} from backup ${backupId}`);
+      // Check if the backup file exists
+      if (!await fs.pathExists(backupFilePath)) {
+        return { success: false, filePath: originalFilePath, message: `Backup file not found at ${backupFilePath}` };
+      }
+
+      // Read content from backup file
+      const originalContent = await fs.readFile(backupFilePath, 'utf-8');
+
+      // Write content back to the original file path
+      await fs.writeFile(originalFilePath, originalContent, 'utf-8');
+
+      // Remove the entry from the map after successful restore
+      delete backupMap[backupId];
+      await fs.writeFile(this.BACKUP_MAP_FILE, JSON.stringify(backupMap, null, 2), 'utf-8');
+
+      console.log(`[Rollback] Restored ${originalFilePath} from backup ${backupId}`);
       
-      notifications.success(
-        '↩️ File restored',
-        `Restored ${path.basename(backup.filePath)} to previous state`
-      );
+      // Removed database notifications as they are not available in this context
+      // notifications.success(
+      //   '↩️ File restored',
+      //   `Restored ${path.basename(originalFilePath)} to previous state`
+      // );
 
       return {
         success: true,
-        filePath: backup.filePath,
+        filePath: originalFilePath,
         message: 'File restored successfully'
       };
 
@@ -114,87 +163,17 @@ class RollbackService {
       console.error(`[Rollback] Failed to restore backup ${backupId}:`, error.message);
       return {
         success: false,
-        filePath: '',
+        filePath: '', // filePath might not be reliably retrieved if map read fails
         message: `Restore failed: ${error.message}`
       };
     }
   }
 
-  /**
-   * Get backup info for an execution log
-   */
-  getBackupsForExecution(executionLogId: string): FileBackup[] {
-    return db.getBackupsForLog(executionLogId);
-  }
+  // Removed DB-specific methods: getBackupsForExecution, canRestore, getTimeRemaining, runCleanup
+  // These would need reimplementation for file-based management if desired.
 
   /**
-   * Check if a backup can be restored
-   */
-  canRestore(backupId: string): boolean {
-    const backup = db.getBackup(backupId);
-    if (!backup) return false;
-    
-    // Check if not expired
-    const expiresAt = new Date(backup.expiresAt || 0);
-    return expiresAt > new Date();
-  }
-
-  /**
-   * Get time remaining before backup expires
-   */
-  getTimeRemaining(backupId: string): number | null {
-    const backup = db.getBackup(backupId);
-    if (!backup || !backup.expiresAt) return null;
-    
-    const expiresAt = new Date(backup.expiresAt).getTime();
-    const now = Date.now();
-    
-    return Math.max(0, expiresAt - now);
-  }
-
-  /**
-   * Format time remaining as human-readable string
-   */
-  formatTimeRemaining(ms: number): string {
-    if (ms <= 0) return 'Expired';
-    
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    
-    if (hours > 0) {
-      return `${hours}h ${minutes}m remaining`;
-    }
-    return `${minutes}m remaining`;
-  }
-
-  /**
-   * Run cleanup of expired backups
-   */
-  runCleanup(): { deleted: number } {
-    const deleted = db.cleanupExpiredBackups();
-    if (deleted > 0) {
-      console.log(`[Rollback] Cleaned up ${deleted} expired backups`);
-    }
-    return { deleted };
-  }
-
-  /**
-   * Set retention period
-   */
-  setRetentionHours(hours: number): void {
-    this.retentionHours = hours;
-    console.log(`[Rollback] Retention period set to ${hours} hours`);
-  }
-
-  /**
-   * Get current retention period
-   */
-  getRetentionHours(): number {
-    return this.retentionHours;
-  }
-
-  /**
-   * Check if a tool supports rollback
+   * Checks if a tool supports file modification that would trigger a backup.
    */
   toolSupportsRollback(toolName: string): boolean {
     return ROLLBACK_SUPPORTED_TOOLS.includes(toolName);
@@ -204,12 +183,12 @@ class RollbackService {
 // Export singleton
 export const rollback = new RollbackService();
 
-// ============================================================
+// ============================================================ 
 // ROLLBACK MIDDLEWARE
-// ============================================================
+// ============================================================ 
 
 /**
- * Wrapper function to execute a tool with automatic backup
+ * Wrapper function to execute a tool with automatic file backup
  */
 export async function executeWithBackup<T>(
   toolName: string,
@@ -219,8 +198,9 @@ export async function executeWithBackup<T>(
 ): Promise<{ result: T; backupId: string | null }> {
   let backupId: string | null = null;
 
-  // Create backup if this is a file-modifying tool
+  // Create backup if this is a file-modifying tool and filePath is provided
   if (filePath && rollback.toolSupportsRollback(toolName)) {
+    // Pass filePath and executionLogId to the new createBackup implementation
     backupId = await rollback.createBackup(filePath, executionLogId);
   }
 
@@ -228,18 +208,8 @@ export async function executeWithBackup<T>(
     const result = await operation();
     return { result, backupId };
   } catch (error) {
-    // If operation failed and we have a backup, we could auto-restore
-    // For now, just keep the backup available for manual restore
+    // If operation failed, we now have a backup file on disk and a map entry.
+    // Future implementation could add auto-restore logic here.
     throw error;
   }
 }
-
-/**
- * Schedule periodic cleanup of expired backups
- */
-export function scheduleBackupCleanup(intervalMs: number = 60 * 60 * 1000): NodeJS.Timeout {
-  return setInterval(() => {
-    rollback.runCleanup();
-  }, intervalMs);
-}
-

@@ -2,13 +2,13 @@ import { Router } from 'express';
 import { capabilities, ModelProfile } from '../../modules/tooly/capabilities.js';
 import { extractBadgeScores } from '../../modules/tooly/badges.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/tooly/leaderboards
  * Get top 3 models per category
  */
-router.get('/leaderboards', async (req, res) => {
+router.get('/leaderboards', async (_req, res) => {
   try {
     const allProfiles = await capabilities.getAllProfiles();
 

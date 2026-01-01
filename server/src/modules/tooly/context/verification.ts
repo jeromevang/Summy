@@ -8,8 +8,6 @@
  */
 
 import { IntentJSON } from '../types.js';
-import { db } from '../../../services/database.js'; // Assuming DB access
-import { mcpOrchestrator } from '../orchestrator/mcp-orchestrator.js';
 
 export interface VerificationResult {
     success: boolean;
@@ -33,7 +31,7 @@ export class VerificationLoop {
 
         // 2. Intent Verification (Heuristic)
         // Did we actually modify the files we said we would? (Mock check)
-        if (intent.strategy === 'refactor' && output.length < 50) {
+        if (intent.action === 'call_tool' && output.length < 50) {
             deviations.push('Refactor output suspiciously short');
         }
 
@@ -55,7 +53,7 @@ export class VerificationLoop {
     /**
      * PERSIST: Learn from the result
      */
-    async persist(intent: IntentJSON, result: VerificationResult, query: string) {
+    async persist(result: VerificationResult) {
         console.log(`[Verification] Persisting result: Success=${result.success} Score=${result.score}`);
 
         // 1. Store in Long-Term Memory (via Database)

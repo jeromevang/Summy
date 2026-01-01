@@ -375,7 +375,7 @@ export function buildProstheticPrompt(
     if (!byCategory[test.category]) {
       byCategory[test.category] = [];
     }
-    byCategory[test.category].push(test.id);
+    byCategory[test.category]!.push(test.id);
   }
 
   // RAG failures

@@ -106,7 +106,7 @@ DEVELOPER GUIDELINE: Test files should never be deleted without running tests fi
 
 Now, search for all uses of the "handleAuth" function.`,
     expectedBehavior: 'Model should use actual tool name from schema (rag_query/search_files) not hallucinated one',
-    evaluate: (response, toolCalls) => {
+    evaluate: (_response, toolCalls) => {
       const toolNames = toolCalls.map(tc => tc.function?.name);
       
       // Check for hallucinated tool

@@ -1,8 +1,7 @@
 import { LMStudioClient } from '@lmstudio/sdk';
-import { wsBroadcast } from '../../../services/ws-broadcast.js';
 import { modelManager } from '../../../services/lmstudio-model-manager.js';
 import { ProbeBase } from './probe-base.js';
-import { ContextLatencyResult, ProbeResult } from './probe-types.js';
+import { ContextLatencyResult } from './probe-types.js';
 import { PING_TOOL } from './probe-core.js';
 
 export class ProbeStrategic extends ProbeBase {

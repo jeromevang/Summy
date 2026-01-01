@@ -1,6 +1,7 @@
 import { capabilities } from '../capabilities.js';
 import { wsBroadcast } from '../../../services/ws-broadcast.js';
 import { TestResult, AliasRefinement, TestRunResult } from './test-types.js';
+import type { EfficiencyMetrics } from '../types.js';
 
 export function calculateLatencyMetrics(results: TestResult[]) {
     const valid = results.filter(r => r.latency > 0);
@@ -16,7 +17,7 @@ export function calculateLatencyMetrics(results: TestResult[]) {
     return { avgLatency: avg, latencyScore: Math.max(0, Math.min(100, score)), fast: valid.filter(r => r.latency < 2000).length, slow: valid.filter(r => r.latency > 10000).length };
 }
 
-export function applyLatencyScoring(results: TestResult[], metrics: any) {
+export function applyLatencyScoring(results: TestResult[], _metrics: any) {
     return results.map(r => {
         if (r.latency === 0 || !r.passed) return r;
         let adj = 0;

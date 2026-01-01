@@ -21,6 +21,7 @@ export interface ModelMetadata {
   vision?: boolean;
   sizeBytes?: number;
   quantization?: string;
+  healthStatus?: 'healthy' | 'unhealthy' | 'unknown';
 }
 
 export interface ModelDiscoveryResult {

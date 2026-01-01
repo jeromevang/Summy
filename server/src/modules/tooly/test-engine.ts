@@ -1,8 +1,3 @@
-import axios from 'axios';
-import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { v4 as uuidv4 } from 'uuid';
 import { notifications } from '../../services/notifications.js';
 import { wsBroadcast } from '../../services/ws-broadcast.js';
 import { modelManager } from '../../services/lmstudio-model-manager.js';
@@ -11,22 +6,17 @@ import {
   TestDefinition,
   TestResult,
   TestRunResult,
-  TestMode,
   TestOptions,
-  AliasRefinement,
-  OptimizationResults
+  AliasRefinement
 } from './testing/test-types.js';
 import {
   ALL_TEST_DEFINITIONS,
-  ALL_PROBE_DEFINITIONS,
   getTestsForMode,
   getProbesForMode
 } from './testing/test-definitions.js';
 import {
   findBestToolByArgs,
-  scoreArgsAgainstSchema,
-  findBestMatch,
-  semanticMatchTools
+  scoreArgsAgainstSchema
 } from './testing/test-utils.js';
 import {
   calculateLatencyMetrics,
@@ -37,9 +27,6 @@ import {
 import { TestRunner } from './testing/test-runner.js';
 import { ALL_TOOLS } from './capabilities.js';
 import { ESSENTIAL_TOOLS, STANDARD_TOOLS, FULL_TOOLS } from './orchestrator/mcp-orchestrator.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export class TestEngine {
   private runner: TestRunner;

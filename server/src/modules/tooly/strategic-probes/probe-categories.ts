@@ -8,7 +8,7 @@ export const STRATEGIC_PROBES: ProbeDefinition[] = [
     prompt: 'How does authentication work in this project?',
     expectedTool: 'rag_query',
     expectedBehavior: 'Model should call rag_query BEFORE file reads',
-    evaluate: (response, toolCalls) => {
+    evaluate: (_response, toolCalls) => {
       const firstTool = toolCalls[0]?.function?.name;
       if (firstTool === 'rag_query') return { passed: true, score: 100, details: 'Correctly used RAG first' };
       if (toolCalls.some(tc => tc.function?.name === 'rag_query')) return { passed: true, score: 70, details: 'Used RAG but not first' };

@@ -1,7 +1,7 @@
 /**
  * LM Studio Model Manager
- * Centralized singleton service for managing LM Studio chat/LLM model loading
- * 
+ * Centralized singleton service for managing LM Studio chat/LLM model loading.
+ *
  * POLICY:
  * - Load on demand (only when needed)
  * - Keep loaded (never auto-unload)
@@ -13,28 +13,43 @@
 import { LMStudioClient } from '@lmstudio/sdk';
 import { wsBroadcast } from './ws-broadcast.js';
 
+/**
+ * Represents the state of a currently loaded model in LM Studio.
+ */
 export interface LoadedModelState {
+  /** The identifier or path of the loaded model. */
   modelId: string;
+  /** The context size configured for the loaded model. */
   contextSize: number;
+  /** The timestamp when the model was loaded. */
   loadedAt: Date;
 }
 
+/**
+ * Singleton service for managing LM Studio LLM models.
+ * Handles loading, unloading, and state synchronization with the LM Studio server.
+ */
 class LMStudioModelManager {
   private static instance: LMStudioModelManager;
   
-  // Current state (tracked internally, synced with LM Studio)
+  /** The current state of the loaded LLM model. */
   private loadedModel: LoadedModelState | null = null;
   
-  // Mutex to prevent concurrent load operations
+  /** Flag to indicate if a load operation is currently in progress. */
   private isLoading: boolean = false;
+  /** Promise tracking the current load operation to prevent concurrent calls. */
   private loadPromise: Promise<void> | null = null;
 
+  /**
+   * Private constructor to enforce the singleton pattern.
+   */
   private constructor() {
     // Private constructor for singleton
   }
 
   /**
-   * Get the singleton instance
+   * Retrieves the singleton instance of the LMStudioModelManager.
+   * @returns The singleton instance.
    */
   static getInstance(): LMStudioModelManager {
     if (!LMStudioModelManager.instance) {
@@ -44,14 +59,17 @@ class LMStudioModelManager {
   }
 
   /**
-   * Create a new LM Studio client
+   * Creates a new instance of the LM Studio client.
+   * @returns A new LMStudioClient instance.
    */
   private createClient(): LMStudioClient {
     return new LMStudioClient();
   }
 
   /**
-   * Check if a model is loaded in LM Studio (by path or identifier)
+   * Checks if a specific LLM model is currently loaded in LM Studio.
+   * @param modelId - The identifier or path of the model to check.
+   * @returns A promise that resolves with an object containing the model's identifier and path if loaded, otherwise null.
    */
   private async getLoadedLLMModel(modelId: string): Promise<{ identifier: string; path: string } | null> {
     try {
@@ -72,7 +90,8 @@ class LMStudioModelManager {
   }
 
   /**
-   * Sync internal state with LM Studio's actual loaded models
+   * Synchronizes the internal state of the manager with the actual models loaded in LM Studio.
+   * @returns A promise that resolves when the state is synchronized.
    */
   async syncState(): Promise<void> {
     try {
@@ -98,15 +117,13 @@ class LMStudioModelManager {
   }
 
   /**
-   * Ensure a model is loaded with the specified context size.
-   * 
-   * BEHAVIOR:
-   * - Unloads ALL other LLM models first (clean slate, no stale models)
-   * - Loads the requested model fresh
-   * - Embedding models are NEVER touched (separate API)
-   * 
-   * @param modelId Model path or identifier
-   * @param contextSize Context size for the model
+   * Ensures that a specific LLM model is loaded with the given context size.
+   * It will unload any other LLM models first to ensure a clean slate.
+   * Embedding models are not affected.
+   * @param modelId - The identifier or path of the model to load.
+   * @param contextSize - The desired context size for the model.
+   * @returns A promise that resolves when the model is loaded.
+   * @throws An error if the model fails to load.
    */
   async ensureLoaded(modelId: string, contextSize: number): Promise<void> {
     // Wait for any pending load operation
@@ -138,11 +155,15 @@ class LMStudioModelManager {
   }
 
   /**
-   * Internal method to perform the actual load
-   * Unloads ALL LLM models first (to avoid OOM and stale models)
-   * Embedding models use a separate API (client.embedding) and are NEVER touched
+   * Internal method to perform the actual model loading.
+   * Unloads all existing LLM models before loading the new one to prevent conflicts and free VRAM.
+   * Embedding models (managed by client.embedding) are explicitly not touched by this process.
+   * @param modelId - The identifier or path of the model to load.
+   * @param contextSize - The context size to configure for the model.
+   * @returns A promise that resolves when the model is loaded.
+   * @throws An error if the model fails to load.
    */
-  private async doLoad(modelId: string, contextSize: number, _unloadFirst?: string): Promise<void> {
+  private async doLoad(modelId: string, contextSize: number): Promise<void> {
     const client = this.createClient();
 
     // Unload ALL LLM models to free VRAM and remove stale models
@@ -218,8 +239,9 @@ class LMStudioModelManager {
   }
 
   /**
-   * Unload all LLM models (explicit user action)
-   * NOTE: This does NOT unload embedding models
+   * Unloads all currently loaded LLM models from LM Studio.
+   * This does NOT affect embedding models.
+   * @returns A promise that resolves when all LLM models have been unloaded.
    */
   async unloadAllLLM(): Promise<void> {
     if (this.loadPromise) {
@@ -251,7 +273,9 @@ class LMStudioModelManager {
   }
 
   /**
-   * Unload a specific model (explicit user action)
+   * Unloads a specific model from LM Studio.
+   * @param modelId - The identifier or path of the model to unload.
+   * @returns A promise that resolves when the model is unloaded.
    */
   async unloadModel(modelId: string): Promise<void> {
     if (this.loadPromise) {
@@ -283,13 +307,19 @@ class LMStudioModelManager {
     }
   }
 
-  // Legacy alias for backwards compatibility
+  /**
+   * Legacy alias for `unloadAllLLM` for backwards compatibility.
+   * @deprecated Use `unloadAllLLM` instead.
+   * @returns A promise that resolves when all LLM models are unloaded.
+   */
   async unloadAll(): Promise<void> {
     return this.unloadAllLLM();
   }
 
   /**
-   * Check if a specific model is loaded
+   * Checks if a specific model is currently loaded.
+   * @param modelId - The identifier or path of the model to check.
+   * @returns A promise that resolves to true if the model is loaded, false otherwise.
    */
   async isModelLoaded(modelId: string): Promise<boolean> {
     const existing = await this.getLoadedLLMModel(modelId);
@@ -297,28 +327,32 @@ class LMStudioModelManager {
   }
 
   /**
-   * Check if any model is loaded (based on our state)
+   * Checks if any LLM model is currently loaded according to the manager's state.
+   * @returns True if an LLM model is loaded, false otherwise.
    */
   isAnyModelLoaded(): boolean {
     return this.loadedModel !== null;
   }
 
   /**
-   * Get the currently loaded model info
+   * Retrieves information about the currently loaded LLM model.
+   * @returns The `LoadedModelState` object if a model is loaded, otherwise null.
    */
   getLoadedModel(): LoadedModelState | null {
     return this.loadedModel;
   }
 
   /**
-   * Check if a load operation is in progress
+   * Checks if a model loading operation is currently in progress.
+   * @returns True if a load is in progress, false otherwise.
    */
   isLoadInProgress(): boolean {
     return this.isLoading;
   }
 
   /**
-   * Clear internal state (useful for testing or resync)
+   * Clears the internal state of the model manager.
+   * Useful for testing or when a manual resynchronization is desired.
    */
   clearState(): void {
     this.loadedModel = null;
@@ -329,6 +363,7 @@ class LMStudioModelManager {
    * Cleanup on server startup - unload all stale LLM models
    * This ensures a clean slate when the server restarts
    * NOTE: Does NOT touch embedding models (separate API)
+   * @returns A promise that resolves when the cleanup is complete.
    */
   async cleanupOnStartup(): Promise<void> {
     console.log(`[ModelManager] Startup cleanup - checking for stale LLM models...`);
@@ -369,4 +404,7 @@ class LMStudioModelManager {
 }
 
 // Export singleton instance
+/**
+ * The singleton instance of the LMStudioModelManager.
+ */
 export const modelManager = LMStudioModelManager.getInstance();

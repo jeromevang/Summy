@@ -3,12 +3,12 @@
  * API endpoints for advanced model management
  */
 
-import express from 'express';
+import express, { Router } from 'express';
 import { modelManager } from '../services/model-manager.js';
 import { cacheService } from '../services/cache/cache-service.js';
 import { addDebugEntry } from '../services/logger.js';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // ============================================================
 // MODEL DISCOVERY AND MANAGEMENT
@@ -17,7 +17,7 @@ const router = express.Router();
 /**
  * Discover all available models
  */
-router.get('/discover', async (req, res) => {
+router.get('/discover', async (_req, res) => {
   try {
     addDebugEntry('request', 'Model discovery request');
     const result = await modelManager.discoverModels();
@@ -295,7 +295,7 @@ router.get('/best/:role', async (req, res) => {
 /**
  * Health check all models
  */
-router.post('/health-check', async (req, res) => {
+router.post('/health-check', async (_req, res) => {
   try {
     addDebugEntry('request', 'Health check all models');
     const results = await modelManager.healthCheckAll();
@@ -356,7 +356,7 @@ router.post('/:modelId/health-check', async (req, res) => {
 /**
  * Clear model cache
  */
-router.delete('/cache/clear', async (req, res) => {
+router.delete('/cache/clear', async (_req, res) => {
   try {
     cacheService.clearAll();
     res.json({
@@ -376,7 +376,7 @@ router.delete('/cache/clear', async (req, res) => {
 /**
  * Get cache statistics
  */
-router.get('/cache/stats', async (req, res) => {
+router.get('/cache/stats', async (_req, res) => {
   try {
     const stats = cacheService.getStats();
     res.json({
@@ -400,7 +400,7 @@ router.get('/cache/stats', async (req, res) => {
 /**
  * Get model statistics
  */
-router.get('/stats', async (req, res) => {
+router.get('/stats', async (_req, res) => {
   try {
     const models = Array.from(modelManager['models'].values());
     

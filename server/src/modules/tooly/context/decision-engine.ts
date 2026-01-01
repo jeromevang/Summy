@@ -8,10 +8,11 @@
  */
 
 import { MentalModel } from './context-prism.js';
+import { IntentSchema } from '../types.js';
 
 export type StrategyType = 'refactor' | 'patch' | 'investigate' | 'consult';
 
-export interface IntentJSON {
+export interface DecisionStrategy {
     strategy: StrategyType;
     primaryAction: string;       // e.g., "rewrite_method"
     reasoning: string;          // "Refactoring is cleaner than patching here..."
@@ -26,10 +27,25 @@ export class DecisionEngine {
      * DECIDE: The core decision logic
      * Prevents "thrashing" by forcing a single committed path.
      */
-    decide(model: MentalModel, query: string): IntentJSON {
+    decide(model: MentalModel, query: string): IntentSchema {
         // 1. Heuristic-based Strategy Selection
         // In a full agent, this would be an LLM call: LLM(model, query) -> IntentJSON
 
+        const strategy = this.determineStrategy(model, query);
+        
+        // Map Strategy to IntentSchema
+        return {
+            schemaVersion: '1.0.0',
+            action: 'multi_step', // Default to multi-step for complex tasks
+            steps: [], // Steps would be populated by the Planner based on this intent
+            metadata: {
+                reasoning: strategy.reasoning,
+                context: JSON.stringify(strategy)
+            }
+        };
+    }
+
+    private determineStrategy(model: MentalModel, query: string): DecisionStrategy {
         // Check for explicit user intent
         const q = query.toLowerCase();
 
@@ -69,13 +85,13 @@ export class DecisionEngine {
     /**
      * Validation: Does the decision violate constraints?
      */
-    validateDecision(intent: IntentJSON, model: MentalModel): { valid: boolean; violation?: string } {
-        if (intent.riskLevel === 'high' && !intent.requiresUserApproval) {
+    validateDecision(strategy: DecisionStrategy, model: MentalModel): { valid: boolean; violation?: string } {
+        if (strategy.riskLevel === 'high' && !strategy.requiresUserApproval) {
             return { valid: false, violation: 'High risk actions must require approval.' };
         }
 
         // Check against model constraints
-        if (model.constraints.includes("Do not break existing sessions") && intent.strategy === 'refactor') {
+        if (model.constraints.includes("Do not break existing sessions") && strategy.strategy === 'refactor') {
             // Warning, but maybe not a hard block if approval is sought
             // For now, we allow it if approved
         }

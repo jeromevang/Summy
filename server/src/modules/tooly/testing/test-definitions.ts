@@ -15,13 +15,9 @@ import { EVOLUTION_TESTS } from './categories/evolution-tests.js';
 import { CALIBRATION_TESTS } from './categories/calibration-tests.js';
 import { COMPLIANCE_PROBES } from './categories/compliance-tests.js';
 import {
-  ParamCondition,
   TestDefinition,
-  TestResult,
-  CheckResult,
-  TestRunResult,
   TestMode,
-  TestOptions
+  TestCategoryId
 } from './test-types.js';
 import type { ProbeDefinition } from '../types.js';
 

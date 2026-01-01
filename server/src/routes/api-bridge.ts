@@ -1,15 +1,13 @@
 import { Router } from 'express';
-import os from 'os';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/bridge/info
  * Get connection info for external agents (the "Bridge")
  */
-router.get('/bridge/info', (req, res) => {
-  const hostname = os.hostname().toLowerCase();
-  const port = process.env.PORT || 3001;
+router.get('/bridge/info', (_req, res) => {
+  const port = process.env['PORT'] || 3001;
   const ragPort = 3002; // RAG usually runs on 3002
 
   const bridgePrompt = `

@@ -6,7 +6,6 @@
 import type {
   HardwareProfile,
   OptimalSetupResult,
-  ModelProfileV2,
   AgenticScores,
   TrainabilityScores
 } from '../types.js';
@@ -31,6 +30,9 @@ export async function detectHardware(): Promise<HardwareProfile> {
   // Real implementation would use node-gpu-stats or similar
 
   return {
+    cpu: '8 Cores',
+    gpu: 'Unknown GPU',
+    ram: '32GB',
     gpuName: 'Unknown GPU',
     vramGB: 12, // Default assumption
     ramGB: 32,
@@ -46,7 +48,7 @@ export function estimateVramRequirement(modelId: string): number {
 
   // Extract size from model name (e.g., "qwen-2.5-72b" -> 72)
   const sizeMatch = lowerModel.match(/(\d+)b/);
-  const sizeB = sizeMatch ? parseInt(sizeMatch[1]) : 7;
+  const sizeB = sizeMatch ? parseInt(sizeMatch[1] || '7') : 7;
 
   // Check for quantization
   let quantMultiplier = 1.0;
@@ -89,7 +91,7 @@ export function filterByHardware(
   models: ScanResult[],
   hardware: HardwareProfile
 ): ScanResult[] {
-  return models.filter(m => fitsInVram(m.estimatedVram, hardware.vramGB));
+  return models.filter(m => fitsInVram(m.estimatedVram, hardware.vramGB || 0));
 }
 
 // ============================================================
@@ -116,7 +118,7 @@ export function findOptimalSetup(input: OptimalSetupInput): OptimalSetupResult {
 
   // Filter to models that fit
   const fittingModels = testedModels.filter(m =>
-    !m.vramRequired || fitsInVram(m.vramRequired, hardware.vramGB)
+    !m.vramRequired || fitsInVram(m.vramRequired, hardware.vramGB || 0)
   );
 
   // Convert to candidates
@@ -139,7 +141,7 @@ export function findOptimalSetup(input: OptimalSetupInput): OptimalSetupResult {
     .sort((a, b) => b.executorScore - a.executorScore);
 
   // 1. LEGACY PAIRING (Keep for backward compatibility)
-  const pairing = findOptimalPairing(candidates, hardware.vramGB);
+  const pairing = findOptimalPairing(candidates, hardware.vramGB || 0);
 
   let recommendedPairing = {
     mainModel: mainCandidates[0]?.modelId || '',
@@ -167,7 +169,7 @@ export function findOptimalSetup(input: OptimalSetupInput): OptimalSetupResult {
   }
 
   // 2. SWARM CLUSTERING (Knapsack Algorithm)
-  const swarmConfig = findOptimalSwarm(candidates, hardware.vramGB);
+  const swarmConfig = findOptimalSwarm(candidates, hardware.vramGB || 0);
 
   return {
     hardware,

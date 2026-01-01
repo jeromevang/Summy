@@ -1,6 +1,7 @@
-import express from 'express';
+import express, { Router } from 'express';
 import axios from 'axios';
-import { loadServerSettings, saveServerSettings, type ServerSettings } from '../services/settings-service.js';
+import { ServerSettings } from '@summy/shared';
+import { loadServerSettings, saveServerSettings } from '../services/settings-service.js';
 import { getFullStatus, getSharedLMStudioClient, resetLMStudioClient } from '../services/lmstudio-status.js';
 import { modelManager } from '../services/lmstudio-model-manager.js';
 import { db } from '../services/database.js';
@@ -13,14 +14,14 @@ import { prostheticPromptBuilder } from '../modules/tooly/orchestrator/prostheti
 import { testSandbox } from '../modules/tooly/test-sandbox.js';
 import { cacheService } from '../services/cache/cache-service.js';
 
-const router = express.Router();
+const router: Router = express.Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ============================================================
 // SETTINGS API
 // ============================================================
 
-router.get('/settings', async (req, res) => {
+router.get('/settings', async (_req, res) => {
     try {
         const settings = await loadServerSettings();
         res.json(settings);
@@ -29,7 +30,7 @@ router.get('/settings', async (req, res) => {
     }
 });
 
-router.post('/settings', async (req, res) => {
+router.post('/settings', async (_req, res) => {
     try {
         const currentSettings = await loadServerSettings();
         const newSettings: ServerSettings = {
@@ -47,7 +48,7 @@ router.post('/settings', async (req, res) => {
 // PROVIDER STATUS & TESTING
 // ============================================================
 
-router.get('/lmstudio/status', async (req, res) => {
+router.get('/lmstudio/status', async (_req, res) => {
     try {
         const client = getSharedLMStudioClient();
         const loadedModels = await client.llm.listLoaded();
@@ -62,7 +63,7 @@ router.get('/lmstudio/status', async (req, res) => {
     }
 });
 
-router.post('/lmstudio/load-model', async (req, res) => {
+router.post('/lmstudio/load-model', async (_req, res) => {
     try {
         const { model, contextLength } = req.body;
         const settings = await loadServerSettings();
@@ -80,7 +81,7 @@ router.post('/lmstudio/load-model', async (req, res) => {
     }
 });
 
-router.get('/openai/models', async (req, res) => {
+router.get('/openai/models', async (_req, res) => {
     try {
         const apiKey = process.env.OPENAI_API_KEY;
         if (!apiKey) return res.status(400).json({ error: 'OpenAI API key not configured' });
@@ -101,7 +102,7 @@ router.get('/openai/models', async (req, res) => {
     }
 });
 
-router.post('/test-lmstudio', async (req, res) => {
+router.post('/test-lmstudio', async (_req, res) => {
     try {
         const { url } = req.body;
         const testUrl = url || (await loadServerSettings()).lmstudioUrl;
@@ -112,7 +113,7 @@ router.post('/test-lmstudio', async (req, res) => {
     }
 });
 
-router.post('/test-openrouter', async (req, res) => {
+router.post('/test-openrouter', async (_req, res) => {
     try {
         const settings = await loadServerSettings();
         const apiKey = settings.openrouterApiKey;
@@ -145,7 +146,7 @@ router.post('/test-openrouter', async (req, res) => {
 // SANDBOX & PROSTHETIC
 // ============================================================
 
-router.post('/tooly/sandbox/enter', async (req, res) => {
+router.post('/tooly/sandbox/enter', async (_req, res) => {
     try {
         const config = await testSandbox.enter();
         res.json({ success: true, config });
@@ -154,7 +155,7 @@ router.post('/tooly/sandbox/enter', async (req, res) => {
     }
 });
 
-router.post('/tooly/sandbox/exit', async (req, res) => {
+router.post('/tooly/sandbox/exit', async (_req, res) => {
     try {
         await testSandbox.exit();
         res.json({ success: true });
@@ -163,11 +164,11 @@ router.post('/tooly/sandbox/exit', async (req, res) => {
     }
 });
 
-router.get('/tooly/sandbox/status', (req, res) => {
+router.get('/tooly/sandbox/status', (_req, res) => {
     res.json({ active: testSandbox.getState().active });
 });
 
-router.post('/tooly/prosthetic/generate', async (req, res) => {
+router.post('/tooly/prosthetic/generate', async (_req, res) => {
     try {
         const { modelId } = req.body;
         if (!modelId) return res.status(400).json({ error: 'Model ID is required' });
@@ -199,11 +200,11 @@ router.post('/tooly/prosthetic/generate', async (req, res) => {
 // SYSTEM UTILITIES (Health, Status, Reset)
 // ============================================================
 
-router.get('/health', (req, res) => {
+router.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-router.get('/status', async (req, res) => {
+router.get('/status', async (_req, res) => {
     try {
         const settings = await loadServerSettings();
         
@@ -241,7 +242,7 @@ router.get('/status', async (req, res) => {
     }
 });
 
-router.delete('/tooly/reset', async (req, res) => {
+router.delete('/tooly/reset', async (_req, res) => {
     try {
         const sessionsDeleted = db.clearAllContextSessions();
         const profiles = await capabilities.getAllProfiles();
@@ -258,7 +259,7 @@ router.delete('/tooly/reset', async (req, res) => {
 });
 
 // Cache stats endpoint
-router.get('/cache/stats', async (req, res) => {
+router.get('/cache/stats', async (_req, res) => {
     try {
         const stats = cacheService.getStats();
         res.json({
@@ -272,7 +273,7 @@ router.get('/cache/stats', async (req, res) => {
 });
 
 // Cache clear endpoint
-router.delete('/cache/clear', async (req, res) => {
+router.delete('/cache/clear', async (_req, res) => {
     try {
         cacheService.clearAll();
         res.json({ success: true, message: 'All caches cleared' });

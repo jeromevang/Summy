@@ -66,7 +66,6 @@ export class ToolProfiler {
    */
   analyzeTestResults(modelId: string, testResults: TestRunResult): ToolProfile {
     const toolPerformances: Record<string, ToolPerformance> = {};
-    const issues: Map<string, ToolIssue[]> = new Map();
 
     // Group results by tool
     const resultsByTool = new Map<string, TestResult[]>();

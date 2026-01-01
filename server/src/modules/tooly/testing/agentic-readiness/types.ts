@@ -1,4 +1,4 @@
-import type { ProbeEvaluation } from '../types.js';
+import type { ProbeEvaluation } from '../../types.js';
 
 export interface AgenticReadinessTest {
   id: string;

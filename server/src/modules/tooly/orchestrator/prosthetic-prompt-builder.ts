@@ -118,7 +118,8 @@ export class ProstheticPromptBuilder {
     /**
      * Map test ID to abstract capability
      */
-    private mapToCapability(testId: string): string {
+    private mapToCapability(testId: string | undefined): string {
+        if (!testId) return 'General Instruction Following';
         if (testId.startsWith('file_')) return 'File Operations';
         if (testId.startsWith('git_')) return 'Git Version Control';
         if (testId.startsWith('npm_')) return 'NPM Package Management';
@@ -136,7 +137,7 @@ export class ProstheticPromptBuilder {
      */
     private getSeverity(result: ProbeResult): 1 | 2 | 3 | 4 {
         // Critical failures (safety, destructive actions) -> Level 3 or 4
-        if (result.error?.includes('destructive') || result.testId.includes('safety')) {
+        if (result.error?.includes('destructive') || result.testId?.includes('safety')) {
             return 3;
         }
 
@@ -146,7 +147,7 @@ export class ProstheticPromptBuilder {
         }
 
         // Logic/Reasoning failures -> Level 1 (Hard to constrain with rules)
-        if (result.testId.startsWith('3.') || result.testId.startsWith('reasoning')) {
+        if (result.testId?.startsWith('3.') || result.testId?.startsWith('reasoning')) {
             return 1;
         }
 
@@ -158,14 +159,14 @@ export class ProstheticPromptBuilder {
      * Generate Level 1: Context Injection
      */
     private generateLevel1(capability: string, result: ProbeResult): string {
-        return `[Advisory] When performing ${capability}, ensure you double-check your parameters. Previous failure: ${result.error?.substring(0, 50)}...`;
+        return `[Advisory] When performing ${capability}, ensure you double-check your parameters. Previous failure: ${result.error?.substring(0, 50) || 'unknown'}`;
     }
 
     /**
      * Generate Level 2: Hard Constraint
      */
     private generateLevel2(capability: string, result: ProbeResult): string {
-        return `CRITICAL CONSTRAINT: You must NOT fail at ${capability}. Specifically: ${result.error}. Verify strictly before executing.`;
+        return `CRITICAL CONSTRAINT: You must NOT fail at ${capability}. Specifically: ${result.error || 'unknown'}. Verify strictly before executing.`;
     }
 
     /**
@@ -175,7 +176,7 @@ export class ProstheticPromptBuilder {
         return {
             trigger: capability.toLowerCase(), // Simplistic trigger for now
             action: 'block',
-            message: `Action blocked by Prosthetic Intelligence. You attempted ${capability} which is flagged as unstable. Error trace: ${result.error}`
+            message: `Action blocked by Prosthetic Intelligence. You attempted ${capability} which is flagged as unstable. Error trace: ${result.error || 'unknown'}`
         };
     }
 }

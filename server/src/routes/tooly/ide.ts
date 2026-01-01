@@ -2,13 +2,13 @@ import { Router } from 'express';
 import { ideMapping } from '../../services/ide-mapping.js';
 import { ALL_TOOLS } from '../../modules/tooly/capabilities.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/tooly/ide-mappings
  * List all available IDE mappings
  */
-router.get('/ide-mappings', async (req, res) => {
+router.get('/ide-mappings', async (_req, res) => {
   try {
     const ides = await ideMapping.listAvailableIDEs();
     const mappings = await Promise.all(
@@ -32,7 +32,7 @@ router.get('/ide-mappings', async (req, res) => {
  * GET /api/tooly/ide-mappings/:ide
  * Get specific IDE mapping details
  */
-router.get('/ide-mappings/:ide', async (req, res) => {
+router.get('/ide-mappings/:ide', async (_req, res) => {
   try {
     const { ide } = req.params;
     const mapping = await ideMapping.loadIDEMapping(ide);
@@ -50,7 +50,7 @@ router.get('/ide-mappings/:ide', async (req, res) => {
  * POST /api/tooly/ide-mappings/:ide/reload
  * Reload an IDE mapping (for hot-reload after editing JSON)
  */
-router.post('/ide-mappings/:ide/reload', async (req, res) => {
+router.post('/ide-mappings/:ide/reload', async (_req, res) => {
   try {
     const { ide } = req.params;
     const mapping = await ideMapping.reloadIDEMapping(ide);
@@ -73,7 +73,7 @@ router.post('/ide-mappings/:ide/reload', async (req, res) => {
  * POST /api/tooly/parse-model
  * Parse a model name to detect IDE suffix
  */
-router.post('/parse-model', (req, res) => {
+router.post('/parse-model', (_req, res) => {
   try {
     const { model } = req.body;
     if (!model) {

@@ -1,29 +1,50 @@
 import { LogEntry, LogLevel, LogType } from './types.js';
 import { LogFileManager } from './managers.js';
 
-export class EnhancedLogger {
-  private module?: string;
-  private component?: string;
-  private userId?: string;
-  private requestId?: string;
-  private sessionId?: string;
-  private modelId?: string;
+/**
+ * Interface for configuring the EnhancedLogger.
+ */
+export interface LoggerConfig {
+  /** Enables or disables console output for log entries. */
+  enableConsole: boolean;
+  /** Optional module name for log entries originating from this logger instance. */
+  module?: string;
+  /** Optional component name for log entries. */
+  component?: string;
+  /** Optional user ID for log entries. */
+  userId?: string;
+  /** Optional request ID for log entries. */
+  requestId?: string;
+  /** Optional session ID for log entries. */
+  sessionId?: string;
+  /** Optional model ID for log entries. */
+  modelId?: string;
+}
 
-  constructor(config?: { module?: string; component?: string; userId?: string; requestId?: string; sessionId?: string; modelId?: string }) {
-    this.module = config?.module;
-    this.component = config?.component;
-    this.userId = config?.userId;
-    this.requestId = config?.requestId;
-    this.sessionId = config?.sessionId;
-    this.modelId = config?.modelId;
+/**
+ * A flexible and extensible logger that supports structured logging,
+ * file management, and various metadata.
+ */
+export class EnhancedLogger {
+  private config: LoggerConfig;
+
+  constructor(config?: Partial<LoggerConfig>) {
+    this.config = {
+      enableConsole: true, // Default value
+      ...config
+    };
   }
 
   private async log(level: LogLevel, type: LogType, message: string, metadata?: Record<string, any>, error?: Error): Promise<void> {
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
       level, type, message,
-      module: this.module, component: this.component, userId: this.userId,
-      requestId: this.requestId, sessionId: this.sessionId, modelId: this.modelId,
+      module: this.config.module, // Use this.config properties
+      component: this.config.component,
+      userId: this.config.userId,
+      requestId: this.config.requestId,
+      sessionId: this.config.sessionId,
+      modelId: this.config.modelId,
       metadata
     };
 
@@ -45,12 +66,12 @@ export class EnhancedLogger {
   debug(message: string, metadata?: Record<string, any>): void { this.log(LogLevel.DEBUG, LogType.DEBUG, message, metadata); }
   trace(message: string, metadata?: Record<string, any>): void { this.log(LogLevel.TRACE, LogType.DEBUG, message, metadata); }
 
-  withModule(module: string) { return new EnhancedLogger({ ...this, module }); }
-  withComponent(component: string) { return new EnhancedLogger({ ...this, component }); }
-  withUser(userId: string) { return new EnhancedLogger({ ...this, userId }); }
-  withRequest(requestId: string) { return new EnhancedLogger({ ...this, requestId }); }
-  withSession(sessionId: string) { return new EnhancedLogger({ ...this, sessionId }); }
-  withModel(modelId: string) { return new EnhancedLogger({ ...this, modelId }); }
+  withModule(module: string): EnhancedLogger { return new EnhancedLogger({ ...this.config, module }); }
+  withComponent(component: string): EnhancedLogger { return new EnhancedLogger({ ...this.config, component }); }
+  withUser(userId: string): EnhancedLogger { return new EnhancedLogger({ ...this.config, userId }); }
+  withRequest(requestId: string): EnhancedLogger { return new EnhancedLogger({ ...this.config, requestId }); }
+  withSession(sessionId: string): EnhancedLogger { return new EnhancedLogger({ ...this.config, sessionId }); }
+  withModel(modelId: string): EnhancedLogger { return new EnhancedLogger({ ...this.config, modelId }); }
 }
 
 export const logger = new EnhancedLogger();

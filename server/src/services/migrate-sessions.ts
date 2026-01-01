@@ -1,6 +1,9 @@
 /**
- * Migration script to move JSON sessions to SQLite
- * Run with: npx tsx src/services/migrate-sessions.ts
+ * Migration script to move JSON sessions to SQLite.
+ * This script reads session data from individual JSON files, converts them to the
+ * `Session` format, and then saves them into the SQLite database.
+ *
+ * To run: `npx tsx src/services/migrate-sessions.ts`
  */
 
 import fs from 'fs-extra';
@@ -14,6 +17,21 @@ const __dirname = path.dirname(__filename);
 const SESSIONS_DIR = path.join(__dirname, '../../../sessions');
 const BACKUP_DIR = path.join(__dirname, '../../../sessions_backup');
 
+/**
+ * Migrates session data from individual JSON files stored in the `sessions` directory
+ * into the SQLite database managed by the `DatabaseService`.
+ *
+ * This function performs the following steps:
+ * 1. Checks for the existence of the `sessions` directory.
+ * 2. Iterates through all `.json` files within the `sessions` directory.
+ * 3. Reads each JSON file, attempts to convert its content into a `Session` object.
+ * 4. Saves the converted `Session` object into the SQLite database using `db.saveSession`.
+ * 5. Provides a summary of migrated and failed sessions.
+ * 6. Creates a backup of the original JSON session files in a `sessions_backup` directory
+ *    after successful migration.
+ *
+ * @returns A promise that resolves when the migration process is complete.
+ */
 async function migrateSessionsToSQLite(): Promise<void> {
   console.log('🔄 Starting session migration from JSON to SQLite...\n');
 

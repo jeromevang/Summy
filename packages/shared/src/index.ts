@@ -77,3 +77,9 @@ export type SymbolType =
   | 'function' | 'class' | 'interface' | 'type' | 'enum' 
   | 'variable' | 'constant' | 'method' | 'property' | 'constructor'
   | 'module' | 'namespace' | 'export' | 'import';
+
+export interface Turn {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  toolCalls?: any[];
+}

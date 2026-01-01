@@ -24,7 +24,7 @@ export function detectBadOutput(content: string): BadOutputResult {
     const isLooping = (text: string) => {
         const phrases = text.split('\n');
         for (let i = 0; i < phrases.length - 1; i++) {
-            if (phrases[i].length > 20 && phrases[i] === phrases[i + 1]) return true;
+            if (phrases[i] && phrases[i+1] && phrases[i]!.length > 20 && phrases[i] === phrases[i + 1]) return true;
         }
         return false;
     };
@@ -62,15 +62,16 @@ export function parseXmlToolCall(content: string): { name: string; arguments: an
     const nameMatch = content.match(/<name>(.*?)<\/name>/);
     const argsMatch = content.match(/<arguments>([\s\S]*?)<\/arguments>/);
 
-    if (!nameMatch) return null;
+    if (!nameMatch || !nameMatch[1]) return null;
 
     const name = nameMatch[1].trim();
     const args: any = {};
 
-    if (argsMatch) {
+    if (argsMatch && argsMatch[1]) {
         const argStr = argsMatch[1];
         const paramMatches = argStr.matchAll(/<(.*?)>(.*?)<\/\1>/g);
         for (const match of paramMatches) {
+            if (!match[1] || match[2] === undefined) continue;
             const key = match[1];
             let val: any = match[2].trim();
             // Try to parse as number or boolean

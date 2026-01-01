@@ -4,9 +4,8 @@ import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { db } from '../../services/database.js';
 import { PROBE_CATEGORIES } from '../../modules/tooly/strategic-probes.js';
-import { loadServerSettings } from '../../services/settings-service.js';
 
-const router = Router();
+const router: Router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SETTINGS_FILE = path.join(__dirname, '../../../settings.json');
@@ -15,7 +14,7 @@ const SETTINGS_FILE = path.join(__dirname, '../../../settings.json');
  * GET /api/tooly/custom-tests
  * Get all custom tests (user-created + built-in probe tests)
  */
-router.get('/custom-tests', (req, res) => {
+router.get('/custom-tests', (_req, res) => {
   try {
     const customTests = db.getCustomTests();
 
@@ -52,7 +51,7 @@ router.get('/custom-tests', (req, res) => {
  * POST /api/tooly/custom-tests
  * Create a new custom test
  */
-router.post('/custom-tests', (req, res) => {
+router.post('/custom-tests', (_req, res) => {
   try {
     const { name, category, prompt, expectedTool, expectedBehavior, difficulty, variants } = req.body;
 
@@ -82,7 +81,7 @@ router.post('/custom-tests', (req, res) => {
  * PUT /api/tooly/custom-tests/:id
  * Update a custom test
  */
-router.put('/custom-tests/:id', (req, res) => {
+router.put('/custom-tests/:id', (_req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -105,7 +104,7 @@ router.put('/custom-tests/:id', (req, res) => {
  * DELETE /api/tooly/custom-tests/:id
  * Delete a custom test
  */
-router.delete('/custom-tests/:id', (req, res) => {
+router.delete('/custom-tests/:id', (_req, res) => {
   try {
     const { id } = req.params;
 
@@ -127,7 +126,7 @@ router.delete('/custom-tests/:id', (req, res) => {
  * POST /api/tooly/custom-tests/:id/try
  * Try a test on the currently selected model
  */
-router.post('/custom-tests/:id/try', async (req, res) => {
+router.post('/custom-tests/:id/try', async (_req, res) => {
   try {
     const { id } = req.params;
     const { modelId, prompt: overridePrompt } = req.body;

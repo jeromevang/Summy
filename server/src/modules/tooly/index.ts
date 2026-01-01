@@ -76,23 +76,27 @@ export {
 // CONTEXT MANAGEMENT (Enhanced with Phase 4 Small Model Integration)
 // ============================================================
 
+// Correctly import and re-export from the context module
 export {
   ContextManager,
   contextManager,
   analyzeQuery,
   estimateTokens,
-  estimateToolSchemaTokens
-} from './context/context-manager.js';
-
-export {
+  estimateMessagesTokens, // Added explicit export for estimateMessagesTokens
   ContextAnalyzer,
-  contextAnalyzer
-} from './context/context-analyzer.js';
-
-export {
+  contextAnalyzer,
   Summarizer,
-  summarizer
-} from './context/summarizer.js';
+  summarizer,
+  ContextBudgetManager, // Export the manager if needed, or its methods
+  type QueryAnalysis,
+  type Turn,
+  type OptimizedContext,
+  type EnhancedQueryAnalysis,
+  type SmallModelConfig,
+  type RelevanceRanking,
+  type SummaryResult,
+  type ConversationSummary
+} from './context/index.js'; // This is the main context barrel file
 
 // ============================================================
 // LEARNING SYSTEM
@@ -129,13 +133,11 @@ export {
 // AGENTIC READINESS (Phase 11)
 // ============================================================
 
-// Temporarily removed these exports to avoid circular dependency issues
+export { SANDBOX_CONTEXT } from './testing/combo-test-definitions.js'; // Corrected import source
 
-export {
-  ReadinessRunner,
-  createReadinessRunner,
-  getReadinessRunner
-} from './testing/readiness-runner';
+// Remove non-existent exports
+// createReadinessRunner, getReadinessRunner are not directly exported
+export { ReadinessRunner } from './testing/readiness-runner/ReadinessRunner.js';
 
 export {
   prostheticStore,
@@ -158,11 +160,10 @@ export { testEngine } from './test-engine.js';
 export { ALL_TEST_DEFINITIONS as TEST_DEFINITIONS } from './testing/test-definitions.js';
 export { probeEngine } from './probe-engine.js';
 export { PROBE_CATEGORIES } from './strategic-probes.js';
-export { INTENT_PROBES, runIntentProbes, calculateIntentScores } from './intent-probes.js';
+export { INTENT_PROBES, calculateIntentScores } from './intent-probes.js';
 
 // Import and re-export default exports
 import generateRecommendationsDefault from './recommendations.js';
 import { calculateBadges as generateBadgesDefault } from './badges.js';
 export const generateRecommendations = generateRecommendationsDefault;
 export const generateBadges = generateBadgesDefault;
-

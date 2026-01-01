@@ -4,7 +4,8 @@
  */
 
 import Database from 'better-sqlite3';
-import { DB_PATH, initializeDatabase } from './schema.js';
+import { initializeDatabase } from './schema.js';
+import { DB_PATH } from './db-base';
 import { addDebugEntry } from '../logger.js';
 
 export class DatabaseManager {

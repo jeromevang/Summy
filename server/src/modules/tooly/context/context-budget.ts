@@ -1,13 +1,12 @@
-import { ModelProfile, ContextBudget } from '../capabilities/types.js';
+import { ModelProfile } from '../types.js';
+import { ContextBudget } from '../types.js';
 import { DEFAULT_CONTEXT_BUDGET } from '../orchestrator/mcp-orchestrator.js';
-import { analytics } from '../../services/analytics.js'; // To estimate tokens
+import { analytics } from '@services/analytics'; // To estimate tokens
 
 export class ContextBudgetManager {
-    private profile: ModelProfile;
     private contextBudget: ContextBudget;
 
     constructor(profile: ModelProfile) {
-        this.profile = profile;
         this.contextBudget = profile.optimalSettings?.contextBudget || profile.contextBudget || DEFAULT_CONTEXT_BUDGET;
     }
 
@@ -47,28 +46,6 @@ export class ContextBudgetManager {
         }
 
         const trimmedMessages = [...messages];
-        let systemPromptTokens = 0;
-        let toolSchemaTokens = 0;
-        let historyTokens = 0;
-        let ragTokens = 0;
-        let otherTokens = 0; // For current user/assistant messages
-
-        // Identify and prioritize core components
-        let systemMessageIndex = -1;
-        let toolSchemaMessageIndex = -1; // Assuming tool schemas might be injected as a message
-
-        for (let i = 0; i < trimmedMessages.length; i++) {
-            const message = trimmedMessages[i];
-            const msgTokens = analytics.estimateMessagesTokens([message]); // Estimate tokens for single message
-
-            if (message.role === 'system') {
-                systemPromptTokens += msgTokens;
-                systemMessageIndex = i;
-            }
-            // For now, assuming tool schemas are part of the system prompt or explicitly added.
-            // A more robust solution would know the actual tool schema size.
-            // We'll treat tool schemas as a fixed budget to protect them.
-        }
 
         // Calculate actual space for history and RAG
         const protectedTokens = this.contextBudget.systemPrompt + this.contextBudget.toolSchemas;
@@ -89,13 +66,11 @@ export class ContextBudgetManager {
         }
 
         if (historyStartIndex !== -1) {
-            let removedCount = 0;
             for (let i = 0; i < historyStartIndex; i++) { // Remove from beginning of history
                 const msgTokens = analytics.estimateMessagesTokens([trimmedMessages[i]]);
                 if (currentTokens > totalBudget && (trimmedMessages[i].role === 'user' || trimmedMessages[i].role === 'assistant')) {
                     trimmedMessages.splice(i, 1);
                     currentTokens -= msgTokens;
-                    removedCount++;
                     i--; // Adjust index due to splice
                 }
             }

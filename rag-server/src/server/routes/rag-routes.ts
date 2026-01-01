@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getIndexer } from '../services/indexer.js';
 import { getRAGDatabase } from '../services/database.js';
 
-export const createRAGRoutes = (indexer: any, config: any) => {
+export const createRAGRoutes = (indexer: any, config: any): Router => {
   const router = Router();
 
   router.get('/health', (req, res) => res.json({ status: 'ok', indexStatus: indexer.getProgress().status }));

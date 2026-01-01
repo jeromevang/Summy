@@ -18,7 +18,7 @@ export class ProbeReasoning extends ProbeBase {
             const jsonMatch = content.match(/\{[\s\S]*\}/);
             if (!jsonMatch) return { testName: 'intent_extraction', passed: false, score: 20, latency: Date.now() - startTime, details: 'No JSON', response };
 
-            const intent = JSON.parse(jsonMatch[0]);
+            JSON.parse(jsonMatch[0]); // Parsed, but not used.
             return { testName: 'intent_extraction', passed: true, score: 100, latency: Date.now() - startTime, details: 'Valid intent JSON', response };
         } catch (error: any) {
             return { testName: 'intent_extraction', passed: false, score: 0, latency: Date.now() - startTime, details: 'Test failed', error: error.message };

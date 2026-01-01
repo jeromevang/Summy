@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { workspaceService } from '../services/workspace-service.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/workspace

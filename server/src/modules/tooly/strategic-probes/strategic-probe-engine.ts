@@ -1,4 +1,4 @@
-import { ProbeTestResult, ProbeVariantResult } from './types.js';
+import { ProbeTestResult } from './types.js';
 import { PROBE_CATEGORIES } from './probe-categories.js';
 
 export async function runProbeCategory(
@@ -13,6 +13,7 @@ export async function runProbeCategory(
 
   for (let i = 0; i < category.probes.length; i++) {
     const probe = category.probes[i];
+    if (!probe) continue;
     const startTime = Date.now();
           if (onProgress) onProgress(`${category.icon} ${probe.name}`, i, totalProbes);    
     try {

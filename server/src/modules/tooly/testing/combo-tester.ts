@@ -1,12 +1,11 @@
-import axios from 'axios';
+
 import { LMStudioClient } from '@lmstudio/sdk';
 import { intentRouter } from '../intent-router.js';
-import { wsBroadcast } from '../../../services/ws-broadcast.js';
+
 import { db } from '../../../services/database.js';
 import { failureLog } from '../../../services/failure-log.js';
 import { capabilities } from '../capabilities.js';
 import {
-  TestCategory,
   DifficultyTier,
   ComboTestCase,
   ComboTestResult,
@@ -14,14 +13,11 @@ import {
   TierScore,
   ComboScore,
   ComboTestConfig,
-  ComboTestProgress,
   BroadcastFn
 } from './test-types.js';
 import {
   SANDBOX_CONTEXT,
-  COMBO_QUALIFYING_GATE,
   COMBO_TEST_CASES,
-  CATEGORY_INFO,
   TIER_WEIGHTS
 } from './combo-test-definitions.js';
 import { getModelProvider, getBasicTools } from './test-utils.js';
@@ -308,3 +304,5 @@ export class ComboTester {
     return this.calculateComboScore(mainId, execId, results);
   }
 }
+
+export type { ComboScore };

@@ -1,6 +1,6 @@
 /**
  * IDE Mapping Service
- * 
+ *
  * Handles detection of IDE from model name suffix and maps IDE-specific
  * tools to MCP tools. Also builds unified system prompts that combine
  * IDE tools with additional MCP capabilities.
@@ -19,47 +19,80 @@ const IDE_MAPPINGS_DIR = path.join(__dirname, '../../data/ide-mappings');
 
 // Known IDE suffixes
 const KNOWN_IDES = ['continue', 'cursor', 'copilot', 'windsurf', 'zed', 'vscode'] as const;
-type KnownIDE = typeof KNOWN_IDES[number];
+/**
+ * Represents the known IDEs that can be detected from model suffixes.
+ */
+export type KnownIDE = typeof KNOWN_IDES[number];
 
 // IDE Mapping file structure
+/**
+ * Defines how an IDE-specific tool maps to an MCP (Model Context Protocol) tool.
+ */
 export interface ToolMapping {
+  /** The name of the corresponding MCP tool. */
   mcp: string;
-  params?: Record<string, string>;  // IDE param name -> MCP param name
-  transform?: string;  // Name of transform function for complex mappings
+  /** Maps IDE parameter names to MCP parameter names. */
+  params?: Record<string, string>;
+  /** The name of a transformation function for complex mappings (e.g., parameter restructuring). */
+  transform?: string;
+  /** An optional description of the tool mapping. */
   description?: string;
 }
 
+/**
+ * Describes tools that are handled exclusively by the IDE and not by MCP.
+ */
 export interface IDEOnlyTool {
+  /** A description of the IDE-only tool. */
   description: string;
+  /** The action to take with this tool: 'passthrough' to IDE or 'ignore'. */
   action: 'passthrough' | 'ignore';
 }
 
+/**
+ * Represents the structure of an IDE mapping configuration file.
+ */
 export interface IDEMapping {
+  /** The identifier for the IDE (e.g., 'cursor', 'continue'). */
   ide: string;
+  /** The version of the mapping configuration. */
   version: string;
+  /** A human-readable description of the mapping. */
   description: string;
+  /** A suffix appended to model names to identify this IDE, or null if none. */
   modelSuffix: string | null;
+  /** Maps IDE tool names to their MCP counterparts. */
   mappings: Record<string, ToolMapping>;
+  /** Defines tools handled exclusively by the IDE. */
   ideOnly: Record<string, IDEOnlyTool>;
+  /** Optional mappings for browser-specific tools (e.g., for Cursor). */
   browserTools?: Record<string, { mcp: string }>;
   // Note: mcpExtensions is computed dynamically, not stored in JSON
 }
 
+/**
+ * Represents a parsed model name, identifying the base model and any associated IDE.
+ */
 export interface ParsedModel {
+  /** The base model name (e.g., 'gpt-4o'). */
   baseModel: string;
+  /** The detected IDE, or null if none. */
   ide: string | null;
+  /** The detected IDE suffix from the model name, or null if none. */
   ideSuffix: string | null;
 }
 
-// Cache for loaded mappings
+// Cache for loaded mappings to avoid repeated file reads
 const mappingCache: Map<string, IDEMapping> = new Map();
 
 /**
- * Parse model name to extract base model and IDE suffix
+ * Parses a model name to extract the base model and identify the IDE suffix.
  * Examples:
  *   "gpt-4o-continue" -> { baseModel: "gpt-4o", ide: "continue", ideSuffix: "continue" }
  *   "claude-3-sonnet-cursor" -> { baseModel: "claude-3-sonnet", ide: "cursor", ideSuffix: "cursor" }
  *   "gpt-4o" -> { baseModel: "gpt-4o", ide: null, ideSuffix: null }
+ * @param model - The model name string to parse.
+ * @returns An object containing the base model and detected IDE information.
  */
 export function parseModelIDE(model: string): ParsedModel {
   if (!model) {
@@ -84,7 +117,10 @@ export function parseModelIDE(model: string): ParsedModel {
 }
 
 /**
- * Load IDE mapping from JSON file
+ * Loads the IDE mapping configuration from a JSON file.
+ * It prioritizes specific IDE mappings and falls back to a default mapping.
+ * @param ide - The IDE identifier (e.g., 'cursor') or null for default mapping.
+ * @returns A promise that resolves with the IDEMapping configuration.
  */
 export async function loadIDEMapping(ide: string | null): Promise<IDEMapping> {
   const mappingFile = ide ? `${ide}.json` : 'default.json';
@@ -108,7 +144,7 @@ export async function loadIDEMapping(ide: string | null): Promise<IDEMapping> {
     console.warn(`Failed to load IDE mapping ${mappingFile}:`, error);
   }
 
-  // Fall back to default mapping
+  // Fall back to default mapping if specific mapping not found or failed to load
   try {
     const defaultPath = path.join(IDE_MAPPINGS_DIR, 'default.json');
     const defaultMapping = await fs.readJson(defaultPath) as IDEMapping;
@@ -116,7 +152,7 @@ export async function loadIDEMapping(ide: string | null): Promise<IDEMapping> {
     return defaultMapping;
   } catch (error) {
     console.error('Failed to load default IDE mapping:', error);
-    // Return empty mapping as last resort
+    // Return empty mapping as a last resort to prevent crashes
     return {
       ide: 'Unknown',
       version: '1.0.0',
@@ -129,28 +165,35 @@ export async function loadIDEMapping(ide: string | null): Promise<IDEMapping> {
 }
 
 /**
- * Clear the mapping cache (useful for hot-reloading)
+ * Clears the entire mapping cache. Useful for development or when mappings are updated.
  */
 export function clearMappingCache(): void {
   mappingCache.clear();
 }
 
 /**
- * Get all mapped tool names (IDE tools that map to MCP tools)
+ * Retrieves a list of all IDE tool names that are mapped to MCP tools.
+ * @param mapping - The IDEMapping configuration.
+ * @returns An array of mapped tool names.
  */
 export function getMappedToolNames(mapping: IDEMapping): string[] {
   return Object.keys(mapping.mappings);
 }
 
 /**
- * Get all IDE-only tool names (tools handled by IDE, not MCP)
+ * Retrieves a list of all tool names that are exclusively handled by the IDE.
+ * @param mapping - The IDEMapping configuration.
+ * @returns An array of IDE-only tool names.
  */
 export function getIDEOnlyToolNames(mapping: IDEMapping): string[] {
   return Object.keys(mapping.ideOnly);
 }
 
 /**
- * Check if a tool is mapped to MCP
+ * Checks if a given tool name is mapped to an MCP tool (either directly or via browserTools).
+ * @param toolName - The name of the tool to check.
+ * @param mapping - The IDEMapping configuration.
+ * @returns True if the tool is mapped, false otherwise.
  */
 export function isMappedTool(toolName: string, mapping: IDEMapping): boolean {
   return toolName in mapping.mappings || 
@@ -158,15 +201,21 @@ export function isMappedTool(toolName: string, mapping: IDEMapping): boolean {
 }
 
 /**
- * Check if a tool is IDE-only (passthrough)
+ * Checks if a given tool name is exclusively handled by the IDE.
+ * @param toolName - The name of the tool to check.
+ * @param mapping - The IDEMapping configuration.
+ * @returns True if the tool is IDE-only, false otherwise.
  */
 export function isIDEOnlyTool(toolName: string, mapping: IDEMapping): boolean {
   return toolName in mapping.ideOnly;
 }
 
 /**
- * Compute MCP extensions from model's enabled tools
- * Returns tools that are enabled for the model but NOT covered by IDE mappings
+ * Computes the list of MCP tools that are enabled for a model but not covered by IDE mappings.
+ * These are considered 'MCP extensions'.
+ * @param modelEnabledTools - An array of tool names enabled for the current model.
+ * @param mapping - The IDEMapping configuration.
+ * @returns An array of MCP extension tool names.
  */
 export function computeMCPExtensions(modelEnabledTools: string[], mapping: IDEMapping): string[] {
   // Get all MCP tools that IDE mappings cover
@@ -189,7 +238,11 @@ export function computeMCPExtensions(modelEnabledTools: string[], mapping: IDEMa
 }
 
 /**
- * Check if a tool is an MCP extension (not covered by IDE)
+ * Checks if a specific tool is an MCP extension (i.e., enabled for the model but not mapped by the IDE).
+ * @param toolName - The name of the tool to check.
+ * @param modelEnabledTools - An array of tool names enabled for the current model.
+ * @param mapping - The IDEMapping configuration.
+ * @returns True if the tool is an MCP extension, false otherwise.
  */
 export function isMCPExtension(toolName: string, modelEnabledTools: string[], mapping: IDEMapping): boolean {
   const extensions = computeMCPExtensions(modelEnabledTools, mapping);
@@ -197,7 +250,11 @@ export function isMCPExtension(toolName: string, modelEnabledTools: string[], ma
 }
 
 /**
- * Map IDE tool call to MCP tool call
+ * Maps an IDE tool call to its corresponding MCP tool call, handling parameter transformations.
+ * @param ideToolName - The name of the tool as called by the IDE.
+ * @param ideParams - The parameters for the IDE tool call.
+ * @param mapping - The IDEMapping configuration.
+ * @returns An object containing the MCP tool name and parameters, or null if no mapping is found.
  */
 export function mapToolCall(
   ideToolName: string, 
@@ -246,7 +303,11 @@ export function mapToolCall(
 }
 
 /**
- * Apply transform function for complex mappings
+ * Applies a specific transformation function to map IDE parameters to MCP parameters for complex cases.
+ * @param transformName - The name of the transformation function.
+ * @param ideParams - The parameters from the IDE tool call.
+ * @param mapping - The ToolMapping object, which includes the transform name.
+ * @returns The transformed MCP tool call details.
  */
 function applyTransform(
   transformName: string, 
@@ -291,8 +352,11 @@ function applyTransform(
 }
 
 /**
- * Build unified system prompt that describes all available tools
- * (both IDE-mapped tools and MCP extensions)
+ * Builds a unified system prompt that describes all available tools (both IDE-mapped and MCP extensions).
+ * This helps the LLM understand the full toolset it can utilize.
+ * @param modelEnabledTools - An array of tool names that are enabled for the current model.
+ * @param mapping - The IDEMapping configuration.
+ * @returns A formatted string representing the tool descriptions for the system prompt.
  */
 export function buildUnifiedToolPrompt(modelEnabledTools: string[], mapping: IDEMapping): string {
   const sections: string[] = [];
@@ -321,15 +385,19 @@ To use these tools, call them by name with the appropriate parameters.
 }
 
 /**
- * Get the list of MCP tools to add to the tools array
- * These are tools not covered by IDE mappings
+ * Retrieves the list of MCP tools that should be added to the model's toolset
+ * because they are enabled for the model but not covered by IDE mappings.
+ * @param modelEnabledTools - An array of tool names enabled for the current model.
+ * @param mapping - The IDEMapping configuration.
+ * @returns An array of MCP tool names to be added.
  */
 export function getMCPToolsToAdd(modelEnabledTools: string[], mapping: IDEMapping): string[] {
   return computeMCPExtensions(modelEnabledTools, mapping);
 }
 
 /**
- * List all available IDE mappings
+ * Lists all available IDE mapping files in the `data/ide-mappings` directory.
+ * @returns A promise that resolves with an array of available IDE identifiers (filenames without extension).
  */
 export async function listAvailableIDEs(): Promise<string[]> {
   try {
@@ -343,7 +411,10 @@ export async function listAvailableIDEs(): Promise<string[]> {
 }
 
 /**
- * Reload a specific IDE mapping (for hot reload)
+ * Reloads a specific IDE mapping from its JSON file, updating the cache.
+ * Useful for applying changes without restarting the server.
+ * @param ide - The IDE identifier for which to reload the mapping.
+ * @returns A promise that resolves with the reloaded IDEMapping, or null if an error occurs.
  */
 export async function reloadIDEMapping(ide: string): Promise<IDEMapping | null> {
   mappingCache.delete(`${ide}.json`);
@@ -355,8 +426,13 @@ export async function reloadIDEMapping(ide: string): Promise<IDEMapping | null> 
 }
 
 /**
- * Process a tool call from LLM response
- * Returns the mapped MCP tool info or null if it should be passed through to IDE
+ * Processes a tool call originating from the LLM response, determining the correct action.
+ * It checks if the tool should be executed via MCP, passed to the IDE, or is unknown.
+ * @param toolName - The name of the tool called by the LLM.
+ * @param toolParams - The parameters of the tool call.
+ * @param modelEnabledTools - An array of tool names enabled for the current model.
+ * @param mapping - The IDEMapping configuration.
+ * @returns An object indicating the action ('execute', 'passthrough', 'unknown') and optionally the MCP tool details.
  */
 export function processToolCall(
   toolName: string,
@@ -394,7 +470,10 @@ export function processToolCall(
 }
 
 /**
- * Get statistics about the IDE mapping
+ * Provides statistics about the current IDE mapping configuration.
+ * @param modelEnabledTools - An array of tool names enabled for the current model.
+ * @param mapping - The IDEMapping configuration.
+ * @returns An object containing statistics about the mapping (e.g., counts of different tool types).
  */
 export function getMappingStats(modelEnabledTools: string[], mapping: IDEMapping): {
   ide: string;
@@ -413,7 +492,7 @@ export function getMappingStats(modelEnabledTools: string[], mapping: IDEMapping
   };
 }
 
-// Export singleton-like interface
+// Export a singleton-like interface for the IDE mapping functionalities
 export const ideMapping = {
   parseModelIDE,
   loadIDEMapping,

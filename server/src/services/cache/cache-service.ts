@@ -5,7 +5,7 @@
 
 import { CacheManager, caches, cacheInvalidation } from './cache-manager';
 import { db } from '../database.js';
-import { ModelProfile, TestResult, ComboTestResult } from '../../types';
+import { ModelProfile, TestResult, ComboTestResult } from '@summy/shared';
 import { addDebugEntry } from '../logger';
 
 export class CacheService {

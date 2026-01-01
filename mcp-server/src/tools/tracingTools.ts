@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { textResult, errorResult } from "../utils/helpers.js";
-import { codeIndexService } from "../../../database/src/index.js";
+import { codeIndexService } from "@summy/database";
 
 export function registerTracingTools(server: McpServer) {
   

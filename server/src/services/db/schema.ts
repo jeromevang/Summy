@@ -4,16 +4,6 @@
  */
 
 import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs-extra';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Database file location
-export const DB_PATH = path.join(__dirname, '../../../../data/summy.db');
-
 // Database schema SQL
 export const SCHEMA_SQL = `
 -- Sessions

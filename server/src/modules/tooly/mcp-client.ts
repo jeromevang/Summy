@@ -8,9 +8,7 @@ import { createInterface, Interface } from 'readline';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 import { notifications } from '../../services/notifications.js';
-import { errorHandler } from '../../services/error-handler.js';
 import { capabilities, ALL_TOOLS } from './capabilities.js';
 
 // ES module equivalent of __dirname
@@ -185,7 +183,7 @@ class MCPClient {
         }
 
         // Add model config path to args if it exists for the current model
-        const activeModelId = process.env.MAIN_MODEL_ID || process.env.LMSTUDIO_MODEL;
+        const activeModelId = process.env['MAIN_MODEL_ID'] || process.env['LMSTUDIO_MODEL'];
         if (activeModelId) {
           const configPath = path.resolve(this.mcpServerPath, 'configs', 'models', `${activeModelId.replace(/[^a-zA-Z0-9-_.]/g, '_')}.json`);
           if (require('fs').existsSync(configPath)) {
@@ -254,7 +252,8 @@ class MCPClient {
   }
 
   private retryCount = 0;
-  private retryTimer: NodeJS.Timeout | null = null;
+
+  private _retryTimer: NodeJS.Timeout | null = null;
 
   private async attemptReconnectWithBackoff() {
     if (this.retryCount >= this.backoffConfig.maxRetries) {
@@ -270,7 +269,7 @@ class MCPClient {
 
     console.log(`[MCP] Reconnecting in ${delay}ms (Attempt ${this.retryCount + 1}/${this.backoffConfig.maxRetries})`);
 
-    this.retryTimer = setTimeout(async () => {
+    this._retryTimer = setTimeout(async () => {
       this.retryCount++;
       try {
         await this.reconnect();
@@ -317,7 +316,7 @@ class MCPClient {
     this.httpBaseUrl = null;
 
     // Reject all pending requests
-    for (const [id, pending] of this.pendingRequests) {
+    for (const [_id, pending] of this.pendingRequests) {
       clearTimeout(pending.timeout);
       pending.reject(new Error('MCP disconnected'));
     }

@@ -280,18 +280,7 @@ export function extractBadgeScores(profile: any): BadgeScores {
   };
 }
 
-/**
- * Calculate average score for a category of probes
- */
-function calculateCategoryScore(probes: Record<string, any>): number | undefined {
-  const scores = Object.values(probes)
-    .filter((p: any) => typeof p?.score === 'number')
-    .map((p: any) => p.score);
-  
-  if (scores.length === 0) return undefined;
-  
-  return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-}
+
 
 export default {
   BADGE_DEFINITIONS,

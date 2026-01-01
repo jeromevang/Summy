@@ -5,7 +5,7 @@ import { ComboTeachingLoop } from '../../modules/tooly/orchestrator/combo-teachi
 import { ComboTester } from '../../modules/tooly/testing/combo-tester.js';
 import { wsBroadcast } from '../../services/ws-broadcast.js';
 
-const router = Router();
+const router: Router = Router();
 
 // Mock state (kept for status/start/stop)
 let observerStatus = { running: false, lastActive: null as string | null };
@@ -23,7 +23,7 @@ const teachingLoops = new Map<string, ComboTeachingLoop>();
  * GET /api/tooly/controller/status
  * Get controller status
  */
-router.get('/controller/status', (req, res) => {
+router.get('/controller/status', (_req, res) => {
   res.json({
     observer: observerStatus,
     summary
@@ -34,7 +34,7 @@ router.get('/controller/status', (req, res) => {
  * POST /api/tooly/controller/start
  * Start observer
  */
-router.post('/controller/start', (req, res) => {
+router.post('/controller/start', (_req, res) => {
   observerStatus.running = true;
   res.json({ status: observerStatus });
 });
@@ -43,7 +43,7 @@ router.post('/controller/start', (req, res) => {
  * POST /api/tooly/controller/stop
  * Stop observer
  */
-router.post('/controller/stop', (req, res) => {
+router.post('/controller/stop', (_req, res) => {
   observerStatus.running = false;
   observerStatus.lastActive = new Date().toISOString();
   res.json({ status: observerStatus });
@@ -53,7 +53,7 @@ router.post('/controller/stop', (req, res) => {
  * POST /api/tooly/controller/analyze
  * Run analysis
  */
-router.post('/controller/analyze', (req, res) => {
+router.post('/controller/analyze', (_req, res) => {
   try {
     const failures = failureLog.getFailures();
     const analysis = {
@@ -120,7 +120,7 @@ router.post('/controller/analyze', (req, res) => {
  * GET /api/tooly/controller/combo-teaching-results
  * Get combo teaching results
  */
-router.get('/controller/combo-teaching-results', (req, res) => {
+router.get('/controller/combo-teaching-results', (_req, res) => {
   // TODO: Retrieve persisted results if stored, or current active sessions
   res.json({ results: [] });
 });
@@ -129,7 +129,7 @@ router.get('/controller/combo-teaching-results', (req, res) => {
  * POST /api/tooly/controller/run-combo-teaching
  * Run combo teaching session
  */
-router.post('/controller/run-combo-teaching', async (req, res) => {
+router.post('/controller/run-combo-teaching', async (_req, res) => {
   const { mainModelId, executorModelId, contextSize } = req.body;
 
   if (!mainModelId || !executorModelId) {

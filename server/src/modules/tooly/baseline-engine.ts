@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { db } from '../../services/database.js';
-import { capabilities } from './capabilities.js';
 import { wsBroadcast } from '../../services/ws-broadcast.js';
+import { ProbeDefinition } from './types.js';
 
 export interface BaselineRunResult {
     testId: string;
@@ -17,7 +17,7 @@ export class BaselineEngine {
     private genAI: GoogleGenerativeAI | null = null;
 
     constructor() {
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = process.env['GEMINI_API_KEY'];
         if (apiKey) {
             this.genAI = new GoogleGenerativeAI(apiKey);
         }
@@ -39,7 +39,7 @@ export class BaselineEngine {
 
             try {
                 // Fetch the test definition from DB or test-engine
-                const test = db.getCustomTests().find(t => t.id === testId);
+                const test = db.getCustomTests().find((t: ProbeDefinition) => t.id === testId);
                 if (!test) continue;
 
                 const prompt = this.buildBaselinePrompt(test);

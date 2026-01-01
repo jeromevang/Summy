@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { notifications } from '../services/notifications.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/notifications
@@ -13,8 +13,8 @@ const router = Router();
  */
 router.get('/', (req, res) => {
   try {
-    const unreadOnly = req.query.unreadOnly === 'true';
-    const limit = parseInt(req.query.limit as string) || 20;
+    const unreadOnly = req.query['unreadOnly'] === 'true';
+    const limit = parseInt(req.query['limit'] as string) || 20;
     
     const notificationList = notifications.getAll(unreadOnly, limit);
     const unreadCount = notifications.getUnreadCount();
@@ -48,7 +48,7 @@ router.post('/:id/read', (req, res) => {
  * POST /api/notifications/read-all
  * Mark all notifications as read
  */
-router.post('/read-all', (req, res) => {
+router.post('/read-all', (_req, res) => {
   try {
     notifications.markAllAsRead();
     res.json({ success: true });
@@ -77,7 +77,7 @@ router.delete('/:id', (req, res) => {
  * DELETE /api/notifications
  * Clear all notifications
  */
-router.delete('/', (req, res) => {
+router.delete('/', (_req, res) => {
   try {
     notifications.clearAll();
     res.json({ success: true });

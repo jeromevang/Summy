@@ -95,7 +95,7 @@ export class FailureLogService {
     this.data.patterns[pid].lastSeen = entry.timestamp;
   }
 
-  getFailures(options?: any) { 
+  getFailures(_options?: any) { 
     this.ensureDataLoaded();
     return this.data.entries; 
   }
@@ -110,9 +110,9 @@ export class FailureLogService {
     return { unresolvedPatterns: Object.values(this.data.patterns), recentFailures: this.data.entries.slice(-20), modelSummary: [] }; 
   }
   
-  markResolved(ids: string[], pid: string) { return 0; }
-  clearForModel(mid: string) { return 0; }
-  clearOld(days: number) { return 0; }
+  markResolved(_ids: string[], _pid: string) { return 0; }
+  clearForModel(_mid: string) { return 0; }
+  clearOld(_days: number) { return 0; }
 }
 
 export const failureLog = new FailureLogService();

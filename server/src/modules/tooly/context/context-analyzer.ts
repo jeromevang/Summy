@@ -71,7 +71,6 @@ const analysisCache = new Map<string, { result: EnhancedQueryAnalysis; timestamp
 
 export class ContextAnalyzer {
   private config: SmallModelConfig;
-  private fallbackAnalysis: boolean = true;
 
   constructor(config?: Partial<SmallModelConfig>) {
     this.config = { ...DEFAULT_SMALL_MODEL_CONFIG, ...config };
@@ -180,9 +179,8 @@ export class ContextAnalyzer {
         { timeout: this.config.timeout }
       );
 
-      const content = response.data.choices?.[0]?.message?.content || '';
-      
-      // Try to parse JSON from response
+      if (!response.data) return null;
+      const content = (response.data as any).choices?.[0]?.message?.content || '';
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) return null;
 
@@ -246,10 +244,11 @@ ${truncatedItems.map((item, i) => `${i}. ${item.substring(0, 200)}`).join('\n')}
         { timeout: this.config.timeout * 2 }
       );
 
-      const content = response.data.choices?.[0]?.message?.content || '';
+      if (!response.data) return null;
+      const content = (response.data as any).choices?.[0]?.message?.content || '';
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       
-      if (!jsonMatch) {
+      if (!jsonMatch || !jsonMatch[0]) {
         return this.keywordBasedRanking(query, items, maxItems);
       }
 
@@ -339,7 +338,7 @@ ${truncatedItems.map((item, i) => `${i}. ${item.substring(0, 200)}`).join('\n')}
       requiresHistory: lowerQuery.includes('we') || lowerQuery.includes('earlier') ||
                        lowerQuery.includes('before') || lowerQuery.includes('previous'),
       estimatedResponseTokens: this.estimateResponseTokens(complexity, queryType),
-      intent: this.extractIntent(query, queryType),
+      intent: this.extractIntent(queryType),
       entities: [...new Set(entities)],
       suggestedTools,
       contextNeeds: {
@@ -379,7 +378,7 @@ ${truncatedItems.map((item, i) => `${i}. ${item.substring(0, 200)}`).join('\n')}
 
     return {
       items: sorted,
-      queryRelevance: sorted.length > 0 ? sorted[0].score : 0
+      queryRelevance: sorted.length > 0 ? sorted[0]?.score ?? 0 : 0
     };
   }
 
@@ -447,7 +446,7 @@ ${truncatedItems.map((item, i) => `${i}. ${item.substring(0, 200)}`).join('\n')}
     return Math.round(base);
   }
 
-  private extractIntent(query: string, type: string): string {
+  private extractIntent(type: string): string {
     const actions: Record<string, string> = {
       'code_question': 'understand or find code',
       'file_operation': 'modify files',

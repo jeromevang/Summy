@@ -5,8 +5,7 @@
  * Handles "Protocol X" disqualifications and automatic failover.
  */
 
-import { mcpOrchestrator } from './mcp-orchestrator.js';
-import { ModelProfileV2, IntentJSON, StrategyType } from '../types.js';
+import { IntentSchema } from '../types.ts';
 
 export class SwarmRouter {
     private activeSwarm: {
@@ -28,25 +27,25 @@ export class SwarmRouter {
     /**
    * Route a task based on explicit Intent
    */
-    async executeIntent(intent: IntentJSON): Promise<string | null> {
-        const taskType = this.mapStrategyToTaskType(intent.strategy);
-        return this.routeTask(taskType, intent.reasoning);
+    async executeIntent(intent: IntentSchema): Promise<string | null> {
+        const taskType = this.mapActionToTaskType(intent.action);
+        return this.routeTask(taskType);
     }
 
-    private mapStrategyToTaskType(strategy: StrategyType): string {
-        switch (strategy) {
-            case 'refactor': return 'coding'; // Strong coding needed
-            case 'patch': return 'coding';
-            case 'investigate': return 'reasoning'; // Deep thought
-            case 'consult': return 'rag'; // Research
-            default: return 'reasoning';
+    private mapActionToTaskType(action: IntentSchema['action']): string {
+        switch (action) {
+            case 'call_tool': return 'tool_use';
+            case 'multi_step': return 'planning';
+            case 'respond': return 'reasoning';
+            case 'ask_clarification': return 'reasoning';
+            default: return 'reasoning'; // Fallback
         }
     }
 
     /**
      * Route a task to the best available model
      */
-    async routeTask(taskType: string, intent: string): Promise<string | null> {
+    async routeTask(taskType: string): Promise<string | null> {
         if (!this.activeSwarm) {
             throw new Error('Swarm not initialized');
         }
@@ -71,7 +70,7 @@ export class SwarmRouter {
         }
 
         // 3. Return the best candidate (first one for now, could be score-based)
-        return qualifiedCandidates[0];
+        return qualifiedCandidates[0] || null;
     }
 
     /**

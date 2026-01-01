@@ -12,14 +12,14 @@ import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
 
-const router = Router();
+const router: Router = Router();
 
 // ============================================================
 // FILE SYSTEM BROWSER
 // ============================================================
 
 // Get system drives (Windows) or root directories
-router.get('/browse/roots', async (req: Request, res: Response) => {
+router.get('/browse/roots', async (_req: Request, res: Response) => {
   try {
     const platform = os.platform();
     const roots: { path: string; name: string; type: 'drive' | 'folder' }[] = [];
@@ -70,16 +70,16 @@ router.get('/browse/roots', async (req: Request, res: Response) => {
       }
     }
     
-    res.json(validRoots);
+    return res.json(validRoots);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
 // Browse a directory
 router.get('/browse/dir', async (req: Request, res: Response) => {
   try {
-    const dirPath = req.query.path as string;
+    const dirPath = req.query['path'] as string;
     
     if (!dirPath) {
       return res.status(400).json({ error: 'path is required' });
@@ -140,7 +140,7 @@ router.get('/browse/dir', async (req: Request, res: Response) => {
 // ============================================================
 
 // Health check
-router.get('/health', async (req: Request, res: Response) => {
+router.get('/health', async (_req: Request, res: Response) => {
   try {
     const healthy = await ragClient.healthCheck();
     const status = ragClient.getStatus();
@@ -155,7 +155,7 @@ router.get('/health', async (req: Request, res: Response) => {
 });
 
 // Get configuration - from database (persisted) with optional RAG server merge
-router.get('/config', async (req: Request, res: Response) => {
+router.get('/config', async (_req: Request, res: Response) => {
   try {
     // Always get from database first (this is the persisted source of truth)
     const dbConfig = db.getRAGConfig();
@@ -205,7 +205,7 @@ router.put('/config', async (req: Request, res: Response) => {
 });
 
 // Get statistics - pure proxy to RAG server
-router.get('/stats', async (req: Request, res: Response) => {
+router.get('/stats', async (_req: Request, res: Response) => {
   try {
     const stats = await ragClient.getStats();
     if (!stats) {
@@ -218,7 +218,7 @@ router.get('/stats', async (req: Request, res: Response) => {
 });
 
 // List available embedding models
-router.get('/models', async (req: Request, res: Response) => {
+router.get('/models', async (_req: Request, res: Response) => {
   let models: any[] = [];
   
   try {
@@ -321,7 +321,7 @@ router.post('/index', async (req: Request, res: Response) => {
 });
 
 // Delete index
-router.delete('/index', async (req: Request, res: Response) => {
+router.delete('/index', async (_req: Request, res: Response) => {
   try {
     const success = await ragClient.clearIndex();
     res.json({ success });
@@ -331,7 +331,7 @@ router.delete('/index', async (req: Request, res: Response) => {
 });
 
 // Get indexing status
-router.get('/index/status', async (req: Request, res: Response) => {
+router.get('/index/status', async (_req: Request, res: Response) => {
   try {
     const status = await ragClient.getIndexStatus();
     if (!status) {
@@ -344,7 +344,7 @@ router.get('/index/status', async (req: Request, res: Response) => {
 });
 
 // Cancel indexing
-router.post('/index/cancel', async (req: Request, res: Response) => {
+router.post('/index/cancel', async (_req: Request, res: Response) => {
   try {
     const success = await ragClient.cancelIndexing();
     res.json({ success });
@@ -376,7 +376,7 @@ router.post('/query', async (req: Request, res: Response) => {
 });
 
 // Get metrics - pure proxy to RAG server
-router.get('/metrics', async (req: Request, res: Response) => {
+router.get('/metrics', async (_req: Request, res: Response) => {
   try {
     const metrics = await ragClient.getMetrics();
     res.json(metrics || {
@@ -390,7 +390,7 @@ router.get('/metrics', async (req: Request, res: Response) => {
 });
 
 // Get visualization data - pure proxy to RAG server
-router.get('/visualization', async (req: Request, res: Response) => {
+router.get('/visualization', async (_req: Request, res: Response) => {
   try {
     const visualization = await ragClient.getVisualization();
     res.json(visualization);
@@ -400,7 +400,7 @@ router.get('/visualization', async (req: Request, res: Response) => {
 });
 
 // Get chunks with pagination - pure proxy to RAG server
-router.get('/chunks', async (req: Request, res: Response) => {
+router.get('/chunks', async (_req: Request, res: Response) => {
   try {
     const chunks = await ragClient.getChunks(req.query as any);
     res.json(chunks);
@@ -410,7 +410,7 @@ router.get('/chunks', async (req: Request, res: Response) => {
 });
 
 // Get single chunk - pure proxy to RAG server
-router.get('/chunks/:id', async (req: Request, res: Response) => {
+router.get('/chunks/:id', async (_req: Request, res: Response) => {
   try {
     const chunk = await ragClient.getChunk(req.params.id);
     if (!chunk) {
@@ -423,7 +423,7 @@ router.get('/chunks/:id', async (req: Request, res: Response) => {
 });
 
 // Get similar chunks
-router.get('/chunks/:id/similar', async (req: Request, res: Response) => {
+router.get('/chunks/:id/similar', async (_req: Request, res: Response) => {
   try {
     const limit = req.query.limit ? Number(req.query.limit) : 5;
     const similar = await ragClient.getSimilarChunks(req.params.id, limit);
@@ -434,7 +434,7 @@ router.get('/chunks/:id/similar', async (req: Request, res: Response) => {
 });
 
 // Start RAG server
-router.post('/start', async (req: Request, res: Response) => {
+router.post('/start', async (_req: Request, res: Response) => {
   try {
     const success = await ragClient.ensureRunning();
     res.json({ success, status: ragClient.getStatus() });
@@ -444,7 +444,7 @@ router.post('/start', async (req: Request, res: Response) => {
 });
 
 // Stop RAG server
-router.post('/stop', async (req: Request, res: Response) => {
+router.post('/stop', async (_req: Request, res: Response) => {
   try {
     ragClient.stop();
     res.json({ success: true });

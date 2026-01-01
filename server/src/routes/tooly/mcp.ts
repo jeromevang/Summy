@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { mcpClient } from '../../modules/tooly/mcp-client.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/tooly/mcp/status
  * Get MCP connection status
  */
-router.get('/status', (req, res) => {
+router.get('/status', (_req, res) => {
   res.json(mcpClient.getStatus());
 });
 
@@ -15,7 +15,7 @@ router.get('/status', (req, res) => {
  * POST /api/tooly/mcp/connect
  * Connect to MCP server
  */
-router.post('/connect', async (req, res) => {
+router.post('/connect', async (_req, res) => {
   try {
     await mcpClient.connect();
     res.json({ success: true, status: mcpClient.getStatus() });
@@ -29,7 +29,7 @@ router.post('/connect', async (req, res) => {
  * POST /api/tooly/mcp/disconnect
  * Disconnect from MCP server
  */
-router.post('/disconnect', (req, res) => {
+router.post('/disconnect', (_req, res) => {
   mcpClient.disconnect();
   res.json({ success: true });
 });
@@ -38,7 +38,7 @@ router.post('/disconnect', (req, res) => {
  * GET /api/tooly/mcp/tools
  * List available MCP tools
  */
-router.get('/tools', async (req, res) => {
+router.get('/tools', async (_req, res) => {
   try {
     const tools = await mcpClient.listTools();
     res.json({ tools });

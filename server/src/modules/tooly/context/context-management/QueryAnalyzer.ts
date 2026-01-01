@@ -5,6 +5,7 @@ export function analyzeQuery(query: string): QueryAnalysis {
   let queryType: QueryAnalysis['queryType'] = 'explanation';
   if (lowerQuery.includes('read') || lowerQuery.includes('write')) queryType = 'file_operation';
   else if (lowerQuery.includes('git')) queryType = 'git_operation';
+  else if (lowerQuery.includes('find') || lowerQuery.includes('search') || lowerQuery.includes('how')) queryType = 'code_question';
   
   return {
     queryType,

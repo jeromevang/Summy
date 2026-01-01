@@ -9,7 +9,6 @@
  *  2. MentalModel: Structured understanding (Relationships, Constraints)
  */
 
-import fs from 'fs-extra';
 import path from 'path';
 import { ragClient } from '../../../services/rag-client.js';
 
@@ -117,6 +116,8 @@ export class ContextPrism {
             let currentPath = '';
             for (let i = 0; i < parts.length - 1; i++) {
                 const part = parts[i];
+                if (!part) continue;
+
                 const parent = currentPath;
                 currentPath = currentPath ? path.join(currentPath, part) : part;
 
@@ -125,6 +126,8 @@ export class ContextPrism {
             }
 
             const fileName = parts[parts.length - 1];
+            if (!fileName) continue;
+
             const dir = path.dirname(relPath);
             const key = dir === '.' ? '' : dir;
 

@@ -1,56 +1,112 @@
-import { v4 as uuidv4 } from 'uuid';
-import { db, type ContextMessage } from './database.js';
+import { db } from './database.js';
 import { addDebugEntry } from './logger.js';
 
+/**
+ * Represents a single phase within a Tooly agent's operation.
+ */
 export interface ToolyPhase {
+    /** The name of the phase. */
     phase: 'planning' | 'execution' | 'response';
+    /** The system prompt used in this phase. */
     systemPrompt: string;
+    /** The model that executed this phase. */
     model: string;
+    /** The time taken for this phase in milliseconds. */
     latencyMs: number;
+    /** Optional reasoning or thoughts from the model for this phase. */
     reasoning?: string;
 }
 
+/**
+ * Represents a single tool call made by the Tooly agent.
+ */
 export interface ToolyToolCall {
+    /** A unique identifier for the tool call. */
     id: string;
+    /** The name of the tool being called. */
     name: string;
+    /** The arguments passed to the tool. */
     arguments: any;
+    /** The result returned by the tool. */
     result?: any;
+    /** The execution status of the tool call. */
     status: 'success' | 'failed' | 'timeout' | 'pending';
+    /** The time taken for the tool call to complete in milliseconds. */
     latencyMs?: number;
+    /** Any error message if the tool call failed. */
     error?: string;
 }
 
+/**
+ * Contains metadata about the Tooly agent's execution for a given turn.
+ */
 export interface ToolyMeta {
+    /** The operational mode of the agent. */
     mode: 'single' | 'dual' | 'passthrough';
+    /** An array of phases the agent went through. */
     phases: ToolyPhase[];
+    /** An array of tool calls made during the execution phase. */
     toolCalls?: ToolyToolCall[];
+    /** The total time taken for the entire agent operation in milliseconds. */
     totalLatencyMs?: number;
 }
 
+/**
+ * Represents a single request-response turn in a conversation.
+ */
 export interface ConversationTurn {
+    /** A unique identifier for the turn. */
     id: string;
+    /** The timestamp when the turn was recorded. */
     timestamp: string;
+    /** The original request object from the client. */
     request: any;
+    /** The final response object sent to the client. */
     response?: any;
+    /** Optional metadata from the Tooly agent. */
     toolyMeta?: ToolyMeta;
 }
 
+/**
+ * Represents a full conversation session, containing multiple turns.
+ */
 export interface ContextSession {
+    /** A unique identifier for the session. */
     id: string;
+    /** A user-friendly name for the session. */
     name: string;
+    /** The IDE or client that initiated the session. */
     ide: string;
+    /** A more specific mapping for the IDE if available. */
     ideMapping?: string;
+    /** The timestamp when the session was created. */
     created: string;
+    /** An array of conversation turns that make up the session. */
     conversations: ConversationTurn[];
+    /** The original size of the conversation context before compression. */
     originalSize?: number;
+    /** The size of the conversation context after compression. */
     summarizedSize?: number;
+    /** A summary of the conversation. */
     summary?: any;
+    /** The compression data. */
     compression?: any; // Use the type from compression-engine.ts
+    /** The compressed conversation turns. */
     compressedConversations?: ConversationTurn[];
+    /** Cached compression results. */
     cachedCompressions?: any;
 }
 
+/**
+ * Manages the lifecycle of conversation sessions, including creation, updating, and retrieval.
+ */
 export class SessionService {
+    /**
+     * Extracts a conversation ID from an incoming request.
+     * The ID is sourced from headers, body, or generated from message content.
+     * @param req - The incoming request object.
+     * @returns A unique string identifier for the conversation.
+     */
     static extractConversationId(req: any): string {
         const body = req.body || {};
         const headers = req.headers || {};
@@ -73,6 +129,12 @@ export class SessionService {
         return `conv_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     }
 
+    /**
+     * Creates a new session in the database if one doesn't already exist for the request.
+     * The session is populated with details from the request headers and body.
+     * @param req - The request object, containing sessionId, headers, and body.
+     * @returns A promise that resolves when the session is created.
+     */
     static async createSessionFromRequest(req: any): Promise<void> {
         const sessionExists = db.contextSessionExists(req.sessionId);
         if (!sessionExists) {
@@ -106,13 +168,21 @@ export class SessionService {
         }
     }
 
+    /**
+     * Updates a session with a new conversation turn, or updates a session's title.
+     * @param sessionId - The ID of the session to update.
+     * @param requestBody - The body of the original request.
+     * @param responseData - The response data from the LLM.
+     * @param agenticMessages - Optional array of messages from an agentic execution.
+     * @param options - Optional parameters, e.g., for handling title generation requests.
+     * @returns A promise that resolves when the update is complete.
+     */
     static async updateSessionWithResponse(
         sessionId: string,
         requestBody: any,
-        responseData: any,
+    responseData: any,
         agenticMessages?: any[],
-        options?: { isTitleRequest?: boolean; titleTargetSession?: string }
-    ): Promise<void> {
+        options?: { isTitleRequest?: boolean; titleTargetSession?: string }): Promise<void> {
         if (options?.isTitleRequest && options?.titleTargetSession) {
             const generatedTitle = responseData.choices?.[0]?.message?.content || responseData.content || '';
             if (generatedTitle.trim()) {
@@ -194,6 +264,11 @@ export class SessionService {
         }
     }
 
+    /**
+     * Loads a session and its conversation turns from the database.
+     * @param sessionId - The ID of the session to load.
+     * @returns A promise that resolves with the ContextSession object or null if not found.
+     */
     static async loadSession(sessionId: string): Promise<ContextSession | null> {
         try {
             const dbSession = db.getContextSession(sessionId);
@@ -214,6 +289,12 @@ export class SessionService {
             return null;
         }
     }
+    
+    /**
+     * Placeholder for saving a session. Currently a no-op as sessions are saved turn-by-turn.
+     * @param session - The session object to save.
+     * @returns A promise that resolves when the operation is complete.
+     */
     static async saveSession(session: ContextSession): Promise<void> {
         // This is a no-op for now as context sessions are managed turn-by-turn in the database.
         // We might want to implement a bulk update if needed, but for index.ts compatibility
@@ -221,3 +302,4 @@ export class SessionService {
         addDebugEntry('session', `💾 saveSession called for ${session.id} (no-op in DB mode)`, { sessionId: session.id });
     }
 }
+

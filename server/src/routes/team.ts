@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { teamService } from '../services/team-service.js';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/team
  * Get team config for current workspace
  */
-router.get('/team', (req, res) => {
+router.get('/team', (_req, res) => {
   const team = teamService.getCurrentTeam();
   res.json({ team });
 });
@@ -16,7 +16,7 @@ router.get('/team', (req, res) => {
  * POST /api/team
  * Save team config
  */
-router.post('/team', (req, res) => {
+router.post('/team', (_req, res) => {
   const { mainModelId, executorEnabled, executorModelId, agents } = req.body;
 
   if (!mainModelId) {

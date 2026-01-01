@@ -1,6 +1,8 @@
 import { IntentProbeResult } from './types.js';
 import { INTENT_PROBES, calculateIntentScores } from './probe-data.js';
 
+export { calculateIntentScores };
+
 export async function runIntentProbes(
   executeChat: (prompt: string) => Promise<{ response: any; toolCalls: any[] }>
 ): Promise<{

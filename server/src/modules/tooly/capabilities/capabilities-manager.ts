@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ModelProfile, ToolCapability, ProbeResults, ContextLatencyData, AgenticReadinessStatus } from './types.js';
-import { ALL_TOOLS, REMOVED_TOOLS, TOOL_CATEGORIES, TOOL_RISK_LEVELS } from './tool-metadata.js';
+import { ALL_TOOLS, REMOVED_TOOLS } from './tool-metadata.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

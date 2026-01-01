@@ -226,15 +226,28 @@ export class DBAnalytics extends DBBase {
         };
     }
 
-    public createBackup(backup: FileBackup): string {
-        const id = backup.id || uuidv4();
-        const expiresAt = backup.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    // Modified to accept individual parameters and construct FileBackup internally
+    public createBackup(logId: string, filePath: string, content: string): string {
+        const id = uuidv4(); // Generate a new ID for each backup
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // Default to 24 hours expiration
 
-        this.run(`
+        // Construct the FileBackup object
+        const backup: FileBackup = {
+            id: id,
+            executionLogId: logId,
+            filePath: filePath,
+            originalContent: content,
+            expiresAt: expiresAt
+        };
+
+        this.run(
+            `
       INSERT INTO file_backups 
       (id, execution_log_id, file_path, original_content, expires_at)
       VALUES (?, ?, ?, ?, ?)
-    `, [id, backup.executionLogId, backup.filePath, backup.originalContent, expiresAt]);
+    `,
+            [backup.id, backup.executionLogId, backup.filePath, backup.originalContent, backup.expiresAt]
+        );
         return id;
     }
 
