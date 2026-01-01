@@ -11,6 +11,8 @@ const Sources: React.FC = () => {
     openaiApiKey: '',
     openrouterApiKey: '',
     lmstudioUrl: '',
+    ollamaUrl: '',
+    ollamaModel: '',
     azureResourceName: '',
     azureApiKey: ''
   });
@@ -22,6 +24,8 @@ const Sources: React.FC = () => {
         openaiApiKey: settings.openaiApiKey || '',
         openrouterApiKey: settings.openrouterApiKey || '',
         lmstudioUrl: settings.lmstudioUrl || 'http://localhost:1234',
+        ollamaUrl: settings.ollamaUrl || 'http://localhost:11434',
+        ollamaModel: settings.ollamaModel || 'llama3',
         azureResourceName: settings.azureResourceName || '',
         azureApiKey: settings.azureApiKey || ''
       });
@@ -138,6 +142,34 @@ const Sources: React.FC = () => {
                   <span className="w-2 h-2 rounded-full bg-gray-500"></span>
                   <span className="text-xs text-gray-500">Status check not implemented</span>
                 </div>
+              </div>
+
+              {/* Ollama URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Ollama URL</label>
+                <input 
+                  type="text"
+                  value={formData.ollamaUrl}
+                  onChange={e => handleChange('ollamaUrl', e.target.value)}
+                  placeholder="http://localhost:11434"
+                  className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 focus:outline-none transition-colors"
+                />
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="w-2 h-2 rounded-full bg-gray-500"></span>
+                  <span className="text-xs text-gray-500">Status check not implemented</span>
+                </div>
+              </div>
+
+              {/* Ollama Model */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Ollama Model</label>
+                <input 
+                  type="text"
+                  value={formData.ollamaModel}
+                  onChange={e => handleChange('ollamaModel', e.target.value)}
+                  placeholder="llama3"
+                  className="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 text-white focus:border-purple-500 focus:outline-none transition-colors"
+                />
               </div>
             </div>
           </div>

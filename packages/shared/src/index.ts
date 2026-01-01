@@ -4,7 +4,7 @@ import { z } from 'zod';
 // Base Schemas
 // ==========================================
 export const ModelIdSchema = z.string().min(1, 'Model ID is required').max(500, 'Model ID too long');
-export const ProviderSchema = z.enum(['all', 'lmstudio', 'openai', 'azure', 'openrouter']).default('all');
+export const ProviderSchema = z.enum(['all', 'lmstudio', 'openai', 'azure', 'openrouter', 'ollama']).default('all');
 export const BooleanSchema = z.preprocess((val) => {
   if (typeof val === 'boolean') return val;
   if (val === 'true' || val === '1') return true;
@@ -69,6 +69,8 @@ export interface ServerSettings {
     enableDualModel?: boolean;
     mainModelId?: string;
     executorModelId?: string;
+    ollamaModel?: string;
+    ollamaUrl?: string;
 }
 
 export type SymbolType = 

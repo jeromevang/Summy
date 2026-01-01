@@ -22,5 +22,7 @@
       "enabled": true
     }
   },
-  "openrouterApiKey": ""
+  "openrouterApiKey": "",
+  "ollamaModel": "llama3",
+  "ollamaUrl": "http://localhost:11434"
 }

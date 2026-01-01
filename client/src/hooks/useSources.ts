@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ServerSettings } from '../pages/Settings/types';
+import { ServerSettings } from '@summy/shared';
 
 export const useSources = () => {
   const [settings, setSettings] = useState<ServerSettings | null>(null);

@@ -25,5 +25,11 @@
     "timeout": 5000,
     "cacheEnabled": true,
     "cacheTTL": 300000
-  }
+  },
+  "openrouterApiKey": "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",
+  "ollamaModel": "llama3",
+  "ollamaUrl": "http://localhost:11434",
+  "openaiApiKey": "sk-test-key-123",
+  "azureResourceName": "",
+  "azureApiKey": ""
 }

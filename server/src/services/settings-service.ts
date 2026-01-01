@@ -17,6 +17,8 @@ export const loadServerSettings = async (): Promise<ServerSettings> => {
             const finalSettings = {
                 ...settings,
                 openrouterApiKey: process.env.OPENROUTER_API_KEY || settings.openrouterApiKey || '',
+                ollamaModel: process.env.OLLAMA_MODEL || settings.ollamaModel || '',
+                ollamaUrl: process.env.OLLAMA_URL || settings.ollamaUrl || 'http://localhost:11434',
             };
             console.log('[Settings] Settings loaded successfully');
             return finalSettings;
@@ -35,6 +37,8 @@ export const loadServerSettings = async (): Promise<ServerSettings> => {
         lmstudioModel: '',
         openrouterApiKey: process.env.OPENROUTER_API_KEY || '',
         openrouterModel: '',
+        ollamaModel: '',
+        ollamaUrl: 'http://localhost:11434',
         defaultCompressionMode: 1,
         defaultKeepRecent: 5,
         defaultContextLength: 8192,

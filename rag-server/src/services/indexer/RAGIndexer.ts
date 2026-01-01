@@ -20,7 +20,7 @@ import {
   buildContextualContent
 } from '../summarizer.js';
 import { analyzeFile as analyzeFileDeps, serializeGraph, loadGraph } from '../graph-builder.js';
-import { getRAGDatabase, RAGDatabase, StoredChunk as DBStoredChunk, FileSummary as DBFileSummary, SymbolType } from '../database.js';
+import { getRAGDatabase, RAGDatabase, StoredChunk as DBStoredChunk, FileSummary as DBFileSummary } from '../database.js';
 import { ProgressCallback, StoredChunk } from './types.js';
 
 const execAsync = promisify(exec);
@@ -79,6 +79,18 @@ export class Indexer {
     });
   }
 
+  stopWatcher(): void {
+    if (this.fileWatcher) {
+      this.fileWatcher.close();
+      this.fileWatcher = null;
+    }
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    this.pendingChanges.clear();
+  }
+
   private async triggerCodeIndexSync(): Promise<void> {
     try {
       console.log('[Indexer] Triggering Code Index sync...');
@@ -91,14 +103,6 @@ export class Indexer {
   }
 
   private async indexFile(file: string, projectPath: string) { /* ... */ }
-import { RAGResult } from '../../config.js';
-
-// ... existing imports ...
-
-export class Indexer {
-  // ... existing properties ...
-
-  // ... existing constructor ...
 
   async query(text: string, limit: number = 5): Promise<RAGResult[]> {
     try {
@@ -108,11 +112,12 @@ export class Indexer {
       
       // 1. Embed query
       // The embedder might not be loaded, this should handle lazy loading
-      const embedding = await this.embedder.embed(text);
-      if (!embedding || embedding.length === 0) {
+      const embeddings = await this.embedder.embed([text]);
+      if (!embeddings || embeddings.length === 0 || !embeddings[0]) {
         console.warn('[Indexer] Failed to generate embedding for query');
         return [];
       }
+      const embedding = embeddings[0];
 
       // 2. Search vector store
       const vectorResults = await this.vectorStore.search(embedding, limit);
@@ -122,7 +127,7 @@ export class Indexer {
       const results: RAGResult[] = [];
       for (const res of vectorResults) {
         // res.id corresponds to chunk.id
-        const chunk = this.ragDb.chunks.getChunk(res.id);
+        const chunk = this.ragDb.chunks.getChunk(res.id.toString());
         if (chunk) {
           results.push({
             filePath: chunk.filePath,
@@ -143,5 +148,4 @@ export class Indexer {
       return [];
     }
   }
-
-  // ... existing methods ...
+}

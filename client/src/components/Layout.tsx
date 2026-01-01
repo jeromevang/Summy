@@ -1,5 +1,14 @@
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { ProjectSwitcher } from './ProjectSwitcher';
+import Sidebar from './Sidebar';
+import { SystemHUD } from './SystemHUD';
+import NotificationBell from './notifications/NotificationBell';
 import { useGit } from '../hooks/useGit';
+
+interface LayoutProps {
+  children: React.ReactNode;
+}
 
 // ... other imports ...
 
@@ -23,6 +32,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (path === '/') return 'Command Center';
     if (path === '/sessions') return 'Conversations';
     if (path === '/rag') return 'Semantic Index';
+    if (path === '/sources') return 'Sources & Providers';
+    if (path === '/team-builder') return 'Team Builder';
     if (path === '/settings') return 'Configuration';
     if (path === '/debug') return 'System Diagnostics';
     if (path.startsWith('/tooly')) {
@@ -90,8 +101,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </main>
       </div>
 
-      {/* Toast notifications */}
-      <ToastContainer />
+      {/* Toast notifications provided by App context */}
     </div>
   );
 };

@@ -21,7 +21,7 @@
 3.  **Local Intelligence (The API Bridge):**
     *   **RAG Server:** A semantic search engine that indexes the active project.
     *   **API Bridge:** Exposes endpoints (`/api/rag/query`, `/api/nav/symbols`) so *external* agents (like Gemini CLI) can tap into Summy's index.
-    *   **Sources Page:** Centralized management for API Keys (OpenAI, Anthropic) and Local Endpoints (LM Studio).
+    *   **Sources Page:** Centralized management for API Keys (OpenAI, Anthropic) and Local Endpoints (LM Studio, Ollama).
 
 4.  **Refactoring & Tooling:**
     *   **Auto File Splitter:** An explicit tool (`refactor_split_file`) for breaking large files into modules.
@@ -78,3 +78,13 @@ npm run dev
 *   `server/src/modules/tooly/mcp-client.ts`: Handles spawning/restarting the MCP tool server.
 *   `client/src/pages/TeamBuilder.tsx`: UI for defining model squads.
 *   `rag-server/src/server/RAGServer.ts`: The semantic search API backend.
+
+
+## Gemini Added Memories
+- Always automatically update WORKING_MEMORY.md and GEMINI.md after completing significant tasks or structural changes without being prompted.
+- Frontend Phase 1 (Swarm Hub & Cyber-Obsidian Theme) is complete. SystemHUD is integrated globally. Backend /status endpoint updated.
+- Disabled 'verbatimModuleSyntax' in client/tsconfig.json to allow mixed value/type imports without explicit 'import type'.
+- Frontend Phase 2 (The Prism) is complete. Context visualization components (useContextPrism, PrismVisualizer, SplitHorizon) are implemented and integrated into ContextEditor. Path aliases configured.
+- Frontend Phase 5 (RAG & GPS Navigator) is complete. Dedicated page for semantic code search and codebase indexing status has been implemented.
+- We are pivoting Summy's architecture to a "Sidecar Platform" model. Key changes: 1. Centralized Sources/Secrets page. 2. "Team Builder" (Main/Executor/Agents) replacing Dual Mode. 3. Dynamic Project Switching (arbitrary directories). 4. Unifying Middleware/Standalone modes into one Platform.
+- Integrated Ollama support into the Summy platform. This includes updating the ServerSettings interface and ProviderSchema in @summy/shared, modifying server-side settings loading and default values, and adding UI components for Ollama configuration in the Sources page. The @summy/shared package was rebuilt and useSources hook was updated to reflect the new ServerSettings import path.
