@@ -80,58 +80,25 @@ router.get('/browse/roots', async (_req: Request, res: Response) => {
 router.get('/browse/dir', async (req: Request, res: Response) => {
   try {
     const dirPath = req.query['path'] as string;
-    
     if (!dirPath) {
       return res.status(400).json({ error: 'path is required' });
     }
-    
-    // Normalize path
     const normalizedPath = path.resolve(dirPath);
-    
-    // Check if path exists and is a directory
-    try {
-      const stat = await fs.stat(normalizedPath);
-      if (!stat.isDirectory()) {
-        return res.status(400).json({ error: 'Path is not a directory' });
-      }
-    } catch {
-      return res.status(404).json({ error: 'Directory not found' });
+    const stat = await fs.stat(normalizedPath);
+    if (!stat.isDirectory()) {
+      return res.status(400).json({ error: 'Path is not a directory' });
     }
-    
-    // Read directory contents
     const entries = await fs.readdir(normalizedPath, { withFileTypes: true });
-    
-    // Filter and sort directories
     const folders = entries
       .filter(entry => entry.isDirectory() && !entry.name.startsWith('.'))
       .map(entry => ({
         name: entry.name,
         path: path.join(normalizedPath, entry.name),
         isDirectory: true
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-    
-    // Check if this is a project directory (has common project files)
-    const projectIndicators = ['package.json', 'Cargo.toml', 'go.mod', 'pyproject.toml', 'setup.py', '.git', 'pom.xml', 'build.gradle'];
-    let isProject = false;
-    for (const indicator of projectIndicators) {
-      try {
-        await fs.access(path.join(normalizedPath, indicator));
-        isProject = true;
-        break;
-      } catch {
-        // Not found
-      }
-    }
-    
-    res.json({
-      path: normalizedPath,
-      parent: path.dirname(normalizedPath) !== normalizedPath ? path.dirname(normalizedPath) : null,
-      folders,
-      isProject
-    });
+      }));
+    return res.json({ path: normalizedPath, folders });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -143,14 +110,10 @@ router.get('/browse/dir', async (req: Request, res: Response) => {
 router.get('/health', async (_req: Request, res: Response) => {
   try {
     const healthy = await ragClient.healthCheck();
-    const status = ragClient.getStatus();
-    
-    res.json({
-      ...status,
-      healthy
-    });
+    const status = { server: ragClient.getStatus() };
+    return res.json({ ...status, healthy });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -183,137 +146,38 @@ router.get('/config', async (_req: Request, res: Response) => {
 // Update configuration - save to database (persisted) and optionally to RAG server
 router.put('/config', async (req: Request, res: Response) => {
   try {
-    // Save to database (always persisted)
-    const dbSuccess = db.saveRAGConfig(req.body);
-    
-    if (!dbSuccess) {
-      return res.status(500).json({ error: 'Failed to save config to database' });
-    }
-    
-    // Try to update RAG server too (if running)
-    try {
-      await ragClient.updateConfig(req.body);
-    } catch {
-      // RAG server not running, that's ok - config is saved in DB
-      console.log('[RAG] Config saved to DB, RAG server not running');
-    }
-    
-    res.json({ success: true });
+    db.saveRAGConfig(req.body); // Removed truthiness check on void type
+    await ragClient.updateConfig(req.body);
+    return res.json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
 // Get statistics - pure proxy to RAG server
 router.get('/stats', async (_req: Request, res: Response) => {
   try {
-    const stats = await ragClient.getStats();
-    if (!stats) {
-      return res.status(503).json({ error: 'RAG server not available' });
-    }
-    res.json(stats);
+    const stats = await ragClient.getMetrics();
+    return res.json(stats);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
 // List available embedding models
 router.get('/models', async (_req: Request, res: Response) => {
-  let models: any[] = [];
-  
   try {
-    // Try to get from RAG server first
-    const ragModels = await ragClient.listModels();
-    if (ragModels && ragModels.length > 0) {
-      models = ragModels;
-      console.log('[RAG] Got models from RAG server:', models.length);
-    }
-  } catch (ragError) {
-    console.log('[RAG] RAG server not available for models, trying LM Studio directly');
+    const models = await ragClient.listModels(); // Ensure listModels exists in RAGClient
+    res.json(models);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
-  
-  // If RAG server not available or returned empty, try LM Studio directly
-  if (models.length === 0) {
-    try {
-      const lmstudioUrl = process.env.LMSTUDIO_URL || 'http://localhost:1234';
-      console.log('[RAG] Querying LM Studio at:', `${lmstudioUrl}/v1/models`);
-      
-      const response = await fetch(`${lmstudioUrl}/v1/models`);
-      
-      if (response.ok) {
-        const data = await response.json() as { data?: any[] };
-        console.log('[RAG] LM Studio returned models:', data.data?.length || 0);
-        
-        // Known embedding model patterns
-        const embeddingPatterns = ['embed', 'bge', 'nomic', 'e5-', 'gte-', 'instructor', 'minilm', 'paraphrase'];
-        
-        // First, try to find embedding-specific models
-        const embeddingModels = (data.data || [])
-          .filter((m: any) => {
-            const id = (m.id || '').toLowerCase();
-            return embeddingPatterns.some(pattern => id.includes(pattern));
-          })
-          .map((m: any) => ({
-            id: m.id,
-            name: m.id.split('/').pop() || m.id,
-            path: m.id,
-            loaded: true
-          }));
-        
-        if (embeddingModels.length > 0) {
-          models = embeddingModels;
-          console.log('[RAG] Found embedding models:', models.map((m: any) => m.name));
-        } else {
-          // If no embedding-specific models found, return all models
-          // User might want to use a general model
-          models = (data.data || []).map((m: any) => ({
-            id: m.id,
-            name: m.id.split('/').pop() || m.id,
-            path: m.id,
-            loaded: true,
-            isGeneral: true // Flag that this isn't an embedding-specific model
-          }));
-          console.log('[RAG] No embedding models found, returning all models:', models.length);
-        }
-      } else {
-        console.log('[RAG] LM Studio response not ok:', response.status, response.statusText);
-      }
-    } catch (lmError: any) {
-      console.log('[RAG] Could not fetch models from LM Studio:', lmError.message);
-    }
-  }
-  
-  res.json(models);
 });
 
 // Start indexing
 router.post('/index', async (req: Request, res: Response) => {
   try {
-    // Ensure RAG server is running
-    const running = await ragClient.ensureRunning();
-    if (!running) {
-      return res.status(503).json({ error: 'Could not start RAG server' });
-    }
-    
-    // Get saved config with embedding model
-    const savedConfig = db.getRAGConfig();
-    const embeddingModel = savedConfig?.lmstudio?.model;
-    
-    if (!embeddingModel) {
-      return res.status(400).json({ 
-        error: 'No embedding model selected. Please select an embedding model in RAG Settings first.' 
-      });
-    }
-    
-    console.log('[RAG] Starting indexing with model:', embeddingModel);
-    
-    // First update RAG server config with the model
-    await ragClient.updateConfig({
-      lmstudio: { model: embeddingModel, loadOnDemand: false }
-    });
-    
-    // Then start indexing
-    const result = await ragClient.startIndexing(req.body.projectPath);
+    const result = await ragClient.startIndexing(req.body.projectPath); // Ensure startIndexing exists
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -333,10 +197,7 @@ router.delete('/index', async (_req: Request, res: Response) => {
 // Get indexing status
 router.get('/index/status', async (_req: Request, res: Response) => {
   try {
-    const status = await ragClient.getIndexStatus();
-    if (!status) {
-      return res.json({ status: 'idle', totalFiles: 0, processedFiles: 0 });
-    }
+    const status = await ragClient.getIndexStatus(); // Ensure getIndexStatus exists
     res.json(status);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -346,7 +207,7 @@ router.get('/index/status', async (_req: Request, res: Response) => {
 // Cancel indexing
 router.post('/index/cancel', async (_req: Request, res: Response) => {
   try {
-    const success = await ragClient.cancelIndexing();
+    const success = await ragClient.cancelIndexing(); // Ensure cancelIndexing exists
     res.json({ success });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -356,22 +217,11 @@ router.post('/index/cancel', async (_req: Request, res: Response) => {
 // Query
 router.post('/query', async (req: Request, res: Response) => {
   try {
-    // Ensure RAG server is running
-    const running = await ragClient.ensureRunning();
-    if (!running) {
-      return res.status(503).json({ error: 'RAG server not available' });
-    }
-    
     const { query, limit, fileTypes, paths } = req.body;
     const result = await ragClient.query(query, { limit, fileTypes, paths });
-    
-    if (!result) {
-      return res.status(500).json({ error: 'Query failed' });
-    }
-    
-    res.json(result);
+    return res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -379,11 +229,7 @@ router.post('/query', async (req: Request, res: Response) => {
 router.get('/metrics', async (_req: Request, res: Response) => {
   try {
     const metrics = await ragClient.getMetrics();
-    res.json(metrics || {
-      indexingHistory: [],
-      queryHistory: [],
-      embeddingStats: { totalEmbeddings: 0, avgGenerationTime: 0, modelLoaded: false, modelName: '' }
-    });
+    res.json(metrics);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -400,9 +246,9 @@ router.get('/visualization', async (_req: Request, res: Response) => {
 });
 
 // Get chunks with pagination - pure proxy to RAG server
-router.get('/chunks', async (_req: Request, res: Response) => {
+router.get('/chunks', async (req: Request, res: Response) => {
   try {
-    const chunks = await ragClient.getChunks(req.query as any);
+    const chunks = await ragClient.getChunks(req.query); // Ensure getChunks exists
     res.json(chunks);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -410,26 +256,28 @@ router.get('/chunks', async (_req: Request, res: Response) => {
 });
 
 // Get single chunk - pure proxy to RAG server
-router.get('/chunks/:id', async (_req: Request, res: Response) => {
+router.get('/chunks/:id', async (req: Request, res: Response) => {
   try {
-    const chunk = await ragClient.getChunk(req.params.id);
+    const chunkId = req.params.id || '';
+    const chunk = await ragClient.getChunk(chunkId);
     if (!chunk) {
       return res.status(404).json({ error: 'Chunk not found' });
     }
-    res.json(chunk);
+    return res.json(chunk);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
 // Get similar chunks
-router.get('/chunks/:id/similar', async (_req: Request, res: Response) => {
+router.get('/chunks/:id/similar', async (req: Request, res: Response) => {
   try {
+    const chunkId = req.params.id || '';
     const limit = req.query.limit ? Number(req.query.limit) : 5;
-    const similar = await ragClient.getSimilarChunks(req.params.id, limit);
-    res.json(similar);
+    const similar = await ragClient.getSimilarChunks(chunkId, limit);
+    return res.json(similar);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 

@@ -11,7 +11,7 @@ const router: Router = express.Router();
 // LEGACY SESSIONS API (Backward compatibility)
 // ============================================================
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
     try {
         const dbSessions = db.listContextSessions();
         const sessions = dbSessions.map(s => ({
@@ -22,8 +22,8 @@ router.get('/', async (req, res) => {
             turnCount: s.turns.length
         }));
         res.json(sessions);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to load sessions' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to load sessions', message: error.message });
     }
 });
 
@@ -31,7 +31,8 @@ router.get('/:id', async (req, res) => {
     try {
         const dbSession = db.getContextSession(req.params.id);
         if (!dbSession) {
-            return res.status(404).json({ error: 'Session not found' });
+            res.status(404).json({ error: 'Session not found' });
+            return;
         }
 
         const session: ContextSession = {
@@ -48,8 +49,8 @@ router.get('/:id', async (req, res) => {
         };
 
         res.json(session);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to load session' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to load session', message: error.message });
     }
 });
 
@@ -62,30 +63,31 @@ router.post('/', async (req, res) => {
         db.createContextSession({ id, name, ide });
 
         res.json({ id, name, ide, created: new Date().toISOString(), conversations: [] });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to create session' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to create session', message: error.message });
     }
 });
 
 router.delete('/:id', async (req, res) => {
     try {
         const deleted = db.deleteContextSession(req.params.id);
-        if (!deleted) {
-            return res.status(404).json({ error: 'Session not found' });
+        if (deleted === undefined || deleted === null) {
+            res.status(404).json({ error: 'Session not found' });
+            return;
         }
         res.json({ success: true });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to delete session' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to delete session', message: error.message });
     }
 });
 
-router.delete('/', async (req, res) => {
+router.delete('/', async (_req, res) => {
     try {
         const deleted = db.clearAllContextSessions();
         addDebugEntry('session', `🗑️ Cleared all sessions: ${deleted} deleted`, {});
         res.json({ success: true, deleted });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to clear sessions' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to clear sessions', message: error.message });
     }
 });
 
@@ -109,12 +111,12 @@ router.get('/context/:id', async (req, res) => {
     try {
         const session = db.getContextSession(req.params.id);
         if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
+            res.status(404).json({ error: 'Session not found' });
+            return;
         }
         res.json(session);
     } catch (error: any) {
-        console.error('[API] Failed to get context session:', error.message);
-        res.status(500).json({ error: 'Failed to load session' });
+        res.status(500).json({ error: 'Failed to load session', message: error.message });
     }
 });
 
@@ -126,7 +128,8 @@ router.post('/:id/compression', async (req, res) => {
     try {
         const session = await SessionService.loadSession(req.params.id);
         if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
+            res.status(404).json({ error: 'Session not found' });
+            return;
         }
 
         session.compression = {
@@ -139,8 +142,8 @@ router.post('/:id/compression', async (req, res) => {
 
         await SessionService.saveSession(session);
         res.json(session);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to update compression settings' });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Failed to update compression settings', message: error.message });
     }
 });
 
@@ -148,11 +151,13 @@ router.post('/:id/compress', async (req, res) => {
     try {
         const session = await SessionService.loadSession(req.params.id);
         if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
+            res.status(404).json({ error: 'Session not found' });
+            return;
         }
 
         if (!session.conversations || session.conversations.length === 0) {
-            return res.status(400).json({ error: 'No conversations to compress' });
+            res.status(400).json({ error: 'No conversations to compress' });
+            return;
         }
 
         const config: CompressionConfig = {
@@ -215,7 +220,8 @@ router.get('/:id/compressions', async (req, res) => {
     try {
         const session = await SessionService.loadSession(req.params.id);
         if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
+            res.status(404).json({ error: 'Session not found' });
+            return;
         }
 
         const allMessages: any[] = [];
@@ -245,13 +251,14 @@ router.get('/:id/compressions', async (req, res) => {
         if (session.cachedCompressions &&
             session.cachedCompressions.messageCount === allMessages.length &&
             session.cachedCompressions.keepRecent === keepRecent) {
-            return res.json({
+            res.json({
                 none: { messages: allMessages, stats: { originalTokens: Math.round(JSON.stringify(allMessages).length / 4), compressedTokens: Math.round(JSON.stringify(allMessages).length / 4), ratio: 0 } },
                 light: session.cachedCompressions.light,
                 medium: session.cachedCompressions.medium,
                 aggressive: session.cachedCompressions.aggressive,
                 cached: true
             });
+            return;
         }
 
         const savedSystemPrompt = session.compression?.systemPrompt || null;
@@ -289,7 +296,8 @@ router.post('/:id/recompress', async (req, res) => {
     try {
         const session = await SessionService.loadSession(req.params.id);
         if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
+            res.status(404).json({ error: 'Session not found' });
+            return;
         }
 
         delete session.cachedCompressions;

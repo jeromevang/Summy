@@ -138,6 +138,35 @@ export class CapabilitiesService {
     return { native: profile.nativeStrengths || [], learned: profile.learnedCapabilities || [], blocked: profile.blockedCapabilities || [], untested: all.filter(c => !tested.has(c)), fallbackModel: profile.fallbackModelId || null };
   }
 
+  async toggleTool(modelId: string, tool: string, enabled: boolean): Promise<void> {
+    const profile = await this.getProfile(modelId) || this.createEmptyProfile(modelId, modelId, this.detectProviderFromModelId(modelId));
+    if (!profile.capabilities[tool]) {
+      profile.capabilities[tool] = { supported: false, score: 0, testsPassed: 0, testsFailed: 0 };
+    }
+    profile.capabilities[tool].supported = enabled;
+    await this.saveProfile(profile);
+  }
+
+  async updateSystemPrompt(modelId: string, systemPrompt: string): Promise<void> {
+    const profile = await this.getProfile(modelId) || this.createEmptyProfile(modelId, modelId, this.detectProviderFromModelId(modelId));
+    profile.systemPrompt = systemPrompt;
+    await this.saveProfile(profile);
+  }
+
+  async updateContextLength(modelId: string, contextLength: number): Promise<void> {
+    const profile = await this.getProfile(modelId) || this.createEmptyProfile(modelId, modelId, this.detectProviderFromModelId(modelId));
+    profile.contextLength = contextLength;
+    await this.saveProfile(profile);
+  }
+
+  async removeContextLength(modelId: string): Promise<void> {
+    const profile = await this.getProfile(modelId);
+    if (profile) {
+      delete profile.contextLength;
+      await this.saveProfile(profile);
+    }
+  }
+
   private sanitizeFileName(id: string): string {
     return id.toLowerCase().replace(/[^a-z0-9-_.]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
   }

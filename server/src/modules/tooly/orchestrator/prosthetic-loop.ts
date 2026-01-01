@@ -18,9 +18,9 @@ import { loadTestSuite, type ReadinessResult } from '../testing/agentic-readines
 import { prostheticStore, buildProstheticPrompt } from '../learning/prosthetic-store.js';
 import { capabilities, ALL_TOOLS } from '../capabilities.js';
 
-// ============================================================
+// ============================================================ 
 // TYPES
-// ============================================================
+// ============================================================ 
 
 export interface TeachingResult {
   success: boolean;
@@ -77,9 +77,9 @@ interface BroadcastService {
 
 type BroadcastFn = BroadcastService;
 
-// ============================================================
+// ============================================================ 
 // PROSTHETIC LOOP CLASS
-// ============================================================
+// ============================================================ 
 
 export class ProstheticLoop {
   private runner: ReadinessRunner;
@@ -234,8 +234,7 @@ export class ProstheticLoop {
     const certified = currentResult.overallScore >= targetScore;
     
     if (certified) {
-      this.log(log, '
-=== TEACHING COMPLETE: Model Certified ===');
+      this.log(log, '\n=== TEACHING COMPLETE: Model Certified ===');
       // Update model profile with certification
       await this.certifyModel(modelId, currentResult);
     } else {
@@ -283,9 +282,7 @@ export class ProstheticLoop {
 
       // Add or update the prosthetic system prompt
       const existingPrompt = profile!.systemPrompt || '';
-      const newPrompt = prostheticPrompt + '
-
-' + existingPrompt;
+      const newPrompt = prostheticPrompt + '\n\n' + existingPrompt;
 
       profile!.systemPrompt = newPrompt;
       profile!.prostheticApplied = true;
@@ -391,9 +388,9 @@ export class ProstheticLoop {
 
 }
 
-// ============================================================
+// ============================================================ 
 // FACTORY FUNCTION
-// ============================================================
+// ============================================================ 
 
 export function createProstheticLoop(
   runner: ReadinessRunner,

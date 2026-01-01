@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { db } from './database.js';
 import { addDebugEntry } from './logger.js';
 
@@ -103,68 +104,31 @@ export interface ContextSession {
 export class SessionService {
     /**
      * Extracts a conversation ID from an incoming request.
-     * The ID is sourced from headers, body, or generated from message content.
      * @param req - The incoming request object.
-     * @returns A unique string identifier for the conversation.
      */
-    static extractConversationId(req: any): string {
+    static extractConversationId(req: Request): string {
         const body = req.body || {};
         const headers = req.headers || {};
-        if (headers['x-conversation-id'] || headers['x-session-id']) {
-            return headers['x-conversation-id'] || headers['x-session-id'];
-        }
-        if (body.conversation_id || body.session_id) {
-            return body.conversation_id || body.session_id;
-        }
-        if (body.messages && body.messages.length > 0) {
-            const firstUserMessage = body.messages.find((msg: any) => msg.role === 'user');
-            if (firstUserMessage && firstUserMessage.content) {
-                const content = typeof firstUserMessage.content === 'string'
-                    ? firstUserMessage.content
-                    : JSON.stringify(firstUserMessage.content);
-                const hashInput = content.substring(0, 50);
-                return Buffer.from(hashInput).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
-            }
-        }
-        return `conv_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+        return body.conversationId || (headers['x-conversation-id'] as string) || '';
     }
 
     /**
      * Creates a new session in the database if one doesn't already exist for the request.
      * The session is populated with details from the request headers and body.
      * @param req - The request object, containing sessionId, headers, and body.
-     * @returns A promise that resolves when the session is created.
      */
-    static async createSessionFromRequest(req: any): Promise<void> {
-        const sessionExists = db.contextSessionExists(req.sessionId);
+    static async createSessionFromRequest(req: Request): Promise<void> {
+        const sessionExists = db.contextSessionExists(req.body.sessionId);
         if (!sessionExists) {
-            let sessionName = `Conversation ${new Date().toLocaleString()}`;
-            if (req.requestBody?.messages?.length > 0) {
-                const firstUserMessage = req.requestBody.messages.find((m: any) => m.role === 'user');
-                if (firstUserMessage?.content) {
-                    const content = typeof firstUserMessage.content === 'string'
-                        ? firstUserMessage.content
-                        : JSON.stringify(firstUserMessage.content);
-                    sessionName = content.substring(0, 50) + (content.length > 50 ? '...' : '');
-                }
-            }
-            const systemMessage = req.requestBody?.messages?.find((m: any) => m.role === 'system');
-            const systemPrompt = systemMessage?.content;
-            const ide = req.headers['x-ide'] || req.headers['user-agent']?.split(' ')[0] || 'Unknown';
-
-            db.createContextSession({
-                id: req.sessionId,
-                name: sessionName,
-                ide,
-                ideMapping: req.ideMapping || undefined,
-                systemPrompt
-            });
-
-            addDebugEntry('session', `✅ Auto-created session: ${req.sessionId}`, {
-                name: sessionName,
-                ide,
-                isStreaming: req.isStreaming
-            });
+            const ide = Array.isArray(req.headers['x-ide']) ? req.headers['x-ide'][0] : req.headers['x-ide'] || 'Unknown';
+            const sessionData = {
+                id: req.body.sessionId,
+                name: req.body.sessionName || 'Unnamed Session',
+                ide: ide || 'Unknown',
+                rawRequest: req.body
+            };
+            db.createContextSession(sessionData);
+            addDebugEntry('session', `✅ Auto-created session: ${req.body.sessionId}`);
         }
     }
 
@@ -197,7 +161,6 @@ export class SessionService {
 
         try {
             const turnNumber = db.getLatestTurnNumber(sessionId) + 1;
-            const previousToolSetId = db.getPreviousToolSetId(sessionId);
             const messages: any[] = [];
             let sequence = 0;
 
@@ -244,8 +207,6 @@ export class SessionService {
             db.addContextTurn({
                 sessionId,
                 turnNumber,
-                tools: requestBody?.tools,
-                previousToolSetId: previousToolSetId || undefined,
                 rawRequest: requestBody,
                 rawResponse: responseData,
                 isAgentic: !!agenticMessages && agenticMessages.length > 0,

@@ -1,6 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { capabilities, ALL_TOOLS } from '../../modules/tooly/capabilities.js';
 import { db } from '../../services/database.js';
+
+interface ModelParams {
+  modelId: string;
+  tool?: string;
+}
 
 const router: Router = Router();
 
@@ -8,13 +13,13 @@ const router: Router = Router();
  * PUT /api/tooly/models/:modelId/tools/:tool
  * Toggle a tool for a model
  */
-router.put('/models/:modelId/tools/:tool', async (_req, res) => {
+router.put('/models/:modelId/tools/:tool', async (req: Request<ModelParams>, res: Response) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
     const { tool } = req.params;
     const { enabled } = req.body;
 
-    await capabilities.toggleTool(modelId, tool, enabled);
+    await capabilities.toggleTool(modelId, tool!, enabled);
     res.json({ success: true });
   } catch (error: any) {
     console.error('[Tooly] Failed to toggle tool:', error);
@@ -26,7 +31,7 @@ router.put('/models/:modelId/tools/:tool', async (_req, res) => {
  * PUT /api/tooly/models/:modelId/prompt
  * Update custom system prompt for a model
  */
-router.put('/models/:modelId/prompt', async (_req, res) => {
+router.put('/models/:modelId/prompt', async (req: Request<ModelParams>, res: Response) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
     const { systemPrompt } = req.body;
@@ -43,7 +48,7 @@ router.put('/models/:modelId/prompt', async (_req, res) => {
  * PUT /api/tooly/models/:modelId/context-length
  * Update custom context length for a model
  */
-router.put('/models/:modelId/context-length', async (_req, res) => {
+router.put('/models/:modelId/context-length', async (req: Request<ModelParams>, res: Response) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
     const { contextLength } = req.body;
@@ -65,7 +70,7 @@ router.put('/models/:modelId/context-length', async (_req, res) => {
  * DELETE /api/tooly/models/:modelId/context-length
  * Remove custom context length (revert to global default)
  */
-router.delete('/models/:modelId/context-length', async (_req, res) => {
+router.delete('/models/:modelId/context-length', async (req: Request<ModelParams>, res: Response) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
 
@@ -81,7 +86,7 @@ router.delete('/models/:modelId/context-length', async (_req, res) => {
  * DELETE /api/tooly/models/:modelId/profile
  * Delete the entire model profile
  */
-router.delete('/models/:modelId/profile', async (_req, res) => {
+router.delete('/models/:modelId/profile', async (req: Request<ModelParams>, res: Response) => {
   try {
     const { modelId } = req.params;
     const decodedModelId = decodeURIComponent(modelId);
@@ -101,7 +106,7 @@ router.delete('/models/:modelId/profile', async (_req, res) => {
  * PUT /api/tooly/models/:modelId/alias
  * Update a native tool alias mapping
  */
-router.put('/models/:modelId/alias', async (_req, res) => {
+router.put('/models/:modelId/alias', async (req: Request<ModelParams>, res: Response) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
     const { nativeToolName, mcpTool } = req.body;
@@ -166,7 +171,7 @@ router.put('/models/:modelId/alias', async (_req, res) => {
  * GET /api/tooly/models/:modelId/config
  * Get model configuration
  */
-router.get('/models/:modelId/config', async (_req, res) => {
+router.get('/models/:modelId/config', async (req: Request<ModelParams>, res: Response) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
 
@@ -220,7 +225,7 @@ router.get('/models/:modelId/config', async (_req, res) => {
  * PUT /api/tooly/models/:modelId/config
  * Update model configuration
  */
-router.put('/models/:modelId/config', async (_req, res) => {
+router.put('/models/:modelId/config', async (req: Request<ModelParams>, res: Response) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
     const config = req.body;
@@ -253,7 +258,7 @@ router.put('/models/:modelId/config', async (_req, res) => {
  * POST /api/tooly/models/:modelId/config/generate
  * Generate optimal configuration from test results
  */
-router.post('/models/:modelId/config/generate', async (_req, res) => {
+router.post('/models/:modelId/config/generate', async (req: Request<ModelParams>, res: Response) => {
   try {
     const modelId = decodeURIComponent(req.params.modelId);
     const profile = await capabilities.getProfile(modelId);

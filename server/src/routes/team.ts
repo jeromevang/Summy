@@ -16,7 +16,7 @@ router.get('/team', (_req, res) => {
  * POST /api/team
  * Save team config
  */
-router.post('/team', (_req, res) => {
+router.post('/team', (req, res) => {
   const { mainModelId, executorEnabled, executorModelId, agents } = req.body;
 
   if (!mainModelId) {
@@ -31,6 +31,7 @@ router.post('/team', (_req, res) => {
   });
 
   res.json({ success: true, team });
+  return;
 });
 
 export const teamRouter = router;

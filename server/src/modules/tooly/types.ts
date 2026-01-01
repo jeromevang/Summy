@@ -263,6 +263,7 @@ export interface TrainabilityScores {
 export interface SystemPromptCompliance {
   score: number;
   adherenceRate: number;
+  overallComplianceScore: number;
 }
 
 export interface AntiPatternDetection {
