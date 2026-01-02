@@ -41,7 +41,7 @@ import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 
 // Import new route modules
-import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter, teamsEnhancedRouter, workspaceEnhancedRouter, healthRouter } from './routes/index.js';
+import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, mcpRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter, teamsEnhancedRouter, workspaceEnhancedRouter, healthRouter } from './routes/index.js';
 // Services
 import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
@@ -190,6 +190,7 @@ app.use('/api/tooly', toolyRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/rag', ragRoutes);
+app.use('/api/mcp', mcpRoutes);
 app.use('/api/sessions', sessionsRoutes);
 app.use('/api/context-sessions', sessionsRoutes); // Legacy alias for sessions
 app.use('/api', systemRoutes);

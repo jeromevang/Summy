@@ -19,6 +19,8 @@ import { registerRagTools } from "./tools/ragTools.js";
 import { registerTracingTools } from "./tools/tracingTools.js";
 import { registerSystemTools } from "./tools/systemTools.js";
 import { registerRefactorTools } from "./tools/refactorTools.js";
+import { TOOLSET_PRESETS, ToolCategory } from "./config/toolset-presets.js";
+import { getMCPConfig } from "./utils/settings.js";
 
 // ============================================================
 // MCP SERVER SETUP
@@ -35,17 +37,77 @@ export const server = new McpServer({
 const modelConfig = {}; // Config loading logic to be implemented
 (server as any).modelConfig = modelConfig;
 
-// Register all tool categories
+// ============================================================
+// CONDITIONAL TOOL REGISTRATION
+// ============================================================
+
+// Read toolset configuration
+const mcpConfig = getMCPConfig();
+const toolset = mcpConfig.toolset || 'standard';
+
+// Get categories to register
+let categories: ToolCategory[] = [];
+if (toolset === 'custom') {
+  categories = mcpConfig.customCategories || [];
+  console.error(`[MCP] Loading custom toolset with ${categories.length} categories`);
+} else {
+  const preset = TOOLSET_PRESETS[toolset];
+  categories = preset.categories;
+  console.error(`[MCP] Loading "${toolset}" toolset preset`);
+  console.error(`[MCP] Description: ${preset.description}`);
+  console.error(`[MCP] Estimated tokens: ${preset.estimatedTokens}`);
+}
+
+console.error(`[MCP] Tool categories:`, categories.join(', '));
+
+// Always register utility and HTTP tools (core functionality)
 registerUtilityTools(server);
-registerFileTools(server);
-registerGitTools(server);
-registerNpmTools(server);
 registerHttpTools(server);
-registerBrowserTools(server);
-registerRagTools(server);
-registerTracingTools(server);
-registerSystemTools(server);
-registerRefactorTools(server);
+registerTracingTools(server); // Internal monitoring, always enabled
+
+// Conditionally register tool categories based on preset
+if (categories.includes('file_ops')) {
+  console.error('[MCP] ✓ Registering file operations tools');
+  registerFileTools(server);
+}
+
+if (categories.includes('git')) {
+  console.error('[MCP] ✓ Registering git tools');
+  registerGitTools(server);
+}
+
+if (categories.includes('npm')) {
+  console.error('[MCP] ✓ Registering npm tools');
+  registerNpmTools(server);
+}
+
+if (categories.includes('browser')) {
+  console.error('[MCP] ✓ Registering browser automation tools');
+  registerBrowserTools(server);
+}
+
+if (categories.includes('rag')) {
+  console.error('[MCP] ✓ Registering RAG search tools');
+  registerRagTools(server);
+}
+
+if (categories.includes('refactor')) {
+  console.error('[MCP] ✓ Registering refactor tools');
+  registerRefactorTools(server);
+}
+
+if (categories.includes('system')) {
+  console.error('[MCP] ✓ Registering system tools');
+  registerSystemTools(server);
+}
+
+if (categories.includes('memory')) {
+  console.error('[MCP] ✓ Registering memory tools');
+  // Memory tools are part of system tools in current implementation
+  // If separate, would need registerMemoryTools(server);
+}
+
+console.error(`[MCP] Registered toolset with ${categories.length} optional categories`);
 
 // ============================================================
 // SERVER START
