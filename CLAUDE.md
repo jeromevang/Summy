@@ -351,17 +351,19 @@ When starting long-running Node.js servers without blocking or risking terminati
 1. **Never run blocking commands** like `npm run dev` directly in CLI - it will hang the interface
 2. **Use `Start-Process`** to launch in separate hidden window with output redirection:
    ```powershell
-   Start-Process powershell -ArgumentList '-NoProfile', '-Command', 'npm run dev > server.out 2> server.err' -WindowStyle Hidden
+   Start-Process powershell -ArgumentList '-NoProfile', '-Command', 'npm run dev > temp/logs/server.out 2> temp/logs/server.err' -WindowStyle Hidden
    ```
 3. **Monitor logs on demand** (don't use `-Wait`):
    ```powershell
-   Get-Content -Tail 20 server.out
+   Get-Content -Tail 20 temp/logs/server.out
    ```
 4. **Cleanup first**: Check for and kill conflicting processes before starting:
    ```powershell
    Get-NetTCPConnection -LocalPort 3001 -ErrorAction SilentlyContinue
    Get-Process node -ErrorAction SilentlyContinue | Stop-Process
    ```
+
+**Note:** All log files (*.out, *.err) and temporary screenshots should be stored in the `temp/logs/` directory, which is gitignored. Never create log files in the project root.
 
 ### Recent Changes (from WORKING_MEMORY.md)
 

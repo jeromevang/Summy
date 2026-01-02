@@ -7,7 +7,7 @@
   "provider": "openrouter",
   "modules": {
     "summy": {
-      "enabled": false
+      "enabled": true
     },
     "tooly": {
       "enabled": true
@@ -27,8 +27,12 @@
     "cacheTTL": 300000
   },
   "mcp": {
-    "toolset": "standard",
-    "customCategories": []
+    "toolset": "custom",
+    "customCategories": [
+      "rag",
+      "browser",
+      "memory"
+    ]
   },
   "openrouterApiKey": "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",
   "ollamaModel": "llama3",

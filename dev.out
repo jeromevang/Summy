@@ -1,1109 +1,2275 @@
 
-> summy@1.0.0 dev
-> concurrently -n server,client,rag,continue-tools -c blue,green,magenta,cyan "npm run dev:server" "npm run dev:client" "npm run dev:rag" "npm run dev:continue-tools"
+> server@1.0.0 dev
+> tsx watch src/index.ts
 
-[client] 
-[client] > summy@1.0.0 dev:client
-[client] > cd client && npm run dev
-[client] 
-[server] 
-[server] > summy@1.0.0 dev:server
-[server] > cd server && npm run dev
-[server] 
-[rag] 
-[rag] > summy@1.0.0 dev:rag
-[rag] > cd rag-server && npm run dev
-[rag] 
-[continue-tools] 
-[continue-tools] > summy@1.0.0 dev:continue-tools
-[continue-tools] > cd mcp-server && npm run dev:continue-tools
-[continue-tools] 
-[server] 
-[server] > server@1.0.0 dev
-[server] > tsx watch src/index.ts
-[server] 
-[client] 
-[client] > client@0.0.0 dev
-[client] > vite
-[client] 
-[continue-tools] 
-[continue-tools] > @summy/mcp-server@1.0.0 dev:continue-tools
-[continue-tools] > tsx watch src/continue-extra-tools.ts
-[continue-tools] 
-[rag] 
-[rag] > @summy/rag-server@1.0.0 dev
-[rag] > tsx watch src/index.ts
-[rag] 
-[client] 
-[client]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m151[22m[2m[0m ms[22m
-[client] 
-[client]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
-[client] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
-[continue-tools] [Extra Tools - Continue] ═══════════════════════════════════════
-[continue-tools] [Extra Tools - Continue] MCP Server v1.0 (SSE)
-[continue-tools] [Extra Tools - Continue] http://localhost:3006
-[continue-tools] [Extra Tools - Continue] SSE: http://localhost:3006/sse
-[continue-tools] [Extra Tools - Continue] Tools: 25 (git_status, git_diff, git_log, git_branch, git_commit, git_stash, http_request, system_info, disk_usage, process_list, clipboard_read, clipboard_write, json_validate, json_query, env_get, datetime, npm_scripts, npm_outdated, rag_query, rag_status, rag_index, find_symbol, get_callers, get_file_interface, get_dependencies)
-[continue-tools] [Extra Tools - Continue] ═══════════════════════════════════════
-[continue-tools] [Extra Tools] New SSE connection
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
-[client] [2m00:44:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
-[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mInternal server error: C:\Users\Jerome\Documents\Projects\Summy\client\src\components\ProjectSwitcher.tsx: Expected corresponding JSX closing tag for <>. (275:10)
-[client] 
-[client] [0m [90m 273 |[31m               [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
-[client]  [90m 274 |[31m             [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
-[client] [31m[1m>[22m[31m[90m 275 |[31m           [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
-[client]  [90m     |[31m           [31m[1m^[22m[31m
-[client]  [90m 276 |[31m         [33m<[31m[33m/[31m[33m>[31m
-[client]  [90m 277 |[31m       )}
-[client]  [90m 278 |[31m     [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m[0m[39m
-[client]   Plugin: [35mvite:react-babel[39m
-[client]   File: [36mC:/Users/Jerome/Documents/Projects/Summy/client/src/components/ProjectSwitcher.tsx[39m:275:10
-[client] [33m  273 |                </div>
-[client]   274 |              </div>
-[client]   275 |            </div>
-[client]       |            ^
-[client]   276 |          </>
-[client]   277 |        )}[39m
-[client]       at constructor (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:367:19)
-[client]       at TypeScriptParserMixin.raise (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:6624:19)
-[client]       at TypeScriptParserMixin.jsxParseElementAt (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4749:14)
-[client]       at TypeScriptParserMixin.jsxParseElement (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4778:17)
-[client]       at TypeScriptParserMixin.parseExprAtom (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4788:19)
-[client]       at TypeScriptParserMixin.parseExprSubscripts (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11145:23)
-[client]       at TypeScriptParserMixin.parseUpdate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11130:21)
-[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11110:23)
-[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9890:18)
-[client]       at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10963:61)
-[client]       at TypeScriptParserMixin.parseExprOps (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10968:23)
-[client]       at TypeScriptParserMixin.parseMaybeConditional (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10945:23)
-[client]       at TypeScriptParserMixin.parseMaybeAssign (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10895:21)
-[client]       at C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9828:39
-[client]       at TypeScriptParserMixin.tryParse (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:6932:20)
-[client]       at TypeScriptParserMixin.parseMaybeAssign (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9828:18)
-[client]       at C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10864:39
-[client]       at TypeScriptParserMixin.allowInAnd (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:12500:12)
-[client]       at TypeScriptParserMixin.parseMaybeAssignAllowIn (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10864:17)
-[client]       at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:12567:17)
-[client]       at TypeScriptParserMixin.parseParenAndDistinguishExpression (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11747:28)
-[client]       at TypeScriptParserMixin.parseExprAtom (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11395:23)
-[client]       at TypeScriptParserMixin.parseExprAtom (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4793:20)
-[client]       at TypeScriptParserMixin.parseExprSubscripts (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11145:23)
-[client]       at TypeScriptParserMixin.parseUpdate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11130:21)
-[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11110:23)
-[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9890:18)
-[client]       at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10963:61)
-[client]       at TypeScriptParserMixin.parseExprOpBaseRightExpr (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11050:34)
-[client]       at TypeScriptParserMixin.parseExprOpRightExpr (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11045:21)
-[client]       at TypeScriptParserMixin.parseExprOp (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11011:27)
-[client]       at TypeScriptParserMixin.parseExprOp (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9365:18)
-[client]       at TypeScriptParserMixin.parseExprOps (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10972:17)
-[client]       at TypeScriptParserMixin.parseMaybeConditional (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10945:23)
-[client]       at TypeScriptParserMixin.parseMaybeAssign (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10895:21)
-[client]       at TypeScriptParserMixin.parseMaybeAssign (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9839:20)
-[client]       at TypeScriptParserMixin.parseExpressionBase (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10848:23)
-[client]       at C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10844:39
-[client]       at TypeScriptParserMixin.allowInAnd (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:12500:12)
-[client]       at TypeScriptParserMixin.parseExpression (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10844:17)
-[client]       at TypeScriptParserMixin.jsxParseExpressionContainer (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4661:31)
-[client]       at TypeScriptParserMixin.jsxParseElementAt (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4740:36)
-[client]       at TypeScriptParserMixin.jsxParseElement (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4778:17)
-[client]       at TypeScriptParserMixin.parseExprAtom (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4788:19)
-[client]       at TypeScriptParserMixin.parseExprSubscripts (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11145:23)
-[client]       at TypeScriptParserMixin.parseUpdate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11130:21)
-[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11110:23)
-[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9890:18)
-[client]       at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10963:61)
-[client]       at TypeScriptParserMixin.parseExprOps (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10968:23)
-[client] [2m00:44:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:44:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[continue-tools] [Extra Tools] SSE closed: 14055f54-457f-43d3-bb8f-9e420fc550df
-[continue-tools] [Extra Tools] New SSE connection
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
-[client] [2m00:49:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:12[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:12[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:32[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:32[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:52[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:50:52[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[continue-tools] [Extra Tools] SSE closed: c61fd192-7256-4a7c-8858-bfaf5e6e4c5d
-[continue-tools] [Extra Tools] New SSE connection
-[client] [2m00:51:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:37[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace/browse[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:43[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:50[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:50[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:52[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:51:52[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:52:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[client] [2m00:52:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
-[client] AggregateError [ECONNREFUSED]: 
-[client]     at internalConnectMultiple (node:net:1139:18)
-[client]     at afterConnectMultiple (node:net:1712:7)
-[continue-tools] [Extra Tools] SSE closed: c889fb70-3844-416d-8682-0944f53b48f9
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: 7dc83c11-da67-48da-a8e7-3abbbf4836b3
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: 7a58682e-eba0-4a14-a448-aca6979f9f4b
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: 10a70187-41be-4f88-a3b6-a4cbae7ca09e
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: 9db61008-ac1d-4b01-9d14-a54b1e9f8c58
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: f64c6199-830d-4886-82d2-b5c6c9b814ca
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: 0c889c9f-3cfa-4402-a269-d3884b7ee4cf
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: ca078836-e8c3-4b2d-b269-7b40cf823f90
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: c8c5382a-f132-4511-b2b6-9db816ed897f
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: 3988297a-d468-46b0-b912-8736a8e31bf6
-[continue-tools] [Extra Tools] New SSE connection
-[server] 01:45:11 [tsx] change in ./src\services\workspace-service.ts Restarting...
-[server] c
-[continue-tools] [Extra Tools] SSE closed: 7bbf7ba8-02da-46ef-aee8-ace504bd9808
-[continue-tools] [Extra Tools] New SSE connection
-[server] 01:50:59 [tsx] change in ./src\routes\index.ts Restarting...
-[server] c01:51:09 [tsx] change in ./src\index.ts Restarting...
-[server] c01:51:19 [tsx] change in ./src\index.ts Restarting...
-[server] c01:51:26 [tsx] change in ./src\index.ts Restarting...
-[server] c01:51:36 [tsx] change in ./src\index.ts Restarting...
-[server] c01:51:44 [tsx] change in ./src\index.ts Restarting...
-[server] c
-[continue-tools] [Extra Tools] SSE closed: 751bef2d-4020-4b5b-82e4-c10c16996471
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: 220c02b8-6234-4077-ba54-f4c3ce6d29a3
-[continue-tools] [Extra Tools] New SSE connection
-[server] 01:58:39 [tsx] change in ./src\routes\health.ts Restarting...
-[server] c01:58:39 [tsx] change in ./src\routes\health.ts Restarting...
-[server] c01:58:59 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:00 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:27 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:28 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:28 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:29 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:30 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:30 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:49 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:50 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:50 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c01:59:58 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c01:59:59 [tsx] change in ./src\middleware\error-handler.ts Restarting...
-[server] c
-[continue-tools] [Extra Tools] SSE closed: fa5b5c81-17e4-41b2-ac3d-42a9231cd78f
-[continue-tools] [Extra Tools] New SSE connection
-[server] 02:06:41 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c02:06:41 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c02:06:42 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c02:06:43 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c02:06:44 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c02:06:44 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c02:06:45 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
-[server] c02:07:13 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c02:07:13 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c02:07:14 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c02:07:15 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c02:07:16 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c02:07:16 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c02:07:17 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c02:07:18 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
-[server] c
-[continue-tools] [Extra Tools] SSE closed: 0cc9825d-2a4d-430b-aca2-09969e46fe91
-[continue-tools] [Extra Tools] New SSE connection
-[client] npm error Lifecycle script `dev` failed with error:
-[client] npm error code 1
-[client] npm error path C:\Users\Jerome\Documents\Projects\Summy\client
-[client] npm error workspace client@0.0.0
-[client] npm error location C:\Users\Jerome\Documents\Projects\Summy\client
-[client] npm error command failed
-[client] npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vite
-[client] npm run dev:client exited with code 1
-[continue-tools] [Extra Tools] SSE closed: 897fcf2f-c99d-4609-94ee-0cb239421b30
-[continue-tools] [Extra Tools] New SSE connection
-[server] 02:15:57 [tsx] change in ./src\services\team-service-enhanced.ts Restarting...
-[server] c
-[continue-tools] [Extra Tools] SSE closed: 6b846cb0-38ac-4f1c-9413-149ae98101c7
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: 6841eb32-5218-48fb-b12f-33e69e2b3f23
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: af765223-07aa-40be-af80-1f2908c0778a
-[continue-tools] [Extra Tools] New SSE connection
-[continue-tools] [Extra Tools] SSE closed: c9f7139c-c20a-4291-9716-41fe123be68c
-[continue-tools] [Extra Tools] New SSE connection
-[server] 02:34:12 [tsx] change in ./src\routes\health.ts Restarting...
-[server] c
-[continue-tools] [Extra Tools] SSE closed: a8c10d6d-5cc9-477b-a84c-913930d39bb9
-[continue-tools] [Extra Tools] New SSE connection
+✅ Database service initialized successfully
+[MCP Client] MCP server path: C:\Users\jvgeu\Documents\Projects\Summy\mcp-server
+🔧 DOTENV DEBUG: Loading .env from: C:\Users\jvgeu\Documents\Projects\Summy\server\.env
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+🔧 DOTENV DEBUG: OPENAI_API_KEY after dotenv: MISSING
+[Notifications] Service initialized
+🚀 Summy proxy server running on port 3001
+📁 Sessions stored in: C:\Users\jvgeu\Documents\Projects\Summy\sessions
+🔌 WebSocket server ready for real-time updates
+✅ SERVER STARTED - Manual proxy (no http-proxy-middleware):
+  📝 General logging middleware: ACTIVE
+  🤖 Manual proxy routes: POST /chat/completions, /v1/chat/completions
+  📊 API routes: /api/*
+  🔧 Tooly routes: /api/tooly/*
+  🔔 Notifications: /api/notifications/*
+  📈 Analytics: /api/analytics/*
+[SESSION] Pre-warming skipped for model profiles (not stored in database)
+[SESSION] Cache service initialized
+  🚀 Cache service initialized
+[Tracing] Initializing trace storage...
+  📍 Distributed tracing initialized
+  🩺 Health check scheduler started
+  📝 Enhanced logging system initialized
+[ModelManager] Startup cleanup - checking for stale LLM models...
+  📊 System metrics: DISABLED (CPU/GPU monitoring)
+  🔌 WebSocket: Ready for real-time updates
+[ModelManager] Startup: No stale LLM models found
+[REQUEST] INCOMING: GET /api/mcp/status
+[2026-01-02T15:18:47.718Z] [INFO] HTTP GET /api/mcp/status - 200 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:19:28.947Z] [INFO] HTTP GET /api/status - 200 (27ms)
+[2026-01-02T15:19:29.133Z] [INFO] HTTP GET /api/git/status - 200 (210ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:19:29.142Z] [INFO] HTTP GET /api/workspace - 200 (1ms)
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:11.054Z] [INFO] HTTP GET /api/status - 304 (16ms)
+[WS] Client disconnected
+[WS] Client connected
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:12.281Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/notifications
+[2026-01-02T15:20:12.288Z] [INFO] HTTP GET /api/notifications - 200 (6ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[WS] Client disconnected
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:12.357Z] [INFO] HTTP GET /api/workspace - 304 (3ms)
+[REQUEST] INCOMING: GET /api/notifications
+[2026-01-02T15:20:12.362Z] [INFO] HTTP GET /api/notifications - 304 (4ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:12.372Z] [INFO] HTTP GET /api/settings - 200 (96ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:12.376Z] [INFO] HTTP GET /api/status - 304 (80ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:12.380Z] [INFO] HTTP GET /api/settings - 200 (66ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:12.395Z] [INFO] HTTP GET /api/settings - 304 (11ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:12.398Z] [INFO] HTTP GET /api/status - 304 (9ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:12.401Z] [INFO] HTTP GET /api/settings - 304 (9ms)
+[2026-01-02T15:20:12.751Z] [INFO] HTTP GET /api/git/status - 200 (435ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:12.782Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T15:20:13.154Z] [INFO] HTTP GET /api/git/status - 304 (395ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:13.168Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:20:16.333Z] [INFO] HTTP GET /api/sessions - 200 (2ms)
+[WS] Client connected
+[2026-01-02T15:20:16.339Z] [INFO] HTTP GET /api/sessions - 304 (2ms)
+[WS] Client disconnected
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:17.845Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:17.853Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:17.857Z] [INFO] HTTP GET /api/settings - 304 (1ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:17.863Z] [INFO] HTTP GET /api/settings - 304 (2ms)
+[REQUEST] INCOMING: GET /api/analytics?period=week
+[2026-01-02T15:20:17.868Z] [INFO] HTTP GET /api/analytics?period=week - 304 (2ms)
+[REQUEST] INCOMING: GET /api/analytics?period=week
+[2026-01-02T15:20:17.875Z] [INFO] HTTP GET /api/analytics?period=week - 304 (2ms)
+[2026-01-02T15:20:17.878Z] [INFO] HTTP GET /api/sessions - 304 (1ms)
+[2026-01-02T15:20:17.885Z] [INFO] HTTP GET /api/sessions - 304 (1ms)
+[REQUEST] INCOMING: GET /api/tooly/controller/status
+[Audit] GET /controller/status from ::1
+[Audit] GET /controller/status - 200 - 2ms
+[2026-01-02T15:20:17.891Z] [INFO] HTTP GET /api/tooly/controller/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/tooly/controller/status
+[Audit] GET /controller/status from ::1
+[Audit] GET /controller/status - 200 - 1ms
+[2026-01-02T15:20:17.897Z] [INFO] HTTP GET /api/tooly/controller/status - 304 (2ms)
+[WS] Client disconnected
+[WS] Client disconnected
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:21.612Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/notifications
+[2026-01-02T15:20:21.617Z] [INFO] HTTP GET /api/notifications - 304 (2ms)
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:21.637Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/notifications
+[2026-01-02T15:20:21.641Z] [INFO] HTTP GET /api/notifications - 304 (1ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:21.643Z] [INFO] HTTP GET /api/status - 304 (30ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:21.651Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:21.658Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:21.665Z] [INFO] HTTP GET /api/settings - 304 (5ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:21.667Z] [INFO] HTTP GET /api/status - 304 (5ms)
+[REQUEST] INCOMING: GET /api/analytics?period=week
+[2026-01-02T15:20:21.676Z] [INFO] HTTP GET /api/analytics?period=week - 304 (2ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:21.679Z] [INFO] HTTP GET /api/settings - 304 (2ms)
+[2026-01-02T15:20:21.687Z] [INFO] HTTP GET /api/sessions - 304 (1ms)
+[REQUEST] INCOMING: GET /api/analytics?period=week
+[2026-01-02T15:20:21.691Z] [INFO] HTTP GET /api/analytics?period=week - 304 (1ms)
+[REQUEST] INCOMING: GET /api/tooly/controller/status
+[Audit] GET /controller/status from ::1
+[Audit] GET /controller/status - 200 - 0ms
+[2026-01-02T15:20:21.696Z] [INFO] HTTP GET /api/tooly/controller/status - 304 (1ms)
+[2026-01-02T15:20:21.701Z] [INFO] HTTP GET /api/sessions - 304 (1ms)
+[REQUEST] INCOMING: GET /api/tooly/controller/status
+[Audit] GET /controller/status from ::1
+[Audit] GET /controller/status - 200 - 0ms
+[2026-01-02T15:20:21.714Z] [INFO] HTTP GET /api/tooly/controller/status - 304 (1ms)
+[2026-01-02T15:20:21.875Z] [INFO] HTTP GET /api/git/status - 304 (255ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:21.894Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T15:20:22.104Z] [INFO] HTTP GET /api/git/status - 304 (225ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:22.113Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:28.926Z] [INFO] HTTP GET /api/status - 304 (12ms)
+[2026-01-02T15:20:29.092Z] [INFO] HTTP GET /api/git/status - 200 (178ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:29.099Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:20:32.082Z] [INFO] HTTP GET /api/git/status - 304 (176ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:32.091Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:20:42.141Z] [INFO] HTTP GET /api/git/status - 304 (235ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:42.148Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:20:51.928Z] [INFO] HTTP GET /api/status - 304 (17ms)
+[2026-01-02T15:20:52.301Z] [INFO] HTTP GET /api/git/status - 304 (389ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:20:52.316Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:21:02.139Z] [INFO] HTTP GET /api/git/status - 304 (229ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:02.150Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:21:12.122Z] [INFO] HTTP GET /api/git/status - 304 (212ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:12.129Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:21.922Z] [INFO] HTTP GET /api/status - 304 (16ms)
+[2026-01-02T15:21:22.161Z] [INFO] HTTP GET /api/git/status - 304 (254ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:22.173Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:28.930Z] [INFO] HTTP GET /api/status - 304 (24ms)
+[2026-01-02T15:21:29.256Z] [INFO] HTTP GET /api/git/status - 304 (349ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:29.277Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:21:32.235Z] [INFO] HTTP GET /api/git/status - 304 (323ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:32.249Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[WS] Client connected
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:51.230Z] [INFO] HTTP GET /api/workspace - 200 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/notifications
+[2026-01-02T15:21:51.239Z] [INFO] HTTP GET /api/notifications - 200 (3ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:51.270Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/notifications
+[2026-01-02T15:21:51.276Z] [INFO] HTTP GET /api/notifications - 304 (1ms)
+[WS] Client disconnected
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:51.279Z] [INFO] HTTP GET /api/settings - 200 (39ms)
+[2026-01-02T15:21:51.281Z] [INFO] HTTP GET /api/status - 200 (50ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:51.282Z] [INFO] HTTP GET /api/settings - 200 (40ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:51.286Z] [INFO] HTTP GET /api/settings - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:51.291Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:51.292Z] [INFO] HTTP GET /api/settings - 304 (3ms)
+[2026-01-02T15:21:51.553Z] [INFO] HTTP GET /api/git/status - 200 (306ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:51.579Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:21:51.857Z] [INFO] HTTP GET /api/git/status - 304 (297ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:51.906Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:21:51.917Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:53.188Z] [INFO] HTTP POST /api/settings - 200 (7ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:53.211Z] [INFO] HTTP POST /api/settings - 200 (13ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:54.399Z] [INFO] HTTP POST /api/settings - 200 (4ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:54.413Z] [INFO] HTTP POST /api/settings - 200 (4ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:56.271Z] [INFO] HTTP POST /api/settings - 200 (5ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:21:56.281Z] [INFO] HTTP POST /api/settings - 200 (5ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:22:01.551Z] [INFO] HTTP GET /api/git/status - 200 (292ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:22:01.560Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[WS] Client disconnected
+[WS] Client disconnected
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:22:21.902Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:22:28.924Z] [INFO] HTTP GET /api/status - 304 (18ms)
+[2026-01-02T15:22:29.123Z] [INFO] HTTP GET /api/git/status - 200 (216ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:22:29.140Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:22:29.351Z] [INFO] HTTP GET /api/git/status - 304 (225ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:22:29.359Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:22:51.902Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:23:21.900Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:23:28.909Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:23:29.068Z] [INFO] HTTP GET /api/git/status - 304 (157ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:23:29.080Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T15:23:29.236Z] [INFO] HTTP GET /api/git/status - 304 (165ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:23:29.242Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:24:28.917Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:24:28.925Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:24:29.132Z] [INFO] HTTP GET /api/git/status - 304 (227ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:24:29.151Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T15:24:29.365Z] [INFO] HTTP GET /api/git/status - 304 (226ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:24:29.373Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:25:28.933Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:25:28.943Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T15:25:29.170Z] [INFO] HTTP GET /api/git/status - 304 (259ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:25:29.190Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:25:29.408Z] [INFO] HTTP GET /api/git/status - 304 (233ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:25:29.417Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:26:28.923Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:26:28.928Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:26:29.082Z] [INFO] HTTP GET /api/git/status - 304 (171ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:26:29.097Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:26:29.265Z] [INFO] HTTP GET /api/git/status - 304 (179ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:26:29.271Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:27:28.915Z] [INFO] HTTP GET /api/status - 304 (12ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:27:28.920Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T15:27:29.070Z] [INFO] HTTP GET /api/git/status - 304 (165ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:27:29.084Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T15:27:29.240Z] [INFO] HTTP GET /api/git/status - 304 (167ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:27:29.252Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:28:28.918Z] [INFO] HTTP GET /api/status - 304 (16ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:28:28.925Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T15:28:29.102Z] [INFO] HTTP GET /api/git/status - 304 (199ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:28:29.121Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T15:28:29.317Z] [INFO] HTTP GET /api/git/status - 304 (211ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:28:29.333Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:29:28.906Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:29:28.915Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T15:29:29.047Z] [INFO] HTTP GET /api/git/status - 304 (151ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:29:29.059Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:29:29.204Z] [INFO] HTTP GET /api/git/status - 304 (154ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:29:29.210Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:30:28.924Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:30:28.928Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T15:30:29.065Z] [INFO] HTTP GET /api/git/status - 304 (151ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:30:29.078Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:30:29.227Z] [INFO] HTTP GET /api/git/status - 304 (159ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:30:29.234Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:31:28.933Z] [INFO] HTTP GET /api/status - 304 (19ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:31:28.938Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T15:31:29.122Z] [INFO] HTTP GET /api/git/status - 304 (207ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:31:29.139Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:31:29.322Z] [INFO] HTTP GET /api/git/status - 304 (195ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:31:29.331Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:32:28.921Z] [INFO] HTTP GET /api/status - 304 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:32:28.926Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:32:29.075Z] [INFO] HTTP GET /api/git/status - 304 (164ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:32:29.089Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:32:29.245Z] [INFO] HTTP GET /api/git/status - 304 (166ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:32:29.251Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:33:28.922Z] [INFO] HTTP GET /api/status - 304 (9ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:33:28.927Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:33:29.075Z] [INFO] HTTP GET /api/git/status - 304 (162ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:33:29.091Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:33:29.259Z] [INFO] HTTP GET /api/git/status - 304 (180ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:33:29.266Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:34:28.916Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:34:28.923Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:34:29.081Z] [INFO] HTTP GET /api/git/status - 304 (179ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:34:29.097Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:34:29.268Z] [INFO] HTTP GET /api/git/status - 304 (183ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:34:29.276Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:35:28.921Z] [INFO] HTTP GET /api/status - 304 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:35:28.925Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T15:35:29.060Z] [INFO] HTTP GET /api/git/status - 304 (149ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:35:29.073Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T15:35:29.223Z] [INFO] HTTP GET /api/git/status - 304 (160ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:35:29.229Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:35:46.691Z] [INFO] HTTP GET /api/git/status - 304 (249ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:35:46.699Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:35:51.631Z] [INFO] HTTP GET /api/status - 304 (14ms)
+[2026-01-02T15:35:51.806Z] [INFO] HTTP GET /api/git/status - 304 (188ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:35:51.813Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/rag/stats
+[RAGClient] Fetching stats from http://localhost:3002/api/rag/stats
+[REQUEST] INCOMING: GET /api/rag/models
+[REQUEST] INCOMING: GET /api/rag/config
+[2026-01-02T15:35:55.848Z] [INFO] HTTP GET /api/rag/config - 500 (1ms)
+[REQUEST] INCOMING: GET /api/rag/config
+[2026-01-02T15:35:55.854Z] [INFO] HTTP GET /api/rag/config - 500 (1ms)
+[RAGClient] Stats fetch response status: 200
+[RAGClient] Successfully fetched stats: {
+  projectPath: 'C:\\Users\\jvgeu\\Documents\\Projects\\Summy',
+  status: 'idle',
+  totalFiles: 0,
+  processedFiles: 0,
+  chunksCreated: 0,
+  embeddingsGenerated: 0,
+  fileWatcherActive: true,
+  embeddingModel: 'LMStudio',
+  embeddingModelLoaded: false
+}
+[2026-01-02T15:35:55.868Z] [INFO] HTTP GET /api/rag/stats - 200 (54ms)
+[REQUEST] INCOMING: GET /api/rag/stats
+[RAGClient] Fetching stats from http://localhost:3002/api/rag/stats
+[RAGClient] Stats fetch response status: 200
+[RAGClient] Successfully fetched stats: {
+  projectPath: 'C:\\Users\\jvgeu\\Documents\\Projects\\Summy',
+  status: 'idle',
+  totalFiles: 0,
+  processedFiles: 0,
+  chunksCreated: 0,
+  embeddingsGenerated: 0,
+  fileWatcherActive: true,
+  embeddingModel: 'LMStudio',
+  embeddingModelLoaded: false
+}
+[2026-01-02T15:35:55.991Z] [INFO] HTTP GET /api/rag/stats - 304 (118ms)
+[2026-01-02T15:35:56.160Z] [INFO] HTTP GET /api/rag/models - 200 (315ms)
+[REQUEST] INCOMING: GET /api/rag/models
+[REQUEST] INCOMING: GET /api/rag/stats
+[RAGClient] Fetching stats from http://localhost:3002/api/rag/stats
+[REQUEST] INCOMING: GET /api/rag/config
+[2026-01-02T15:35:56.181Z] [INFO] HTTP GET /api/rag/config - 500 (2ms)
+[RAGClient] Stats fetch response status: 200
+[RAGClient] Successfully fetched stats: {
+  projectPath: 'C:\\Users\\jvgeu\\Documents\\Projects\\Summy',
+  status: 'idle',
+  totalFiles: 0,
+  processedFiles: 0,
+  chunksCreated: 0,
+  embeddingsGenerated: 0,
+  fileWatcherActive: true,
+  embeddingModel: 'LMStudio',
+  embeddingModelLoaded: false
+}
+[2026-01-02T15:35:56.184Z] [INFO] HTTP GET /api/rag/stats - 304 (7ms)
+[2026-01-02T15:35:56.198Z] [INFO] HTTP GET /api/rag/models - 304 (32ms)
+[REQUEST] INCOMING: GET /api/rag/models
+[2026-01-02T15:35:56.231Z] [INFO] HTTP GET /api/rag/models - 304 (28ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:35:58.394Z] [INFO] HTTP GET /api/settings - 200 (3ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:35:58.396Z] [INFO] HTTP GET /api/settings - 200 (3ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:35:58.399Z] [INFO] HTTP GET /api/settings - 304 (2ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:35:58.404Z] [INFO] HTTP GET /api/settings - 304 (2ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:36:01.807Z] [INFO] HTTP GET /api/git/status - 304 (190ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:36:01.816Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:36:03.285Z] [INFO] HTTP POST /api/settings - 200 (3ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:36:04.631Z] [INFO] HTTP POST /api/settings - 200 (3ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:36:05.142Z] [INFO] HTTP POST /api/settings - 200 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:36:11.808Z] [INFO] HTTP GET /api/git/status - 304 (194ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:36:11.816Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:36:21.621Z] [INFO] HTTP GET /api/status - 304 (10ms)
+[2026-01-02T15:36:21.773Z] [INFO] HTTP GET /api/git/status - 304 (162ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:36:21.780Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:36:28.916Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[2026-01-02T15:36:29.121Z] [INFO] HTTP GET /api/git/status - 304 (218ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:36:29.130Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:36:31.812Z] [INFO] HTTP GET /api/git/status - 304 (191ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:36:31.820Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: POST /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:36:36.916Z] [INFO] HTTP POST /api/settings - 200 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:36:42.091Z] [INFO] HTTP GET /api/git/status - 304 (187ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:36:42.098Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:36:51.922Z] [INFO] HTTP GET /api/status - 304 (12ms)
+[2026-01-02T15:36:52.086Z] [INFO] HTTP GET /api/git/status - 304 (175ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:36:52.093Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:37:02.094Z] [INFO] HTTP GET /api/git/status - 304 (183ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:37:02.103Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:37:12.101Z] [INFO] HTTP GET /api/git/status - 304 (197ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:37:12.110Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:37:21.917Z] [INFO] HTTP GET /api/status - 304 (16ms)
+[2026-01-02T15:37:22.166Z] [INFO] HTTP GET /api/git/status - 304 (265ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:37:22.177Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:37:28.922Z] [INFO] HTTP GET /api/status - 304 (17ms)
+[2026-01-02T15:37:29.125Z] [INFO] HTTP GET /api/git/status - 304 (219ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:37:29.132Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:37:32.201Z] [INFO] HTTP GET /api/git/status - 304 (298ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:37:32.211Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:38:28.927Z] [INFO] HTTP GET /api/status - 304 (22ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:38:28.936Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T15:38:29.187Z] [INFO] HTTP GET /api/git/status - 200 (279ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:38:29.213Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T15:38:29.462Z] [INFO] HTTP GET /api/git/status - 304 (268ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:38:29.471Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[Health] Running scheduled health checks...
+4:38:58 PM [tsx] change in ./src\routes\index.ts Restarting...
+c✅ Database service initialized successfully
+[MCP Client] MCP server path: C:\Users\jvgeu\Documents\Projects\Summy\mcp-server
+🔧 DOTENV DEBUG: Loading .env from: C:\Users\jvgeu\Documents\Projects\Summy\server\.env
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+🔧 DOTENV DEBUG: OPENAI_API_KEY after dotenv: MISSING
+[Notifications] Service initialized
+🚀 Summy proxy server running on port 3001
+📁 Sessions stored in: C:\Users\jvgeu\Documents\Projects\Summy\sessions
+🔌 WebSocket server ready for real-time updates
+✅ SERVER STARTED - Manual proxy (no http-proxy-middleware):
+  📝 General logging middleware: ACTIVE
+  🤖 Manual proxy routes: POST /chat/completions, /v1/chat/completions
+  📊 API routes: /api/*
+  🔧 Tooly routes: /api/tooly/*
+  🔔 Notifications: /api/notifications/*
+  📈 Analytics: /api/analytics/*
+[SESSION] Pre-warming skipped for model profiles (not stored in database)
+[SESSION] Cache service initialized
+  🚀 Cache service initialized
+[Tracing] Initializing trace storage...
+  📍 Distributed tracing initialized
+  🩺 Health check scheduler started
+  📝 Enhanced logging system initialized
+[ModelManager] Startup cleanup - checking for stale LLM models...
+[WS] Client connected
+[ModelManager] Startup: No stale LLM models found
+  📊 System metrics: DISABLED (CPU/GPU monitoring)
+  🔌 WebSocket: Ready for real-time updates
+4:39:10 PM [tsx] change in ./src\index.ts Restarting...
+c✅ Database service initialized successfully
+[MCP Client] MCP server path: C:\Users\jvgeu\Documents\Projects\Summy\mcp-server
+🔧 DOTENV DEBUG: Loading .env from: C:\Users\jvgeu\Documents\Projects\Summy\server\.env
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+🔧 DOTENV DEBUG: OPENAI_API_KEY after dotenv: MISSING
+[Notifications] Service initialized
+🚀 Summy proxy server running on port 3001
+📁 Sessions stored in: C:\Users\jvgeu\Documents\Projects\Summy\sessions
+🔌 WebSocket server ready for real-time updates
+✅ SERVER STARTED - Manual proxy (no http-proxy-middleware):
+  📝 General logging middleware: ACTIVE
+  🤖 Manual proxy routes: POST /chat/completions, /v1/chat/completions
+  📊 API routes: /api/*
+  🔧 Tooly routes: /api/tooly/*
+  🔔 Notifications: /api/notifications/*
+  📈 Analytics: /api/analytics/*
+[SESSION] Pre-warming skipped for model profiles (not stored in database)
+[SESSION] Cache service initialized
+  🚀 Cache service initialized
+[Tracing] Initializing trace storage...
+  📍 Distributed tracing initialized
+  🩺 Health check scheduler started
+  📝 Enhanced logging system initialized
+[ModelManager] Startup cleanup - checking for stale LLM models...
+  📊 System metrics: DISABLED (CPU/GPU monitoring)
+  🔌 WebSocket: Ready for real-time updates
+[ModelManager] Startup: No stale LLM models found
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:39:28.941Z] [INFO] HTTP GET /api/status - 304 (7ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:39:28.947Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:39:29.130Z] [INFO] HTTP GET /api/git/status - 200 (218ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:39:29.150Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:39:29.325Z] [INFO] HTTP GET /api/git/status - 304 (191ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:39:29.336Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+4:39:32 PM [tsx] change in ./src\index.ts Restarting...
+c✅ Database service initialized successfully
+[MCP Client] MCP server path: C:\Users\jvgeu\Documents\Projects\Summy\mcp-server
+🔧 DOTENV DEBUG: Loading .env from: C:\Users\jvgeu\Documents\Projects\Summy\server\.env
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+🔧 DOTENV DEBUG: OPENAI_API_KEY after dotenv: MISSING
+[Notifications] Service initialized
+🚀 Summy proxy server running on port 3001
+📁 Sessions stored in: C:\Users\jvgeu\Documents\Projects\Summy\sessions
+🔌 WebSocket server ready for real-time updates
+✅ SERVER STARTED - Manual proxy (no http-proxy-middleware):
+  📝 General logging middleware: ACTIVE
+  🤖 Manual proxy routes: POST /chat/completions, /v1/chat/completions
+  📊 API routes: /api/*
+  🔧 Tooly routes: /api/tooly/*
+  🔔 Notifications: /api/notifications/*
+  📈 Analytics: /api/analytics/*
+[SESSION] Pre-warming skipped for model profiles (not stored in database)
+[SESSION] Cache service initialized
+  🚀 Cache service initialized
+[Tracing] Initializing trace storage...
+  📍 Distributed tracing initialized
+  🩺 Health check scheduler started
+  📝 Enhanced logging system initialized
+[ModelManager] Startup cleanup - checking for stale LLM models...
+  📊 System metrics: DISABLED (CPU/GPU monitoring)
+  🔌 WebSocket: Ready for real-time updates
+[ModelManager] Startup: No stale LLM models found
+[WS] Client connected
+4:40:01 PM [tsx] change in ./src\index.ts Restarting...
+c✅ Database service initialized successfully
+[MCP Client] MCP server path: C:\Users\jvgeu\Documents\Projects\Summy\mcp-server
+🔧 DOTENV DEBUG: Loading .env from: C:\Users\jvgeu\Documents\Projects\Summy\server\.env
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+🔧 DOTENV DEBUG: OPENAI_API_KEY after dotenv: MISSING
+[Notifications] Service initialized
+🚀 Summy proxy server running on port 3001
+📁 Sessions stored in: C:\Users\jvgeu\Documents\Projects\Summy\sessions
+🔌 WebSocket server ready for real-time updates
+✅ SERVER STARTED - Manual proxy (no http-proxy-middleware):
+  📝 General logging middleware: ACTIVE
+  🤖 Manual proxy routes: POST /chat/completions, /v1/chat/completions
+  📊 API routes: /api/*
+  🔧 Tooly routes: /api/tooly/*
+  🔔 Notifications: /api/notifications/*
+  📈 Analytics: /api/analytics/*
+[SESSION] Pre-warming skipped for model profiles (not stored in database)
+[SESSION] Cache service initialized
+  🚀 Cache service initialized
+[Tracing] Initializing trace storage...
+  📍 Distributed tracing initialized
+  🩺 Health check scheduler started
+  📝 Enhanced logging system initialized
+[ModelManager] Startup cleanup - checking for stale LLM models...
+  📊 System metrics: DISABLED (CPU/GPU monitoring)
+  🔌 WebSocket: Ready for real-time updates
+[ModelManager] Startup: No stale LLM models found
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/mcp/status
+[2026-01-02T15:40:17.451Z] [INFO] HTTP GET /api/mcp/status - 200 (8ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:40:17.490Z] [INFO] HTTP GET /api/settings - 200 (7ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:40:28.961Z] [INFO] HTTP GET /api/status - 304 (45ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:40:28.973Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T15:40:29.224Z] [INFO] HTTP GET /api/git/status - 304 (303ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:40:29.251Z] [INFO] HTTP GET /api/workspace - 304 (3ms)
+[2026-01-02T15:40:29.531Z] [INFO] HTTP GET /api/git/status - 304 (301ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:40:29.542Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:41:28.921Z] [INFO] HTTP GET /api/status - 304 (17ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:41:28.929Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T15:41:29.113Z] [INFO] HTTP GET /api/git/status - 304 (207ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:41:29.134Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:41:29.330Z] [INFO] HTTP GET /api/git/status - 304 (212ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:41:29.339Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+4:41:51 PM [tsx] change in ./src\index.ts Restarting...
+c✅ Database service initialized successfully
+[MCP Client] MCP server path: C:\Users\jvgeu\Documents\Projects\Summy\mcp-server
+🔧 DOTENV DEBUG: Loading .env from: C:\Users\jvgeu\Documents\Projects\Summy\server\.env
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+🔧 DOTENV DEBUG: OPENAI_API_KEY after dotenv: MISSING
+[Notifications] Service initialized
+🚀 Summy proxy server running on port 3001
+📁 Sessions stored in: C:\Users\jvgeu\Documents\Projects\Summy\sessions
+🔌 WebSocket server ready for real-time updates
+✅ SERVER STARTED - Manual proxy (no http-proxy-middleware):
+  📝 General logging middleware: ACTIVE
+  🤖 Manual proxy routes: POST /chat/completions, /v1/chat/completions
+  📊 API routes: /api/*
+  🔧 Tooly routes: /api/tooly/*
+  🔔 Notifications: /api/notifications/*
+  📈 Analytics: /api/analytics/*
+[SESSION] Pre-warming skipped for model profiles (not stored in database)
+[SESSION] Cache service initialized
+  🚀 Cache service initialized
+[Tracing] Initializing trace storage...
+  📍 Distributed tracing initialized
+  🩺 Health check scheduler started
+[HookLogger] Initialized with WebSocket broadcasting
+  🪝 Hook logger initialized with WebSocket broadcasting
+  📝 Enhanced logging system initialized
+[ModelManager] Startup cleanup - checking for stale LLM models...
+[WS] Client connected
+  📊 System metrics: DISABLED (CPU/GPU monitoring)
+  🔌 WebSocket: Ready for real-time updates
+[ModelManager] Startup: No stale LLM models found
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:42:28.952Z] [INFO] HTTP GET /api/status - 304 (40ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:42:28.958Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T15:42:29.190Z] [INFO] HTTP GET /api/git/status - 304 (274ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:42:29.215Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T15:42:29.449Z] [INFO] HTTP GET /api/git/status - 304 (253ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:42:29.459Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:43:28.922Z] [INFO] HTTP GET /api/status - 304 (13ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:43:28.928Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:43:29.110Z] [INFO] HTTP GET /api/git/status - 304 (199ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:43:29.126Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:43:29.303Z] [INFO] HTTP GET /api/git/status - 304 (190ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:43:29.310Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:44:28.927Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:44:28.935Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:44:29.128Z] [INFO] HTTP GET /api/git/status - 304 (215ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:44:29.152Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:44:29.397Z] [INFO] HTTP GET /api/git/status - 304 (263ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:44:29.405Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:45:28.920Z] [INFO] HTTP GET /api/status - 304 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:45:28.924Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T15:45:29.068Z] [INFO] HTTP GET /api/git/status - 304 (159ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:45:29.082Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:45:29.241Z] [INFO] HTTP GET /api/git/status - 304 (170ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:45:29.248Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:46:28.917Z] [INFO] HTTP GET /api/status - 304 (14ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:46:28.923Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:46:29.075Z] [INFO] HTTP GET /api/git/status - 304 (171ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:46:29.090Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:46:29.253Z] [INFO] HTTP GET /api/git/status - 304 (175ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:46:29.260Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:47:28.931Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:47:28.940Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T15:47:29.149Z] [INFO] HTTP GET /api/git/status - 200 (237ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:47:29.169Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:47:29.368Z] [INFO] HTTP GET /api/git/status - 304 (214ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:47:29.377Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:48:28.941Z] [INFO] HTTP GET /api/status - 304 (16ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:48:28.948Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T15:48:29.157Z] [INFO] HTTP GET /api/git/status - 304 (231ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:48:29.175Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:48:29.381Z] [INFO] HTTP GET /api/git/status - 304 (220ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:48:29.389Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:49:28.927Z] [INFO] HTTP GET /api/status - 304 (18ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:49:28.934Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:49:29.150Z] [INFO] HTTP GET /api/git/status - 200 (240ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:49:29.171Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:49:29.407Z] [INFO] HTTP GET /api/git/status - 304 (253ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:49:29.417Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[WS] Client disconnected
+[WS] Client connected
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:50:21.891Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/notifications
+[2026-01-02T15:50:21.896Z] [INFO] HTTP GET /api/notifications - 304 (2ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:50:21.925Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/notifications
+[2026-01-02T15:50:21.927Z] [INFO] HTTP GET /api/notifications - 304 (1ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:50:21.931Z] [INFO] HTTP GET /api/status - 304 (39ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:50:21.933Z] [INFO] HTTP GET /api/settings - 200 (34ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:50:21.934Z] [INFO] HTTP GET /api/settings - 304 (33ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:50:21.940Z] [INFO] HTTP GET /api/settings - 304 (4ms)
+[REQUEST] INCOMING: GET /api/settings
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:50:21.943Z] [INFO] HTTP GET /api/status - 304 (6ms)
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:50:21.945Z] [INFO] HTTP GET /api/settings - 304 (4ms)
+[WS] Client disconnected
+[2026-01-02T15:50:22.192Z] [INFO] HTTP GET /api/git/status - 200 (288ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:50:22.214Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:50:22.432Z] [INFO] HTTP GET /api/git/status - 304 (235ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:50:22.441Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:50:28.940Z] [INFO] HTTP GET /api/status - 304 (21ms)
+[2026-01-02T15:50:29.197Z] [INFO] HTTP GET /api/git/status - 304 (277ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:50:29.205Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:50:33.078Z] [INFO] HTTP GET /api/git/status - 304 (167ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:50:33.086Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:50:43.142Z] [INFO] HTTP GET /api/git/status - 304 (228ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:50:43.151Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:50:52.924Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[2026-01-02T15:50:53.130Z] [INFO] HTTP GET /api/git/status - 304 (220ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:50:53.140Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:51:03.139Z] [INFO] HTTP GET /api/git/status - 200 (236ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:51:03.183Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:51:13.131Z] [INFO] HTTP GET /api/git/status - 304 (227ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:51:13.142Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:51:22.922Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[2026-01-02T15:51:23.115Z] [INFO] HTTP GET /api/git/status - 304 (207ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:51:23.125Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:51:28.926Z] [INFO] HTTP GET /api/status - 304 (19ms)
+[2026-01-02T15:51:29.185Z] [INFO] HTTP GET /api/git/status - 304 (277ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:51:29.462Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:51:33.131Z] [INFO] HTTP GET /api/git/status - 200 (227ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:51:33.141Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:51:52.905Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:52:22.903Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:52:28.916Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T15:52:29.149Z] [INFO] HTTP GET /api/git/status - 304 (232ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:52:29.171Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:52:29.373Z] [INFO] HTTP GET /api/git/status - 304 (218ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:52:29.382Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:52:52.905Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:53:22.913Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:53:28.929Z] [INFO] HTTP GET /api/status - 304 (16ms)
+[2026-01-02T15:53:29.105Z] [INFO] HTTP GET /api/git/status - 304 (191ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:53:29.121Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T15:53:29.314Z] [INFO] HTTP GET /api/git/status - 304 (205ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:53:29.321Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:54:28.925Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:54:28.931Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:54:29.101Z] [INFO] HTTP GET /api/git/status - 304 (188ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:54:29.119Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:54:29.301Z] [INFO] HTTP GET /api/git/status - 304 (196ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:54:29.309Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:55:28.930Z] [INFO] HTTP GET /api/status - 304 (19ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:55:28.939Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:55:29.171Z] [INFO] HTTP GET /api/git/status - 304 (259ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:55:29.192Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:55:29.431Z] [INFO] HTTP GET /api/git/status - 304 (255ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:55:29.443Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:56:28.915Z] [INFO] HTTP GET /api/status - 304 (12ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:56:28.921Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:56:29.099Z] [INFO] HTTP GET /api/git/status - 304 (196ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:56:29.116Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:56:29.303Z] [INFO] HTTP GET /api/git/status - 304 (199ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:56:29.310Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:57:28.927Z] [INFO] HTTP GET /api/status - 304 (13ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:57:28.933Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:57:29.116Z] [INFO] HTTP GET /api/git/status - 304 (201ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:57:29.133Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:57:29.321Z] [INFO] HTTP GET /api/git/status - 304 (201ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:57:29.329Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:58:28.906Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:58:28.927Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:58:29.069Z] [INFO] HTTP GET /api/git/status - 304 (153ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:58:29.082Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:58:29.229Z] [INFO] HTTP GET /api/git/status - 304 (157ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:58:29.235Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:59:28.907Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T15:59:28.923Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T15:59:29.142Z] [INFO] HTTP GET /api/git/status - 304 (234ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:59:29.164Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T15:59:29.428Z] [INFO] HTTP GET /api/git/status - 304 (280ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T15:59:29.437Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:00:28.920Z] [INFO] HTTP GET /api/status - 304 (12ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:00:28.925Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:00:29.083Z] [INFO] HTTP GET /api/git/status - 304 (174ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:00:29.102Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:00:29.282Z] [INFO] HTTP GET /api/git/status - 304 (196ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:00:29.289Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:01:28.917Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:01:28.937Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:01:29.161Z] [INFO] HTTP GET /api/git/status - 304 (241ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:01:29.182Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:01:29.393Z] [INFO] HTTP GET /api/git/status - 304 (227ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:01:29.402Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:02:28.918Z] [INFO] HTTP GET /api/status - 304 (12ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:02:28.922Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:02:29.071Z] [INFO] HTTP GET /api/git/status - 304 (165ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:02:29.085Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:02:29.242Z] [INFO] HTTP GET /api/git/status - 304 (167ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:02:29.248Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:03:28.924Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:03:28.929Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:03:29.084Z] [INFO] HTTP GET /api/git/status - 304 (174ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:03:29.097Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:03:29.247Z] [INFO] HTTP GET /api/git/status - 304 (160ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:03:29.253Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:04:28.916Z] [INFO] HTTP GET /api/status - 304 (14ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:04:28.922Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:04:29.083Z] [INFO] HTTP GET /api/git/status - 304 (181ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:04:29.097Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:04:29.267Z] [INFO] HTTP GET /api/git/status - 304 (181ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:04:29.273Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:05:28.927Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:05:28.934Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:05:29.152Z] [INFO] HTTP GET /api/git/status - 304 (239ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:05:29.173Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:05:29.422Z] [INFO] HTTP GET /api/git/status - 304 (265ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:05:29.432Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[REQUEST] INCOMING: GET /api/git/status
+[2026-01-02T16:06:28.928Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:06:28.933Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:06:29.091Z] [INFO] HTTP GET /api/git/status - 304 (175ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:06:29.104Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:06:29.273Z] [INFO] HTTP GET /api/git/status - 304 (179ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:06:29.281Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:07:28.920Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:07:28.928Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:07:29.143Z] [INFO] HTTP GET /api/git/status - 304 (242ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:07:29.163Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:07:29.386Z] [INFO] HTTP GET /api/git/status - 304 (238ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:07:29.395Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:08:28.940Z] [INFO] HTTP GET /api/status - 304 (12ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:08:28.946Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:08:29.119Z] [INFO] HTTP GET /api/git/status - 304 (190ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:08:29.135Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:08:29.317Z] [INFO] HTTP GET /api/git/status - 304 (194ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:08:29.324Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:09:28.923Z] [INFO] HTTP GET /api/status - 304 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:09:28.928Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:09:29.062Z] [INFO] HTTP GET /api/git/status - 304 (149ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:09:29.074Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:09:29.221Z] [INFO] HTTP GET /api/git/status - 304 (156ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:09:29.227Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:10:28.928Z] [INFO] HTTP GET /api/status - 304 (17ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:10:28.936Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:10:29.188Z] [INFO] HTTP GET /api/git/status - 304 (276ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:10:29.212Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:10:29.465Z] [INFO] HTTP GET /api/git/status - 304 (270ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:10:29.476Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:11:28.923Z] [INFO] HTTP GET /api/status - 304 (14ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:11:28.931Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:11:29.125Z] [INFO] HTTP GET /api/git/status - 304 (215ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:11:29.146Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:11:29.346Z] [INFO] HTTP GET /api/git/status - 304 (217ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:11:29.354Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:12:28.927Z] [INFO] HTTP GET /api/status - 304 (19ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:12:28.934Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:12:29.180Z] [INFO] HTTP GET /api/git/status - 304 (271ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:12:29.201Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:12:29.451Z] [INFO] HTTP GET /api/git/status - 304 (265ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:12:29.460Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:13:28.936Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:13:28.943Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:13:29.162Z] [INFO] HTTP GET /api/git/status - 304 (242ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:13:29.185Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:13:29.413Z] [INFO] HTTP GET /api/git/status - 304 (246ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:13:29.422Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:14:28.937Z] [INFO] HTTP GET /api/status - 304 (22ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:14:28.946Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:14:29.256Z] [INFO] HTTP GET /api/git/status - 304 (340ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:14:29.283Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:14:29.611Z] [INFO] HTTP GET /api/git/status - 304 (349ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:14:29.622Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:15:28.913Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:15:28.937Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:15:29.215Z] [INFO] HTTP GET /api/git/status - 304 (300ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:15:29.237Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:15:29.488Z] [INFO] HTTP GET /api/git/status - 304 (268ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:15:29.497Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:16:28.917Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:16:28.937Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:16:29.182Z] [INFO] HTTP GET /api/git/status - 304 (263ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:16:29.206Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:16:29.529Z] [INFO] HTTP GET /api/git/status - 304 (342ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:16:29.541Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:17:28.927Z] [INFO] HTTP GET /api/status - 304 (19ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:17:28.936Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[2026-01-02T16:17:29.254Z] [INFO] HTTP GET /api/git/status - 304 (345ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:17:29.281Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:17:29.632Z] [INFO] HTTP GET /api/git/status - 304 (372ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:17:29.649Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:18:28.952Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:18:28.960Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:18:29.206Z] [INFO] HTTP GET /api/git/status - 304 (274ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:18:29.230Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:18:29.475Z] [INFO] HTTP GET /api/git/status - 304 (262ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:18:29.484Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:19:28.934Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:19:28.944Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:19:29.239Z] [INFO] HTTP GET /api/git/status - 304 (327ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:19:29.271Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:19:29.618Z] [INFO] HTTP GET /api/git/status - 304 (369ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:19:29.629Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:20:28.938Z] [INFO] HTTP GET /api/status - 304 (26ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:20:28.949Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[2026-01-02T16:20:29.382Z] [INFO] HTTP GET /api/git/status - 304 (469ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:20:29.414Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:20:29.805Z] [INFO] HTTP GET /api/git/status - 304 (415ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:20:29.818Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: POST /api/hooks/log-start
+[2026-01-02T16:20:33.177Z] [INFO] HTTP POST /api/hooks/log-start - 500 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:21:28.927Z] [INFO] HTTP GET /api/status - 304 (22ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:21:28.940Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[2026-01-02T16:21:29.281Z] [INFO] HTTP GET /api/git/status - 304 (374ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:21:29.308Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:21:29.806Z] [INFO] HTTP GET /api/git/status - 304 (519ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:21:29.820Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: POST /api/hooks/log-start
+[2026-01-02T16:22:07.996Z] [INFO] HTTP POST /api/hooks/log-start - 500 (2ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:22:28.944Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:22:28.956Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:22:29.219Z] [INFO] HTTP GET /api/git/status - 304 (300ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:22:29.247Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T16:22:29.531Z] [INFO] HTTP GET /api/git/status - 304 (305ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:22:29.543Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:23:28.933Z] [INFO] HTTP GET /api/status - 304 (22ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:23:28.942Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:23:29.264Z] [INFO] HTTP GET /api/git/status - 304 (352ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:23:29.293Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T16:23:29.591Z] [INFO] HTTP GET /api/git/status - 304 (321ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:23:29.604Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T16:24:17.638Z] [INFO] HTTP GET /health - 200 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:24:27.083Z] [INFO] HTTP GET /api/status - 304 (5ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:24:27.099Z] [INFO] HTTP GET /api/status - 304 (7ms)
+[2026-01-02T16:24:27.575Z] [INFO] HTTP GET /api/git/status - 304 (525ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:24:27.623Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T16:24:28.207Z] [INFO] HTTP GET /api/git/status - 304 (619ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:24:28.224Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[REQUEST] INCOMING: GET /api/hooks/stats
+[2026-01-02T16:24:30.204Z] [INFO] HTTP GET /api/hooks/stats - 200 (2ms)
+[REQUEST] INCOMING: GET /api/hooks/activity
+[2026-01-02T16:24:45.858Z] [INFO] HTTP GET /api/hooks/activity - 200 (3ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:25:27.040Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:25:27.063Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:25:27.318Z] [INFO] HTTP GET /api/git/status - 304 (277ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:25:27.343Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T16:25:27.601Z] [INFO] HTTP GET /api/git/status - 304 (276ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:25:27.612Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:26:27.047Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:26:27.076Z] [INFO] HTTP GET /api/status - 304 (5ms)
+[2026-01-02T16:26:27.455Z] [INFO] HTTP GET /api/git/status - 304 (407ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:26:27.484Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T16:26:27.851Z] [INFO] HTTP GET /api/git/status - 304 (390ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:26:27.865Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:27:27.050Z] [INFO] HTTP GET /api/status - 304 (14ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:27:27.055Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:27:27.237Z] [INFO] HTTP GET /api/git/status - 304 (201ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:27:27.253Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:27:27.452Z] [INFO] HTTP GET /api/git/status - 304 (211ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:27:27.462Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:28:27.043Z] [INFO] HTTP GET /api/status - 304 (4ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:28:27.070Z] [INFO] HTTP GET /api/status - 304 (6ms)
+[2026-01-02T16:28:27.300Z] [INFO] HTTP GET /api/git/status - 304 (256ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:28:27.324Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:28:27.564Z] [INFO] HTTP GET /api/git/status - 304 (257ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:28:27.573Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:29:27.059Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:29:27.069Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:29:27.350Z] [INFO] HTTP GET /api/git/status - 304 (310ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:29:27.376Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:29:27.662Z] [INFO] HTTP GET /api/git/status - 304 (305ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:29:27.671Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:30:27.035Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:30:27.053Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:30:27.300Z] [INFO] HTTP GET /api/git/status - 304 (264ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:30:27.320Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:30:27.549Z] [INFO] HTTP GET /api/git/status - 304 (244ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:30:27.557Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:31:27.055Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:31:27.062Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:31:27.257Z] [INFO] HTTP GET /api/git/status - 304 (216ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:31:27.276Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:31:27.486Z] [INFO] HTTP GET /api/git/status - 304 (224ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:31:27.494Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:32:27.055Z] [INFO] HTTP GET /api/status - 304 (14ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:32:27.061Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:32:27.251Z] [INFO] HTTP GET /api/git/status - 304 (209ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:32:27.269Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:32:27.461Z] [INFO] HTTP GET /api/git/status - 304 (205ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:32:27.470Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:33:27.056Z] [INFO] HTTP GET /api/status - 304 (19ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:33:27.066Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:33:27.288Z] [INFO] HTTP GET /api/git/status - 304 (250ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:33:27.321Z] [INFO] HTTP GET /api/workspace - 304 (2ms)
+[2026-01-02T16:33:27.561Z] [INFO] HTTP GET /api/git/status - 304 (265ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:33:27.571Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:34:27.055Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:34:27.060Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:34:27.219Z] [INFO] HTTP GET /api/git/status - 304 (176ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:34:27.234Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:34:27.413Z] [INFO] HTTP GET /api/git/status - 304 (190ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:34:27.421Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:35:27.046Z] [INFO] HTTP GET /api/status - 304 (15ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:35:27.052Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:35:27.260Z] [INFO] HTTP GET /api/git/status - 304 (228ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:35:27.282Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:35:27.514Z] [INFO] HTTP GET /api/git/status - 304 (249ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:35:27.523Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:36:27.044Z] [INFO] HTTP GET /api/status - 304 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:36:27.048Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:36:27.208Z] [INFO] HTTP GET /api/git/status - 304 (175ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:36:27.226Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:36:27.403Z] [INFO] HTTP GET /api/git/status - 304 (191ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:36:27.410Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:37:27.066Z] [INFO] HTTP GET /api/status - 304 (23ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:37:27.078Z] [INFO] HTTP GET /api/status - 304 (3ms)
+[2026-01-02T16:37:27.334Z] [INFO] HTTP GET /api/git/status - 304 (290ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:37:27.356Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:37:27.594Z] [INFO] HTTP GET /api/git/status - 304 (254ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:37:27.604Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:38:27.048Z] [INFO] HTTP GET /api/status - 304 (9ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:38:27.052Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:38:27.178Z] [INFO] HTTP GET /api/git/status - 304 (139ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:38:27.189Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:38:27.332Z] [INFO] HTTP GET /api/git/status - 304 (151ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:38:27.337Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:39:27.048Z] [INFO] HTTP GET /api/status - 304 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:39:27.052Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:39:27.175Z] [INFO] HTTP GET /api/git/status - 304 (137ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:39:27.186Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:39:27.321Z] [INFO] HTTP GET /api/git/status - 304 (143ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:39:27.327Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:40:27.053Z] [INFO] HTTP GET /api/status - 304 (11ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:40:27.057Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:40:27.166Z] [INFO] HTTP GET /api/git/status - 304 (123ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:40:27.176Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:40:27.291Z] [INFO] HTTP GET /api/git/status - 304 (122ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:40:27.297Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:41:27.052Z] [INFO] HTTP GET /api/status - 304 (10ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:41:27.056Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:41:27.160Z] [INFO] HTTP GET /api/git/status - 304 (117ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:41:27.170Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:41:27.274Z] [INFO] HTTP GET /api/git/status - 304 (111ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:41:27.279Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:42:27.064Z] [INFO] HTTP GET /api/status - 304 (14ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:42:27.069Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:42:27.179Z] [INFO] HTTP GET /api/git/status - 304 (128ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:42:27.190Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:42:27.298Z] [INFO] HTTP GET /api/git/status - 304 (117ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:42:27.303Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:43:27.048Z] [INFO] HTTP GET /api/status - 304 (10ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:43:27.052Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[2026-01-02T16:43:27.155Z] [INFO] HTTP GET /api/git/status - 200 (116ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:43:27.166Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[2026-01-02T16:43:27.280Z] [INFO] HTTP GET /api/git/status - 304 (121ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:43:27.285Z] [INFO] HTTP GET /api/workspace - 304 (0ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[REQUEST] INCOMING: GET /api/git/status
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:44:27.052Z] [INFO] HTTP GET /api/status - 304 (9ms)
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:44:27.056Z] [INFO] HTTP GET /api/status - 304 (1ms)
+[2026-01-02T16:44:27.164Z] [INFO] HTTP GET /api/git/status - 304 (121ms)
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:44:27.175Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[2026-01-02T16:44:27.288Z] [INFO] HTTP GET /api/git/status - 304 (121ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:44:27.293Z] [INFO] HTTP GET /api/workspace - 304 (1ms)
+[WS] Client disconnected
+[WS] Client disconnected
+[Health] Running scheduled health checks...
+[REQUEST] INCOMING: GET /api/git/status
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:53:57.341Z] [INFO] HTTP GET /api/status - 304 (2ms)
+[WS] Client connected
+[REQUEST] INCOMING: GET /api/status
+[Settings] loadServerSettings called
+[Settings] Loaded from JSON file
+[Settings] Settings loaded successfully
+[2026-01-02T16:53:57.384Z] [INFO] HTTP GET /api/status - 304 (5ms)
+[REQUEST] INCOMING: GET /api/git/status
+[WS] Client disconnected
+[2026-01-02T16:53:57.729Z] [INFO] HTTP GET /api/git/status - 200 (208ms)
+[REQUEST] INCOMING: GET /api/workspace
+[2026-01-02T16:53:57.737Z] [INFO] HTTP GET /api/workspace - 304 (0ms)

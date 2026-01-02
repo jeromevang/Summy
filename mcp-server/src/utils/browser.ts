@@ -20,7 +20,7 @@ const browserState: BrowserState = {
 
 export async function ensureBrowser(): Promise<{ browser: Browser; context: BrowserContext; page: Page }> {
   if (!browserState.browser) {
-    browserState.browser = await chromium.launch({ headless: true });
+    browserState.browser = await chromium.launch({ headless: false });
     browserState.context = await browserState.browser.newContext();
     const page = await browserState.context.newPage();
 

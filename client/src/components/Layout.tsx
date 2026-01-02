@@ -36,6 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (path === '/team-builder') return 'Team Builder';
     if (path === '/settings') return 'Configuration';
     if (path === '/debug') return 'System Diagnostics';
+    if (path === '/hooks') return 'Hooks Monitor';
     if (path.startsWith('/tooly')) {
       if (path === '/tooly/readiness') return 'Agentic Readiness';
       if (path === '/tooly/combo-test') return 'Combo Optimizer';

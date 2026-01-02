@@ -22,3 +22,6 @@ export { workspaceEnhancedRouter } from './workspace-enhanced.js';
 // Health Check Routes (Improvement #11)
 export { healthRouter } from './health.js';
 
+// Hook Monitoring Routes
+export { default as hooksRouter } from './hooks.js';
+

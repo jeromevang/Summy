@@ -140,6 +140,12 @@ const Sidebar: React.FC = () => {
       {/* Footer Navigation */}
       <div className="p-4 border-t border-white/5 space-y-1">
         <NavItem
+          to="/hooks"
+          icon="🪝"
+          label="Hooks"
+          isActive={isNavItemActive('/hooks')}
+        />
+        <NavItem
           to="/debug"
           icon="🐛"
           label="Debug"

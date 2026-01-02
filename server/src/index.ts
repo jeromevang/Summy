@@ -41,7 +41,7 @@ import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 
 // Import new route modules
-import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, mcpRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter, teamsEnhancedRouter, workspaceEnhancedRouter, healthRouter } from './routes/index.js';
+import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, mcpRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter, teamsEnhancedRouter, workspaceEnhancedRouter, healthRouter, hooksRouter } from './routes/index.js';
 // Services
 import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
@@ -51,6 +51,7 @@ import { HealthCheckScheduler } from './services/health-checks.js';
 import { loggingMiddleware } from './services/enhanced-logger.js';
 import { wsBroadcast } from './services/ws-broadcast.js';
 import { systemMetrics } from './services/system-metrics.js';
+import { initializeHookLogger } from './services/hook-logger.js';
 
 // Modularized Services with exports
 import { addDebugEntry, debugLog } from './services/logger.js';
@@ -198,6 +199,7 @@ app.use('/api', workspaceRouter);
 app.use('/api', apiBridgeRouter);
 app.use('/api', teamRouter);
 app.use('/api/git', gitRouter);
+app.use('/api/hooks', hooksRouter);
 
 // --- Enhanced Routes (Improvements #2, #3, #11) ---
 app.use('/api', teamsEnhancedRouter); // Full Teams API with 12 endpoints
@@ -341,6 +343,14 @@ server.listen(PORT, async () => {
     console.log('  🩺 Health check scheduler started');
   } catch (error) {
     console.error('❌ Health check scheduler failed:', error);
+  }
+
+  // Initialize hook logger with WebSocket broadcasting
+  try {
+    initializeHookLogger(wsBroadcast.broadcast);
+    console.log('  🪝 Hook logger initialized with WebSocket broadcasting');
+  } catch (error) {
+    console.error('❌ Hook logger initialization failed:', error);
   }
 
   // Initialize enhanced logging
