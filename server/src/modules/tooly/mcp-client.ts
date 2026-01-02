@@ -6,6 +6,7 @@
 import { spawn, ChildProcess } from 'child_process';
 import { createInterface, Interface } from 'readline';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
 import { notifications } from '../../services/notifications.js';
@@ -172,7 +173,7 @@ class MCPClient {
 
         // Check if dist exists, otherwise use TSX
         // Note: fs.existsSync is synchronous, but okay for startup
-        if (require('fs').existsSync(distPath)) {
+        if (fs.existsSync(distPath)) {
           cmd = 'node';
           args = [distPath];
           console.log('[MCP] Launching via node dist/index.js');
@@ -186,7 +187,7 @@ class MCPClient {
         const activeModelId = process.env['MAIN_MODEL_ID'] || process.env['LMSTUDIO_MODEL'];
         if (activeModelId) {
           const configPath = path.resolve(this.mcpServerPath, 'configs', 'models', `${activeModelId.replace(/[^a-zA-Z0-9-_.]/g, '_')}.json`);
-          if (require('fs').existsSync(configPath)) {
+          if (fs.existsSync(configPath)) {
             console.log(`[MCP] Found model-specific config: ${configPath}`);
             args.push('--config', configPath);
           }

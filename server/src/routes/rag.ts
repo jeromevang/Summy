@@ -157,7 +157,7 @@ router.put('/config', async (req: Request, res: Response) => {
 // Get statistics - pure proxy to RAG server
 router.get('/stats', async (_req: Request, res: Response) => {
   try {
-    const stats = await ragClient.getMetrics();
+    const stats = await ragClient.getStats();
     return res.json(stats);
   } catch (error: any) {
     return res.status(500).json({ error: error.message });

@@ -53,11 +53,33 @@
       "Bash(timeout 30 bash -c 'until curl -s http://localhost:3001/health > /dev/null 2>&1; do sleep 1; echo \"\"Waiting...\"\"; done; curl -s http://localhost:3001/health')",
       "Bash(node real-verification.mjs:*)",
       "Bash(npm run dev:*)",
-      "Bash(node test-team-builder-models.mjs:*)"
+      "Bash(node test-team-builder-models.mjs:*)",
+      "mcp__summy__browser_take_screenshot",
+      "mcp__summy__browser_snapshot",
+      "mcp__summy__browser_click",
+      "mcp__summy__browser_navigate",
+      "Bash(pnpm rebuild:*)",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File .claude/hooks/__tests__/test-precompact.ps1)",
+      "Bash(powershell.exe -Command \"Get-Content ''.claude/hooks/__tests__/test-precompact.ps1'' | Select-String -Pattern ''{|}'' -Context 0,1\")",
+      "Bash(timeout 30 bash -c 'until curl -s http://localhost:3001/health > /dev/null 2>&1; do sleep 1; echo \"\"Waiting...\"\"; done; echo \"\"Server ready!\"\"')"
     ]
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "summy"
-  ]
+  ],
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell.exe -ExecutionPolicy Bypass -File $CLAUDE_PROJECT_DIR\\.claude\\hooks\\precompact-summarize.ps1",
+            "timeout": 30000
+          }
+        ]
+      }
+    ]
+  }
 }

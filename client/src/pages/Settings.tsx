@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProviderSelection, ModuleToggles } from './Settings/sections';
+import { ProviderSelection, ModuleToggles, MCPToolsConfig } from './Settings/sections';
 import { useSettings } from './Settings/hooks/useSettings';
 
 const Settings: React.FC = () => {
@@ -14,6 +14,7 @@ const Settings: React.FC = () => {
         <form onSubmit={e => { e.preventDefault(); handleSave(); }} className="p-6 space-y-8">
           <ProviderSelection currentProvider={settings.provider} onChange={v => setSettings({ ...settings, provider: v })} />
           <ModuleToggles summyEnabled={summyEnabled} setSummyEnabled={setSummyEnabled} toolyEnabled={toolyEnabled} setToolyEnabled={setToolyEnabled} />
+          <MCPToolsConfig onSave={handleSave} />
           <button type="submit" className="w-full py-3 bg-purple-600 rounded-lg font-bold">
             {saveStatus === 'saving' ? 'Saving...' : 'Save Settings'}
           </button>

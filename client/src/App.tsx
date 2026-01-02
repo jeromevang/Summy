@@ -14,6 +14,7 @@ import { ProstheticManager } from './pages/tooly/ProstheticManager';
 import Controller from './pages/tooly/Controller/SystemControllerPage';
 import Debug from './pages/Debug';
 import RAG from './pages/RAG/RAGNavigatorPage';
+import Hooks from './pages/Hooks';
 import Layout from './components/Layout';
 import { ToastProvider, useToast } from './components/Toast';
 import { useWebSocketConnection } from './hooks/useWebSocketManager';
@@ -70,6 +71,7 @@ function App() {
             <Route path="/team-builder" element={<TeamBuilder />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/debug" element={<Debug />} />
+            <Route path="/hooks" element={<Hooks />} />
             <Route path="/session/:sessionId" element={<ContextEditor />} />
           </Routes>
         </Layout>
