@@ -24,13 +24,13 @@ describe('Input Validation', () => {
     it('should validate valid input', () => {
       const middleware = validateSchema(testSchema);
       const req = {
-        query: { provider: 'lmstudio' },
-        body: { modelId: 'test-model', runLatencyProfile: true },
+        query: {},
+        body: { modelId: 'test-model', provider: 'lmstudio', runLatencyProfile: true },
         params: {}
       };
       const res = { status: () => ({ json: () => {} }) };
       const next = vi.fn();
-      
+
       middleware(req, res, next);
       expect(next).toHaveBeenCalled();
     });
@@ -117,12 +117,16 @@ describe('Input Validation', () => {
   describe('addSecurityHeaders', () => {
     it('should add security headers', () => {
       const middleware = addSecurityHeaders();
+      const req = {
+        headers: {},
+        method: 'GET'
+      };
       const res = {
         setHeader: vi.fn()
       };
       const next = vi.fn();
-      
-      middleware({}, res, next);
+
+      middleware(req, res, next);
       
       expect(res.setHeader).toHaveBeenCalledWith('X-Content-Type-Options', 'nosniff');
       expect(res.setHeader).toHaveBeenCalledWith('X-Frame-Options', 'DENY');

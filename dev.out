@@ -1,0 +1,1109 @@
+
+> summy@1.0.0 dev
+> concurrently -n server,client,rag,continue-tools -c blue,green,magenta,cyan "npm run dev:server" "npm run dev:client" "npm run dev:rag" "npm run dev:continue-tools"
+
+[client] 
+[client] > summy@1.0.0 dev:client
+[client] > cd client && npm run dev
+[client] 
+[server] 
+[server] > summy@1.0.0 dev:server
+[server] > cd server && npm run dev
+[server] 
+[rag] 
+[rag] > summy@1.0.0 dev:rag
+[rag] > cd rag-server && npm run dev
+[rag] 
+[continue-tools] 
+[continue-tools] > summy@1.0.0 dev:continue-tools
+[continue-tools] > cd mcp-server && npm run dev:continue-tools
+[continue-tools] 
+[server] 
+[server] > server@1.0.0 dev
+[server] > tsx watch src/index.ts
+[server] 
+[client] 
+[client] > client@0.0.0 dev
+[client] > vite
+[client] 
+[continue-tools] 
+[continue-tools] > @summy/mcp-server@1.0.0 dev:continue-tools
+[continue-tools] > tsx watch src/continue-extra-tools.ts
+[continue-tools] 
+[rag] 
+[rag] > @summy/rag-server@1.0.0 dev
+[rag] > tsx watch src/index.ts
+[rag] 
+[client] 
+[client]   [32m[1mVITE[22m v7.3.0[39m  [2mready in [0m[1m151[22m[2m[0m ms[22m
+[client] 
+[client]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[client] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[continue-tools] [Extra Tools - Continue] ═══════════════════════════════════════
+[continue-tools] [Extra Tools - Continue] MCP Server v1.0 (SSE)
+[continue-tools] [Extra Tools - Continue] http://localhost:3006
+[continue-tools] [Extra Tools - Continue] SSE: http://localhost:3006/sse
+[continue-tools] [Extra Tools - Continue] Tools: 25 (git_status, git_diff, git_log, git_branch, git_commit, git_stash, http_request, system_info, disk_usage, process_list, clipboard_read, clipboard_write, json_validate, json_query, env_get, datetime, npm_scripts, npm_outdated, rag_query, rag_status, rag_index, find_symbol, get_callers, get_file_interface, get_dependencies)
+[continue-tools] [Extra Tools - Continue] ═══════════════════════════════════════
+[continue-tools] [Extra Tools] New SSE connection
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:42:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
+[client] [2m00:44:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
+[client] [2m00:44:56[22m [31m[1m[vite][22m[39m [31mInternal server error: C:\Users\Jerome\Documents\Projects\Summy\client\src\components\ProjectSwitcher.tsx: Expected corresponding JSX closing tag for <>. (275:10)
+[client] 
+[client] [0m [90m 273 |[31m               [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+[client]  [90m 274 |[31m             [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+[client] [31m[1m>[22m[31m[90m 275 |[31m           [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+[client]  [90m     |[31m           [31m[1m^[22m[31m
+[client]  [90m 276 |[31m         [33m<[31m[33m/[31m[33m>[31m
+[client]  [90m 277 |[31m       )}
+[client]  [90m 278 |[31m     [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m[0m[39m
+[client]   Plugin: [35mvite:react-babel[39m
+[client]   File: [36mC:/Users/Jerome/Documents/Projects/Summy/client/src/components/ProjectSwitcher.tsx[39m:275:10
+[client] [33m  273 |                </div>
+[client]   274 |              </div>
+[client]   275 |            </div>
+[client]       |            ^
+[client]   276 |          </>
+[client]   277 |        )}[39m
+[client]       at constructor (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:367:19)
+[client]       at TypeScriptParserMixin.raise (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:6624:19)
+[client]       at TypeScriptParserMixin.jsxParseElementAt (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4749:14)
+[client]       at TypeScriptParserMixin.jsxParseElement (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4778:17)
+[client]       at TypeScriptParserMixin.parseExprAtom (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4788:19)
+[client]       at TypeScriptParserMixin.parseExprSubscripts (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11145:23)
+[client]       at TypeScriptParserMixin.parseUpdate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11130:21)
+[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11110:23)
+[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9890:18)
+[client]       at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10963:61)
+[client]       at TypeScriptParserMixin.parseExprOps (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10968:23)
+[client]       at TypeScriptParserMixin.parseMaybeConditional (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10945:23)
+[client]       at TypeScriptParserMixin.parseMaybeAssign (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10895:21)
+[client]       at C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9828:39
+[client]       at TypeScriptParserMixin.tryParse (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:6932:20)
+[client]       at TypeScriptParserMixin.parseMaybeAssign (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9828:18)
+[client]       at C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10864:39
+[client]       at TypeScriptParserMixin.allowInAnd (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:12500:12)
+[client]       at TypeScriptParserMixin.parseMaybeAssignAllowIn (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10864:17)
+[client]       at TypeScriptParserMixin.parseMaybeAssignAllowInOrVoidPattern (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:12567:17)
+[client]       at TypeScriptParserMixin.parseParenAndDistinguishExpression (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11747:28)
+[client]       at TypeScriptParserMixin.parseExprAtom (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11395:23)
+[client]       at TypeScriptParserMixin.parseExprAtom (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4793:20)
+[client]       at TypeScriptParserMixin.parseExprSubscripts (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11145:23)
+[client]       at TypeScriptParserMixin.parseUpdate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11130:21)
+[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11110:23)
+[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9890:18)
+[client]       at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10963:61)
+[client]       at TypeScriptParserMixin.parseExprOpBaseRightExpr (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11050:34)
+[client]       at TypeScriptParserMixin.parseExprOpRightExpr (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11045:21)
+[client]       at TypeScriptParserMixin.parseExprOp (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11011:27)
+[client]       at TypeScriptParserMixin.parseExprOp (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9365:18)
+[client]       at TypeScriptParserMixin.parseExprOps (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10972:17)
+[client]       at TypeScriptParserMixin.parseMaybeConditional (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10945:23)
+[client]       at TypeScriptParserMixin.parseMaybeAssign (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10895:21)
+[client]       at TypeScriptParserMixin.parseMaybeAssign (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9839:20)
+[client]       at TypeScriptParserMixin.parseExpressionBase (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10848:23)
+[client]       at C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10844:39
+[client]       at TypeScriptParserMixin.allowInAnd (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:12500:12)
+[client]       at TypeScriptParserMixin.parseExpression (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10844:17)
+[client]       at TypeScriptParserMixin.jsxParseExpressionContainer (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4661:31)
+[client]       at TypeScriptParserMixin.jsxParseElementAt (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4740:36)
+[client]       at TypeScriptParserMixin.jsxParseElement (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4778:17)
+[client]       at TypeScriptParserMixin.parseExprAtom (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:4788:19)
+[client]       at TypeScriptParserMixin.parseExprSubscripts (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11145:23)
+[client]       at TypeScriptParserMixin.parseUpdate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11130:21)
+[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:11110:23)
+[client]       at TypeScriptParserMixin.parseMaybeUnary (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:9890:18)
+[client]       at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10963:61)
+[client]       at TypeScriptParserMixin.parseExprOps (C:\Users\Jerome\Documents\Projects\Summy\node_modules\@babel\parser\lib\index.js:10968:23)
+[client] [2m00:44:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:58[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:44:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:00[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:45:47[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[continue-tools] [Extra Tools] SSE closed: 14055f54-457f-43d3-bb8f-9e420fc550df
+[continue-tools] [Extra Tools] New SSE connection
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:48:06[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:15[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
+[client] [2m00:49:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ProjectSwitcher.tsx, /src/style.css[22m
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:49:51[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:02[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:12[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:12[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:32[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:32[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:42[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:52[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:50:52[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[continue-tools] [Extra Tools] SSE closed: c61fd192-7256-4a7c-8858-bfaf5e6e4c5d
+[continue-tools] [Extra Tools] New SSE connection
+[client] [2m00:51:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/notifications[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/settings[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/analytics?period=week[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/sessions[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:33[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/tooly/controller/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:37[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/workspace/browse[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:43[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:50[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:50[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/git/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:52[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:51:52[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:52:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[client] [2m00:52:22[22m [31m[1m[vite][22m[39m [31mhttp proxy error: /api/status[39m
+[client] AggregateError [ECONNREFUSED]: 
+[client]     at internalConnectMultiple (node:net:1139:18)
+[client]     at afterConnectMultiple (node:net:1712:7)
+[continue-tools] [Extra Tools] SSE closed: c889fb70-3844-416d-8682-0944f53b48f9
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: 7dc83c11-da67-48da-a8e7-3abbbf4836b3
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: 7a58682e-eba0-4a14-a448-aca6979f9f4b
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: 10a70187-41be-4f88-a3b6-a4cbae7ca09e
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: 9db61008-ac1d-4b01-9d14-a54b1e9f8c58
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: f64c6199-830d-4886-82d2-b5c6c9b814ca
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: 0c889c9f-3cfa-4402-a269-d3884b7ee4cf
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: ca078836-e8c3-4b2d-b269-7b40cf823f90
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: c8c5382a-f132-4511-b2b6-9db816ed897f
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: 3988297a-d468-46b0-b912-8736a8e31bf6
+[continue-tools] [Extra Tools] New SSE connection
+[server] 01:45:11 [tsx] change in ./src\services\workspace-service.ts Restarting...
+[server] c
+[continue-tools] [Extra Tools] SSE closed: 7bbf7ba8-02da-46ef-aee8-ace504bd9808
+[continue-tools] [Extra Tools] New SSE connection
+[server] 01:50:59 [tsx] change in ./src\routes\index.ts Restarting...
+[server] c01:51:09 [tsx] change in ./src\index.ts Restarting...
+[server] c01:51:19 [tsx] change in ./src\index.ts Restarting...
+[server] c01:51:26 [tsx] change in ./src\index.ts Restarting...
+[server] c01:51:36 [tsx] change in ./src\index.ts Restarting...
+[server] c01:51:44 [tsx] change in ./src\index.ts Restarting...
+[server] c
+[continue-tools] [Extra Tools] SSE closed: 751bef2d-4020-4b5b-82e4-c10c16996471
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: 220c02b8-6234-4077-ba54-f4c3ce6d29a3
+[continue-tools] [Extra Tools] New SSE connection
+[server] 01:58:39 [tsx] change in ./src\routes\health.ts Restarting...
+[server] c01:58:39 [tsx] change in ./src\routes\health.ts Restarting...
+[server] c01:58:59 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:00 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:27 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:28 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:28 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:29 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:30 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:30 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:49 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:50 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:50 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c01:59:58 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c01:59:59 [tsx] change in ./src\middleware\error-handler.ts Restarting...
+[server] c
+[continue-tools] [Extra Tools] SSE closed: fa5b5c81-17e4-41b2-ac3d-42a9231cd78f
+[continue-tools] [Extra Tools] New SSE connection
+[server] 02:06:41 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c02:06:41 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c02:06:42 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c02:06:43 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c02:06:44 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c02:06:44 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c02:06:45 [tsx] change in ./src\routes\teams-enhanced.ts Restarting...
+[server] c02:07:13 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c02:07:13 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c02:07:14 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c02:07:15 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c02:07:16 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c02:07:16 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c02:07:17 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c02:07:18 [tsx] change in ./src\routes\workspace-enhanced.ts Restarting...
+[server] c
+[continue-tools] [Extra Tools] SSE closed: 0cc9825d-2a4d-430b-aca2-09969e46fe91
+[continue-tools] [Extra Tools] New SSE connection
+[client] npm error Lifecycle script `dev` failed with error:
+[client] npm error code 1
+[client] npm error path C:\Users\Jerome\Documents\Projects\Summy\client
+[client] npm error workspace client@0.0.0
+[client] npm error location C:\Users\Jerome\Documents\Projects\Summy\client
+[client] npm error command failed
+[client] npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vite
+[client] npm run dev:client exited with code 1
+[continue-tools] [Extra Tools] SSE closed: 897fcf2f-c99d-4609-94ee-0cb239421b30
+[continue-tools] [Extra Tools] New SSE connection
+[server] 02:15:57 [tsx] change in ./src\services\team-service-enhanced.ts Restarting...
+[server] c
+[continue-tools] [Extra Tools] SSE closed: 6b846cb0-38ac-4f1c-9413-149ae98101c7
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: 6841eb32-5218-48fb-b12f-33e69e2b3f23
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: af765223-07aa-40be-af80-1f2908c0778a
+[continue-tools] [Extra Tools] New SSE connection
+[continue-tools] [Extra Tools] SSE closed: c9f7139c-c20a-4291-9716-41fe123be68c
+[continue-tools] [Extra Tools] New SSE connection
+[server] 02:34:12 [tsx] change in ./src\routes\health.ts Restarting...
+[server] c
+[continue-tools] [Extra Tools] SSE closed: a8c10d6d-5cc9-477b-a84c-913930d39bb9
+[continue-tools] [Extra Tools] New SSE connection
