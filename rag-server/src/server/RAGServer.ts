@@ -125,6 +125,37 @@ export class RAGServer {
         res.status(500).json({ error: error.message });
       }
     });
+
+    this.app.get('/api/rag/models', async (req, res) => {
+      try {
+        // Always query LMStudio for available models
+        const lmstudioEmbedder = getLMStudioEmbedder();
+        const models = await lmstudioEmbedder.listModels();
+        res.json(models);
+      } catch (error: any) {
+        console.error('[RAG Server] Failed to list models:', error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.put('/api/rag/config', async (req, res) => {
+      try {
+        const configUpdate = req.body;
+
+        // Update embedder if type or model changed
+        if (configUpdate.embedder?.type === 'lmstudio' && configUpdate.lmstudio?.model) {
+          if (typeof this.embedder.setModel === 'function') {
+            await this.embedder.setModel(configUpdate.lmstudio.model);
+            await this.embedder.load();
+          }
+        }
+
+        res.json({ success: true });
+      } catch (error: any) {
+        console.error('[RAG Server] Failed to update config:', error);
+        res.status(500).json({ error: error.message });
+      }
+    });
   }
 
   private setupWebSocket(server: any) {

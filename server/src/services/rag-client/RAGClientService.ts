@@ -27,6 +27,25 @@ export class RAGClient {
     return res.json();
   }
 
+  async getStats(): Promise<any> {
+    console.log('[RAGClient] Fetching stats from', `${this.httpUrl}/api/rag/stats`);
+    try {
+      const res = await fetch(`${this.httpUrl}/api/rag/stats`);
+      console.log('[RAGClient] Stats fetch response status:', res.status);
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch stats: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      console.log('[RAGClient] Successfully fetched stats:', data);
+      return data;
+    } catch (error: any) {
+      console.error('[RAGClient] Failed to fetch stats:', error);
+      throw error;
+    }
+  }
+
   async getVisualization(): Promise<any> {
     const res = await fetch(`${this.httpUrl}/api/rag/visualization`);
     return res.json();

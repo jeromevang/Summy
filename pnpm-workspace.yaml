@@ -1,8 +1,19 @@
 packages:
-  - 'client'
-  - 'server'
-  - 'mcp-server'
-  - 'rag-server'
-  - 'database'
-  - 'packages/shared'
-  - 'packages/types'
+  - client
+  - server
+  - mcp-server
+  - rag-server
+  - database
+  - packages/shared
+  - packages/types
+
+ignoredBuiltDependencies:
+  - better-sqlite3
+  - esbuild
+  - hnswlib-node
+  - puppeteer
+  - sqlite3
+  - tree-sitter
+  - tree-sitter-javascript
+  - tree-sitter-python
+  - tree-sitter-typescript

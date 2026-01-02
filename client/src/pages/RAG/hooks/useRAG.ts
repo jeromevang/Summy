@@ -5,6 +5,44 @@ interface SearchResult {
   filePath: string;
   snippet: string;
   relevance: number;
+  score?: number; // API returns 'score' but we map to 'relevance'
+}
+
+interface RAGStats {
+  projectPath: string | null;
+  status: string;
+  totalFiles: number;
+  processedFiles: number;
+  chunksCreated: number;
+  embeddingsGenerated: number;
+  fileWatcherActive: boolean;
+  embeddingModel: string;
+  embeddingModelLoaded: boolean;
+}
+
+interface EmbeddingModel {
+  id: string;
+  name: string;
+  path: string;
+  loaded: boolean;
+  size?: number;
+}
+
+interface RAGConfig {
+  port?: number;
+  embedder?: {
+    type: string;
+    apiKey?: string;
+  };
+  lmstudio?: {
+    model: string;
+    chatModel?: string;
+    loadOnDemand?: boolean;
+    keepLoaded?: boolean;
+  };
+  project?: {
+    path: string;
+  };
 }
 
 type RagStatus = 'uninitialized' | 'indexing' | 'indexed' | 'error';
@@ -18,7 +56,17 @@ interface UseRag {
   isIndexing: boolean;
   triggerIndex: () => void;
   error: string | null;
+  stats: RAGStats | null;
+  availableModels: EmbeddingModel[];
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
+  loadModel: () => Promise<void>;
+  isLoadingModel: boolean;
+  ragConfig: RAGConfig | null;
+  updateConfig: (config: Partial<RAGConfig>) => Promise<void>;
 }
+
+const API_BASE = '/api/rag';
 
 export const useRag = (): UseRag => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -27,34 +75,177 @@ export const useRag = (): UseRag => {
   const [ragStatus, setRagStatus] = useState<RagStatus>('uninitialized');
   const [isIndexing, setIsIndexing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<RAGStats | null>(null);
+  const [availableModels, setAvailableModels] = useState<EmbeddingModel[]>([]);
+  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [isLoadingModel, setIsLoadingModel] = useState<boolean>(false);
+  const [ragConfig, setRagConfig] = useState<RAGConfig | null>(null);
 
-  // Simulate RAG server API calls
+  // Fetch RAG status and stats
   const fetchRagStatus = useCallback(async () => {
-    // In a real scenario, this would fetch from http://localhost:3002/status or /api/rag/status
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-    setRagStatus(Math.random() > 0.1 ? 'indexed' : 'error'); // 90% chance of success
+    console.log('[useRAG] Fetching RAG status from', `${API_BASE}/stats`);
+    try {
+      const response = await fetch(`${API_BASE}/stats`);
+      console.log('[useRAG] Stats fetch response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch RAG stats');
+      }
+
+      const data: RAGStats = await response.json();
+      console.log('[useRAG] Received stats:', data);
+      setStats(data);
+
+      // Determine status based on stats
+      if (data.status === 'indexing') {
+        setRagStatus('indexing');
+      } else if (data.totalFiles > 0 && data.embeddingsGenerated > 0) {
+        setRagStatus('indexed');
+      } else if (data.status === 'error') {
+        setRagStatus('error');
+      } else {
+        setRagStatus('uninitialized');
+      }
+
+      console.log('[useRAG] Updated RAG status to:', ragStatus);
+    } catch (err: any) {
+      console.error('[useRAG] Failed to fetch RAG status:', err);
+      setRagStatus('error');
+      setError(err.message);
+    }
   }, []);
 
+  // Fetch available embedding models
+  const fetchAvailableModels = useCallback(async () => {
+    console.log('[useRAG] Fetching available models from', `${API_BASE}/models`);
+    try {
+      const response = await fetch(`${API_BASE}/models`);
+      console.log('[useRAG] Models fetch response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch models');
+      }
+
+      const models: EmbeddingModel[] = await response.json();
+      console.log('[useRAG] Received models:', models);
+      setAvailableModels(models);
+
+      // Auto-select first model if none selected
+      if (models.length > 0 && !selectedModel) {
+        console.log('[useRAG] Auto-selecting first model:', models[0].path);
+        setSelectedModel(models[0].path);
+      }
+    } catch (err: any) {
+      console.error('[useRAG] Failed to fetch models:', err);
+    }
+  }, [selectedModel]);
+
+  // Fetch RAG configuration
+  const fetchConfig = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE}/config`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch config');
+      }
+      const config: RAGConfig = await response.json();
+      setRagConfig(config);
+
+      // Set selected model from config
+      if (config.lmstudio?.model) {
+        setSelectedModel(config.lmstudio.model);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch config:', err);
+    }
+  }, []);
+
+  // Update RAG configuration
+  const updateConfig = useCallback(async (configUpdate: Partial<RAGConfig>) => {
+    try {
+      const response = await fetch(`${API_BASE}/config`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(configUpdate)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update config');
+      }
+
+      await fetchConfig();
+    } catch (err: any) {
+      console.error('Failed to update config:', err);
+      setError(err.message);
+      throw err;
+    }
+  }, [fetchConfig]);
+
+  // Load selected embedding model
+  const loadModel = useCallback(async () => {
+    if (!selectedModel) {
+      setError('No model selected');
+      return;
+    }
+
+    setIsLoadingModel(true);
+    setError(null);
+
+    try {
+      // Update config with selected model
+      await updateConfig({
+        embedder: { type: 'lmstudio' },
+        lmstudio: {
+          model: selectedModel,
+          loadOnDemand: false,
+          keepLoaded: true
+        }
+      });
+
+      // Wait a moment for model to load
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Refresh status
+      await fetchRagStatus();
+    } catch (err: any) {
+      setError(`Failed to load model: ${err.message}`);
+    } finally {
+      setIsLoadingModel(false);
+    }
+  }, [selectedModel, updateConfig, fetchRagStatus]);
+
+  // Perform semantic search
   const performSearch = useCallback(async (query: string) => {
-    if (!query) {
+    if (!query || query.trim().length === 0) {
       setSearchResults([]);
       return;
     }
+
     setIsSearching(true);
     setError(null);
+
     try {
-      // In a real scenario, this would fetch from http://localhost:3002/query or /api/rag/query
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
-      if (Math.random() > 0.2) { // 80% chance of success
-        setSearchResults([
-          { filePath: 'src/services/authService.ts', snippet: 'export async function verifyToken(token: string): Promise<boolean> { ... }', relevance: 0.95 },
-          { filePath: 'src/middleware/authMiddleware.ts', snippet: 'if (!req.headers.authorization) { ... }', relevance: 0.88 },
-          { filePath: 'docs/authentication.md', snippet: '## Authentication Flow\n1. User logs in...\n', relevance: 0.72 },
-        ]);
-      } else {
-        throw new Error('RAG search failed');
+      const response = await fetch(`${API_BASE}/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, limit: 10 })
+      });
+
+      if (!response.ok) {
+        throw new Error('Search failed');
       }
+
+      const data = await response.json();
+
+      // Map API response to expected format
+      const results: SearchResult[] = (data.results || []).map((r: any) => ({
+        filePath: r.filePath,
+        snippet: r.snippet || r.content || '',
+        relevance: r.score || 0
+      }));
+
+      setSearchResults(results);
     } catch (err: any) {
+      console.error('Search failed:', err);
       setError(err.message);
       setSearchResults([]);
     } finally {
@@ -62,44 +253,73 @@ export const useRag = (): UseRag => {
     }
   }, []);
 
+  // Trigger indexing
   const triggerIndex = useCallback(async () => {
     setIsIndexing(true);
     setError(null);
     setRagStatus('indexing');
+
     try {
-      // In a real scenario, this would POST to http://localhost:3002/index or /api/rag/index
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate indexing time
-      if (Math.random() > 0.1) { // 90% chance of success
-        setRagStatus('indexed');
-      } else {
-        throw new Error('Indexing failed');
+      // Get current project path from config or use default
+      const projectPath = ragConfig?.project?.path || process.cwd();
+
+      const response = await fetch(`${API_BASE}/index`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectPath })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to start indexing');
       }
+
+      // Poll for indexing completion
+      const pollInterval = setInterval(async () => {
+        await fetchRagStatus();
+
+        if (stats?.status !== 'indexing') {
+          clearInterval(pollInterval);
+          setIsIndexing(false);
+        }
+      }, 2000);
+
+      // Stop polling after 5 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        setIsIndexing(false);
+      }, 300000);
+
     } catch (err: any) {
+      console.error('Indexing failed:', err);
       setError(err.message);
       setRagStatus('error');
-    } finally {
       setIsIndexing(false);
     }
-  }, []);
+  }, [ragConfig, fetchRagStatus, stats]);
 
-  // Initial load of RAG status
+  // Initial setup
   useEffect(() => {
+    console.log('[useRAG] Component mounted, initializing...');
     fetchRagStatus();
-    // Refresh status periodically
-    const interval = setInterval(fetchRagStatus, 10000); 
-    return () => clearInterval(interval);
-  }, [fetchRagStatus]);
+    fetchAvailableModels();
+    fetchConfig();
 
-  // Perform search when query changes (with debounce in real app)
+    // Refresh status periodically
+    const interval = setInterval(fetchRagStatus, 10000);
+    return () => {
+      console.log('[useRAG] Component unmounting, cleaning up...');
+      clearInterval(interval);
+    };
+  }, [fetchRagStatus, fetchAvailableModels, fetchConfig]);
+
+  // Perform search when query changes (with debounce)
   useEffect(() => {
     const handler = setTimeout(() => {
       performSearch(searchQuery);
-    }, 500); // Debounce search
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchQuery, performSearch]);
+    }, 500);
 
+    return () => clearTimeout(handler);
+  }, [searchQuery, performSearch]);
 
   return {
     searchQuery,
@@ -110,5 +330,13 @@ export const useRag = (): UseRag => {
     isIndexing,
     triggerIndex,
     error,
+    stats,
+    availableModels,
+    selectedModel,
+    setSelectedModel,
+    loadModel,
+    isLoadingModel,
+    ragConfig,
+    updateConfig,
   };
 };
