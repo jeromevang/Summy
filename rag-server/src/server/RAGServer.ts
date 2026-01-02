@@ -41,7 +41,7 @@ export class RAGServer {
   private async initializeServices() {
     // Determine which embedder to use based on config
     const embedderType = (this.config as any).embedder?.type || 'lmstudio';
-    
+
     if (embedderType === 'gemini') {
       const apiKey = (this.config as any).embedder?.apiKey || process.env.GEMINI_API_KEY;
       this.embedder = getGeminiEmbedder(apiKey);
@@ -54,9 +54,28 @@ export class RAGServer {
     this.indexer = getIndexer(this.config);
     // Inject the selected embedder into the indexer
     (this.indexer as any).embedder = this.embedder;
-    
+
     this.indexer.onProgress((p) => this.broadcast('indexProgress', p));
     this.ragDb = getRAGDatabase(this.config.storage.dataPath);
+
+    // Auto-load persisted embedding model if configured
+    if (embedderType === 'lmstudio' && this.config.lmstudio?.model) {
+      console.log(`[RAG Server] Auto-loading persisted model: ${this.config.lmstudio.model}`);
+      try {
+        // Unload other embedding models first (LM Studio as slave - only needed models loaded)
+        if (typeof this.embedder.unloadOtherEmbeddings === 'function') {
+          await this.embedder.unloadOtherEmbeddings();
+        }
+
+        // Set and load the model (with 3 retry attempts)
+        await this.embedder.setModel(this.config.lmstudio.model);
+        await this.embedder.load();
+        console.log(`[RAG Server] Successfully auto-loaded model: ${this.config.lmstudio.model}`);
+      } catch (error: any) {
+        console.error(`[RAG Server] Failed to auto-load model:`, error.message);
+        // Don't crash server - model can be loaded manually later
+      }
+    }
 
     // Start file watcher if enabled
     if (this.config.watcher.enabled && this.config.project.path) {
@@ -141,13 +160,44 @@ export class RAGServer {
     this.app.put('/api/rag/config', async (req, res) => {
       try {
         const configUpdate = req.body;
+        console.log('[RAG Server] Updating config:', JSON.stringify(configUpdate, null, 2));
+
+        // Merge with existing config
+        this.config = {
+          ...this.config,
+          ...configUpdate,
+          lmstudio: { ...this.config.lmstudio, ...configUpdate.lmstudio },
+          storage: { ...this.config.storage, ...configUpdate.storage },
+          indexing: { ...this.config.indexing, ...configUpdate.indexing },
+          watcher: { ...this.config.watcher, ...configUpdate.watcher },
+          project: { ...this.config.project, ...configUpdate.project }
+        };
 
         // Update embedder if type or model changed
         if (configUpdate.embedder?.type === 'lmstudio' && configUpdate.lmstudio?.model) {
+          console.log(`[RAG Server] Loading embedding model: ${configUpdate.lmstudio.model}`);
+
           if (typeof this.embedder.setModel === 'function') {
+            // Unload other embedding models first (LM Studio as slave - only needed models)
+            if (typeof this.embedder.unloadOtherEmbeddings === 'function') {
+              console.log('[RAG Server] Unloading other embedding models...');
+              await this.embedder.unloadOtherEmbeddings();
+            }
+
+            // Set and load the model (load() has 3 retry attempts built in)
             await this.embedder.setModel(configUpdate.lmstudio.model);
             await this.embedder.load();
+            console.log(`[RAG Server] Successfully loaded model: ${configUpdate.lmstudio.model}`);
           }
+        }
+
+        // Persist config to file for auto-load on next startup
+        try {
+          await fs.writeFile('./data/rag-config.json', JSON.stringify(this.config, null, 2), 'utf-8');
+          console.log('[RAG Server] Config persisted to file');
+        } catch (error: any) {
+          console.error('[RAG Server] Failed to persist config to file:', error.message);
+          // Don't fail the request - config is updated in memory
         }
 
         res.json({ success: true });

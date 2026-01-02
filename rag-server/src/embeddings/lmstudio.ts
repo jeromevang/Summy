@@ -155,33 +155,64 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
   }
   
   /**
-   * Load the embedding model
+   * Load the embedding model with retry logic (3 attempts)
    */
   async load(): Promise<void> {
     if (!this.model) {
       throw new Error('No embedding model selected');
     }
-    
+
     // Wait for any pending load operation
     if (this.loadPromise) {
       await this.loadPromise;
       return;
     }
-    
+
     // Already loaded
     if (this.isLoaded && this.embeddingModel) {
       return;
     }
-    
+
     this.isLoading = true;
-    this.loadPromise = this.doLoad();
-    
+    this.loadPromise = this.doLoadWithRetry();
+
     try {
       await this.loadPromise;
     } finally {
       this.isLoading = false;
       this.loadPromise = null;
     }
+  }
+
+  /**
+   * Load with retry logic - attempts up to 3 times before failing
+   */
+  private async doLoadWithRetry(): Promise<void> {
+    const MAX_ATTEMPTS = 3;
+    let lastError: Error | null = null;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        console.log(`[LMStudioEmbedder] Load attempt ${attempt}/${MAX_ATTEMPTS} for model: ${this.model}`);
+        await this.doLoad();
+        console.log(`[LMStudioEmbedder] Successfully loaded model on attempt ${attempt}`);
+        return;
+      } catch (error: any) {
+        lastError = error;
+        console.error(`[LMStudioEmbedder] Load attempt ${attempt}/${MAX_ATTEMPTS} failed:`, error.message);
+
+        if (attempt < MAX_ATTEMPTS) {
+          // Wait before retrying (exponential backoff: 1s, 2s)
+          const waitMs = attempt * 1000;
+          console.log(`[LMStudioEmbedder] Waiting ${waitMs}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, waitMs));
+        }
+      }
+    }
+
+    // All attempts failed
+    console.error(`[LMStudioEmbedder] Failed to load model after ${MAX_ATTEMPTS} attempts`);
+    throw new Error(`Failed to load model after ${MAX_ATTEMPTS} attempts: ${lastError?.message}`);
   }
   
   private async doLoad(): Promise<void> {
@@ -262,9 +293,9 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
   async forceUnload(): Promise<void> {
     try {
       const client = this.getClient();
-      
+
       console.log(`[LMStudioEmbedder] Force unloading model from LM Studio...`);
-      
+
       // Try to unload by identifier first, then by model path
       try {
         await client.embedding.unload(RAG_EMBEDDER_IDENTIFIER);
@@ -275,16 +306,82 @@ export class LMStudioEmbedder extends BaseEmbeddingProvider {
           // Model might already be unloaded
         }
       }
-      
+
       this.embeddingModel = null;
       this.isLoaded = false;
-      
+
       console.log(`[LMStudioEmbedder] Model force unloaded`);
-      
+
     } catch (error: any) {
       console.error(`[LMStudioEmbedder] Failed to force unload:`, error);
       this.embeddingModel = null;
       this.isLoaded = false;
+    }
+  }
+
+  /**
+   * Unload other embedding models that aren't the current one.
+   * This ensures only the model we need is loaded in LM Studio.
+   * LM Studio as slave: only needed models stay loaded.
+   */
+  async unloadOtherEmbeddings(): Promise<void> {
+    try {
+      const client = this.getClient();
+
+      console.log(`[LMStudioEmbedder] Checking for other embedding models to unload...`);
+
+      // Get all loaded embedding models
+      const loadedEmbeddings = await client.embedding.listLoaded();
+      console.log(`[LMStudioEmbedder] Found ${loadedEmbeddings.length} loaded embedding models`);
+
+      // Unload any that aren't our current model
+      const toUnload = loadedEmbeddings.filter(m => {
+        // Keep our RAG embedder
+        if (m.identifier === RAG_EMBEDDER_IDENTIFIER) {
+          console.log(`[LMStudioEmbedder] Keeping RAG embedder: ${m.identifier}`);
+          return false;
+        }
+
+        // Keep if it's the model we're using
+        if (m.path === this.model || m.identifier === this.model) {
+          console.log(`[LMStudioEmbedder] Keeping current model: ${m.path}`);
+          return false;
+        }
+
+        // Keep if the path contains our model name
+        if (this.model && m.path?.includes(this.model.split('/').pop() || '')) {
+          console.log(`[LMStudioEmbedder] Keeping model matching current: ${m.path}`);
+          return false;
+        }
+
+        // Unload everything else
+        console.log(`[LMStudioEmbedder] Will unload unused model: ${m.path || m.identifier}`);
+        return true;
+      });
+
+      if (toUnload.length === 0) {
+        console.log(`[LMStudioEmbedder] No other embedding models to unload`);
+        return;
+      }
+
+      // Unload other models
+      for (const model of toUnload) {
+        try {
+          const identifier = model.identifier || model.path;
+          console.log(`[LMStudioEmbedder] Unloading: ${identifier}`);
+          await client.embedding.unload(identifier);
+          console.log(`[LMStudioEmbedder] Successfully unloaded: ${identifier}`);
+        } catch (error: any) {
+          console.error(`[LMStudioEmbedder] Failed to unload ${model.path}:`, error.message);
+          // Continue unloading others even if one fails
+        }
+      }
+
+      console.log(`[LMStudioEmbedder] Finished unloading other embedding models`);
+
+    } catch (error: any) {
+      console.error(`[LMStudioEmbedder] Failed to unload other embeddings:`, error);
+      // Don't throw - this is a cleanup operation, not critical
     }
   }
   
