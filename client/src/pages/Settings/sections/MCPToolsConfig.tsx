@@ -74,7 +74,7 @@ export const MCPToolsConfig: React.FC<MCPToolsConfigProps> = ({ onSave }) => {
     setSaving(true);
     try {
       const response = await fetch('/api/settings', {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mcp: {
@@ -105,7 +105,7 @@ export const MCPToolsConfig: React.FC<MCPToolsConfigProps> = ({ onSave }) => {
     setSaving(true);
     try {
       const response = await fetch('/api/settings', {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mcp: {
