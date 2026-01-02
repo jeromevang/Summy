@@ -41,7 +41,7 @@ import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 
 // Import new route modules
-import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter } from './routes/index.js';
+import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter, teamsEnhancedRouter, workspaceEnhancedRouter, healthRouter } from './routes/index.js';
 // Services
 import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
@@ -57,6 +57,10 @@ import { addDebugEntry, debugLog } from './services/logger.js';
 import { wsClients, broadcastStatus } from './services/broadcast-util.js';
 import { OpenAIProxy } from './services/openai-proxy.js';
 import { getFullStatus } from './services/lmstudio-status.js';
+
+// New Improvements: Middleware and Error Handling (Improvements #5, #13)
+import { errorHandler, notFoundHandler } from './middleware/error-handler.js';
+import { requestIdMiddleware } from './middleware/request-id.js';
 
 // Export addDebugEntry for external use if needed (e.g., within tool implementations)
 export { addDebugEntry };
@@ -86,6 +90,7 @@ app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(express.json()); // Parse JSON request bodies
 app.use(tracingMiddleware); // Middleware for distributed tracing
 app.use(loggingMiddleware); // Enhanced logging for requests and responses
+app.use(requestIdMiddleware); // Request ID tracking (Improvement #13)
 
 /**
  * General request logging middleware.
@@ -193,11 +198,21 @@ app.use('/api', apiBridgeRouter);
 app.use('/api', teamRouter);
 app.use('/api/git', gitRouter);
 
+// --- Enhanced Routes (Improvements #2, #3, #11) ---
+app.use('/api', teamsEnhancedRouter); // Full Teams API with 12 endpoints
+app.use('/api', workspaceEnhancedRouter); // Enhanced Workspace with git integration
+app.use(healthRouter); // Health check endpoints (/health, /ready)
+
 // --- Shared Proxy Routes ---
 // These routes act as a proxy for OpenAI-compatible API calls, forwarding requests
 // to the configured LLM provider (e.g., OpenAI, LM Studio).
 app.post('/chat/completions', OpenAIProxy.proxyToOpenAI);
 app.post('/v1/chat/completions', OpenAIProxy.proxyToOpenAI);
+
+// --- Error Handlers (Improvement #5) ---
+// MUST be after all routes
+app.use(notFoundHandler); // Handle 404 errors
+app.use(errorHandler); // Global error handler
 
 // --- Service Initializations ---
 // Initialize notification service with the WebSocket server instance

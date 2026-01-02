@@ -149,6 +149,149 @@ class WorkspaceService {
 
     return { success: true };
   }
+
+  /**
+   * Get git repository status for current workspace
+   */
+  async getGitStatus(): Promise<{
+    isClean: boolean;
+    branch: string;
+    hasUncommittedChanges: boolean;
+    modifiedFiles: string[];
+  }> {
+    const { execSync } = await import('child_process');
+    const cwd = this.getCurrentWorkspace();
+
+    try {
+      // Check if it's a git repo
+      execSync('git rev-parse --is-inside-work-tree', { cwd, stdio: 'ignore' });
+
+      // Get branch
+      const branch = execSync('git branch --show-current', { cwd, encoding: 'utf-8' }).trim();
+
+      // Get status
+      const status = execSync('git status --porcelain', { cwd, encoding: 'utf-8' });
+      const modifiedFiles = status
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => line.substring(3).trim());
+
+      const hasChanges = modifiedFiles.length > 0;
+
+      return {
+        isClean: !hasChanges,
+        branch,
+        hasUncommittedChanges: hasChanges,
+        modifiedFiles
+      };
+    } catch (e) {
+      // Not a git repo or git not available
+      return {
+        isClean: true,
+        branch: '',
+        hasUncommittedChanges: false,
+        modifiedFiles: []
+      };
+    }
+  }
+
+  /**
+   * Generate project hash from path (for scoping data)
+   */
+  getProjectHash(projectPath: string): string {
+    const crypto = require('crypto');
+    return crypto.createHash('md5').update(projectPath).digest('hex').substring(0, 12);
+  }
+
+  /**
+   * Validate if an operation is allowed (safe mode enforcement)
+   */
+  async validateOperation(operation: 'read' | 'write', filePath: string): Promise<{
+    allowed: boolean;
+    reason?: string;
+  }> {
+    // Read operations always allowed
+    if (operation === 'read') {
+      return { allowed: true };
+    }
+
+    // Check safe mode
+    if (!this.isSafeMode()) {
+      return { allowed: true };
+    }
+
+    // In safe mode, check git status
+    const gitStatus = await this.getGitStatus();
+
+    if (gitStatus.hasUncommittedChanges) {
+      return {
+        allowed: false,
+        reason: 'Safe mode is active: repository has uncommitted changes. Please commit or stash changes first.'
+      };
+    }
+
+    return { allowed: true };
+  }
+
+  /**
+   * Get project metadata for current workspace
+   */
+  getProjectMetadata(hash?: string): Record<string, any> {
+    const projectHash = hash || this.getProjectHash(this.getCurrentWorkspace());
+    const metadataPath = path.join(__dirname, `../../data/projects/${projectHash}/metadata.json`);
+
+    try {
+      if (fs.existsSync(metadataPath)) {
+        return JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+      }
+    } catch (e) {
+      console.error('[WorkspaceService] Failed to load metadata:', e);
+    }
+
+    return {};
+  }
+
+  /**
+   * Set project metadata
+   */
+  setProjectMetadata(key: string, value: any, hash?: string): void {
+    const projectHash = hash || this.getProjectHash(this.getCurrentWorkspace());
+    const projectDir = path.join(__dirname, `../../data/projects/${projectHash}`);
+    const metadataPath = path.join(projectDir, 'metadata.json');
+
+    try {
+      fs.ensureDirSync(projectDir);
+
+      let metadata = {};
+      if (fs.existsSync(metadataPath)) {
+        metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+      }
+
+      (metadata as any)[key] = value;
+
+      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+    } catch (e) {
+      console.error('[WorkspaceService] Failed to save metadata:', e);
+    }
+  }
+
+  /**
+   * Refresh workspace state (re-check git status, update safe mode)
+   */
+  async refreshWorkspace(): Promise<void> {
+    const gitStatus = await this.getGitStatus();
+
+    // Auto-enable safe mode if repo is dirty
+    if (gitStatus.hasUncommittedChanges && !this.isSafeMode()) {
+      console.log('[WorkspaceService] Uncommitted changes detected, enabling safe mode');
+      this.setSafeMode(true);
+    }
+    // Auto-disable if repo is clean and safe mode is on
+    else if (!gitStatus.hasUncommittedChanges && this.isSafeMode()) {
+      console.log('[WorkspaceService] Repository clean, safe mode can be disabled');
+      // Don't auto-disable - let user control this
+    }
+  }
 }
 
 /**

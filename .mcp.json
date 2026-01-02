@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "summy": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "tsx",
+        "C:/Users/Jerome/Documents/Projects/Summy/mcp-server/src/server.ts"
+      ],
+      "env": {}
+    }
+  }
+}

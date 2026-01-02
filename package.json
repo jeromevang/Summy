@@ -29,6 +29,16 @@
     "install:all": "npm install",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:functional": "cd tests && node run-all-tests.mjs",
+    "test:rag": "vitest run tests/functional/rag-server.test.mjs",
+    "test:mcp": "vitest run tests/functional/mcp-server.test.mjs",
+    "test:workspace": "vitest run tests/functional/workspace-management.test.mjs",
+    "test:team": "vitest run tests/functional/team-builder.test.mjs",
+    "test:learning": "vitest run tests/functional/learning-system.test.mjs",
+    "test:ws": "vitest run tests/functional/websocket.test.mjs",
+    "test:e2e": "node test-comprehensive.mjs",
+    "test:all": "npm test && npm run test:functional && npm run test:e2e",
+    "test:coverage": "vitest run --coverage",
     "postinstall": "cd mcp-server && npx playwright install chromium"
   },
   "keywords": [

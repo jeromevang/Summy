@@ -14,3 +14,10 @@ export { apiBridgeRouter } from './api-bridge.js';
 export { teamRouter } from './team.js';
 export { gitRouter } from './git.js';
 
+// Enhanced Routes (Improvement #2 and #3)
+export { teamsEnhancedRouter } from './teams-enhanced.js';
+export { workspaceEnhancedRouter } from './workspace-enhanced.js';
+
+// Health Check Routes (Improvement #11)
+export { healthRouter } from './health.js';
+
