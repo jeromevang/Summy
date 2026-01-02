@@ -39,6 +39,7 @@
     "test:e2e": "node test-comprehensive.mjs",
     "test:all": "npm test && npm run test:functional && npm run test:e2e",
     "test:coverage": "vitest run --coverage",
+    "verify:context": "node verify-context-reduction.mjs",
     "postinstall": "cd mcp-server && npx playwright install chromium"
   },
   "keywords": [
@@ -52,6 +53,7 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.2.1",
+    "playwright": "^1.57.0",
     "puppeteer": "^24.33.1",
     "vitest": "^4.0.16"
   },

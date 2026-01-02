@@ -18,6 +18,9 @@ importers:
       concurrently:
         specifier: ^9.2.1
         version: 9.2.1
+      playwright:
+        specifier: ^1.57.0
+        version: 1.57.0
       puppeteer:
         specifier: ^24.33.1
         version: 24.34.0(typescript@5.9.3)
