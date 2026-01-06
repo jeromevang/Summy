@@ -485,7 +485,7 @@ export function getFileInterface(filePath: string): {
 } {
   const ragDb = getRAGDatabase();
   const fileInterface = ragDb.getFileInterface(filePath);
-  const dependents = ragDb.getFileDependents(filePath).map(d => d.fromFile);
+  const dependents = ragDb.getFileDependents(filePath).map((d: FileDependency) => d.fromFile);
   
   return {
     ...fileInterface,
@@ -509,7 +509,7 @@ export function getCallGraph(symbolName: string, filePath?: string): {
   
   // If filePath provided, filter to that file
   if (filePath && symbols.length > 0) {
-    const filtered = symbols.find(s => s.filePath === filePath || s.filePath.includes(filePath));
+    const filtered = symbols.find((s: CodeSymbol) => s.filePath === filePath || s.filePath.includes(filePath));
     if (filtered) targetSymbol = filtered;
   }
   

@@ -41,10 +41,22 @@ function parseArgs(): CliArgs {
         parsed.mode = 'content';
         break;
       case '--skip-last':
-        parsed.skipLast = parseInt(args[++i], 10);
+        i++;
+        {
+          const value = args[i];
+          if (value) {
+            parsed.skipLast = parseInt(value, 10);
+          }
+        }
         break;
       case '--target-tokens':
-        parsed.targetTokens = parseInt(args[++i], 10);
+        i++;
+        {
+          const value = args[i];
+          if (value) {
+            parsed.targetTokens = parseInt(value, 10);
+          }
+        }
         break;
       case '--json':
         parsed.json = true;

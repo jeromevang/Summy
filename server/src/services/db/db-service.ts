@@ -9,17 +9,17 @@ import { addDebugEntry } from '../logger.js';
 
 // Re-export common operations for convenience
 export const db = {
-  query: (..._args: any[]) => DatabaseOperations.query(..._args),
-  get: (..._args: any[]) => DatabaseOperations.get(..._args),
-  insert: (..._args: any[]) => DatabaseOperations.insert(..._args),
-  update: (..._args: any[]) => DatabaseOperations.update(..._args),
-  delete: (..._args: any[]) => DatabaseOperations.delete(..._args),
-  transaction: (..._args: any[]) => DatabaseOperations.transaction(..._args),
-  getTableStats: (..._args: any[]) => DatabaseOperations.getTableStats(..._args),
-  getHealthCheck: (..._args: any[]) => DatabaseOperations.getHealthCheck(..._args),
-  cleanupOldRecords: (..._args: any[]) => DatabaseOperations.cleanupOldRecords(..._args),
-  optimize: (..._args: any[]) => DatabaseOperations.optimize(..._args),
-  getRecentActivity: (..._args: any[]) => DatabaseOperations.getRecentActivity(..._args)
+  query: DatabaseOperations.query.bind(DatabaseOperations),
+  get: DatabaseOperations.get.bind(DatabaseOperations),
+  insert: DatabaseOperations.insert.bind(DatabaseOperations),
+  update: DatabaseOperations.update.bind(DatabaseOperations),
+  delete: DatabaseOperations.delete.bind(DatabaseOperations),
+  transaction: DatabaseOperations.transaction.bind(DatabaseOperations),
+  getTableStats: DatabaseOperations.getTableStats.bind(DatabaseOperations),
+  getHealthCheck: DatabaseOperations.getHealthCheck.bind(DatabaseOperations),
+  cleanupOldRecords: DatabaseOperations.cleanupOldRecords.bind(DatabaseOperations),
+  optimize: DatabaseOperations.optimize.bind(DatabaseOperations),
+  getRecentActivity: DatabaseOperations.getRecentActivity.bind(DatabaseOperations)
 };
 
 // Re-export connection manager

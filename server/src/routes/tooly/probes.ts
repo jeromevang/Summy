@@ -22,7 +22,7 @@ const SETTINGS_FILE = path.join(__dirname, '../../../settings.json');
  */
 router.post('/models/:modelId/probe', expensiveOperationRateLimit, validateProbeExecution, async (req, res) => {
   try {
-    const modelId = sanitizeInput(decodeURIComponent(req.params.modelId));
+    const modelId = sanitizeInput(decodeURIComponent(req.params.modelId || ''));
     const body = sanitizeInput(req.body || {});
     const provider = body.provider || 'lmstudio';
     const runLatencyProfile = body.runLatencyProfile || false;

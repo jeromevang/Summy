@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+// @ts-ignore - database package doesn't emit declarations properly
 import { FileSplitter } from "@summy/database";
 import { textResult, errorResult } from "../utils/helpers.js";
 import { resolvePath, isPathInProject } from "../utils/fs.js";

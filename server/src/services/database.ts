@@ -67,7 +67,7 @@ export class DatabaseService {
   /** @see DBNotifications.deleteNotification */
   deleteNotification!: (id: string) => void;
   /** @see DBNotifications.clearAllNotifications */
-  clearAllNotificationsread!: () => void;
+  clearAllNotifications!: () => void;
 
   /** @see DBContext.createContextSession */
   createContextSession!: (session: Omit<ContextSessionDB, "createdAt" | "updatedAt" | "turns" | "summary" | "compression">) => ContextSessionDB;
@@ -139,17 +139,17 @@ export class DatabaseService {
   /** @see DBComboTests.getAllComboResults */
   getAllComboResults!: () => ComboTestRecord[];
   /** @see DBComboTests.getComboResult */
-  getComboResult: (mainModelId: string, executorModelId: string) => ComboTestRecord | null;
+  getComboResult!: (mainModelId: string, executorModelId: string) => ComboTestRecord | null;
   /** @see DBComboTests.getResultsForMainModel */
-  getResultsForMainModel: (mainModelId: string) => ComboTestRecord[];
+  getResultsForMainModel!: (mainModelId: string) => ComboTestRecord[];
   /** @see DBComboTests.getResultsForExecutorModel */
-  getResultsForExecutorModel: (executorModelId: string) => ComboTestRecord[];
+  getResultsForExecutorModel!: (executorModelId: string) => ComboTestRecord[];
   /** @see DBComboTests.getTopCombos */
-  getTopCombos: (limit?: number) => ComboTestRecord[];
+  getTopCombos!: (limit?: number) => ComboTestRecord[];
   /** @see DBComboTests.deleteComboResult */
-  deleteComboResult: (mainModelId: string, executorModelId: string) => void;
+  deleteComboResult!: (mainModelId: string, executorModelId: string) => void;
   /** @see DBComboTests.clearAllComboResults */
-  clearAllComboResults: () => number;
+  clearAllComboResults!: () => number;
 
   /**
    * Initializes the DatabaseService by creating instances of all sub-database services.
@@ -203,24 +203,27 @@ export class DatabaseService {
     } else {
       // Fallback methods
       this.recordAnalytics = () => {};
-      this.getAnalyticsSummary = () => ({});
-      this.logExecution = () => {};
+      this.getAnalyticsSummary = () => ({
+        totalRequests: 0,
+        tokensOriginal: 0,
+        tokensCompressed: 0,
+        tokensSaved: 0,
+        toolExecutions: 0,
+        toolSuccessRate: 0,
+        dailyActivity: [],
+        toolUsageStats: [],
+        toolUsage: []
+      });
+      this.logExecution = () => '';
       this.getExecutionLogs = () => [];
       this.getExecutionLog = () => null;
-      this.createBackup = () => ({});
+      this.createBackup = () => '';
 
       // Add fallbacks for all other methods
       this.getNotifications = () => [];
-      this.addNotification = () => {};
+      this.addNotification = () => '';
       this.markNotificationRead = () => {};
       this.deleteNotification = () => {};
-      this.getContextData = () => null;
-      this.saveContextData = () => {};
-      this.deleteContextData = () => {};
-      this.getConfig = () => ({});
-      this.setConfig = () => {};
-      this.getComboTestResults = () => [];
-      this.saveComboTestResult = () => {};
       this.deleteComboResult = () => {};
       this.clearAllComboResults = () => 0;
     }
@@ -276,10 +279,10 @@ export class DatabaseService {
 
     // Context Helpers
     if (this.context) {
-      this.getSystemPrompt = this.context.getSystemPrompt.bind(this.context);
-      this.getToolSet = this.context.getToolSet.bind(this.context);
-      this.getOrCreateSystemPrompt = this.context.getOrCreateSystemPrompt.bind(this.context);
-      this.getOrCreateToolSet = this.context.getOrCreateToolSet.bind(this.context);
+      this.getSystemPrompt = (this.context as any).getSystemPrompt?.bind(this.context) || (() => null);
+      this.getToolSet = (this.context as any).getToolSet?.bind(this.context) || (() => null);
+      this.getOrCreateSystemPrompt = (this.context as any).getOrCreateSystemPrompt?.bind(this.context) || (() => '');
+      this.getOrCreateToolSet = (this.context as any).getOrCreateToolSet?.bind(this.context) || (() => '');
     }
 
     // Combo Tests

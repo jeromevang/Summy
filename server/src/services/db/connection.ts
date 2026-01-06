@@ -160,7 +160,7 @@ export class DatabaseManager {
 
     try {
       const backup = new Database(targetPath);
-      this.db.backup(backup);
+      (this.db as any).backup(backup);
       backup.close();
       addDebugEntry('session', `Database backed up to ${targetPath}`);
     } catch (error) {

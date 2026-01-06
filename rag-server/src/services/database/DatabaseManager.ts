@@ -4,7 +4,7 @@ import fs from 'fs';
 import { ChunkRepository } from './ChunkRepository.js';
 import { SymbolRepository } from './SymbolRepository.js';
 import { RelationshipRepository } from './RelationshipRepository.js';
-import { IndexStatus, IndexMetric } from './types.js';
+import { IndexStatus, IndexMetric, CodeSymbol, FileDependency } from './types.js';
 
 export class RAGDatabase {
   private db: Database.Database;
@@ -46,6 +46,99 @@ export class RAGDatabase {
 
   clearAll(): void {
     this.db.exec('DELETE FROM chunks; DELETE FROM file_summaries; DELETE FROM metrics; DELETE FROM index_status; DELETE FROM modules; DELETE FROM symbols; DELETE FROM relationships; DELETE FROM file_dependencies;');
+  }
+
+  searchSymbols(query: string, options?: { type?: string; exported?: boolean; limit?: number }): CodeSymbol[] {
+    return this.symbols.searchSymbols(query, options as any);
+  }
+
+  getCallGraph(symbolId: string): { callers: CodeSymbol[]; callees: CodeSymbol[] } {
+    const callerRels = this.db.prepare(
+      'SELECT * FROM relationships WHERE target_id = ? AND relation_type = ?'
+    ).all(symbolId, 'calls') as any[];
+
+    const calleeRels = this.db.prepare(
+      'SELECT * FROM relationships WHERE source_id = ? AND relation_type = ?'
+    ).all(symbolId, 'calls') as any[];
+
+    const callers = callerRels
+      .map(rel => this.symbols.getSymbol(rel.source_id))
+      .filter((s): s is CodeSymbol => s !== null);
+    const callees = calleeRels
+      .map(rel => this.symbols.getSymbol(rel.target_id))
+      .filter((s): s is CodeSymbol => s !== null);
+
+    return { callers, callees };
+  }
+
+  getFileDependencies(filePath: string): FileDependency[] {
+    const rows = this.db.prepare(
+      'SELECT * FROM file_dependencies WHERE from_file = ?'
+    ).all(filePath) as any[];
+
+    return rows.map(row => ({
+      id: row.id,
+      fromFile: row.from_file,
+      toFile: row.to_file,
+      importType: row.import_type,
+      importedSymbols: JSON.parse(row.imported_symbols || '[]'),
+      isExternal: row.is_external === 1,
+      createdAt: row.created_at
+    }));
+  }
+
+  getFileDependents(filePath: string): FileDependency[] {
+    const rows = this.db.prepare(
+      'SELECT * FROM file_dependencies WHERE to_file = ?'
+    ).all(filePath) as any[];
+
+    return rows.map(row => ({
+      id: row.id,
+      fromFile: row.from_file,
+      toFile: row.to_file,
+      importType: row.import_type,
+      importedSymbols: JSON.parse(row.imported_symbols || '[]'),
+      isExternal: row.is_external === 1,
+      createdAt: row.created_at
+    }));
+  }
+
+  getExportedSymbols(filePath: string): CodeSymbol[] {
+    const rows = this.db.prepare(
+      'SELECT * FROM symbols WHERE file_path = ? AND is_exported = 1'
+    ).all(filePath) as any[];
+
+    return rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      qualifiedName: row.qualified_name,
+      type: row.type,
+      filePath: row.file_path,
+      startLine: row.start_line,
+      endLine: row.end_line,
+      signature: row.signature,
+      docComment: row.doc_comment,
+      visibility: row.visibility || 'public',
+      isExported: row.is_exported === 1,
+      isAsync: row.is_async === 1,
+      isStatic: row.is_static === 1,
+      parentSymbolId: row.parent_symbol_id,
+      chunkId: row.chunk_id,
+      language: row.language,
+      createdAt: row.created_at
+    }));
+  }
+
+  getFileInterface(filePath: string): { exports: CodeSymbol[]; imports: { from: string; symbols: string[] }[] } {
+    const exports = this.getExportedSymbols(filePath);
+    const deps = this.getFileDependencies(filePath);
+
+    const imports = deps.map(dep => ({
+      from: dep.toFile,
+      symbols: dep.importedSymbols
+    }));
+
+    return { exports, imports };
   }
 
   close(): void { this.db.close(); }

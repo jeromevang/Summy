@@ -4,6 +4,9 @@
  */
 
 import Database from 'better-sqlite3';
+import path from 'path';
+import fs from 'fs-extra';
+import { DB_PATH } from './db-base.js';
 // Database schema SQL
 export const SCHEMA_SQL = `
 -- Sessions
@@ -375,8 +378,8 @@ export function initializeDatabase(db: Database.Database): void {
   
   // Insert default settings if needed
   const stmt = db.prepare('SELECT COUNT(*) as count FROM system_settings WHERE key = ?');
-  const count = stmt.get('initialized');
-  
+  const count = stmt.get('initialized') as any;
+
   if (!count || count.count === 0) {
     const insertStmt = db.prepare('INSERT INTO system_settings (key, value) VALUES (?, ?)');
     insertStmt.run('initialized', 'true');

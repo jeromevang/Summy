@@ -104,12 +104,14 @@ class LMStudioModelManager {
       } else {
         // Track the first loaded model (we support one at a time for now)
         const first = loadedModels[0];
-        this.loadedModel = {
-          modelId: first.path || first.identifier,
-          contextSize: 0, // Unknown from API
-          loadedAt: new Date()
-        };
-        console.log(`[ModelManager] Synced: Found ${loadedModels.length} LLM model(s), tracking ${first.identifier}`);
+        if (first) {
+          this.loadedModel = {
+            modelId: first.path || first.identifier,
+            contextSize: 0, // Unknown from API
+            loadedAt: new Date()
+          };
+          console.log(`[ModelManager] Synced: Found ${loadedModels.length} LLM model(s), tracking ${first.identifier}`);
+        }
       }
     } catch (error: any) {
       console.log(`[ModelManager] Could not sync state: ${error.message}`);

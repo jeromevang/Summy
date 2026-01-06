@@ -265,10 +265,12 @@ export function mapToolCall(
   // Check browser tools first (for Cursor)
   if (mapping.browserTools && ideToolName in mapping.browserTools) {
     const browserMapping = mapping.browserTools[ideToolName];
-    return {
-      mcpTool: browserMapping.mcp,
-      mcpParams: ideParams  // Browser tools use same params
-    };
+    if (browserMapping) {
+      return {
+        mcpTool: browserMapping.mcp,
+        mcpParams: ideParams  // Browser tools use same params
+      };
+    }
   }
 
   // Check regular mappings

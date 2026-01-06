@@ -72,8 +72,8 @@ export class TeamServiceEnhanced {
       executor: team.executor ? JSON.stringify(team.executor) : null,
       specialists: JSON.stringify(team.specialists),
       isActive: team.isActive,
-      createdAt: Math.floor(team.createdAt.getTime() / 1000),
-      updatedAt: Math.floor(now.getTime() / 1000)
+      createdAt: team.createdAt,
+      updatedAt: now
     });
 
     return team;
@@ -96,13 +96,10 @@ export class TeamServiceEnhanced {
    * List all teams, optionally filtered by project
    */
   async listTeams(projectHash?: string): Promise<Team[]> {
-    let query = db.select().from(teams);
+    const results = projectHash
+      ? await db.select().from(teams).where(eq(teams.projectHash, projectHash))
+      : await db.select().from(teams);
 
-    if (projectHash) {
-      query = query.where(eq(teams.projectHash, projectHash));
-    }
-
-    const results = await query;
     return results.map(r => this.rowToTeam(r));
   }
 
@@ -122,7 +119,7 @@ export class TeamServiceEnhanced {
 
     const now = new Date();
     const updateData: any = {
-      updatedAt: Math.floor(now.getTime() / 1000)
+      updatedAt: now
     };
 
     if (updates.name) updateData.name = updates.name;
@@ -161,7 +158,7 @@ export class TeamServiceEnhanced {
 
     // Activate this one
     await db.update(teams)
-      .set({ isActive: true, updatedAt: Math.floor(Date.now() / 1000) })
+      .set({ isActive: true, updatedAt: new Date() })
       .where(eq(teams.id, id));
   }
 
@@ -170,7 +167,7 @@ export class TeamServiceEnhanced {
    */
   async deactivateTeam(id: string): Promise<void> {
     await db.update(teams)
-      .set({ isActive: false, updatedAt: Math.floor(Date.now() / 1000) })
+      .set({ isActive: false, updatedAt: new Date() })
       .where(eq(teams.id, id));
   }
 
@@ -212,7 +209,7 @@ export class TeamServiceEnhanced {
     await db.update(teams)
       .set({
         specialists: JSON.stringify(team.specialists),
-        updatedAt: Math.floor(Date.now() / 1000)
+        updatedAt: new Date()
       })
       .where(eq(teams.id, teamId));
 
@@ -233,7 +230,7 @@ export class TeamServiceEnhanced {
     await db.update(teams)
       .set({
         specialists: JSON.stringify(team.specialists),
-        updatedAt: Math.floor(Date.now() / 1000)
+        updatedAt: new Date()
       })
       .where(eq(teams.id, teamId));
 
@@ -278,7 +275,7 @@ export class TeamServiceEnhanced {
    */
   private async deactivateAll(projectHash: string): Promise<void> {
     await db.update(teams)
-      .set({ isActive: false, updatedAt: Math.floor(Date.now() / 1000) })
+      .set({ isActive: false, updatedAt: new Date() })
       .where(eq(teams.projectHash, projectHash));
   }
 

@@ -210,8 +210,11 @@ export function semanticMatchTools(discoveredTools: string[], mcpTools: string[]
     for (const nativeTool of discoveredTools) {
         if (mcpTools.includes(nativeTool)) continue;
         const match = findBestMatch(nativeTool, mcpTools);
-        if (match && match.confidence >= 50 && match.tool && aliases[match.tool]) {
-            aliases[match.tool].push(nativeTool);
+        if (match && match.confidence >= 50 && match.tool) {
+            const toolName = match.tool;
+            if (aliases[toolName]) {
+                aliases[toolName].push(nativeTool);
+            }
         }
     }
     return aliases;

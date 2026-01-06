@@ -1,10 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { execSync } from "child_process";
 import { textResult, errorResult } from "../utils/helpers.js";
-import { resolvePath } from "../utils/fs.js";
+import { resolvePath, isPathInProject } from "../utils/fs.js";
 
 const projectRoot = process.cwd();
 const MEMORY_FILE = path.join(projectRoot, 'data', 'memory.json');

@@ -117,8 +117,9 @@ router.get('/models/:modelId', async (req, res) => {
         contextLength: 4096,
         role: 'none' as const,
         probeResults: undefined,
-        systemPrompt: '',
-        scoreBreakdown: {
+        systemPrompt: ''
+      } as any;
+      (profile as any).scoreBreakdown = {
           ragScore: 0,
           bugDetectionScore: 0,
           architecturalScore: 0,
@@ -128,8 +129,7 @@ router.get('/models/:modelId', async (req, res) => {
           reasoningScore: 0,
           intentScore: 0,
           overallScore: 0
-        }
-      };
+        };
     }
 
     let maxContextLength: number | undefined;

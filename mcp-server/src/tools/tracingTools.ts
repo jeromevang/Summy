@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { textResult, errorResult } from "../utils/helpers.js";
+// @ts-ignore - database package doesn't emit declarations properly
 import { codeIndexService } from "@summy/database";
 
 export function registerTracingTools(server: McpServer) {

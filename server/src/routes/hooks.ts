@@ -48,17 +48,17 @@ router.get('/activity', (req: Request, res: Response) => {
  * GET /api/hooks/stats
  * Get hook execution statistics
  */
-router.get('/stats', (req: Request, res: Response) => {
+router.get('/stats', (_req: Request, res: Response) => {
   try {
     const stats = getHookStats();
 
-    res.json({
+    return res.json({
       success: true,
       stats
     });
   } catch (error) {
     console.error('[Hooks API] Error fetching stats:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to fetch hook statistics'
     });
@@ -69,18 +69,18 @@ router.get('/stats', (req: Request, res: Response) => {
  * GET /api/hooks/active
  * Get currently running hooks
  */
-router.get('/active', (req: Request, res: Response) => {
+router.get('/active', (_req: Request, res: Response) => {
   try {
     const active = getActiveExecutions();
 
-    res.json({
+    return res.json({
       success: true,
       active,
       count: active.length
     });
   } catch (error) {
     console.error('[Hooks API] Error fetching active hooks:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to fetch active hooks'
     });
@@ -93,7 +93,15 @@ router.get('/active', (req: Request, res: Response) => {
  */
 router.get('/:id', (req: Request, res: Response) => {
   try {
-    const execution = getExecution(req.params.id);
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Hook ID is required'
+      });
+    }
+
+    const execution = getExecution(id);
 
     if (!execution) {
       return res.status(404).json({
@@ -102,13 +110,13 @@ router.get('/:id', (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       execution
     });
   } catch (error) {
     console.error('[Hooks API] Error fetching execution:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to fetch hook execution'
     });
@@ -140,13 +148,13 @@ router.post('/log-start', (req: Request, res: Response) => {
       messageCount
     });
 
-    res.json({
+    return res.json({
       success: true,
       id
     });
   } catch (error) {
     console.error('[Hooks API] Error logging start:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to log hook start'
     });
@@ -177,12 +185,12 @@ router.post('/log-complete', (req: Request, res: Response) => {
       cliTime
     });
 
-    res.json({
+    return res.json({
       success: true
     });
   } catch (error) {
     console.error('[Hooks API] Error logging completion:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to log hook completion'
     });
@@ -206,12 +214,12 @@ router.post('/log-error', (req: Request, res: Response) => {
 
     logHookError(id, error || 'Unknown error');
 
-    res.json({
+    return res.json({
       success: true
     });
   } catch (error) {
     console.error('[Hooks API] Error logging error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to log hook error'
     });
@@ -226,17 +234,17 @@ router.post('/log-error', (req: Request, res: Response) => {
  * DELETE /api/hooks/history
  * Clear hook execution history
  */
-router.delete('/history', (req: Request, res: Response) => {
+router.delete('/history', (_req: Request, res: Response) => {
   try {
     clearHistory();
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Hook history cleared'
     });
   } catch (error) {
     console.error('[Hooks API] Error clearing history:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Failed to clear history'
     });

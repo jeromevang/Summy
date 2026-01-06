@@ -361,7 +361,7 @@ export class DBContext extends DBBase {
             ide: row.ide,
             ideMapping: row.ide_mapping,
             systemPromptId: row.system_prompt_id,
-            systemPrompt: row.system_prompt_id ? this.getSystemPrompt(row.system_prompt_id) || undefined : undefined,
+            systemPrompt: row.system_prompt_id ? (this.getSystemPrompt(row.system_prompt_id) as any) || undefined : undefined,
             createdAt: row.created_at,
             updatedAt: row.updated_at,
             turns: []
