@@ -41,7 +41,7 @@ import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 
 // Import new route modules
-import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, mcpRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter, teamsEnhancedRouter, workspaceEnhancedRouter, healthRouter, hooksRouter } from './routes/index.js';
+import { toolyRoutes, notificationsRoutes, analyticsRoutes, ragRoutes, sessionsRoutes, systemRoutes, mcpRoutes, workspaceRouter, apiBridgeRouter, teamRouter, gitRouter, teamsEnhancedRouter, workspaceEnhancedRouter, healthRouter, hooksRouter, compressionSessionsRouter } from './routes/index.js';
 // Services
 import { notifications } from './services/notifications.js';
 import { scheduleBackupCleanup } from './modules/tooly/rollback.js';
@@ -200,6 +200,7 @@ app.use('/api', apiBridgeRouter);
 app.use('/api', teamRouter);
 app.use('/api/git', gitRouter);
 app.use('/api/hooks', hooksRouter);
+app.use('/api/compression-sessions', compressionSessionsRouter);
 
 // --- Enhanced Routes (Improvements #2, #3, #11) ---
 app.use('/api', teamsEnhancedRouter); // Full Teams API with 12 endpoints

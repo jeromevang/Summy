@@ -1,7 +1,7 @@
 import { ModelProfile } from '../types.js';
 import { ContextBudget } from '../types.js';
 import { DEFAULT_CONTEXT_BUDGET } from '../orchestrator/mcp-orchestrator.js';
-import { analytics } from '@services/analytics'; // To estimate tokens
+import { analytics } from '../../../services/analytics.js'; // To estimate tokens
 
 export class ContextBudgetManager {
     private contextBudget: ContextBudget;

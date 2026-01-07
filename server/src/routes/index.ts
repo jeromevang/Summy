@@ -25,3 +25,6 @@ export { healthRouter } from './health.js';
 // Hook Monitoring Routes
 export { default as hooksRouter } from './hooks.js';
 
+// Compression Sessions Routes (Smart Context Compression)
+export { default as compressionSessionsRouter } from './compression-sessions.js';
+

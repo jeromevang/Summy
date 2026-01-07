@@ -46,3 +46,39 @@ export interface Turn {
   content: string;
   toolCalls?: any[];
 }
+
+// Imports from Smart Compression System
+export {
+  MessageAnalyzer,
+  getMessageAnalyzer,
+  type MessageScore,
+  type MessageType,
+  type AnalysisConfig,
+  type BatchAnalysisResult
+} from './message-analyzer.js';
+
+export {
+  SmartCompressor,
+  getSmartCompressor,
+  validateCompressionResult,
+  compareCompressionResults,
+  type CompressionAction,
+  type CompressionMode,
+  type CompressionDecision,
+  type CompressionStats,
+  type CompressedMessage,
+  type CompressionResult,
+  type CompressionConfig
+} from './smart-compressor.js';
+
+export {
+  RAGCompressor,
+  getRAGCompressor,
+  mergeScores,
+  calculateSemanticDiversity,
+  generateSemanticReport,
+  type RAGConfig,
+  type SimilarityMatch,
+  type RAGEnhancedScore,
+  type SemanticCluster
+} from './rag-compressor.js';

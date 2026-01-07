@@ -132,3 +132,44 @@ export const testResults = sqliteTable('test_results', {
   testTypeIdx: index('idx_test_results_test_type').on(table.testType),
   timestampIdx: index('idx_test_results_timestamp').on(table.timestamp),
 }));
+
+/**
+ * Compression Sessions - Smart context compression tracking
+ */
+export const compressionSessions = sqliteTable('compression_sessions', {
+  id: text('id').primaryKey(),
+  claudeSessionId: text('claude_session_id').unique(), // Map to Claude Code session
+  transcriptHash: text('transcript_hash').notNull(),  // Hash of original transcript
+  uncompressedData: text('uncompressed_data').notNull(), // JSONL original
+  compressedData: text('compressed_data'),           // JSONL compressed (null if disabled)
+  compressionEnabled: integer('compression_enabled', { mode: 'boolean' }).default(true),
+  compressionMode: text('compression_mode').default('conservative'), // 'conservative' | 'aggressive' | 'context-aware'
+  llmProvider: text('llm_provider').default('lmstudio'), // 'lmstudio' | 'claude'
+  useRAG: integer('use_rag', { mode: 'boolean' }).default(false), // Use RAG for semantic deduplication
+  decisions: text('decisions', { mode: 'json' }),    // MessageDecision[]
+  stats: text('stats', { mode: 'json' }),            // CompressionStats
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`)
+}, (table) => ({
+  claudeIdIdx: index('idx_compression_sessions_claude_id').on(table.claudeSessionId),
+  enabledIdx: index('idx_compression_sessions_enabled').on(table.compressionEnabled),
+}));
+
+/**
+ * Compression Turns - Turn-by-turn compression history
+ */
+export const compressionTurns = sqliteTable('compression_turns', {
+  id: text('id').primaryKey(),
+  sessionId: text('session_id').notNull().references(() => compressionSessions.id),
+  turnNumber: integer('turn_number').notNull(),
+  messageCount: integer('message_count').notNull(),
+  uncompressedSnapshot: text('uncompressed_snapshot').notNull(), // JSONL at this turn
+  compressedSnapshot: text('compressed_snapshot').notNull(),     // JSONL after compression
+  decisions: text('decisions', { mode: 'json' }),                // MessageDecision[] for this turn
+  stats: text('stats', { mode: 'json' }),                        // CompressionStats for this turn
+  triggerReason: text('trigger_reason'),                         // 'threshold_reached' | 'manual' | 'forced'
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`)
+}, (table) => ({
+  sessionIdIdx: index('idx_compression_turns_session').on(table.sessionId, table.turnNumber),
+  createdIdx: index('idx_compression_turns_created').on(table.createdAt),
+}));
